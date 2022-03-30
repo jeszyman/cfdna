@@ -1,3 +1,44 @@
+* MPNST Sequencing Read Pre-processing                              :bioinfo:
+** Setup
+*** Git and github
+#+begin_src bash
+repo=/home/jeszyman/repos/mpnst-preprocessing
+cd $repo
+
+git init
+git add -A 
+git commit -m "first commit"
+
+git remote add origin git@github.com:jeszyman/mpnst-preprocessing.git
+git branch -M master
+git push -u origin master
+#+end_src
+
+*** Docker and singularity - none; use biotools submodule
+** TODO CAPPseq WGS fastq processing                                    :smk:
+:PROPERTIES:
+:header-args:snakemake: :tangle ./workflow/cappseq.smk
+:END:
+- cappseq naming is inconsistent, not suitable for regex. need to work off csv sheet
+
+
+#+begin_src bash
+mkdir -p /mnt/ris/aadel/mpnst/cappseq/rename
+
+ln -s /mnt/ris/aadel/mpnst/cappseq//demultiplexed/new_HiSeq-W44* /mnt/ris/aadel/mpnst/cappseq/rename
+
+rename 's/([^_]+)_([^_]+)_([^_]+)_([^_]+)\.fastq.gz$/$1_$3_$4_$2.fastq.gz/' /mnt/ris/aadel/mpnst/cappseq/rename/*.fastq.gz
+
+mkdir -p /mnt/ris/aadel/mpnst/cappseq/barcode
+
+repo=/home/jeszyman/repos/mpnst-preprocessing
+cd $repo
+
+perl ../cappseq/bin/cp-fastq-extract-auto.pl /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq-W44_Undetermined_R6000324_L004_001_AGGT_R1.fastq.gz \
+     /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq-W44_Undetermined_R6000324_L004_001_AGGT_R1.fastq.gz
+
+
+#+end_src
 - start with multiplexed capp fastqs as inputs
 - to a demulti w/o barcode sheet
 - filter to min file size && expected by manual spreadsheet
@@ -218,13 +259,6 @@ fi
 
 #+end_src
 
-* MPNST Sequencing Read Pre-processing :bioinfo:
-** Setup
-*** Docker and singularity - none; use biotools submodule
-** TODO CAPPseq WGS fastq processing                                    :smk:
-:PROPERTIES:
-:header-args:snakemake: :tangle ./workflow/cappseq.smk
-:END:
 - Take demultiplexed fastqs and extract barcodes.
 - For barcode-extracted fastqs, correct headers for use with bwa  
   #+begin_src bash

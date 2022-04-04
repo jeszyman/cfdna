@@ -1,5 +1,6 @@
 * MPNST Sequencing Read Pre-processing                              :bioinfo:
 ** Setup
+<<<<<<< HEAD
 *** Git and github
 #+begin_src bash
 repo=/home/jeszyman/repos/mpnst-preprocessing
@@ -14,11 +15,14 @@ git branch -M master
 git push -u origin master
 #+end_src
 
+=======
+>>>>>>> 13100f2e636cf025b3635db5ccf481b075cdf1a5
 *** Docker and singularity - none; use biotools submodule
 ** TODO CAPPseq WGS fastq processing                                    :smk:
 :PROPERTIES:
 :header-args:snakemake: :tangle ./workflow/cappseq.smk
 :END:
+<<<<<<< HEAD
 :LOGBOOK:
 - State "DONE"       from "TODO"       [2022-04-03 Sun 06:40]
 :END:
@@ -139,6 +143,10 @@ find /mnt/ris/aadel/mpnst/inputs/cappseq-fastq -size -500M
 | /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W46_Undetermined_R6000324_L006_R1_001_.fastq.gz        |
 
 #+begin_src bash
+=======
+- Demultiplexing
+  #+begin_src bash
+>>>>>>> 13100f2e636cf025b3635db5ccf481b075cdf1a5
 ## Functions
 cappseq_demultiplex() {
   if [ "$#" -ne 3 ]; then      
@@ -174,9 +182,46 @@ cappseq_demultiplex() {
 
 perl ~/repos/mpnst-preprocessing/src/cp_fastq_demultiplex.pl /mnt/ris/aadel/capp-seq/capp-fastqs/HiSeqW38,39,40,41,42/new_HiSeq42_Undetermined_R6000281_L008_R1_001.fastq.gz /mnt/ris/aadel/mpnst/tmp/demulti 
 #+end_src
+- Barcode extraction
+  #+begin_src bash
+\rm -rf /mnt/ris/aadel/mpnst/cappseq/barcode
+\rm -rf /mnt/ris/aadel/mpnst/cappseq/rename
+\rm -rf /mnt/ris/aadel/mpnst/cappseq/headerfix
+
+mkdir -p /mnt/ris/aadel/mpnst/cappseq/barcode
+mkdir -p /mnt/ris/aadel/mpnst/cappseq/rename
+mkdir -p /mnt/ris/aadel/mpnst/cappseq/headerfix
+
+cp /mnt/ris/aadel/mpnst/cappseq/demultiplexed/new_HiSeq-W44_Undetermined_R6000324_L004_R1_001_AGGT.fastq.gz /mnt/ris/aadel/mpnst/cappseq/rename/            
+
+cp /mnt/ris/aadel/mpnst/cappseq/demultiplexed/new_HiSeq-W44_Undetermined_R6000324_L004_R2_001_AGGT.fastq.gz /mnt/ris/aadel/mpnst/cappseq/rename/            
+
+rename s/\.fastq.gz/_R1.fastq.gz/g /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq-W44_Undetermined_R6000324_L004_R1_001_AGGT.fastq.gz 
+
+rename s/\.fastq.gz/_R2.fastq.gz/g /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq-W44_Undetermined_R6000324_L004_R2_001_AGGT.fastq.gz 
+
+rename s/_R1_/_/g /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq-W44_Undetermined_R6000324_L004_R1_001_AGGT_R1.fastq.gz
+
+rename s/_R2_/_/g /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq-W44_Undetermined_R6000324_L004_R2_001_AGGT_R2.fastq.gz
+
+perl ~/repos/mpnst-preprocessing/src/cp_fastq_extract_auto.pl \
+     /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq-W44_Undetermined_R6000324_L004_001_AGGT_R1.fastq.gz \
+     /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq-W44_Undetermined_R6000324_L004_001_AGGT_R2.fastq.gz
+
+cat /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq-W44_Undetermined_R6000324_L004_001_AGGT_R1.fastq | awk '{if(NR%4==1){print substr($0, 1, length($0)-21)}else{print $0}}' > /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq-W44_Undetermined_R6000324_L004_001_AGGT_headfix_R1.fastq
+
+cat /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq-W44_Undetermined_R6000324_L004_001_AGGT_R2.fastq | awk '{if(NR%4==1){print substr($0, 1, length($0)-21)}else{print $0}}' > /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq-W44_Undetermined_R6000324_L004_001_AGGT_headfix_R2.fastq
+
+pigz -c -p 16 /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq-W44_Undetermined_R6000324_L004_001_AGGT_headfix_R1.fastq
+pigz -c -p 16 /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq-W44_Undetermined_R6000324_L004_001_AGGT_headfix_R1.fastq
 
 
-#+begin_src bash
+
+bwa index \
+    --algoType bwtsw \
+    --prefix /mnt/ris/aadel/mpnst/resources/hg38/hg38
+#+end_src
+  #+begin_src bash
 mkdir -p ~/repos/mpnst-preprocessing/src
 cp ~/repos/mpnst-data/src/cp-fastq-extract-auto.pl ~/repos/mpnst-preprocessing/src/cp_fastq_extract_auto.pl
 
@@ -241,8 +286,11 @@ capp_extract \
 # @E00521:255:H3HJ5CCX2:6:1101:2443:2909:CGTAACAC
 
 #+end_src
+- start with multiplexed capp fastqs as inputs
+- to a demulti w/o barcode sheet
 
 
+<<<<<<< HEAD
 
 | NCI FASTQ | ${data_dir}/inputs | box | MPNST Early Cancer Detection | box_dir | yes | GET |
 
@@ -262,6 +310,8 @@ fi
 
 #+end_src
 
+=======
+>>>>>>> 13100f2e636cf025b3635db5ccf481b075cdf1a5
 - Take demultiplexed fastqs and extract barcodes.
 - For barcode-extracted fastqs, correct headers for use with bwa  
   #+begin_src bash
@@ -325,6 +375,298 @@ if [ -f $(basename -s .gz $2) ]; then mv $(basename -s .gz $2) $3; fi
 # Function
 # Run command
 #+end_src
+** TODO Read QC
+- fastqs too small (< 500 Mb)
+  #+begin_src bash :results replace
+find /mnt/ris/aadel/mpnst/inputs/cappseq-fastq -size -500M
+#+end_src
+  #+RESULTS[09ee8ac249493789a7532cf4ab70bd8cee0f4d35]:
+| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq                                                              |
+| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W46_Undetermined_R6000324_L006_R1_001_TAGC.fastq.gz    |
+| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W48_Undetermined_R6000324_L008_R1_001_CGAT.fastq.gz    |
+| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W48_Undetermined_R6000324_L008_R2_001_CGAT.fastq.gz    |
+| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W45_Undetermined_R6000324_L005_R1_001_TAGC.fastq.gz    |
+| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W44_Undetermined_R6000324_L004_R1_001_ATCG.fastq.gz    |
+| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W46_Undetermined_R6000324_L006_R2_001_GTGT.fastq.gz    |
+| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W45_Undetermined_R6000324_L005_R2_001_GCTA.fastq.gz    |
+| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W44_Undetermined_R6000324_L004_R1_001_TGTG.fastq.gz    |
+| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W47_Undetermined_R6000324_L007_R2_001_GCTA.fastq.gz    |
+| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W45_Undetermined_R6000324_L005_R2_001_CGAT.fastq.gz    |
+| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W46_Undetermined_R6000324_L006_R1_001_AGGT.fastq.gz    |
+| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W47_Undetermined_R6000324_L007_R2_001_TAGC.fastq.gz    |
+| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W47_Undetermined_R6000324_L007_R1_001_TGTG.fastq.gz    |
+| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W46_Undetermined_R6000324_L006_R1_001_TGTG.fastq.gz    |
+| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/new_HiSeq28_Undetermined_R6000204_L006001_AGGT_R1.fastq.gz   |
+| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/new_HiSeq42_Undetermined_R6000281_L008_R2_001_GCTA.fastq.gz  |
+| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/new_HiSeq28_Undetermined_R6000204_L006_R1_001_AGGT.fastq.gz  |
+| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W46_Undetermined_R6000324_L006_R2_001_CACA.fastq.gz    |
+| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W44_Undetermined_R6000324_L004_R1_001_CGAT.fastq.gz    |
+| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/new_HiSeq42_Undetermined_R6000281_L008_R2_001_GTGT.fastq.gz  |
+| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W46_Undetermined_R6000324_L006_R2_001_.fastq.gz        |
+| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W45_Undetermined_R6000324_L005_R1_001_GCTA.fastq.gz    |
+| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/new_HiSeq28_Undetermined_R6000204_L006_R2_001_GTGT.fastq.gz  |
+| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/new_HiSeq28_Undetermined_R6000204_L006001_GTGT_R2.fastq.gz   |
+| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W46_Undetermined_R6000324_L006_R2_001_TGTG.fastq.gz    |
+| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W46_Undetermined_R6000324_L006_R1_001_CGAT.fastq.gz    |
+| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W45_Undetermined_R6000324_L005_R2_001_TAGC.fastq.gz    |
+| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W44_Undetermined_R6000324_L004_R1_001_CTTC.fastq.gz    |
+| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W46_Undetermined_R6000324_L006_R2_001_GCTA.fastq.gz    |
+| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/new_HiSeq-19_L006001_ACAC_R1.fastq.gz                        |
+| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/new_HiSeq28_Undetermined_R6000204_L006_R1_001_GTGT.fastq.gz  |
+| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/new_HiSeqW36_Undetermined_R6000244_L008_R2_001_CTTC.fastq.gz |
+| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W45_Undetermined_R6000324_L005_R1_001_CACA.fastq.gz    |
+| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W47_Undetermined_R6000324_L007_R1_001_TAGC.fastq.gz    |
+| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W44_Undetermined_R6000324_L004_R2_001_GCTA.fastq.gz    |
+| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W46_Undetermined_R6000324_L006_R1_001_GCTA.fastq.gz    |
+| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W44_Undetermined_R6000324_L004_R2_001_GAAG.fastq.gz    |
+| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/new_HiSeq42_Undetermined_R6000281_L008_R2_001_ATCG.fastq.gz  |
+| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W45_Undetermined_R6000324_L005_R1_001_CTTC.fastq.gz    |
+| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W45_Undetermined_R6000324_L005_R1_001_GAAG.fastq.gz    |
+| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W45_Undetermined_R6000324_L005_R2_001_CACA.fastq.gz    |
+| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/new_HiSeq42_Undetermined_R6000281_L008_R2_001_TGTG.fastq.gz  |
+| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/new_HiSeq28_Undetermined_R6000204_L006001_GTGT_R1.fastq.gz   |
+| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/new_HiSeq-19_L006_R2_001_ACAC.fastq.gz                       |
+| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W45_Undetermined_R6000324_L005_R2_001_ATCG.fastq.gz    |
+| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W46_Undetermined_R6000324_L006_R2_001_CGAT.fastq.gz    |
+| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W46_Undetermined_R6000324_L006_R1_001_TCCT.fastq.gz    |
+| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W44_Undetermined_R6000324_L004_R1_001_CACA.fastq.gz    |
+| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W47_Undetermined_R6000324_L007_R2_001_ACAC.fastq.gz    |
+| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W44_Undetermined_R6000324_L004_R2_001_CGAT.fastq.gz    |
+| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W45_Undetermined_R6000324_L005_R2_001_GAAG.fastq.gz    |
+| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/new_HiSeqW36_Undetermined_R6000244_L008_R1_001_CTTC.fastq.gz |
+| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/new_HiSeq28_Undetermined_R6000204_L006_R2_001_AGGT.fastq.gz  |
+| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W46_Undetermined_R6000324_L006_R2_001_TCCT.fastq.gz    |
+| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/new_HiSeq28_Undetermined_R6000204_L006001_AGGT_R2.fastq.gz   |
+| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W46_Undetermined_R6000324_L006_R1_001_CACA.fastq.gz    |
+| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W44_Undetermined_R6000324_L004_R2_001_AGGT.fastq.gz    |
+| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W48_Undetermined_R6000324_L008_R1_001_CACA.fastq.gz    |
+| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W48_Undetermined_R6000324_L008_R1_001_GAAG.fastq.gz    |
+| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W47_Undetermined_R6000324_L007_R1_001_ACAC.fastq.gz    |
+| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W48_Undetermined_R6000324_L008_R2_001_CACA.fastq.gz    |
+| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/new_HiSeq42_Undetermined_R6000281_L008_R2_001_TAGC.fastq.gz  |
+| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W44_Undetermined_R6000324_L004_R2_001_TGTG.fastq.gz    |
+| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W47_Undetermined_R6000324_L007_R1_001_GCTA.fastq.gz    |
+| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W45_Undetermined_R6000324_L005_R1_001_TGTG.fastq.gz    |
+| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W47_Undetermined_R6000324_L007_R2_001_TGTG.fastq.gz    |
+| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W46_Undetermined_R6000324_L006_R2_001_TAGC.fastq.gz    |
+| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W45_Undetermined_R6000324_L005_R2_001_TGTG.fastq.gz    |
+| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W48_Undetermined_R6000324_L008_R2_001_GAAG.fastq.gz    |
+| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W45_Undetermined_R6000324_L005_R1_001_ATCG.fastq.gz    |
+| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W44_Undetermined_R6000324_L004_R2_001_CACA.fastq.gz    |
+| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W44_Undetermined_R6000324_L004_R2_001_ATCG.fastq.gz    |
+| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/new_HiSeq-19_L006_R1_001_ACAC.fastq.gz                       |
+| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W46_Undetermined_R6000324_L006_R1_001_GTGT.fastq.gz    |
+| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/new_HiSeq-19_L006001_ACAC_R2.fastq.gz                        |
+| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W46_Undetermined_R6000324_L006_R2_001_AGGT.fastq.gz    |
+| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W44_Undetermined_R6000324_L004_R1_001_GCTA.fastq.gz    |
+| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W44_Undetermined_R6000324_L004_R2_001_CTTC.fastq.gz    |
+| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W45_Undetermined_R6000324_L005_R2_001_CTTC.fastq.gz    |
+| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W45_Undetermined_R6000324_L005_R1_001_CGAT.fastq.gz    |
+| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W44_Undetermined_R6000324_L004_R1_001_AGGT.fastq.gz    |
+| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W44_Undetermined_R6000324_L004_R1_001_GAAG.fastq.gz    |
+| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W46_Undetermined_R6000324_L006_R1_001_.fastq.gz        |
+
+** TODO Alignment 
+*** Align and dedup
+:PROPERTIES:
+:CREATED:  [2020-08-16 Sun 16:46]
+:ID:       69cae6db-8483-4944-8831-9eafe158cf95
+:END:
+:LOGBOOK:
+CLOCK: [2020-09-08 Tue 09:46]--[2020-09-08 Tue 14:26] =>  4:40
+:END:
+- bam processing
+  #+name: bam_processing
+  #+begin_src bash :tangle no
+#########1#########2#########3#########4#########5#########6#########7#########8
+# 
+# Setup 
+##
+## Docker
+if [ -f /.dockerenv ]; then
+    echo "shell already in docker, exiting"
+    exit 1
+fi
+source ~/repos/mpnst/bin/local-setup.sh 
+docker_interactive
+biotools
+##
+## Local parameters
+fastqdir=$localdata/fastqs
+bamdir=$localdata/bams
+mkdir -p $bamdir
+hg19=/drive3/users/jszymanski/data/ref/bwa-hg19/hg19.fa
+##
+## Functions
+bam_processing() {
+    # $1 = fastq read 1 ending in _R1.fastq.gz
+    # $2 = bam directory
+    # $3 = reference fasta
+    # $4 = fastq directory
+    # $5 = cores
+    base=`basename -s _R1.fastq.gz $1`
+    # If no alignment files exist, then run full alignment, dedup, sort, and index
+    if [ -f "$2/${base}.dedup.sorted.bam" ] &&
+           [ -f "$2/${base}.dedup.sorted.bam.bai" ]; then
+        echo $base bam processing complete
+        rm -f $2/${base}.sam        
+        rm -f $2/${base}.bam
+        rm -f $2/${base}.dedup.bam
+    elif
+        # ...
+        [ -f "$2/${base}.dedup.sorted.bam" ] &&
+            [ ! -f "$2/${base}.dedup.sorted.bam.bai" ]; then
+        sambamba index -t $5 $2/${base}.dedup.sorted.bam
+        rm -f $2/${base}.sam        
+        rm -f $2/${base}.bam
+        rm -f $2/${base}.dedup.bam
+    elif
+        # ...
+        [ -f "$2/${base}.dedup.bam" ] &&
+            [ ! -f "$2/${base}.dedup.sorted.bam" ]; then
+        sambamba sort -t $5 $2/${base}.dedup.bam -o $2/${base}.dedup.sorted.bam
+        sambamba index -t $5 $2/${base}.dedup.sorted.bam
+        rm -f $2/${base}.sam        
+        rm -f $2/${base}.bam
+        rm -f $2/${base}.dedup.bam
+    elif
+        # ...
+        [ -f "$2/${base}.bam" ] &&
+            [ ! -f "$2/${base}.dedup.bam" ] &&
+            [ ! -f "$2/${base}.dedup.sorted.bam" ]; then
+        sambamba markdup -r -t $5 $2/${base}.bam $2/${base}.dedup.bam
+        sambamba sort -t $5 $2/${base}.dedup.bam -o $2/${base}.dedup.sorted.bam
+        sambamba index -t $5 $2/${base}.dedup.sorted.bam
+        rm -f $2/${base}.sam        
+        rm -f $2/${base}.bam
+        rm -f $2/${base}.dedup.bam
+    elif
+        # If only sam exists, then run dedup, sort, and index
+        [ -f "$2/${base}.sam" ] &&
+            [ ! -f "$2/${base}.bam" ] &&
+            [ ! -f "$2/${base}.dedup.bam" ] &&
+            [ ! -f "$2/${base}.dedup.sorted.bam" ]; then
+        sambamba view -t $5 -S -f bam $2/${base}.sam > $2/${base}.bam
+        sambamba markdup -r -t $5 $2/${base}.bam $2/${base}.dedup.bam
+        sambamba sort -t $5 $2/${base}.dedup.bam -o $2/${base}.dedup.sorted.bam
+        sambamba index -t $5 $2/${base}.dedup.sorted.bam
+        rm -f $2/${base}.sam        
+        rm -f $2/${base}.bam
+        rm -f $2/${base}.dedup.bam
+    else
+        bwa mem \
+            -t $5 \
+            $3 \
+            $4/${base}_R1.fastq.gz \
+            $4/${base}_R2.fastq.gz > $2/${base}.sam
+        sambamba view -t $5 -S -f bam $2/${base}.sam > $2/${base}.bam
+        sambamba markdup -r -t $5 $2/${base}.bam $2/${base}.dedup.bam
+        sambamba sort -t $5 $2/${base}.dedup.bam -o $2/${base}.dedup.sorted.bam
+        sambamba index -t $5 $2/${base}.dedup.sorted.bam
+        rm -f $2/${base}.sam        
+        rm -f $2/${base}.bam
+        rm -f $2/${base}.dedup.bam
+    fi
+}
+# 
+#########1#########2#########3#########4#########5#########6#########7#########8
+# test
+#bam_processing /mnt/xt3/mpnst/fastqs/lib249_R1.fastq.gz $bamdir $hg19 $fastqdir 30
+#
+for file in $fastqdir/*_R1.fastq.gz; do
+    bam_processing $file $bamdir $hg19 $fastqdir 30
+done
+#
+bam_processing $localdata/fastqs/lib168_R1.fastq.gz $bamdir $hg19 $fastqdir 30
+#+end_src
+- bam special processing for nci-provided bams
+  #+name: bam_special_processing_nci_provided_bams
+  #+begin_src bash :tangle no  
+#!/bin/bash
+#
+### BAM SPECIAL PROCESSING FOR NCI-PROVIDED BAMS ###
+#
+# Setup 
+##
+## Docker
+if [ -f /.dockerenv ]; then
+    echo "shell already in docker, exiting"
+    exit 1
+fi
+source ~/repos/mpnst/bin/local-setup.sh 
+docker_interactive
+biotools
+##
+## Parameters
+localdata=/mnt/xt3/mpnst
+fastqdir=$localdata/fastqs
+bamdir=$localdata/bams
+mkdir -p $bamdir
+hg19=/drive3/users/jszymanski/data/ref/bwa-hg19/hg19.fa
+##
+# 
+#########1#########2#########3#########4#########5#########6#########7#########8
+
+#
+# Pass array of NCI-provided bams
+ncibams=(lib210 lib211 lib212 lib213 lib214 lib215 lib216 lib217 lib218 lib219 lib220 lib221 lib222 lib223 lib224 lib225 lib226 lib227 lib228 lib229 lib230 lib231 lib232 lib233 lib 234 lib235 lib236 lib237)
+#
+#
+for file in "${ncibams[@]}"; do
+    if [ -f "$bamdir/${file}.dedup.sorted.bam" ] &&
+           [ -f "$bamdir/${file}.dedup.sorted.bam.bai" ]; then
+        echo $base bam processing complete
+        rm -f $bamdir/${file}.dedup.bam
+    elif
+        # ...
+        [ -f "$bamdir/${file}.dedup.sorted.bam" ] &&
+            [ ! -f "$bamdir/${file}.dedup.sorted.bam.bai" ]; then
+        sambamba index -t 30 $bamdir/${file}.dedup.sorted.bam
+        rm -f $bamdir/${file}.dedup.bam
+    elif
+        # ...
+        [ -f "$bamdir/${file}.dedup.bam" ] &&
+            [ ! -f "$bamdir/${file}.dedup.sorted.bam" ]; then
+        sambamba sort -t 30 $bamdir/${file}.dedup.bam -o $bamdir/${file}.dedup.sorted.bam
+        sambamba index -t 30 $bamdir/${file}.dedup.sorted.bam
+        rm -f $bamdir/${file}.dedup.bam
+    else
+        echo done
+    fi
+done
+
+# Start bam processing as sort
+#+end_src
+- ideas
+  - add # # TODO setup via fastqc metrics check
+    - # for read1 in $fastqdir/*_R1.fastq.gz; do
+      #     base=`basename -s _R1.fastq.gz ${read1}`
+      #     filesize=$(wc -c <"$bamdir/${base}.bam")
+      #     if [ $minimum_bam_size -ge $filesize ]; then
+      #         echo $base >> /drive3/users/jszymanski/repos/mpnst/data/small_bams        
+      #     fi
+      # done
+      # readarray -t small_bam < /drive3/users/jszymanski/repos/mpnst/data/small_bams         
+
+** TODO Alignment QC
+** TODO Downsample Bams
+
+#+name: downsample_bam
+#+begin_src bash :tangle ./src/functions.sh
+function downsample_bam {
+
+## Calculate the sampling factor based on the intended number of reads:
+FACTOR=$(samtools idxstats $1 | cut -f3 | awk -v COUNT=$2 'BEGIN {total=0} {total += $1} END {print COUNT/total}')
+
+if [[ $FACTOR > 1 ]]; then 
+    echo "DS reads exceeds total for $1"
+else
+    sambamba view -s $FACTOR -f bam -l 5 $1    
+fi
+}
+
+#+end_src
+
 * Local Variables
 #+TODO: WAITING(w@) TODO(t) INPROCESS(p) | CLOSEOUT DONE(d!) DELEGATED(@) CANCELED(@)  
 #+PROPERTY: LOGGING nil

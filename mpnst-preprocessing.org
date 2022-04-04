@@ -22,166 +22,7 @@ git push -u origin master
 :PROPERTIES:
 :header-args:snakemake: :tangle ./workflow/cappseq.smk
 :END:
-<<<<<<< HEAD
-:LOGBOOK:
-- State "DONE"       from "TODO"       [2022-04-03 Sun 06:40]
-:END:
-- cappseq naming is inconsistent, not suitable for regex. need to work off csv sheet
-
-
-#+begin_src bash
-mkdir -p /mnt/ris/aadel/mpnst/cappseq/rename
-
-ln -s /mnt/ris/aadel/mpnst/cappseq//demultiplexed/new_HiSeq-W44* /mnt/ris/aadel/mpnst/cappseq/rename
-
-rename 's/([^_]+)_([^_]+)_([^_]+)_([^_]+)\.fastq.gz$/$1_$3_$4_$2.fastq.gz/' /mnt/ris/aadel/mpnst/cappseq/rename/*.fastq.gz
-
-mkdir -p /mnt/ris/aadel/mpnst/cappseq/barcode
-
-repo=/home/jeszyman/repos/mpnst-preprocessing
-cd $repo
-
-perl ../cappseq/bin/cp-fastq-extract-auto.pl /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq-W44_Undetermined_R6000324_L004_001_AGGT_R1.fastq.gz \
-     /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq-W44_Undetermined_R6000324_L004_001_AGGT_R1.fastq.gz
-
-
-#+end_src
-- start with multiplexed capp fastqs as inputs
-- to a demulti w/o barcode sheet
-- filter to min file size && expected by manual spreadsheet
-- then barcode extract
-- then merge workflow to nci
-
-- fastqs too small (< 500 Mb)
-  #+begin_src bash :results replace
-find /mnt/ris/aadel/mpnst/inputs/cappseq-fastq -size -500M
-#+end_src
-  #+RESULTS[09ee8ac249493789a7532cf4ab70bd8cee0f4d35]:
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq                                                              |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W46_Undetermined_R6000324_L006_R1_001_TAGC.fastq.gz    |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W48_Undetermined_R6000324_L008_R1_001_CGAT.fastq.gz    |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W48_Undetermined_R6000324_L008_R2_001_CGAT.fastq.gz    |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W45_Undetermined_R6000324_L005_R1_001_TAGC.fastq.gz    |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W44_Undetermined_R6000324_L004_R1_001_ATCG.fastq.gz    |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W46_Undetermined_R6000324_L006_R2_001_GTGT.fastq.gz    |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W45_Undetermined_R6000324_L005_R2_001_GCTA.fastq.gz    |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W44_Undetermined_R6000324_L004_R1_001_TGTG.fastq.gz    |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W47_Undetermined_R6000324_L007_R2_001_GCTA.fastq.gz    |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W45_Undetermined_R6000324_L005_R2_001_CGAT.fastq.gz    |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W46_Undetermined_R6000324_L006_R1_001_AGGT.fastq.gz    |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W47_Undetermined_R6000324_L007_R2_001_TAGC.fastq.gz    |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W47_Undetermined_R6000324_L007_R1_001_TGTG.fastq.gz    |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W46_Undetermined_R6000324_L006_R1_001_TGTG.fastq.gz    |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/new_HiSeq28_Undetermined_R6000204_L006001_AGGT_R1.fastq.gz   |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/new_HiSeq42_Undetermined_R6000281_L008_R2_001_GCTA.fastq.gz  |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/new_HiSeq28_Undetermined_R6000204_L006_R1_001_AGGT.fastq.gz  |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W46_Undetermined_R6000324_L006_R2_001_CACA.fastq.gz    |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W44_Undetermined_R6000324_L004_R1_001_CGAT.fastq.gz    |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/new_HiSeq42_Undetermined_R6000281_L008_R2_001_GTGT.fastq.gz  |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W46_Undetermined_R6000324_L006_R2_001_.fastq.gz        |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W45_Undetermined_R6000324_L005_R1_001_GCTA.fastq.gz    |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/new_HiSeq28_Undetermined_R6000204_L006_R2_001_GTGT.fastq.gz  |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/new_HiSeq28_Undetermined_R6000204_L006001_GTGT_R2.fastq.gz   |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W46_Undetermined_R6000324_L006_R2_001_TGTG.fastq.gz    |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W46_Undetermined_R6000324_L006_R1_001_CGAT.fastq.gz    |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W45_Undetermined_R6000324_L005_R2_001_TAGC.fastq.gz    |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W44_Undetermined_R6000324_L004_R1_001_CTTC.fastq.gz    |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W46_Undetermined_R6000324_L006_R2_001_GCTA.fastq.gz    |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/new_HiSeq-19_L006001_ACAC_R1.fastq.gz                        |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/new_HiSeq28_Undetermined_R6000204_L006_R1_001_GTGT.fastq.gz  |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/new_HiSeqW36_Undetermined_R6000244_L008_R2_001_CTTC.fastq.gz |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W45_Undetermined_R6000324_L005_R1_001_CACA.fastq.gz    |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W47_Undetermined_R6000324_L007_R1_001_TAGC.fastq.gz    |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W44_Undetermined_R6000324_L004_R2_001_GCTA.fastq.gz    |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W46_Undetermined_R6000324_L006_R1_001_GCTA.fastq.gz    |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W44_Undetermined_R6000324_L004_R2_001_GAAG.fastq.gz    |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/new_HiSeq42_Undetermined_R6000281_L008_R2_001_ATCG.fastq.gz  |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W45_Undetermined_R6000324_L005_R1_001_CTTC.fastq.gz    |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W45_Undetermined_R6000324_L005_R1_001_GAAG.fastq.gz    |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W45_Undetermined_R6000324_L005_R2_001_CACA.fastq.gz    |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/new_HiSeq42_Undetermined_R6000281_L008_R2_001_TGTG.fastq.gz  |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/new_HiSeq28_Undetermined_R6000204_L006001_GTGT_R1.fastq.gz   |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/new_HiSeq-19_L006_R2_001_ACAC.fastq.gz                       |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W45_Undetermined_R6000324_L005_R2_001_ATCG.fastq.gz    |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W46_Undetermined_R6000324_L006_R2_001_CGAT.fastq.gz    |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W46_Undetermined_R6000324_L006_R1_001_TCCT.fastq.gz    |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W44_Undetermined_R6000324_L004_R1_001_CACA.fastq.gz    |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W47_Undetermined_R6000324_L007_R2_001_ACAC.fastq.gz    |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W44_Undetermined_R6000324_L004_R2_001_CGAT.fastq.gz    |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W45_Undetermined_R6000324_L005_R2_001_GAAG.fastq.gz    |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/new_HiSeqW36_Undetermined_R6000244_L008_R1_001_CTTC.fastq.gz |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/new_HiSeq28_Undetermined_R6000204_L006_R2_001_AGGT.fastq.gz  |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W46_Undetermined_R6000324_L006_R2_001_TCCT.fastq.gz    |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/new_HiSeq28_Undetermined_R6000204_L006001_AGGT_R2.fastq.gz   |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W46_Undetermined_R6000324_L006_R1_001_CACA.fastq.gz    |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W44_Undetermined_R6000324_L004_R2_001_AGGT.fastq.gz    |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W48_Undetermined_R6000324_L008_R1_001_CACA.fastq.gz    |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W48_Undetermined_R6000324_L008_R1_001_GAAG.fastq.gz    |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W47_Undetermined_R6000324_L007_R1_001_ACAC.fastq.gz    |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W48_Undetermined_R6000324_L008_R2_001_CACA.fastq.gz    |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/new_HiSeq42_Undetermined_R6000281_L008_R2_001_TAGC.fastq.gz  |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W44_Undetermined_R6000324_L004_R2_001_TGTG.fastq.gz    |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W47_Undetermined_R6000324_L007_R1_001_GCTA.fastq.gz    |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W45_Undetermined_R6000324_L005_R1_001_TGTG.fastq.gz    |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W47_Undetermined_R6000324_L007_R2_001_TGTG.fastq.gz    |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W46_Undetermined_R6000324_L006_R2_001_TAGC.fastq.gz    |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W45_Undetermined_R6000324_L005_R2_001_TGTG.fastq.gz    |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W48_Undetermined_R6000324_L008_R2_001_GAAG.fastq.gz    |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W45_Undetermined_R6000324_L005_R1_001_ATCG.fastq.gz    |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W44_Undetermined_R6000324_L004_R2_001_CACA.fastq.gz    |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W44_Undetermined_R6000324_L004_R2_001_ATCG.fastq.gz    |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/new_HiSeq-19_L006_R1_001_ACAC.fastq.gz                       |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W46_Undetermined_R6000324_L006_R1_001_GTGT.fastq.gz    |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/new_HiSeq-19_L006001_ACAC_R2.fastq.gz                        |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W46_Undetermined_R6000324_L006_R2_001_AGGT.fastq.gz    |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W44_Undetermined_R6000324_L004_R1_001_GCTA.fastq.gz    |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W44_Undetermined_R6000324_L004_R2_001_CTTC.fastq.gz    |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W45_Undetermined_R6000324_L005_R2_001_CTTC.fastq.gz    |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W45_Undetermined_R6000324_L005_R1_001_CGAT.fastq.gz    |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W44_Undetermined_R6000324_L004_R1_001_AGGT.fastq.gz    |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W44_Undetermined_R6000324_L004_R1_001_GAAG.fastq.gz    |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W46_Undetermined_R6000324_L006_R1_001_.fastq.gz        |
-
-#+begin_src bash
-=======
-- Demultiplexing
-  #+begin_src bash
->>>>>>> 13100f2e636cf025b3635db5ccf481b075cdf1a5
-## Functions
-cappseq_demultiplex() {
-  if [ "$#" -ne 3 ]; then      
-      printf "___Wrapper function to demultiplex MedGenome CAPP-Seq libraries___\n
-          Inputs:\n
-          1 = Multiplexed .fastq.gz\n
-          2 = Output directory\n
-          3 = sample2barcode\n
-          Returns: Demultiplexed fastqs named as <BASENAME>_<BARCODE>.fastq.gz"
-      fi
-  base=`basename -s .fastq.gz $1`
-  if ["$2/$base*" -nt $1 ]; then
-      echo "$base already demultiplexed"
-  else
-      echo "All inputs exist, running demultiplexing of $1"        
-      perl /drive3/users/jszymanski/repos/cappseq/bin/cp-fastq-demultiplex.pl $1 $2 $3
-  fi    
-}
-
-            
-## Functions
-cappseq_demultiplex() {
-  base=`basename -s .fastq.gz $1`
-  if ["$2/$base*" -nt $1 ]; then
-      echo "$base already demultiplexed"
-  else
-      echo "All inputs exist, running demultiplexing of $1"        
-      perl ~/repos/mpnst-preprocessing/src/cp_fastq_demultiplex.pl $1 $2 $3
-  fi    
-}
-
-# here trying without a specific barcode
-
-perl ~/repos/mpnst-preprocessing/src/cp_fastq_demultiplex.pl /mnt/ris/aadel/capp-seq/capp-fastqs/HiSeqW38,39,40,41,42/new_HiSeq42_Undetermined_R6000281_L008_R1_001.fastq.gz /mnt/ris/aadel/mpnst/tmp/demulti 
-#+end_src
+- starts with DE-multiplexed capp fastqs as inputs
 - Barcode extraction
   #+begin_src bash
 \rm -rf /mnt/ris/aadel/mpnst/cappseq/barcode
@@ -214,12 +55,6 @@ cat /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq-W44_Undetermined_R6000324_L004
 
 pigz -c -p 16 /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq-W44_Undetermined_R6000324_L004_001_AGGT_headfix_R1.fastq
 pigz -c -p 16 /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq-W44_Undetermined_R6000324_L004_001_AGGT_headfix_R1.fastq
-
-
-
-bwa index \
-    --algoType bwtsw \
-    --prefix /mnt/ris/aadel/mpnst/resources/hg38/hg38
 #+end_src
   #+begin_src bash
 mkdir -p ~/repos/mpnst-preprocessing/src
@@ -286,33 +121,62 @@ capp_extract \
 # @E00521:255:H3HJ5CCX2:6:1101:2443:2909:CGTAACAC
 
 #+end_src
-- start with multiplexed capp fastqs as inputs
-- to a demulti w/o barcode sheet
+- d
+  #+begin_src bash
+mkdir -p /mnt/ris/aadel/mpnst/cappseq/rename
 
+ln -s /mnt/ris/aadel/mpnst/cappseq//demultiplexed/new_HiSeq-W44* /mnt/ris/aadel/mpnst/cappseq/rename
 
-<<<<<<< HEAD
+rename 's/([^_]+)_([^_]+)_([^_]+)_([^_]+)\.fastq.gz$/$1_$3_$4_$2.fastq.gz/' /mnt/ris/aadel/mpnst/cappseq/rename/*.fastq.gz
 
-| NCI FASTQ | ${data_dir}/inputs | box | MPNST Early Cancer Detection | box_dir | yes | GET |
+mkdir -p /mnt/ris/aadel/mpnst/cappseq/barcode
 
-#+name: downsample_bam
-#+begin_src bash :tangle ./src/functions.sh
-function downsample_bam {
+repo=/home/jeszyman/repos/mpnst-preprocessing
+cd $repo
 
-## Calculate the sampling factor based on the intended number of reads:
-FACTOR=$(samtools idxstats $1 | cut -f3 | awk -v COUNT=$2 'BEGIN {total=0} {total += $1} END {print COUNT/total}')
+perl ../cappseq/bin/cp-fastq-extract-auto.pl /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq-W44_Undetermined_R6000324_L004_001_AGGT_R1.fastq.gz \
+     /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq-W44_Undetermined_R6000324_L004_001_AGGT_R1.fastq.gz
 
-if [[ $FACTOR > 1 ]]; then 
-    echo "DS reads exceeds total for $1"
-else
-    sambamba view -s $FACTOR -f bam -l 5 $1    
-fi
-}
 
 #+end_src
+- Demultiplexing
+  #+begin_src bash
 
-=======
->>>>>>> 13100f2e636cf025b3635db5ccf481b075cdf1a5
-- Take demultiplexed fastqs and extract barcodes.
+## Functions
+cappseq_demultiplex() {
+  if [ "$#" -ne 3 ]; then      
+      printf "___Wrapper function to demultiplex MedGenome CAPP-Seq libraries___\n
+          Inputs:\n
+          1 = Multiplexed .fastq.gz\n
+          2 = Output directory\n
+          3 = sample2barcode\n
+          Returns: Demultiplexed fastqs named as <BASENAME>_<BARCODE>.fastq.gz"
+      fi
+  base=`basename -s .fastq.gz $1`
+  if ["$2/$base*" -nt $1 ]; then
+      echo "$base already demultiplexed"
+  else
+      echo "All inputs exist, running demultiplexing of $1"        
+      perl /drive3/users/jszymanski/repos/cappseq/bin/cp-fastq-demultiplex.pl $1 $2 $3
+  fi    
+}
+
+            
+## Functions
+cappseq_demultiplex() {
+  base=`basename -s .fastq.gz $1`
+  if ["$2/$base*" -nt $1 ]; then
+      echo "$base already demultiplexed"
+  else
+      echo "All inputs exist, running demultiplexing of $1"        
+      perl ~/repos/mpnst-preprocessing/src/cp_fastq_demultiplex.pl $1 $2 $3
+  fi    
+}
+
+# here trying without a specific barcode
+
+perl ~/repos/mpnst-preprocessing/src/cp_fastq_demultiplex.pl /mnt/ris/aadel/capp-seq/capp-fastqs/HiSeqW38,39,40,41,42/new_HiSeq42_Undetermined_R6000281_L008_R1_001.fastq.gz /mnt/ris/aadel/mpnst/tmp/demulti 
+#+end_src
 - For barcode-extracted fastqs, correct headers for use with bwa  
   #+begin_src bash
 source config/jeszyman-server.sh
@@ -333,11 +197,9 @@ rename -n s/_R2_/_/g *R2.fastq.gz
 
 
 #+end_src
-
 *** Smk preamble
 #+begin_src snakemake
-IDS, = glob_wildcards(config["data_dir"] + "{id}_R1.fastq.gz")
-            
+IDS, = glob_wildcards(config["data_dir"] + "{id}_R1.fastq.gz")            
 #+end_src              
 *** Smk rules
 **** All rule
@@ -364,18 +226,9 @@ rule extract_cappseq_barcodes:
         scripts/extract_cappseq_barcodes.sh {input.bcode_fq_R1} {input.bcode_fq_R2} {params.outdir}
         """
 #+end_src
-- [[file:./workflow/scripts/extract_cappseq_barcodes.sh][Base script]]
-  #+begin_src bash :tangle ./workflow/scripts/extract_cappseq_barcodes.sh
-#########1#########2#########3#########4#########5#########6#########7#########8
-perl ./src/cp-fastq-extract-auto.pl $1 $2
-if [ -f $(basename -s .gz $1) ]; then mv $(basename -s .gz $1) $3; fi
-if [ -f $(basename -s .gz $2) ]; then mv $(basename -s .gz $2) $3; fi
 
-# Snakemake variables
-# Function
-# Run command
-#+end_src
 ** TODO Read QC
+- filter to min file size && expected by manual spreadsheet
 - fastqs too small (< 500 Mb)
   #+begin_src bash :results replace
 find /mnt/ris/aadel/mpnst/inputs/cappseq-fastq -size -500M
@@ -648,8 +501,24 @@ done
       # done
       # readarray -t small_bam < /drive3/users/jszymanski/repos/mpnst/data/small_bams         
 
+*** TODO hg38 - https://mail.google.com/mail/u/0/#inbox/FMfcgzGmvLWSbsmhDsffvSSWfjWdQhhR
 ** TODO Alignment QC
 ** TODO Downsample Bams
+#+name: downsample_bam
+#+begin_src bash :tangle ./src/functions.sh
+function downsample_bam {
+
+## Calculate the sampling factor based on the intended number of reads:
+FACTOR=$(samtools idxstats $1 | cut -f3 | awk -v COUNT=$2 'BEGIN {total=0} {total += $1} END {print COUNT/total}')
+
+if [[ $FACTOR > 1 ]]; then 
+    echo "DS reads exceeds total for $1"
+else
+    sambamba view -s $FACTOR -f bam -l 5 $1    
+fi
+}
+
+#+end_src
 
 #+name: downsample_bam
 #+begin_src bash :tangle ./src/functions.sh

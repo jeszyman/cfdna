@@ -19,6 +19,9 @@ git push -u origin master
 :PROPERTIES:
 :header-args:snakemake: :tangle ./workflow/cappseq.smk
 :END:
+:LOGBOOK:
+- State "DONE"       from "TODO"       [2022-04-03 Sun 06:40]
+:END:
 - cappseq naming is inconsistent, not suitable for regex. need to work off csv sheet
 
 
@@ -324,6 +327,7 @@ if [ -f $(basename -s .gz $2) ]; then mv $(basename -s .gz $2) $3; fi
 #+end_src
 * Local Variables
 #+TODO: WAITING(w@) TODO(t) INPROCESS(p) | CLOSEOUT DONE(d!) DELEGATED(@) CANCELED(@)  
+#+PROPERTY: LOGGING nil
 #+PROPERTY: header-args:bash :tangle-mode (identity #o777)
 #+property: header-args    :cache yes
 #+property: header-args    :exports none            

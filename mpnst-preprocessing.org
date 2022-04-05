@@ -1,6 +1,5 @@
 * MPNST Sequencing Read Pre-processing                              :bioinfo:
 ** Setup
-<<<<<<< HEAD
 *** Git and github
 #+begin_src bash
 repo=/home/jeszyman/repos/mpnst-preprocessing
@@ -18,6 +17,14 @@ git push -u origin master
 =======
 >>>>>>> 13100f2e636cf025b3635db5ccf481b075cdf1a5
 *** Docker and singularity - none; use biotools submodule
+*** Snakemake
+**** Configuration YAMLs
+- common
+  #+begin_src bash :tangle config/common.yaml
+demultiplex_dir: "/mnt/ris/aadel/mpnst/cappseq/demultiplex"
+rename_dir: "/mnt/ris/aadel/mpnst/cappseq/rename"
+healthy_plasma: ["lib060","lib061","lib065","lib067","lib076","lib080","lib085","lib086",
+#+end_src
 ** TODO CAPPseq WGS fastq processing                                    :smk:
 :PROPERTIES:
 :header-args:snakemake: :tangle ./workflow/cappseq.smk
@@ -25,36 +32,91 @@ git push -u origin master
 - starts with DE-multiplexed capp fastqs as inputs
 - Barcode extraction
   #+begin_src bash
+# Setup test
+# \rm -rf /mnt/ris/aadel/mpnst/cappseq/barcode
+# \rm -rf /mnt/ris/aadel/mpnst/cappseq/rename
+# \rm -rf /mnt/ris/aadel/mpnst/cappseq/headerfix
+
+# mkdir -p /mnt/ris/aadel/mpnst/cappseq/barcode
+# mkdir -p /mnt/ris/aadel/mpnst/cappseq/rename
+# mkdir -p /mnt/ris/aadel/mpnst/cappseq/headerfix
+
+# cp /mnt/ris/aadel/mpnst/cappseq/demultiplexed/new_HiSeq-W44_Undetermined_R6000324_L004_R1_001_AGGT.fastq.gz /mnt/ris/aadel/mpnst/cappseq/rename/            
+
+# cp /mnt/ris/aadel/mpnst/cappseq/demultiplexed/new_HiSeq-W44_Undetermined_R6000324_L004_R2_001_AGGT.fastq.gz /mnt/ris/aadel/mpnst/cappseq/rename/            
+
+# rename s/\.fastq.gz/_R1.fastq.gz/g /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq-W44_Undetermined_R6000324_L004_R1_001_AGGT.fastq.gz 
+
+# rename s/\.fastq.gz/_R2.fastq.gz/g /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq-W44_Undetermined_R6000324_L004_R2_001_AGGT.fastq.gz 
+
+# rename s/_R1_/_/g /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq-W44_Undetermined_R6000324_L004_R1_001_AGGT_R1.fastq.gz
+
+# rename s/_R2_/_/g /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq-W44_Undetermined_R6000324_L004_R2_001_AGGT_R2.fastq.gz
+
+# perl ~/repos/mpnst-preprocessing/src/cp_fastq_extract_auto.pl \
+#      /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq-W44_Undetermined_R6000324_L004_001_AGGT_R1.fastq.gz \
+#      /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq-W44_Undetermined_R6000324_L004_001_AGGT_R2.fastq.gz
+
+# cat /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq-W44_Undetermined_R6000324_L004_001_AGGT_R1.fastq | awk '{if(NR%4==1){print substr($0, 1, length($0)-21)}else{print $0}}' > /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq-W44_Undetermined_R6000324_L004_001_AGGT_headfix_R1.fastq
+
+# cat /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq-W44_Undetermined_R6000324_L004_001_AGGT_R2.fastq | awk '{if(NR%4==1){print substr($0, 1, length($0)-21)}else{print $0}}' > /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq-W44_Undetermined_R6000324_L004_001_AGGT_headfix_R2.fastq
+
+# pigz -c -p 16 /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq-W44_Undetermined_R6000324_L004_001_AGGT_headfix_R1.fastq > /mnt/ris/aadel/mpnst/cappseq/headerfix/new_HiSeq-W44_Undetermined_R6000324_L004_001_AGGT_headfix_R1.fastq.gz
+
+# pigz -c -p 16 /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq-W44_Undetermined_R6000324_L004_001_AGGT_headfix_R2.fastq > /mnt/ris/aadel/mpnst/cappseq/headerfix/new_HiSeq-W44_Undetermined_R6000324_L004_001_AGGT_headfix_R2.fastq.gz
+
+#########1#########2#########3#########4#########5#########6#########7#########8
+
+# Setup test
+
 \rm -rf /mnt/ris/aadel/mpnst/cappseq/barcode
 \rm -rf /mnt/ris/aadel/mpnst/cappseq/rename
 \rm -rf /mnt/ris/aadel/mpnst/cappseq/headerfix
 
-mkdir -p /mnt/ris/aadel/mpnst/cappseq/barcode
-mkdir -p /mnt/ris/aadel/mpnst/cappseq/rename
-mkdir -p /mnt/ris/aadel/mpnst/cappseq/headerfix
+demultiplex_dir=/mnt/ris/aadel/mpnst/cappseq/demultiplexed
+rename_dir=/mnt/ris/aadel/mpnst/cappseq/rename
+cap_extract_script=/drive3/users/jszymanski/repos/mpnst-preprocessing/workflows/scripts/cp_fastq_extract_auto.pl
 
-cp /mnt/ris/aadel/mpnst/cappseq/demultiplexed/new_HiSeq-W44_Undetermined_R6000324_L004_R1_001_AGGT.fastq.gz /mnt/ris/aadel/mpnst/cappseq/rename/            
+mkdir -p $rename_dir
 
-cp /mnt/ris/aadel/mpnst/cappseq/demultiplexed/new_HiSeq-W44_Undetermined_R6000324_L004_R2_001_AGGT.fastq.gz /mnt/ris/aadel/mpnst/cappseq/rename/            
+# rule 1
+for file in ${demultiplex_dir}/*.fastq.gz;
+do
+    cp $file $rename_dir
+done
 
-rename s/\.fastq.gz/_R1.fastq.gz/g /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq-W44_Undetermined_R6000324_L004_R1_001_AGGT.fastq.gz 
+cp ${demultiplex_dir}/${read1} $rename_dir
+cp ${demultiplex_dir}/${read2} $rename_dir
+rename s/\.fastq.gz/_R1.fastq.gz/g ${rename_dir}/${read1}
+rename s/\.fastq.gz/_R2.fastq.gz/g ${rename_dir}/${read2}
+rename s/_R1_/_/g ${rename_dir}/${rename1}
+rename s/_R2_/_/g ${rename_dir}/${rename2}
 
-rename s/\.fastq.gz/_R2.fastq.gz/g /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq-W44_Undetermined_R6000324_L004_R2_001_AGGT.fastq.gz 
+read1="new_HiSeq-W44_Undetermined_R6000324_L004_R1_001_AGGT.fastq.gz"
+read2="new_HiSeq-W44_Undetermined_R6000324_L004_R2_001_AGGT.fastq.gz"
+rename1="new_HiSeq-W44_Undetermined_R6000324_L004_R1_001_AGGT_R1.fastq.gz"
+rename2="new_HiSeq-W44_Undetermined_R6000324_L004_R2_001_AGGT_R2.fastq.gz"
+rename11="new_HiSeq-W44_Undetermined_R6000324_L004_001_AGGT_R1.fastq.gz"
+rename22="new_HiSeq-W44_Undetermined_R6000324_L004_001_AGGT_R2.fastq.gz"
 
-rename s/_R1_/_/g /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq-W44_Undetermined_R6000324_L004_R1_001_AGGT_R1.fastq.gz
 
-rename s/_R2_/_/g /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq-W44_Undetermined_R6000324_L004_R2_001_AGGT_R2.fastq.gz
 
-perl ~/repos/mpnst-preprocessing/src/cp_fastq_extract_auto.pl \
-     /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq-W44_Undetermined_R6000324_L004_001_AGGT_R1.fastq.gz \
-     /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq-W44_Undetermined_R6000324_L004_001_AGGT_R2.fastq.gz
+
+
+#2 rule 2
+perl $cap_extract_script ${rename_dir}/${rename11} ${rename_dir}/${rename22}
+# note- &> /tmp/test.txt doesn't work, have to move the log file manually
+mkdir -p $headerfix
+
+# rule 3
 
 cat /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq-W44_Undetermined_R6000324_L004_001_AGGT_R1.fastq | awk '{if(NR%4==1){print substr($0, 1, length($0)-21)}else{print $0}}' > /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq-W44_Undetermined_R6000324_L004_001_AGGT_headfix_R1.fastq
 
 cat /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq-W44_Undetermined_R6000324_L004_001_AGGT_R2.fastq | awk '{if(NR%4==1){print substr($0, 1, length($0)-21)}else{print $0}}' > /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq-W44_Undetermined_R6000324_L004_001_AGGT_headfix_R2.fastq
 
-pigz -c -p 16 /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq-W44_Undetermined_R6000324_L004_001_AGGT_headfix_R1.fastq
-pigz -c -p 16 /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq-W44_Undetermined_R6000324_L004_001_AGGT_headfix_R1.fastq
+pigz -c -p 16 /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq-W44_Undetermined_R6000324_L004_001_AGGT_headfix_R1.fastq > /mnt/ris/aadel/mpnst/cappseq/headerfix/new_HiSeq-W44_Undetermined_R6000324_L004_001_AGGT_headfix_R1.fastq.gz
+
+pigz -c -p 16 /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq-W44_Undetermined_R6000324_L004_001_AGGT_headfix_R2.fastq > /mnt/ris/aadel/mpnst/cappseq/headerfix/new_HiSeq-W44_Undetermined_R6000324_L004_001_AGGT_headfix_R2.fastq.gz
 #+end_src
   #+begin_src bash
 mkdir -p ~/repos/mpnst-preprocessing/src
@@ -197,19 +259,55 @@ rename -n s/_R2_/_/g *R2.fastq.gz
 
 
 #+end_src
-*** Smk preamble
+*** [[file:./workflow/cappseq.smk][Snakefile]] :smk:
+:PROPERTIES:
+:header-args:snakemake: :tangle ./workflow/cappseq.smk
+:END:              
+**** Smk preamble
+#+begin_src snakemake
+demultiplex_fastqs, = glob_wildcards(config["demultiplex_dir"] + "/{id}.fastq.gz")
+#+end_src              
+**** Smk rules
+***** All rule
+#+begin_src snakemake
+rule all:
+    input:
+                    
+#+end_src                            
+- add rules with smk.rule
+***** Rename :smk_rule:
+- Snakemake
+#+begin_src snakemake
+rule rename:
+    input: config["demultiplex_dir"] + "/{id}.fastq.gz",
+    output: config["rename_dir"] "/{id}.fastq.gz",
+    shell:
+        """
+        ln -s {input} {output}
+        """
+#+end_src
+- [[file:./workflow/scripts/rename.sh][Base script]]
+#+begin_src bash
+#!/usr/bin/env bash
+cp 
+#+end_src
+**** Ideas
+:PROPERTIES:
+:header-args:snakemake: :tangle no
+:END:
+**** Smk preamble
 #+begin_src snakemake
 IDS, = glob_wildcards(config["data_dir"] + "{id}_R1.fastq.gz")            
 #+end_src              
-*** Smk rules
-**** All rule
+**** Smk rules
+***** All rule
 #+begin_src snakemake
 rule all:
     input:
                     
 #+end_src                            
 
-**** Extract CAPPseq barcodes :smk_rule:
+***** Extract CAPPseq barcodes                                     :smk_rule:
 - Snakemake
   #+begin_src snakemake
 rule extract_cappseq_barcodes:

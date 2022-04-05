@@ -1,0 +1,17 @@
+Config file ./config/common.yaml is extended by additional config specified via the command line.
+Building DAG of jobs...
+Job stats:
+job          count    min threads    max threads
+---------  -------  -------------  -------------
+get_fasta        1              1              1
+total            1              1              1
+
+
+[Tue Apr  5 14:17:31 2022]
+rule get_fasta:
+    output: /mnt/ris/aadel/mpnst/inputs/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna.fai
+    jobid: 0
+    resources: tmpdir=/tmp
+
+RuleException in line 4 of /drive3/users/jszymanski/repos/mpnst-preprocessing/workflow/align.smk:
+'Params' object has no attribute 'ftp_fasta'

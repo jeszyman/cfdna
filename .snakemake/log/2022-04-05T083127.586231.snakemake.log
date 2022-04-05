@@ -1,0 +1,2 @@
+SyntaxError in line 47 of /drive3/users/jszymanski/repos/mpnst-preprocessing/workflows/cappseq.smk:
+unterminated string literal (detected at line 47) (cappseq.smk, line 47)

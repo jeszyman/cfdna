@@ -1,0 +1,35 @@
+Config file ./config/common.yaml is extended by additional config specified via the command line.
+Building DAG of jobs...
+Using shell: /bin/bash
+Provided cores: 40
+Rules claiming more threads will be scaled down.
+Job stats:
+job          count    min threads    max threads
+---------  -------  -------------  -------------
+all              1              1              1
+get_fasta        1              1              1
+total            2              1              1
+
+Select jobs to execute...
+
+[Tue Apr  5 14:34:09 2022]
+rule get_fasta:
+    output: /mnt/ris/aadel/mpnst/inputs/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna.fai, /mnt/ris/aadel/mpnst/inputs/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna.bwa_index.tar.gz
+    jobid: 1
+    resources: tmpdir=/tmp
+
+[Tue Apr  5 14:38:14 2022]
+Finished job 1.
+1 of 2 steps (50%) done
+Select jobs to execute...
+
+[Tue Apr  5 14:38:14 2022]
+localrule all:
+    input: /mnt/ris/aadel/mpnst/inputs/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna.fai, /mnt/ris/aadel/mpnst/inputs/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna.bwa_index.tar.gz
+    jobid: 0
+    resources: tmpdir=/tmp
+
+[Tue Apr  5 14:38:14 2022]
+Finished job 0.
+2 of 2 steps (100%) done
+Complete log: /drive3/users/jszymanski/repos/mpnst-preprocessing/.snakemake/log/2022-04-05T143407.431987.snakemake.log

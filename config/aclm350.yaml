@@ -1,0 +1,3 @@
+container: "/home/jszymanski/sing_containers/frag.sif"
+data_dir: "/mnt/ris/aadel/mpnst"
+threads: 40

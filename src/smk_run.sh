@@ -1,12 +1,13 @@
 #!/bin/bash
 #########1#########2#########3#########4#########5#########6#########7#########8
-
+eval "$(command conda 'shell.bash' 'hook' 2> /dev/null)"
 ####################################
 ###   Choose and Run Snakefile   ###
 ####################################
 
 # Setup
 #set -euxov pipefail
+
 source config/${HOSTNAME}.sh
 echo "The following `*.smk` archives were found; select one:"
 
@@ -27,7 +28,7 @@ do
         echo selected $run_option
         case $run_option in
             dry_run)
-                source activate snakemake
+                conda activate snakemake
                 snakemake \
                     --configfile config/${HOSTNAME}.yaml \
                     --cores $threads \
@@ -39,7 +40,7 @@ do
                     --snakefile $filename
                 ;;
             normal) 
-                source activate snakemake
+                conda activate snakemake
                 select nohup_option in no yes
                 do
                     case $nohup_option in
@@ -65,7 +66,7 @@ do
                 done                
                 ;;
             force_final)
-                source activate snakemake
+                conda activate snakemake
                 select nohup_option in no yes
                 do
                     case $nohup_option in
@@ -93,7 +94,7 @@ do
                 done                
                 ;;            
             force_all)
-                source activate snakemake
+                conda activate snakemake
                 select nohup_option in no yes
                 do
                     case $nohup_option in

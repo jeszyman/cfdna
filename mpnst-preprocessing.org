@@ -156,6 +156,8 @@ threads: 4
 inputs_dir: "test/inputs"
 processed_fq_dir: "test/processed-fastq"
 unpr_fq_dir: "test/unpaired-fastq"
+bwa_index: "test/ref/chr8"
+bam_dir: "test/bam"
 #+end_src
 **** Run commands
 :PROPERTIES:
@@ -895,32 +897,12 @@ rule extract_cappseq_barcodes:
         """
 #+end_src
 
-** TODO Read QC and pre-processing
-*** Integration testing setup
-#+begin_src bash
-cd ~/repos/mpnst-preprocessing/
-source config/${HOSTNAME}.sh
-
-\rm -rf "${repo}/test"
-mkdir -p "${repo}/test/fastq"
-zcat /mnt/ris/aadel/mpnst/inputs/MPNST/19_2_082_R1.fastq.gz | head -n 100000 > "${repo}/test/fastq/mpnst1_R1.fastq"
-zcat /mnt/ris/aadel/mpnst/inputs/MPNST/19_2_082_R2.fastq.gz | head -n 100000 > "${repo}/test/fastq/mpnst1_R2.fastq"
-zcat /mnt/ris/aadel/mpnst/inputs/MPNST/25_2_072_R1.fastq.gz | head -n 100000 > "${repo}/test/fastq/mpnst2_R1.fastq"
-zcat /mnt/ris/aadel/mpnst/inputs/MPNST/25_2_072_R2.fastq.gz | head -n 100000 > "${repo}/test/fastq/mpnst2_R2.fastq"
-zcat /mnt/ris/aadel/mpnst/inputs/PN/37_JS0050CD112717_R1.fastq.gz | head -n 100000 > "${repo}/test/fastq/plex1_R1.fastq"
-zcat /mnt/ris/aadel/mpnst/inputs/PN/37_JS0050CD112717_R2.fastq.gz | head -n 100000 > "${repo}/test/fastq/plex1_R2.fastq"
-zcat /mnt/ris/aadel/mpnst/inputs/PN/30_JS0044CD112818_R1.fastq.gz | head -n 100000 > "${repo}/test/fastq/plex2_R1.fastq"
-zcat /mnt/ris/aadel/mpnst/inputs/PN/30_JS0044CD112818_R2.fastq.gz | head -n 100000 > "${repo}/test/fastq/plex2_R2.fastq"
-for file in "${repo}/test/fastq/*.fastq"; do gzip $file; done
-
-mkdir -p "${repo}/test/inputs"
-
-wget --directory-prefix="${repo}/test/inputs/" https://raw.githubusercontent.com/usadellab/Trimmomatic/main/adapters/TruSeq3-PE.fa
-#+end_src
+** TODO Pre-processing and alignment
 *** [[file:./workflow/read_qc.smk][Snakefile]]:smk:
 :PROPERTIES:
 :header-args:snakemake: :tangle ./workflow/read_qc.smk
 :END:              
+note- excluded readgroup
 **** Smk preamble
 #+begin_src snakemake
 container: config["container"]
@@ -938,6 +920,11 @@ rule all:
         expand(config["unpr_fq_dir"] + "/{fq_id}_unpr_R2.fastq.gz", fq_id=FQ_ID_RAW),
         expand(config["qc_dir"] + "/{fq_id}_{read}_fastqc.html", fq_id=FQ_ID_RAW, read=["R1", "R2"]),
         expand(config["qc_dir"] + "/{fq_id}_proc_{read}_fastqc.html", fq_id=FQ_ID_RAW, read=["R1", "R2"]),
+        expand(config["bam_dir"] + "/{fq_id}.sam", fq_id=FQ_ID_RAW),
+        expand(config["bam_dir"] + "/{fq_id}.bam", fq_id=FQ_ID_RAW),
+        expand(config["bam_dir"] + "/{fq_id}_dedup.bam", fq_id=FQ_ID_RAW),
+        expand(config["bam_dir"] + "/{fq_id}_dedup_sort.bam", fq_id=FQ_ID_RAW),
+        expand(config["bam_dir"] + "/{fq_id}_dedup_sort.bam.bai", fq_id=FQ_ID_RAW),
 #+end_src                            
 ***** Read preprocessing                                           :smk_rule:
 - Snakemake
@@ -1031,6 +1018,47 @@ fastqc --outdir $2 \
        --quiet \
        --threads $3 $1
 #+end_src
+***** TODO Alignment 
+- Snakemake
+  #+begin_src snakemake
+rule align:
+    input:
+        read1 = config["processed_fq_dir"] + "/{fq_id}_proc_R1.fastq.gz",
+        read2 = config["processed_fq_dir"] + "/{fq_id}_proc_R2.fastq.gz",
+    output:
+        config["bam_dir"] + "/{fq_id}.sam",
+    log:
+        config["log_dir"] + "/align_{fq_id}.log"
+    shell:
+        """
+        bwa mem -M -t 4 {config[bwa_index]} {input.read1} {input.read2} > {output}
+	"""
+#+end_src
+***** TODO Alignment processing
+- Snakemake
+  #+begin_src snakemake
+rule alignment_processing:
+    input:
+        config["bam_dir"] + "/{fq_id}.sam",
+    output:
+        bam = config["bam_dir"] + "/{fq_id}.bam",
+        dedup = config["bam_dir"] + "/{fq_id}_dedup.bam",
+        sort = config["bam_dir"] + "/{fq_id}_dedup_sort.bam",
+        index = config["bam_dir"] + "/{fq_id}_dedup_sort.bam.bai",
+    log:
+        config["log_dir"] + "/alignment_processing_{fq_id}.log"
+    shell:
+        """
+        sambamba view -t {config[threads]} -S -f bam {input} > {output.bam}
+        sambamba markdup -r -t {config[threads]} {output.bam} {output.dedup}
+        sambamba sort -t {config[threads]} {output.dedup} -o {output.sort}
+        sambamba index -t {config[threads]} {output.sort}
+        """
+#+end_src
+
+
+
+
 **** Dev
 :PROPERTIES:
 :header-args:snakemake: :tangle no
@@ -1060,196 +1088,6 @@ rule seq_preprocess:
 :PROPERTIES:
 :header-args:snakemake: :tangle no
 :END:
-***** Ideas
-  - filter to min file size && expected by manual spreadsheet
-  - fastqs too small (< 500 Mb)
-    #+begin_src bash :results replace
-  find /mnt/ris/aadel/mpnst/inputs/cappseq-fastq -size -500M
-  #+end_src
-
-
-** TODO Alignment 
-ref=/fdb/igenomes/Homo_sapiens/UCSC/hg19/Sequence/BWAIndex/genome.fa /fdb/genome/GRCh38.p13/GCF_000001405.39_GRCh38.p13_genomic.fna
-RG="@RG\tID:${sampleName}\tLB:${sampleName}\tSM:${sampleName}\tPL:ILLUMINA"
-bwa mem -M -t 32 -R "$RG" $ref ${sampleName}_trim_R1.fastq ${sampleName}_trim_R2.fastq>${sampleName}.sam
-java -Xmx60g -XX:ParallelGCThreads=5 -jar $PICARDJARPATH/picard.jar  SortSam INPUT=${sampleName}.sam OUTPUT=${sampleName}.bam SORT_ORDER=coordinate
-samtools index ${sampleName}.bam ${sampleName}.bam.bai
-samtools flagstat ${sampleName}.bam  >${sampleName}.flagstat.txt
-java -Xmx60g -XX:ParallelGCThreads=5 -jar $PICARDJARPATH/picard.jar   MarkDuplicates I=${sampleName}.bam O=${sampleName}.dd.bam REMOVE_DUPLICATES=true M=${sampleName}.matrix.txt AS=true VALIDATION_STRINGENCY=LENIENT
-samtools index ${sampleName}.dd.bam ${sampleName}.dd.bam.bai
-rm ${sampleName}_trim_*.fastq
-cd ..
-
-*** Align and dedup
-:PROPERTIES:
-:CREATED:  [2020-08-16 Sun 16:46]
-:ID:       69cae6db-8483-4944-8831-9eafe158cf95
-:END:
-:LOGBOOK:
-CLOCK: [2020-09-08 Tue 09:46]--[2020-09-08 Tue 14:26] =>  4:40
-:END:
-- bam processing
-  #+name: bam_processing
-  #+begin_src bash :tangle no
-#########1#########2#########3#########4#########5#########6#########7#########8
-# 
-# Setup 
-##
-## Docker
-if [ -f /.dockerenv ]; then
-    echo "shell already in docker, exiting"
-    exit 1
-fi
-source ~/repos/mpnst/bin/local-setup.sh 
-docker_interactive
-biotools
-##
-## Local parameters
-fastqdir=$localdata/fastqs
-bamdir=$localdata/bams
-mkdir -p $bamdir
-hg19=/drive3/users/jszymanski/data/ref/bwa-hg19/hg19.fa
-##
-## Functions
-bam_processing() {
-    # $1 = fastq read 1 ending in _R1.fastq.gz
-    # $2 = bam directory
-    # $3 = reference fasta
-    # $4 = fastq directory
-    # $5 = cores
-    base=`basename -s _R1.fastq.gz $1`
-    # If no alignment files exist, then run full alignment, dedup, sort, and index
-    if [ -f "$2/${base}.dedup.sorted.bam" ] &&
-           [ -f "$2/${base}.dedup.sorted.bam.bai" ]; then
-        echo $base bam processing complete
-        rm -f $2/${base}.sam        
-        rm -f $2/${base}.bam
-        rm -f $2/${base}.dedup.bam
-    elif
-        # ...
-        [ -f "$2/${base}.dedup.sorted.bam" ] &&
-            [ ! -f "$2/${base}.dedup.sorted.bam.bai" ]; then
-        sambamba index -t $5 $2/${base}.dedup.sorted.bam
-        rm -f $2/${base}.sam        
-        rm -f $2/${base}.bam
-        rm -f $2/${base}.dedup.bam
-    elif
-        # ...
-        [ -f "$2/${base}.dedup.bam" ] &&
-            [ ! -f "$2/${base}.dedup.sorted.bam" ]; then
-        sambamba sort -t $5 $2/${base}.dedup.bam -o $2/${base}.dedup.sorted.bam
-        sambamba index -t $5 $2/${base}.dedup.sorted.bam
-        rm -f $2/${base}.sam        
-        rm -f $2/${base}.bam
-        rm -f $2/${base}.dedup.bam
-    elif
-        # ...
-        [ -f "$2/${base}.bam" ] &&
-            [ ! -f "$2/${base}.dedup.bam" ] &&
-            [ ! -f "$2/${base}.dedup.sorted.bam" ]; then
-        sambamba markdup -r -t $5 $2/${base}.bam $2/${base}.dedup.bam
-        sambamba sort -t $5 $2/${base}.dedup.bam -o $2/${base}.dedup.sorted.bam
-        sambamba index -t $5 $2/${base}.dedup.sorted.bam
-        rm -f $2/${base}.sam        
-        rm -f $2/${base}.bam
-        rm -f $2/${base}.dedup.bam
-    elif
-        # If only sam exists, then run dedup, sort, and index
-        [ -f "$2/${base}.sam" ] &&
-            [ ! -f "$2/${base}.bam" ] &&
-            [ ! -f "$2/${base}.dedup.bam" ] &&
-            [ ! -f "$2/${base}.dedup.sorted.bam" ]; then
-        sambamba view -t $5 -S -f bam $2/${base}.sam > $2/${base}.bam
-        sambamba markdup -r -t $5 $2/${base}.bam $2/${base}.dedup.bam
-        sambamba sort -t $5 $2/${base}.dedup.bam -o $2/${base}.dedup.sorted.bam
-        sambamba index -t $5 $2/${base}.dedup.sorted.bam
-        rm -f $2/${base}.sam        
-        rm -f $2/${base}.bam
-        rm -f $2/${base}.dedup.bam
-    else
-        bwa mem \
-            -t $5 \
-            $3 \
-            $4/${base}_R1.fastq.gz \
-            $4/${base}_R2.fastq.gz > $2/${base}.sam
-        sambamba view -t $5 -S -f bam $2/${base}.sam > $2/${base}.bam
-        sambamba markdup -r -t $5 $2/${base}.bam $2/${base}.dedup.bam
-        sambamba sort -t $5 $2/${base}.dedup.bam -o $2/${base}.dedup.sorted.bam
-        sambamba index -t $5 $2/${base}.dedup.sorted.bam
-        rm -f $2/${base}.sam        
-        rm -f $2/${base}.bam
-        rm -f $2/${base}.dedup.bam
-    fi
-}
-# 
-#########1#########2#########3#########4#########5#########6#########7#########8
-# test
-#bam_processing /mnt/xt3/mpnst/fastqs/lib249_R1.fastq.gz $bamdir $hg19 $fastqdir 30
-#
-for file in $fastqdir/*_R1.fastq.gz; do
-    bam_processing $file $bamdir $hg19 $fastqdir 30
-done
-#
-bam_processing $localdata/fastqs/lib168_R1.fastq.gz $bamdir $hg19 $fastqdir 30
-#+end_src
-- bam special processing for nci-provided bams
-  #+name: bam_special_processing_nci_provided_bams
-  #+begin_src bash :tangle no  
-#!/bin/bash
-#
-### BAM SPECIAL PROCESSING FOR NCI-PROVIDED BAMS ###
-#
-# Setup 
-##
-## Docker
-if [ -f /.dockerenv ]; then
-    echo "shell already in docker, exiting"
-    exit 1
-fi
-source ~/repos/mpnst/bin/local-setup.sh 
-docker_interactive
-biotools
-##
-## Parameters
-localdata=/mnt/xt3/mpnst
-fastqdir=$localdata/fastqs
-bamdir=$localdata/bams
-mkdir -p $bamdir
-hg19=/drive3/users/jszymanski/data/ref/bwa-hg19/hg19.fa
-##
-# 
-#########1#########2#########3#########4#########5#########6#########7#########8
-
-#
-# Pass array of NCI-provided bams
-ncibams=(lib210 lib211 lib212 lib213 lib214 lib215 lib216 lib217 lib218 lib219 lib220 lib221 lib222 lib223 lib224 lib225 lib226 lib227 lib228 lib229 lib230 lib231 lib232 lib233 lib 234 lib235 lib236 lib237)
-#
-#
-for file in "${ncibams[@]}"; do
-    if [ -f "$bamdir/${file}.dedup.sorted.bam" ] &&
-           [ -f "$bamdir/${file}.dedup.sorted.bam.bai" ]; then
-        echo $base bam processing complete
-        rm -f $bamdir/${file}.dedup.bam
-    elif
-        # ...
-        [ -f "$bamdir/${file}.dedup.sorted.bam" ] &&
-            [ ! -f "$bamdir/${file}.dedup.sorted.bam.bai" ]; then
-        sambamba index -t 30 $bamdir/${file}.dedup.sorted.bam
-        rm -f $bamdir/${file}.dedup.bam
-    elif
-        # ...
-        [ -f "$bamdir/${file}.dedup.bam" ] &&
-            [ ! -f "$bamdir/${file}.dedup.sorted.bam" ]; then
-        sambamba sort -t 30 $bamdir/${file}.dedup.bam -o $bamdir/${file}.dedup.sorted.bam
-        sambamba index -t 30 $bamdir/${file}.dedup.sorted.bam
-        rm -f $bamdir/${file}.dedup.bam
-    else
-        echo done
-    fi
-done
-
-# Start bam processing as sort
-#+end_src
 - ideas
   - add # # TODO setup via fastqc metrics check
     - # for read1 in $fastqdir/*_R1.fastq.gz; do
@@ -1260,73 +1098,52 @@ done
       #     fi
       # done
       # readarray -t small_bam < /drive3/users/jszymanski/repos/mpnst/data/small_bams         
+***** Ideas
+  - filter to min file size && expected by manual spreadsheet
+  - fastqs too small (< 500 Mb)
+    #+begin_src bash :results replace
+  find /mnt/ris/aadel/mpnst/inputs/cappseq-fastq -size -500M
+  #+end_src
 
-*** [[file:./workflow/align.smk][Snakefile]]:smk:
-:PROPERTIES:
-:header-args:snakemake: :tangle ./workflow/align.smk
-:END:              
-**** Smk preamble
-#+begin_src snakemake
-configfile: "./config/common.yaml"            
-#+end_src              
-**** Smk rules
-***** All rule
-#+begin_src snakemake
-rule all:
-    input:
-        config["inputs_dir"] + "/" + config["hg38_fasta"],
-        config["inputs_dir"] + "/" + config["hg38_bwa_index_zip"],
-        config["ref_dir"] + "/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna.amb",
-        config["ref_dir"] + "/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna.ann",
-        config["ref_dir"] + "/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna.bwt",
-        config["ref_dir"] + "/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna.sa",	
-#+end_src                            
-***** Get fasta and index                                          :smk_rule:
-- [[file:/mnt/ris/aadel/mpnst/logs/get_fasta.log][Log file]]
-- Snakemake
-  #+begin_src snakemake
-rule get_fasta:
-    log: config["log_dir"] + "/get_fasta.log"
-    output:
-        hg38_fasta = config["inputs_dir"] + "/" + config["hg38_fasta"],
-        hg38_bwa_index_zip = config["inputs_dir"] + "/" + config["hg38_bwa_index_zip"],
-    shell:
-        """
-        wget {config[hg38_fasta_ftp]} -P {config[inputs_dir]}
-        wget {config[hg38_bwa_index_ftp]} -P {config[inputs_dir]}
-        tar -xzf {config[inputs_dir]}/{config[hg38_bwa_index_zip]} -C {config[ref_dir]}
-        """
-#+end_src
-***** Dev
-:PROPERTIES:
-:header-args:snakemake: :tangle no
-:END:
+*** Integration testing setup
+#+begin_src bash
+cd ~/repos/mpnst-preprocessing/
+source config/${HOSTNAME}.sh
 
-****** Align                                                       :smk_rule:
-- Snakemake
-#+begin_src snakemake
-rule align:
-    input:
-    output:
-    shell:
-        """
-        scripts/align.sh
-        """
-#+end_src
-- [[file:./workflows/scripts/align.sh][Base script]]
-#+begin_src bash :tangle ./workflows/scripts/align.sh
-#!/usr/bin/env bash
-#########1#########2#########3#########4#########5#########6#########7#########8               
-###
-###    SCRIPT TITLE   ###                
-###
+\rm -rf "${repo}/test"
+mkdir -p "${repo}/test/fastq"
+zcat /mnt/ris/aadel/mpnst/inputs/MPNST/19_2_082_R1.fastq.gz | head -n 100000 > "${repo}/test/fastq/mpnst1_R1.fastq"
+zcat /mnt/ris/aadel/mpnst/inputs/MPNST/19_2_082_R2.fastq.gz | head -n 100000 > "${repo}/test/fastq/mpnst1_R2.fastq"
+zcat /mnt/ris/aadel/mpnst/inputs/MPNST/25_2_072_R1.fastq.gz | head -n 100000 > "${repo}/test/fastq/mpnst2_R1.fastq"
+zcat /mnt/ris/aadel/mpnst/inputs/MPNST/25_2_072_R2.fastq.gz | head -n 100000 > "${repo}/test/fastq/mpnst2_R2.fastq"
+zcat /mnt/ris/aadel/mpnst/inputs/PN/37_JS0050CD112717_R1.fastq.gz | head -n 100000 > "${repo}/test/fastq/plex1_R1.fastq"
+zcat /mnt/ris/aadel/mpnst/inputs/PN/37_JS0050CD112717_R2.fastq.gz | head -n 100000 > "${repo}/test/fastq/plex1_R2.fastq"
+zcat /mnt/ris/aadel/mpnst/inputs/PN/30_JS0044CD112818_R1.fastq.gz | head -n 100000 > "${repo}/test/fastq/plex2_R1.fastq"
+zcat /mnt/ris/aadel/mpnst/inputs/PN/30_JS0044CD112818_R2.fastq.gz | head -n 100000 > "${repo}/test/fastq/plex2_R2.fastq"
+for file in "${repo}/test/fastq/*.fastq"; do gzip $file; done
 
+mkdir -p "${repo}/test/inputs"
+
+wget --directory-prefix="${repo}/test/inputs/" https://raw.githubusercontent.com/usadellab/Trimmomatic/main/adapters/TruSeq3-PE.fa
+
+wget --directory-prefix="${repo}/test/inputs/" https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/001/405/GCA_000001405.15_GRCh38/seqs_for_alignment_pipelines.ucsc_ids/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna.gz
+
+mkdir -p ${repo}/test/ref
+
+zcat "${repo}/test/inputs/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna.gz" | grep -A 2000 chr8 > ${repo}/test/inputs/chr8.fa
+
+\rm ${repo}/test/inputs/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna.gz
+
+singularity shell --bind /mnt:/mnt ~/sing_containers/biotools.sif
+
+source config/${HOSTNAME}.sh
+
+bwa index -p ${repo}/test/ref/chr8 ${repo}/test/inputs/chr8.fa
+
+#bwa mem -t 4 ${repo}/test/ref/chr8 ${repo}/test/processed-fastq/mpnst1_proc_R1.fastq.gz ${repo}/test/processed-fastq/mpnst1_proc_R1.fastq.gz
+
+exit
 #+end_src
-**** Ideas
-:PROPERTIES:
-:header-args:snakemake: :tangle no
-:END:
-*** TODO hg38 - https://mail.google.com/mail/u/0/#inbox/FMfcgzGmvLWSbsmhDsffvSSWfjWdQhhR
 ** TODO Alignment QC
 ** TODO Downsample Bams
 #+name: downsample_bam

@@ -6,3 +6,5 @@ threads: 4
 inputs_dir: "test/inputs"
 processed_fq_dir: "test/processed-fastq"
 unpr_fq_dir: "test/unpaired-fastq"
+bwa_index: "test/ref/chr8"
+bam_dir: "test/bam"

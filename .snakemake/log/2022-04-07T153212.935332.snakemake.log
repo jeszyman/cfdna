@@ -1,0 +1,80 @@
+Building DAG of jobs...
+Using shell: /bin/bash
+Provided cores: 8
+Rules claiming more threads will be scaled down.
+Job stats:
+job                     count    min threads    max threads
+--------------------  -------  -------------  -------------
+alignment_processing        4              1              1
+all                         1              1              1
+total                       5              1              1
+
+Select jobs to execute...
+
+[Thu Apr  7 15:32:13 2022]
+rule alignment_processing:
+    input: test/bam/mpnst2.sam
+    output: test/bam/mpnst2.bam
+    log: test/logs/alignment_processing_mpnst2.log
+    jobid: 28
+    wildcards: fq_id=mpnst2
+    resources: tmpdir=/tmp
+
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+
+[Thu Apr  7 15:32:13 2022]
+rule alignment_processing:
+    input: test/bam/mpnst1.sam
+    output: test/bam/mpnst1.bam
+    log: test/logs/alignment_processing_mpnst1.log
+    jobid: 27
+    wildcards: fq_id=mpnst1
+    resources: tmpdir=/tmp
+
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+
+[Thu Apr  7 15:32:13 2022]
+rule alignment_processing:
+    input: test/bam/plex2.sam
+    output: test/bam/plex2.bam
+    log: test/logs/alignment_processing_plex2.log
+    jobid: 25
+    wildcards: fq_id=plex2
+    resources: tmpdir=/tmp
+
+
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+[Thu Apr  7 15:32:13 2022]
+rule alignment_processing:
+    input: test/bam/plex1.sam
+    output: test/bam/plex1.bam
+    log: test/logs/alignment_processing_plex1.log
+    jobid: 26
+    wildcards: fq_id=plex1
+    resources: tmpdir=/tmp
+
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+[Thu Apr  7 15:32:13 2022]
+Finished job 28.
+1 of 5 steps (20%) done
+[Thu Apr  7 15:32:13 2022]
+Finished job 27.
+2 of 5 steps (40%) done
+[Thu Apr  7 15:32:13 2022]
+Finished job 25.
+3 of 5 steps (60%) done
+[Thu Apr  7 15:32:13 2022]
+Finished job 26.
+4 of 5 steps (80%) done
+Select jobs to execute...
+
+[Thu Apr  7 15:32:13 2022]
+localrule all:
+    input: test/processed-fastq/plex2_proc_R1.fastq.gz, test/processed-fastq/plex1_proc_R1.fastq.gz, test/processed-fastq/mpnst1_proc_R1.fastq.gz, test/processed-fastq/mpnst2_proc_R1.fastq.gz, test/processed-fastq/plex2_proc_R2.fastq.gz, test/processed-fastq/plex1_proc_R2.fastq.gz, test/processed-fastq/mpnst1_proc_R2.fastq.gz, test/processed-fastq/mpnst2_proc_R2.fastq.gz, test/unpaired-fastq/plex2_unpr_R1.fastq.gz, test/unpaired-fastq/plex1_unpr_R1.fastq.gz, test/unpaired-fastq/mpnst1_unpr_R1.fastq.gz, test/unpaired-fastq/mpnst2_unpr_R1.fastq.gz, test/unpaired-fastq/plex2_unpr_R2.fastq.gz, test/unpaired-fastq/plex1_unpr_R2.fastq.gz, test/unpaired-fastq/mpnst1_unpr_R2.fastq.gz, test/unpaired-fastq/mpnst2_unpr_R2.fastq.gz, test/qc/plex2_R1_fastqc.html, test/qc/plex2_R2_fastqc.html, test/qc/plex1_R1_fastqc.html, test/qc/plex1_R2_fastqc.html, test/qc/mpnst1_R1_fastqc.html, test/qc/mpnst1_R2_fastqc.html, test/qc/mpnst2_R1_fastqc.html, test/qc/mpnst2_R2_fastqc.html, test/qc/plex2_proc_R1_fastqc.html, test/qc/plex2_proc_R2_fastqc.html, test/qc/plex1_proc_R1_fastqc.html, test/qc/plex1_proc_R2_fastqc.html, test/qc/mpnst1_proc_R1_fastqc.html, test/qc/mpnst1_proc_R2_fastqc.html, test/qc/mpnst2_proc_R1_fastqc.html, test/qc/mpnst2_proc_R2_fastqc.html, test/bam/plex2.sam, test/bam/plex1.sam, test/bam/mpnst1.sam, test/bam/mpnst2.sam, test/bam/plex2.bam, test/bam/plex1.bam, test/bam/mpnst1.bam, test/bam/mpnst2.bam
+    jobid: 0
+    resources: tmpdir=/tmp
+
+[Thu Apr  7 15:32:13 2022]
+Finished job 0.
+5 of 5 steps (100%) done
+Complete log: /home/jeszyman/repos/mpnst-preprocessing/.snakemake/log/2022-04-07T153212.935332.snakemake.log

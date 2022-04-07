@@ -10,6 +10,11 @@ rule all:
         expand(config["unpr_fq_dir"] + "/{fq_id}_unpr_R2.fastq.gz", fq_id=FQ_ID_RAW),
         expand(config["qc_dir"] + "/{fq_id}_{read}_fastqc.html", fq_id=FQ_ID_RAW, read=["R1", "R2"]),
         expand(config["qc_dir"] + "/{fq_id}_proc_{read}_fastqc.html", fq_id=FQ_ID_RAW, read=["R1", "R2"]),
+        expand(config["bam_dir"] + "/{fq_id}.sam", fq_id=FQ_ID_RAW),
+        expand(config["bam_dir"] + "/{fq_id}.bam", fq_id=FQ_ID_RAW),
+        expand(config["bam_dir"] + "/{fq_id}_dedup.bam", fq_id=FQ_ID_RAW),
+        expand(config["bam_dir"] + "/{fq_id}_dedup_sort.bam", fq_id=FQ_ID_RAW),
+        expand(config["bam_dir"] + "/{fq_id}_dedup_sort.bam.bai", fq_id=FQ_ID_RAW),
 
 rule trimmomatic:
     input:
@@ -71,4 +76,35 @@ rule fastqc_proc:
 	fastqc --outdir {params.out_dir} \
 	--quiet \
 	--threads {config[threads]} {input} &> {log}
+        """
+
+rule align:
+    input:
+        read1 = config["processed_fq_dir"] + "/{fq_id}_proc_R1.fastq.gz",
+        read2 = config["processed_fq_dir"] + "/{fq_id}_proc_R2.fastq.gz",
+    output:
+        config["bam_dir"] + "/{fq_id}.sam",
+    log:
+        config["log_dir"] + "/align_{fq_id}.log"
+    shell:
+        """
+        bwa mem -M -t 4 {config[bwa_index]} {input.read1} {input.read2} > {output}
+	"""
+
+rule alignment_processing:
+    input:
+        config["bam_dir"] + "/{fq_id}.sam",
+    output:
+        bam = config["bam_dir"] + "/{fq_id}.bam",
+        dedup = config["bam_dir"] + "/{fq_id}_dedup.bam",
+        sort = config["bam_dir"] + "/{fq_id}_dedup_sort.bam",
+        index = config["bam_dir"] + "/{fq_id}_dedup_sort.bam.bai",
+    log:
+        config["log_dir"] + "/alignment_processing_{fq_id}.log"
+    shell:
+        """
+        sambamba view -t {config[threads]} -S -f bam {input} > {output.bam}
+        sambamba markdup -r -t {config[threads]} {output.bam} {output.dedup}
+        sambamba sort -t {config[threads]} {output.dedup} -o {output.sort}
+        sambamba index -t {config[threads]} {output.sort}
         """

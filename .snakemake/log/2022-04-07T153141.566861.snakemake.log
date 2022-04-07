@@ -1,0 +1,24 @@
+Building DAG of jobs...
+Using shell: /bin/bash
+Provided cores: 8
+Rules claiming more threads will be scaled down.
+Job stats:
+job                     count    min threads    max threads
+--------------------  -------  -------------  -------------
+alignment_processing        4              1              1
+all                         1              1              1
+total                       5              1              1
+
+Select jobs to execute...
+
+[Thu Apr  7 15:31:41 2022]
+rule alignment_processing:
+    input: test/bam/plex1.sam
+    output: test/bam/plex1.bam
+    log: test/logs/alignment_processing_plex1.log
+    jobid: 26
+    wildcards: fq_id=plex1
+    resources: tmpdir=/tmp
+
+RuleException in line 91 of /home/jeszyman/repos/mpnst-preprocessing/workflow/read_qc.smk:
+NameError: The name 'base' is unknown in this context. Please make sure that you defined that variable. Also note that braces not used for variable access have to be escaped by repeating them, i.e. {{print $1}}

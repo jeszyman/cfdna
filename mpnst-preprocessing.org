@@ -1,3 +1,39 @@
+
+Mwe setup
+Get trimmomatic adapters
+Setup dir
+
+#####
+
+Seq preprocessing mwe
+
+rule all:
+    input:
+
+rule fastqc:
+    input: 
+        raw = config["fastq_dir"] + "/{fastq_id}.faster.gz"
+        processed = config
+    output:
+    shell:
+    """
+    fastqc
+    """
+
+rule seq_preprocess:
+    input:
+    output:
+    shell:
+        """
+        trimmomatic
+        """
+
+Alignment
+
+Post alignment qc
+
+Post aligent processing 
+
 * MPNST Sequencing Read Pre-processing                              :bioinfo:
 ** Setup
 *** Repository

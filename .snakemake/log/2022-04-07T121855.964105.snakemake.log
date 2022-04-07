@@ -1,0 +1,17 @@
+Building DAG of jobs...
+MissingInputException in line 4 of /home/jeszyman/repos/mpnst-preprocessing/workflow/read_qc.smk:
+Missing input files for rule all:
+test/qc/mpnst2_R1_fastqc.html
+test/qc/mpnst1_R1_fastqc.zip
+test/qc/mpnst1_R1_fastqc.html
+test/qc/mpnst1_R2_fastqc.html
+test/qc/plex2_R2_fastqc.zip
+test/qc/plex2_R1_fastqc.html
+test/qc/plex1_R2_fastqc.html
+test/qc/plex1_R1_fastqc.html
+test/qc/plex2_R1_fastqc.zip
+test/qc/plex1_R2_fastqc.zip
+test/qc/mpnst1_R2_fastqc.zip
+test/qc/mpnst2_R1_fastqc.zip
+test/qc/plex1_R1_fastqc.zip
+test/qc/plex2_R2_fastqc.html

@@ -35,7 +35,28 @@ if [ -r ${sif_dir}/frag.sif ]; then
 else
     echo "Local singularity file not found."
 fi
-   
+
+# Check if local singularity container is present and up-to-date
+if [ -r "${HOME}/sing_containers/biotools.sif" ]; then
+    echo "Local biotools singularity container exists"
+else
+    echo "No local biotools singularity container, attempting to fetch..."
+    mkdir -p "${HOME}/sing_containers"
+    cp /mnt/ris/aadel/jeszyman/sing_containers/biotools.sif "${HOME}/sing_containers"
+fi 
+
+if [ ${HOME}/sing_containers/biotools.sif -ot /mnt/ris/aadel/jeszyman/sing_containers/biotools.sif ];
+then
+    echo "Local biotools container out of date, updating..."
+    cp /mnt/ris/aadel/jeszyman/sing_containers/biotools.sif "${HOME}/sing_containers"
+else
+    echo "Local biotools singularity container is up to date"
+fi
+
+sing_biotools() {
+    singularity shell --bind /mnt:/mnt ~/sing_containers/biotools.sif            
+}
+
 launch_frag() { 
     if [ -f /.dockerenv ]; then
         echo "shell already in docker, exiting";

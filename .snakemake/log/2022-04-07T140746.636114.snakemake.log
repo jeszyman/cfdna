@@ -1,0 +1,83 @@
+Building DAG of jobs...
+Using shell: /bin/bash
+Provided cores: 4
+Rules claiming more threads will be scaled down.
+Job stats:
+job            count    min threads    max threads
+-----------  -------  -------------  -------------
+all                1              1              1
+fastqc_raw         8              1              1
+trimmomatic        4              1              1
+total             13              1              1
+
+Select jobs to execute...
+
+[Thu Apr  7 14:07:46 2022]
+rule fastqc_raw:
+    input: test/fastq/plex1_R1.fastq.gz
+    output: test/qc/plex1_R1_fastqc.html, test/qc/plex1_R1_fastqc.zip
+    log: test/logs/fastqc_raw_plex1_R1.log
+    jobid: 7
+    wildcards: fq_id=plex1, read=R1
+    resources: tmpdir=/tmp
+
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+
+[Thu Apr  7 14:07:46 2022]
+rule trimmomatic:
+    input: test/fastq/mpnst1_R1.fastq.gz, test/fastq/mpnst1_R2.fastq.gz
+    output: test/processed-fastq/mpnst1_proc_R1.fastq.gz, test/unpaired-fastq/mpnst1_unpr_R1.fastq.gz, test/processed-fastq/mpnst1_proc_R2.fastq.gz, test/unpaired-fastq/mpnst1_unpr_R2.fastq.gz
+    log: test/logs/trimmomatic_trimlog_mpnst1.log, test/logs/trimmomatic_mpnst1.log
+    jobid: 3
+    wildcards: fq_id=mpnst1
+    resources: tmpdir=/tmp
+
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+
+[Thu Apr  7 14:07:46 2022]
+rule fastqc_raw:
+    input: test/fastq/mpnst2_R1.fastq.gz
+    output: test/qc/mpnst2_R1_fastqc.html, test/qc/mpnst2_R1_fastqc.zip
+    log: test/logs/fastqc_raw_mpnst2_R1.log
+    jobid: 11
+    wildcards: fq_id=mpnst2, read=R1
+    resources: tmpdir=/tmp
+
+
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+[Thu Apr  7 14:07:46 2022]
+rule fastqc_raw:
+    input: test/fastq/plex1_R2.fastq.gz
+    output: test/qc/plex1_R2_fastqc.html, test/qc/plex1_R2_fastqc.zip
+    log: test/logs/fastqc_raw_plex1_R2.log
+    jobid: 8
+    wildcards: fq_id=plex1, read=R2
+    resources: tmpdir=/tmp
+
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+[Thu Apr  7 14:07:48 2022]
+Error in rule trimmomatic:
+    jobid: 3
+    output: test/processed-fastq/mpnst1_proc_R1.fastq.gz, test/unpaired-fastq/mpnst1_unpr_R1.fastq.gz, test/processed-fastq/mpnst1_proc_R2.fastq.gz, test/unpaired-fastq/mpnst1_unpr_R2.fastq.gz
+    log: test/logs/trimmomatic_trimlog_mpnst1.log, test/logs/trimmomatic_mpnst1.log (check log file(s) for error message)
+    shell:
+        
+        workflow/scripts/trimmomatic.sh         4         test/logs/trimmomatic_trimlog_mpnst1.log         test/fastq/mpnst1_R1.fastq.gz         test/fastq/mpnst1_R2.fastq.gz         test/processed-fastq/mpnst1_proc_R1.fastq.gz         test/unpaired-fastq/mpnst1_unpr_R1.fastq.gz \	
+        test/processed-fastq/mpnst1_proc_R2.fastq.gz         test/unpaired-fastq/mpnst1_unpr_R2.fastq.gz test/inputs/TruSeq3-PE.fa &> test/logs/trimmomatic_mpnst1.log
+        
+        (one of the commands exited with non-zero exit code; note that snakemake uses bash strict mode!)
+
+Removing output files of failed job trimmomatic since they might be corrupted:
+test/processed-fastq/mpnst1_proc_R1.fastq.gz, test/unpaired-fastq/mpnst1_unpr_R1.fastq.gz
+[Thu Apr  7 14:07:50 2022]
+Finished job 7.
+1 of 13 steps (8%) done
+[Thu Apr  7 14:07:50 2022]
+Finished job 11.
+2 of 13 steps (15%) done
+[Thu Apr  7 14:07:50 2022]
+Finished job 8.
+3 of 13 steps (23%) done
+Shutting down, this might take some time.
+Exiting because a job execution failed. Look above for error message
+Complete log: /home/jeszyman/repos/mpnst-preprocessing/.snakemake/log/2022-04-07T140746.636114.snakemake.log

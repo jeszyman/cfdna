@@ -19,9 +19,8 @@ do
     snakemake --dry-run --snakefile $filename \
               --configfile config/${HOSTNAME}.yaml \
               --cores $threads \
-              --directory /drive3/users/jszymanski/repos/mpnst-preprocessing \
+              --directory ${repo} \
               --rerun-incomplete \
               --singularity-args "--bind $mntpt:$mntpt" \
-              --use-singularity
-    break
+              --use-singularity 
 done

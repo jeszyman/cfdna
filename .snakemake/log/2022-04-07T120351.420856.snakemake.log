@@ -1,0 +1,32 @@
+Building DAG of jobs...
+Using shell: /bin/bash
+Provided cores: 4
+Rules claiming more threads will be scaled down.
+Job stats:
+job                   count    min threads    max threads
+------------------  -------  -------------  -------------
+read_preprocessing        1              1              1
+total                     1              1              1
+
+Select jobs to execute...
+
+[Thu Apr  7 12:03:51 2022]
+rule read_preprocessing:
+    input: test/fastq/mpnst1_R1.fastq.gz, test/fastq/mpnst1_R2.fastq.gz
+    log: /home/jeszyman/repos/mpnst-preprocessing/test/logs/test.txt
+    jobid: 0
+    resources: tmpdir=/tmp
+
+[Thu Apr  7 12:03:51 2022]
+Error in rule read_preprocessing:
+    jobid: 0
+    log: /home/jeszyman/repos/mpnst-preprocessing/test/logs/test.txt (check log file(s) for error message)
+    shell:
+        
+	trimmomatic PE         -threads 2         test/fastq/mpnst1_R1.fastq.gz         test/fastq/mpnst1_R2.fastq.gz         /tmp/test_R1_paired.fastq.gz /tmp/test_R2_paired.fastq.gz         /tmp/test_R1_unpaied.fastq.gz /tmp/test_R2_unpaired.fastq.gz         ILLUMINACLIP:~/repos/mpnst-preprocessing/test/inputs/TruSeq3-PE.fa:2:30:10
+        
+        (one of the commands exited with non-zero exit code; note that snakemake uses bash strict mode!)
+
+Shutting down, this might take some time.
+Exiting because a job execution failed. Look above for error message
+Complete log: /home/jeszyman/repos/mpnst-preprocessing/.snakemake/log/2022-04-07T120351.420856.snakemake.log

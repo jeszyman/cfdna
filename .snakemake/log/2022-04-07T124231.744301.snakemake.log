@@ -1,0 +1,3 @@
+SyntaxError:
+Not all output, log and benchmark files of rule read_preprocessing contain the same wildcards. This is crucial though, in order to avoid that two or more jobs write to the same file.
+  File "/home/jeszyman/repos/mpnst-preprocessing/workflow/read_qc.smk", line 25, in <module>

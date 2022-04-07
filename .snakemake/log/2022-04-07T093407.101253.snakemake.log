@@ -1,0 +1,211 @@
+Building DAG of jobs...
+Relative file path './test/qc/plex2_R1_fastqc.html' starts with './'. This is redundant and strongly discouraged. It can also lead to inconsistent results of the file-matching approach used by Snakemake. You can simply omit the './' for relative file paths.
+Relative file path './test/qc/plex1_R2_fastqc.html' starts with './'. This is redundant and strongly discouraged. It can also lead to inconsistent results of the file-matching approach used by Snakemake. You can simply omit the './' for relative file paths.
+Relative file path './test/qc/plex1_R1_fastqc.html' starts with './'. This is redundant and strongly discouraged. It can also lead to inconsistent results of the file-matching approach used by Snakemake. You can simply omit the './' for relative file paths.
+Relative file path './test/qc/plex2_R2_fastqc.html' starts with './'. This is redundant and strongly discouraged. It can also lead to inconsistent results of the file-matching approach used by Snakemake. You can simply omit the './' for relative file paths.
+Relative file path './test/qc/mpnst1_R1_fastqc.html' starts with './'. This is redundant and strongly discouraged. It can also lead to inconsistent results of the file-matching approach used by Snakemake. You can simply omit the './' for relative file paths.
+Relative file path './test/qc/mpnst2_R1_fastqc.html' starts with './'. This is redundant and strongly discouraged. It can also lead to inconsistent results of the file-matching approach used by Snakemake. You can simply omit the './' for relative file paths.
+Relative file path './test/qc/mpnst1_R2_fastqc.html' starts with './'. This is redundant and strongly discouraged. It can also lead to inconsistent results of the file-matching approach used by Snakemake. You can simply omit the './' for relative file paths.
+Relative file path './test/qc/plex2_R1_fastqc.zip' starts with './'. This is redundant and strongly discouraged. It can also lead to inconsistent results of the file-matching approach used by Snakemake. You can simply omit the './' for relative file paths.
+Relative file path './test/qc/plex1_R2_fastqc.zip' starts with './'. This is redundant and strongly discouraged. It can also lead to inconsistent results of the file-matching approach used by Snakemake. You can simply omit the './' for relative file paths.
+Relative file path './test/qc/plex1_R1_fastqc.zip' starts with './'. This is redundant and strongly discouraged. It can also lead to inconsistent results of the file-matching approach used by Snakemake. You can simply omit the './' for relative file paths.
+Relative file path './test/qc/plex2_R2_fastqc.zip' starts with './'. This is redundant and strongly discouraged. It can also lead to inconsistent results of the file-matching approach used by Snakemake. You can simply omit the './' for relative file paths.
+Relative file path './test/qc/mpnst1_R1_fastqc.zip' starts with './'. This is redundant and strongly discouraged. It can also lead to inconsistent results of the file-matching approach used by Snakemake. You can simply omit the './' for relative file paths.
+Relative file path './test/qc/mpnst2_R1_fastqc.zip' starts with './'. This is redundant and strongly discouraged. It can also lead to inconsistent results of the file-matching approach used by Snakemake. You can simply omit the './' for relative file paths.
+Relative file path './test/qc/mpnst1_R2_fastqc.zip' starts with './'. This is redundant and strongly discouraged. It can also lead to inconsistent results of the file-matching approach used by Snakemake. You can simply omit the './' for relative file paths.
+Relative file path './test/fastq/plex2_R1.fastq.gz' starts with './'. This is redundant and strongly discouraged. It can also lead to inconsistent results of the file-matching approach used by Snakemake. You can simply omit the './' for relative file paths.
+Relative file path './test/qc/plex2_R1_fastqc.html' starts with './'. This is redundant and strongly discouraged. It can also lead to inconsistent results of the file-matching approach used by Snakemake. You can simply omit the './' for relative file paths.
+Relative file path './test/qc/plex2_R1_fastqc.zip' starts with './'. This is redundant and strongly discouraged. It can also lead to inconsistent results of the file-matching approach used by Snakemake. You can simply omit the './' for relative file paths.
+Relative file path './test/logs/fastqc_plex2_R1.log' starts with './'. This is redundant and strongly discouraged. It can also lead to inconsistent results of the file-matching approach used by Snakemake. You can simply omit the './' for relative file paths.
+Relative file path './test/fastq/plex1_R2.fastq.gz' starts with './'. This is redundant and strongly discouraged. It can also lead to inconsistent results of the file-matching approach used by Snakemake. You can simply omit the './' for relative file paths.
+Relative file path './test/qc/plex1_R2_fastqc.html' starts with './'. This is redundant and strongly discouraged. It can also lead to inconsistent results of the file-matching approach used by Snakemake. You can simply omit the './' for relative file paths.
+Relative file path './test/qc/plex1_R2_fastqc.zip' starts with './'. This is redundant and strongly discouraged. It can also lead to inconsistent results of the file-matching approach used by Snakemake. You can simply omit the './' for relative file paths.
+Relative file path './test/logs/fastqc_plex1_R2.log' starts with './'. This is redundant and strongly discouraged. It can also lead to inconsistent results of the file-matching approach used by Snakemake. You can simply omit the './' for relative file paths.
+Relative file path './test/fastq/plex1_R1.fastq.gz' starts with './'. This is redundant and strongly discouraged. It can also lead to inconsistent results of the file-matching approach used by Snakemake. You can simply omit the './' for relative file paths.
+Relative file path './test/qc/plex1_R1_fastqc.html' starts with './'. This is redundant and strongly discouraged. It can also lead to inconsistent results of the file-matching approach used by Snakemake. You can simply omit the './' for relative file paths.
+Relative file path './test/qc/plex1_R1_fastqc.zip' starts with './'. This is redundant and strongly discouraged. It can also lead to inconsistent results of the file-matching approach used by Snakemake. You can simply omit the './' for relative file paths.
+Relative file path './test/logs/fastqc_plex1_R1.log' starts with './'. This is redundant and strongly discouraged. It can also lead to inconsistent results of the file-matching approach used by Snakemake. You can simply omit the './' for relative file paths.
+Relative file path './test/fastq/plex2_R2.fastq.gz' starts with './'. This is redundant and strongly discouraged. It can also lead to inconsistent results of the file-matching approach used by Snakemake. You can simply omit the './' for relative file paths.
+Relative file path './test/qc/plex2_R2_fastqc.html' starts with './'. This is redundant and strongly discouraged. It can also lead to inconsistent results of the file-matching approach used by Snakemake. You can simply omit the './' for relative file paths.
+Relative file path './test/qc/plex2_R2_fastqc.zip' starts with './'. This is redundant and strongly discouraged. It can also lead to inconsistent results of the file-matching approach used by Snakemake. You can simply omit the './' for relative file paths.
+Relative file path './test/logs/fastqc_plex2_R2.log' starts with './'. This is redundant and strongly discouraged. It can also lead to inconsistent results of the file-matching approach used by Snakemake. You can simply omit the './' for relative file paths.
+Relative file path './test/fastq/mpnst1_R1.fastq.gz' starts with './'. This is redundant and strongly discouraged. It can also lead to inconsistent results of the file-matching approach used by Snakemake. You can simply omit the './' for relative file paths.
+Relative file path './test/qc/mpnst1_R1_fastqc.html' starts with './'. This is redundant and strongly discouraged. It can also lead to inconsistent results of the file-matching approach used by Snakemake. You can simply omit the './' for relative file paths.
+Relative file path './test/qc/mpnst1_R1_fastqc.zip' starts with './'. This is redundant and strongly discouraged. It can also lead to inconsistent results of the file-matching approach used by Snakemake. You can simply omit the './' for relative file paths.
+Relative file path './test/logs/fastqc_mpnst1_R1.log' starts with './'. This is redundant and strongly discouraged. It can also lead to inconsistent results of the file-matching approach used by Snakemake. You can simply omit the './' for relative file paths.
+Relative file path './test/fastq/mpnst2_R1.fastq.gz' starts with './'. This is redundant and strongly discouraged. It can also lead to inconsistent results of the file-matching approach used by Snakemake. You can simply omit the './' for relative file paths.
+Relative file path './test/qc/mpnst2_R1_fastqc.html' starts with './'. This is redundant and strongly discouraged. It can also lead to inconsistent results of the file-matching approach used by Snakemake. You can simply omit the './' for relative file paths.
+Relative file path './test/qc/mpnst2_R1_fastqc.zip' starts with './'. This is redundant and strongly discouraged. It can also lead to inconsistent results of the file-matching approach used by Snakemake. You can simply omit the './' for relative file paths.
+Relative file path './test/logs/fastqc_mpnst2_R1.log' starts with './'. This is redundant and strongly discouraged. It can also lead to inconsistent results of the file-matching approach used by Snakemake. You can simply omit the './' for relative file paths.
+Relative file path './test/fastq/mpnst1_R2.fastq.gz' starts with './'. This is redundant and strongly discouraged. It can also lead to inconsistent results of the file-matching approach used by Snakemake. You can simply omit the './' for relative file paths.
+Relative file path './test/qc/mpnst1_R2_fastqc.html' starts with './'. This is redundant and strongly discouraged. It can also lead to inconsistent results of the file-matching approach used by Snakemake. You can simply omit the './' for relative file paths.
+Relative file path './test/qc/mpnst1_R2_fastqc.zip' starts with './'. This is redundant and strongly discouraged. It can also lead to inconsistent results of the file-matching approach used by Snakemake. You can simply omit the './' for relative file paths.
+Relative file path './test/logs/fastqc_mpnst1_R2.log' starts with './'. This is redundant and strongly discouraged. It can also lead to inconsistent results of the file-matching approach used by Snakemake. You can simply omit the './' for relative file paths.
+Relative file path './test/logs/fastqc_plex2_R1.log' starts with './'. This is redundant and strongly discouraged. It can also lead to inconsistent results of the file-matching approach used by Snakemake. You can simply omit the './' for relative file paths.
+Relative file path './test/logs/fastqc_plex1_R2.log' starts with './'. This is redundant and strongly discouraged. It can also lead to inconsistent results of the file-matching approach used by Snakemake. You can simply omit the './' for relative file paths.
+Relative file path './test/logs/fastqc_plex1_R1.log' starts with './'. This is redundant and strongly discouraged. It can also lead to inconsistent results of the file-matching approach used by Snakemake. You can simply omit the './' for relative file paths.
+Relative file path './test/logs/fastqc_plex2_R2.log' starts with './'. This is redundant and strongly discouraged. It can also lead to inconsistent results of the file-matching approach used by Snakemake. You can simply omit the './' for relative file paths.
+Relative file path './test/logs/fastqc_mpnst1_R1.log' starts with './'. This is redundant and strongly discouraged. It can also lead to inconsistent results of the file-matching approach used by Snakemake. You can simply omit the './' for relative file paths.
+Relative file path './test/logs/fastqc_mpnst2_R1.log' starts with './'. This is redundant and strongly discouraged. It can also lead to inconsistent results of the file-matching approach used by Snakemake. You can simply omit the './' for relative file paths.
+Relative file path './test/logs/fastqc_mpnst1_R2.log' starts with './'. This is redundant and strongly discouraged. It can also lead to inconsistent results of the file-matching approach used by Snakemake. You can simply omit the './' for relative file paths.
+Using shell: /bin/bash
+Provided cores: 8
+Rules claiming more threads will be scaled down.
+Job stats:
+job       count    min threads    max threads
+------  -------  -------------  -------------
+all           1              1              1
+fastqc        7              1              1
+total         8              1              1
+
+Select jobs to execute...
+
+[Thu Apr  7 09:34:07 2022]
+rule fastqc:
+    input: ./test/fastq/plex1_R1.fastq.gz
+    output: ./test/qc/plex1_R1_fastqc.html, ./test/qc/plex1_R1_fastqc.zip
+    log: ./test/logs/fastqc_plex1_R1.log
+    jobid: 3
+    wildcards: fq_id=plex1_R1
+    resources: tmpdir=/tmp
+
+
+[Thu Apr  7 09:34:07 2022]
+rule fastqc:
+    input: ./test/fastq/mpnst1_R1.fastq.gz
+    output: ./test/qc/mpnst1_R1_fastqc.html, ./test/qc/mpnst1_R1_fastqc.zip
+    log: ./test/logs/fastqc_mpnst1_R1.log
+    jobid: 5
+    wildcards: fq_id=mpnst1_R1
+    resources: tmpdir=/tmp
+
+
+[Thu Apr  7 09:34:07 2022]
+rule fastqc:
+    input: ./test/fastq/mpnst1_R2.fastq.gz
+    output: ./test/qc/mpnst1_R2_fastqc.html, ./test/qc/mpnst1_R2_fastqc.zip
+    log: ./test/logs/fastqc_mpnst1_R2.log
+    jobid: 7
+    wildcards: fq_id=mpnst1_R2
+    resources: tmpdir=/tmp
+
+[Thu Apr  7 09:34:07 2022]
+
+Error in rule fastqc:
+[Thu Apr  7 09:34:07 2022]
+    jobid: 3
+rule fastqc:
+    input: ./test/fastq/plex2_R1.fastq.gz
+    output: ./test/qc/plex2_R1_fastqc.html, ./test/qc/plex2_R1_fastqc.zip
+    log: ./test/logs/fastqc_plex2_R1.log
+    jobid: 1
+    wildcards: fq_id=plex2_R1
+    resources: tmpdir=/tmp
+    output: ./test/qc/plex1_R1_fastqc.html, ./test/qc/plex1_R1_fastqc.zip
+
+[Thu Apr  7 09:34:07 2022]
+    log: ./test/logs/fastqc_plex1_R1.log (check log file(s) for error message)
+Error in rule fastqc:
+    shell:
+        
+	workflow/scripts/fastqc.sh ./test/fastq/plex1_R1.fastq.gz ./test/qc 4 &> ./test/logs/fastqc_plex1_R1.log
+        
+        (one of the commands exited with non-zero exit code; note that snakemake uses bash strict mode!)
+[Thu Apr  7 09:34:07 2022]
+    jobid: 5
+
+Error in rule fastqc:
+    output: ./test/qc/mpnst1_R1_fastqc.html, ./test/qc/mpnst1_R1_fastqc.zip
+    jobid: 7
+    log: ./test/logs/fastqc_mpnst1_R1.log (check log file(s) for error message)
+    output: ./test/qc/mpnst1_R2_fastqc.html, ./test/qc/mpnst1_R2_fastqc.zip
+    shell:
+        
+	workflow/scripts/fastqc.sh ./test/fastq/mpnst1_R1.fastq.gz ./test/qc 4 &> ./test/logs/fastqc_mpnst1_R1.log
+        
+        (one of the commands exited with non-zero exit code; note that snakemake uses bash strict mode!)
+
+    log: ./test/logs/fastqc_mpnst1_R2.log (check log file(s) for error message)
+
+[Thu Apr  7 09:34:07 2022]
+    shell:
+        
+	workflow/scripts/fastqc.sh ./test/fastq/mpnst1_R2.fastq.gz ./test/qc 4 &> ./test/logs/fastqc_mpnst1_R2.log
+        
+        (one of the commands exited with non-zero exit code; note that snakemake uses bash strict mode!)
+rule fastqc:
+    input: ./test/fastq/plex2_R2.fastq.gz
+    output: ./test/qc/plex2_R2_fastqc.html, ./test/qc/plex2_R2_fastqc.zip
+    log: ./test/logs/fastqc_plex2_R2.log
+    jobid: 4
+    wildcards: fq_id=plex2_R2
+    resources: tmpdir=/tmp
+
+
+
+[Thu Apr  7 09:34:07 2022]
+rule fastqc:
+    input: ./test/fastq/plex1_R2.fastq.gz
+    output: ./test/qc/plex1_R2_fastqc.html, ./test/qc/plex1_R2_fastqc.zip
+    log: ./test/logs/fastqc_plex1_R2.log
+    jobid: 2
+    wildcards: fq_id=plex1_R2
+    resources: tmpdir=/tmp
+
+[Thu Apr  7 09:34:07 2022]
+Error in rule fastqc:
+    jobid: 1
+    output: ./test/qc/plex2_R1_fastqc.html, ./test/qc/plex2_R1_fastqc.zip
+    log: ./test/logs/fastqc_plex2_R1.log (check log file(s) for error message)
+    shell:
+        
+	workflow/scripts/fastqc.sh ./test/fastq/plex2_R1.fastq.gz ./test/qc 4 &> ./test/logs/fastqc_plex2_R1.log
+        
+        (one of the commands exited with non-zero exit code; note that snakemake uses bash strict mode!)
+
+
+[Thu Apr  7 09:34:07 2022]
+rule fastqc:
+    input: ./test/fastq/mpnst2_R1.fastq.gz
+    output: ./test/qc/mpnst2_R1_fastqc.html, ./test/qc/mpnst2_R1_fastqc.zip
+    log: ./test/logs/fastqc_mpnst2_R1.log
+    jobid: 6
+    wildcards: fq_id=mpnst2_R1
+    resources: tmpdir=/tmp
+
+[Thu Apr  7 09:34:07 2022]
+Error in rule fastqc:
+    jobid: 4
+    output: ./test/qc/plex2_R2_fastqc.html, ./test/qc/plex2_R2_fastqc.zip
+    log: ./test/logs/fastqc_plex2_R2.log (check log file(s) for error message)
+    shell:
+        
+	workflow/scripts/fastqc.sh ./test/fastq/plex2_R2.fastq.gz ./test/qc 4 &> ./test/logs/fastqc_plex2_R2.log
+        
+        (one of the commands exited with non-zero exit code; note that snakemake uses bash strict mode!)
+
+[Thu Apr  7 09:34:07 2022]
+Error in rule fastqc:
+    jobid: 2
+    output: ./test/qc/plex1_R2_fastqc.html, ./test/qc/plex1_R2_fastqc.zip
+    log: ./test/logs/fastqc_plex1_R2.log (check log file(s) for error message)
+    shell:
+        
+	workflow/scripts/fastqc.sh ./test/fastq/plex1_R2.fastq.gz ./test/qc 4 &> ./test/logs/fastqc_plex1_R2.log
+        
+        (one of the commands exited with non-zero exit code; note that snakemake uses bash strict mode!)
+
+[Thu Apr  7 09:34:07 2022]
+Error in rule fastqc:
+    jobid: 6
+    output: ./test/qc/mpnst2_R1_fastqc.html, ./test/qc/mpnst2_R1_fastqc.zip
+    log: ./test/logs/fastqc_mpnst2_R1.log (check log file(s) for error message)
+    shell:
+        
+	workflow/scripts/fastqc.sh ./test/fastq/mpnst2_R1.fastq.gz ./test/qc 4 &> ./test/logs/fastqc_mpnst2_R1.log
+        
+        (one of the commands exited with non-zero exit code; note that snakemake uses bash strict mode!)
+
+Shutting down, this might take some time.
+Exiting because a job execution failed. Look above for error message
+Complete log: /home/jeszyman/repos/mpnst-preprocessing/.snakemake/log/2022-04-07T093407.101253.snakemake.log

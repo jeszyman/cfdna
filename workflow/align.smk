@@ -9,6 +9,15 @@ rule all:
         config["ref_dir"] + "/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna.bwt",
         config["ref_dir"] + "/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna.sa",
 
+rule read_preprocessing:
+    input:
+        fastq = config["inputs_dir"] + "/ANF/{ext_id}.fastq.gz"
+    output:
+    shell:
+        """
+        scripts/read_preprocessing.sh
+        """
+
 rule get_fasta:
     log: config["log_dir"] + "/get_fasta.log"
     output:

@@ -1,0 +1,391 @@
+Config file ./config/common.yaml is extended by additional config specified via the command line.
+Building DAG of jobs...
+Using shell: /bin/bash
+Provided cores: 40
+Rules claiming more threads will be scaled down.
+Job stats:
+job                         count    min threads    max threads
+------------------------  -------  -------------  -------------
+all                             1              1              1
+extract_cappseq_barcodes      127              1              1
+total                         128              1              1
+
+Select jobs to execute...
+
+[Wed Apr  6 12:07:10 2022]
+rule extract_cappseq_barcodes:
+    input: /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeqW31_Undetermined_R6000232_L005_001_ATCG_R1.fastq.gz, /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeqW31_Undetermined_R6000232_L005_001_ATCG_R2.fastq.gz
+    output: /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeqW31_Undetermined_R6000232_L005_001_ATCG_R1.fastq, /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeqW31_Undetermined_R6000232_L005_001_ATCG_R2.fastq, /mnt/ris/aadel/mpnst/cappseq/extracted/new_HiSeqW31_Undetermined_R6000232_L005_001_ATCG_R1.fastq, /mnt/ris/aadel/mpnst/cappseq/extracted/new_HiSeqW31_Undetermined_R6000232_L005_001_ATCG_R2.fastq
+    jobid: 17
+    wildcards: read_id=new_HiSeqW31_Undetermined_R6000232_L005_001_ATCG
+    resources: tmpdir=/tmp
+
+
+[Wed Apr  6 12:07:10 2022]
+rule extract_cappseq_barcodes:
+    input: /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq40_Undetermined_R6000281_L006_001_CACA_R1.fastq.gz, /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq40_Undetermined_R6000281_L006_001_CACA_R2.fastq.gz
+    output: /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq40_Undetermined_R6000281_L006_001_CACA_R1.fastq, /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq40_Undetermined_R6000281_L006_001_CACA_R2.fastq, /mnt/ris/aadel/mpnst/cappseq/extracted/new_HiSeq40_Undetermined_R6000281_L006_001_CACA_R1.fastq, /mnt/ris/aadel/mpnst/cappseq/extracted/new_HiSeq40_Undetermined_R6000281_L006_001_CACA_R2.fastq
+    jobid: 80
+    wildcards: read_id=new_HiSeq40_Undetermined_R6000281_L006_001_CACA
+    resources: tmpdir=/tmp
+
+
+[Wed Apr  6 12:07:10 2022]
+rule extract_cappseq_barcodes:
+    input: /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq-W44_Undetermined_R6000324_L004_001_AGGT_R1.fastq.gz, /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq-W44_Undetermined_R6000324_L004_001_AGGT_R2.fastq.gz
+    output: /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq-W44_Undetermined_R6000324_L004_001_AGGT_R1.fastq, /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq-W44_Undetermined_R6000324_L004_001_AGGT_R2.fastq, /mnt/ris/aadel/mpnst/cappseq/extracted/new_HiSeq-W44_Undetermined_R6000324_L004_001_AGGT_R1.fastq, /mnt/ris/aadel/mpnst/cappseq/extracted/new_HiSeq-W44_Undetermined_R6000324_L004_001_AGGT_R2.fastq
+    jobid: 49
+    wildcards: read_id=new_HiSeq-W44_Undetermined_R6000324_L004_001_AGGT
+    resources: tmpdir=/tmp
+
+
+[Wed Apr  6 12:07:10 2022]
+rule extract_cappseq_barcodes:
+    input: /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq-W45_Undetermined_R6000324_L005_001_CACA_R1.fastq.gz, /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq-W45_Undetermined_R6000324_L005_001_CACA_R2.fastq.gz
+    output: /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq-W45_Undetermined_R6000324_L005_001_CACA_R1.fastq, /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq-W45_Undetermined_R6000324_L005_001_CACA_R2.fastq, /mnt/ris/aadel/mpnst/cappseq/extracted/new_HiSeq-W45_Undetermined_R6000324_L005_001_CACA_R1.fastq, /mnt/ris/aadel/mpnst/cappseq/extracted/new_HiSeq-W45_Undetermined_R6000324_L005_001_CACA_R2.fastq
+    jobid: 112
+    wildcards: read_id=new_HiSeq-W45_Undetermined_R6000324_L005_001_CACA
+    resources: tmpdir=/tmp
+
+
+[Wed Apr  6 12:07:10 2022]
+rule extract_cappseq_barcodes:
+    input: /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq-W44_Undetermined_R6000324_L004_001_CACA_R1.fastq.gz, /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq-W44_Undetermined_R6000324_L004_001_CACA_R2.fastq.gz
+    output: /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq-W44_Undetermined_R6000324_L004_001_CACA_R1.fastq, /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq-W44_Undetermined_R6000324_L004_001_CACA_R2.fastq, /mnt/ris/aadel/mpnst/cappseq/extracted/new_HiSeq-W44_Undetermined_R6000324_L004_001_CACA_R1.fastq, /mnt/ris/aadel/mpnst/cappseq/extracted/new_HiSeq-W44_Undetermined_R6000324_L004_001_CACA_R2.fastq
+    jobid: 25
+    wildcards: read_id=new_HiSeq-W44_Undetermined_R6000324_L004_001_CACA
+    resources: tmpdir=/tmp
+
+
+[Wed Apr  6 12:07:10 2022]
+rule extract_cappseq_barcodes:
+    input: /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq-W44_Undetermined_R6000324_L004_001_CGAT_R1.fastq.gz, /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq-W44_Undetermined_R6000324_L004_001_CGAT_R2.fastq.gz
+    output: /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq-W44_Undetermined_R6000324_L004_001_CGAT_R1.fastq, /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq-W44_Undetermined_R6000324_L004_001_CGAT_R2.fastq, /mnt/ris/aadel/mpnst/cappseq/extracted/new_HiSeq-W44_Undetermined_R6000324_L004_001_CGAT_R1.fastq, /mnt/ris/aadel/mpnst/cappseq/extracted/new_HiSeq-W44_Undetermined_R6000324_L004_001_CGAT_R2.fastq
+    jobid: 57
+    wildcards: read_id=new_HiSeq-W44_Undetermined_R6000324_L004_001_CGAT
+    resources: tmpdir=/tmp
+
+
+[Wed Apr  6 12:07:10 2022]
+rule extract_cappseq_barcodes:
+    input: /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeqW36_Undetermined_R6000244_L008_001_AGGT_R1.fastq.gz, /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeqW36_Undetermined_R6000244_L008_001_AGGT_R2.fastq.gz
+    output: /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeqW36_Undetermined_R6000244_L008_001_AGGT_R1.fastq, /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeqW36_Undetermined_R6000244_L008_001_AGGT_R2.fastq, /mnt/ris/aadel/mpnst/cappseq/extracted/new_HiSeqW36_Undetermined_R6000244_L008_001_AGGT_R1.fastq, /mnt/ris/aadel/mpnst/cappseq/extracted/new_HiSeqW36_Undetermined_R6000244_L008_001_AGGT_R2.fastq
+    jobid: 88
+    wildcards: read_id=new_HiSeqW36_Undetermined_R6000244_L008_001_AGGT
+    resources: tmpdir=/tmp
+
+
+[Wed Apr  6 12:07:10 2022]
+rule extract_cappseq_barcodes:
+    input: /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeqW72_Undetermined_R6000482_L001_CACA_R1.fastq.gz, /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeqW72_Undetermined_R6000482_L001_CACA_R2.fastq.gz
+    output: /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeqW72_Undetermined_R6000482_L001_CACA_R1.fastq, /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeqW72_Undetermined_R6000482_L001_CACA_R2.fastq, /mnt/ris/aadel/mpnst/cappseq/extracted/new_HiSeqW72_Undetermined_R6000482_L001_CACA_R1.fastq, /mnt/ris/aadel/mpnst/cappseq/extracted/new_HiSeqW72_Undetermined_R6000482_L001_CACA_R2.fastq
+    jobid: 2
+    wildcards: read_id=new_HiSeqW72_Undetermined_R6000482_L001_CACA
+    resources: tmpdir=/tmp
+
+
+[Wed Apr  6 12:07:10 2022]
+rule extract_cappseq_barcodes:
+    input: /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq-W46_Undetermined_R6000324_L006_001_GTGT_R1.fastq.gz, /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq-W46_Undetermined_R6000324_L006_001_GTGT_R2.fastq.gz
+    output: /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq-W46_Undetermined_R6000324_L006_001_GTGT_R1.fastq, /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq-W46_Undetermined_R6000324_L006_001_GTGT_R2.fastq, /mnt/ris/aadel/mpnst/cappseq/extracted/new_HiSeq-W46_Undetermined_R6000324_L006_001_GTGT_R1.fastq, /mnt/ris/aadel/mpnst/cappseq/extracted/new_HiSeq-W46_Undetermined_R6000324_L006_001_GTGT_R2.fastq
+    jobid: 34
+    wildcards: read_id=new_HiSeq-W46_Undetermined_R6000324_L006_001_GTGT
+    resources: tmpdir=/tmp
+
+
+[Wed Apr  6 12:07:10 2022]
+rule extract_cappseq_barcodes:
+    input: /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq-W46_Undetermined_R6000324_L006_001_TAGC_R1.fastq.gz, /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq-W46_Undetermined_R6000324_L006_001_TAGC_R2.fastq.gz
+    output: /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq-W46_Undetermined_R6000324_L006_001_TAGC_R1.fastq, /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq-W46_Undetermined_R6000324_L006_001_TAGC_R2.fastq, /mnt/ris/aadel/mpnst/cappseq/extracted/new_HiSeq-W46_Undetermined_R6000324_L006_001_TAGC_R1.fastq, /mnt/ris/aadel/mpnst/cappseq/extracted/new_HiSeq-W46_Undetermined_R6000324_L006_001_TAGC_R2.fastq
+    jobid: 65
+    wildcards: read_id=new_HiSeq-W46_Undetermined_R6000324_L006_001_TAGC
+    resources: tmpdir=/tmp
+
+
+[Wed Apr  6 12:07:10 2022]
+rule extract_cappseq_barcodes:
+    input: /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq-W46_Undetermined_R6000324_L006_001_CGAT_R1.fastq.gz, /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq-W46_Undetermined_R6000324_L006_001_CGAT_R2.fastq.gz
+    output: /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq-W46_Undetermined_R6000324_L006_001_CGAT_R1.fastq, /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq-W46_Undetermined_R6000324_L006_001_CGAT_R2.fastq, /mnt/ris/aadel/mpnst/cappseq/extracted/new_HiSeq-W46_Undetermined_R6000324_L006_001_CGAT_R1.fastq, /mnt/ris/aadel/mpnst/cappseq/extracted/new_HiSeq-W46_Undetermined_R6000324_L006_001_CGAT_R2.fastq
+    jobid: 18
+    wildcards: read_id=new_HiSeq-W46_Undetermined_R6000324_L006_001_CGAT
+    resources: tmpdir=/tmp
+
+
+[Wed Apr  6 12:07:10 2022]
+rule extract_cappseq_barcodes:
+    input: /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq11CGAT_R1.fastq.gz, /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq11CGAT_R2.fastq.gz
+    output: /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq11CGAT_R1.fastq, /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq11CGAT_R2.fastq, /mnt/ris/aadel/mpnst/cappseq/extracted/new_HiSeq11CGAT_R1.fastq, /mnt/ris/aadel/mpnst/cappseq/extracted/new_HiSeq11CGAT_R2.fastq
+    jobid: 50
+    wildcards: read_id=new_HiSeq11CGAT
+    resources: tmpdir=/tmp
+
+
+[Wed Apr  6 12:07:10 2022]
+rule extract_cappseq_barcodes:
+    input: /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq40_Undetermined_R6000281_L006_001_TGTG_R1.fastq.gz, /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq40_Undetermined_R6000281_L006_001_TGTG_R2.fastq.gz
+    output: /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq40_Undetermined_R6000281_L006_001_TGTG_R1.fastq, /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq40_Undetermined_R6000281_L006_001_TGTG_R2.fastq, /mnt/ris/aadel/mpnst/cappseq/extracted/new_HiSeq40_Undetermined_R6000281_L006_001_TGTG_R1.fastq, /mnt/ris/aadel/mpnst/cappseq/extracted/new_HiSeq40_Undetermined_R6000281_L006_001_TGTG_R2.fastq
+    jobid: 43
+    wildcards: read_id=new_HiSeq40_Undetermined_R6000281_L006_001_TGTG
+    resources: tmpdir=/tmp
+
+
+[Wed Apr  6 12:07:10 2022]
+rule extract_cappseq_barcodes:
+    input: /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeqW72_Undetermined_R6000482_L001_TCCT_R1.fastq.gz, /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeqW72_Undetermined_R6000482_L001_TCCT_R2.fastq.gz
+    output: /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeqW72_Undetermined_R6000482_L001_TCCT_R1.fastq, /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeqW72_Undetermined_R6000482_L001_TCCT_R2.fastq, /mnt/ris/aadel/mpnst/cappseq/extracted/new_HiSeqW72_Undetermined_R6000482_L001_TCCT_R1.fastq, /mnt/ris/aadel/mpnst/cappseq/extracted/new_HiSeqW72_Undetermined_R6000482_L001_TCCT_R2.fastq
+    jobid: 74
+    wildcards: read_id=new_HiSeqW72_Undetermined_R6000482_L001_TCCT
+    resources: tmpdir=/tmp
+
+
+[Wed Apr  6 12:07:14 2022]
+rule extract_cappseq_barcodes:
+    input: /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeqW55_Undetermined_R6000373_L008_CGAT_R1.fastq.gz, /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeqW55_Undetermined_R6000373_L008_CGAT_R2.fastq.gz
+    output: /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeqW55_Undetermined_R6000373_L008_CGAT_R1.fastq, /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeqW55_Undetermined_R6000373_L008_CGAT_R2.fastq, /mnt/ris/aadel/mpnst/cappseq/extracted/new_HiSeqW55_Undetermined_R6000373_L008_CGAT_R1.fastq, /mnt/ris/aadel/mpnst/cappseq/extracted/new_HiSeqW55_Undetermined_R6000373_L008_CGAT_R2.fastq
+    jobid: 106
+    wildcards: read_id=new_HiSeqW55_Undetermined_R6000373_L008_CGAT
+    resources: tmpdir=/tmp
+
+
+[Wed Apr  6 12:07:28 2022]
+rule extract_cappseq_barcodes:
+    input: /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeqW31_Undetermined_R6000232_L005_001_TGTG_R1.fastq.gz, /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeqW31_Undetermined_R6000232_L005_001_TGTG_R2.fastq.gz
+    output: /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeqW31_Undetermined_R6000232_L005_001_TGTG_R1.fastq, /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeqW31_Undetermined_R6000232_L005_001_TGTG_R2.fastq, /mnt/ris/aadel/mpnst/cappseq/extracted/new_HiSeqW31_Undetermined_R6000232_L005_001_TGTG_R1.fastq, /mnt/ris/aadel/mpnst/cappseq/extracted/new_HiSeqW31_Undetermined_R6000232_L005_001_TGTG_R2.fastq
+    jobid: 12
+    wildcards: read_id=new_HiSeqW31_Undetermined_R6000232_L005_001_TGTG
+    resources: tmpdir=/tmp
+
+
+[Wed Apr  6 12:07:43 2022]
+rule extract_cappseq_barcodes:
+    input: /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq-W45_Undetermined_R6000324_L005_001_CGAT_R1.fastq.gz, /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq-W45_Undetermined_R6000324_L005_001_CGAT_R2.fastq.gz
+    output: /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq-W45_Undetermined_R6000324_L005_001_CGAT_R1.fastq, /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq-W45_Undetermined_R6000324_L005_001_CGAT_R2.fastq, /mnt/ris/aadel/mpnst/cappseq/extracted/new_HiSeq-W45_Undetermined_R6000324_L005_001_CGAT_R1.fastq, /mnt/ris/aadel/mpnst/cappseq/extracted/new_HiSeq-W45_Undetermined_R6000324_L005_001_CGAT_R2.fastq
+    jobid: 44
+    wildcards: read_id=new_HiSeq-W45_Undetermined_R6000324_L005_001_CGAT
+    resources: tmpdir=/tmp
+
+
+[Wed Apr  6 12:07:59 2022]
+rule extract_cappseq_barcodes:
+    input: /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq-W47_Undetermined_R6000324_L007_001_TAGC_R1.fastq.gz, /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq-W47_Undetermined_R6000324_L007_001_TAGC_R2.fastq.gz
+    output: /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq-W47_Undetermined_R6000324_L007_001_TAGC_R1.fastq, /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq-W47_Undetermined_R6000324_L007_001_TAGC_R2.fastq, /mnt/ris/aadel/mpnst/cappseq/extracted/new_HiSeq-W47_Undetermined_R6000324_L007_001_TAGC_R1.fastq, /mnt/ris/aadel/mpnst/cappseq/extracted/new_HiSeq-W47_Undetermined_R6000324_L007_001_TAGC_R2.fastq
+    jobid: 75
+    wildcards: read_id=new_HiSeq-W47_Undetermined_R6000324_L007_001_TAGC
+    resources: tmpdir=/tmp
+
+
+[Wed Apr  6 12:08:22 2022]
+rule extract_cappseq_barcodes:
+    input: /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq-W48_Undetermined_R6000324_L008_001_CGAT_R1.fastq.gz, /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq-W48_Undetermined_R6000324_L008_001_CGAT_R2.fastq.gz
+    output: /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq-W48_Undetermined_R6000324_L008_001_CGAT_R1.fastq, /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq-W48_Undetermined_R6000324_L008_001_CGAT_R2.fastq, /mnt/ris/aadel/mpnst/cappseq/extracted/new_HiSeq-W48_Undetermined_R6000324_L008_001_CGAT_R1.fastq, /mnt/ris/aadel/mpnst/cappseq/extracted/new_HiSeq-W48_Undetermined_R6000324_L008_001_CGAT_R2.fastq
+    jobid: 107
+    wildcards: read_id=new_HiSeq-W48_Undetermined_R6000324_L008_001_CGAT
+    resources: tmpdir=/tmp
+
+
+[Wed Apr  6 12:08:40 2022]
+rule extract_cappseq_barcodes:
+    input: /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq28_Undetermined_R6000204_L006001_TGTG_R1.fastq.gz, /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq28_Undetermined_R6000204_L006001_TGTG_R2.fastq.gz
+    output: /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq28_Undetermined_R6000204_L006001_TGTG_R1.fastq, /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq28_Undetermined_R6000204_L006001_TGTG_R2.fastq, /mnt/ris/aadel/mpnst/cappseq/extracted/new_HiSeq28_Undetermined_R6000204_L006001_TGTG_R1.fastq, /mnt/ris/aadel/mpnst/cappseq/extracted/new_HiSeq28_Undetermined_R6000204_L006001_TGTG_R2.fastq
+    jobid: 13
+    wildcards: read_id=new_HiSeq28_Undetermined_R6000204_L006001_TGTG
+    resources: tmpdir=/tmp
+
+
+[Wed Apr  6 12:09:01 2022]
+rule extract_cappseq_barcodes:
+    input: /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq-W44_Undetermined_R6000324_L004_001_GAAG_R1.fastq.gz, /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq-W44_Undetermined_R6000324_L004_001_GAAG_R2.fastq.gz
+    output: /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq-W44_Undetermined_R6000324_L004_001_GAAG_R1.fastq, /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq-W44_Undetermined_R6000324_L004_001_GAAG_R2.fastq, /mnt/ris/aadel/mpnst/cappseq/extracted/new_HiSeq-W44_Undetermined_R6000324_L004_001_GAAG_R1.fastq, /mnt/ris/aadel/mpnst/cappseq/extracted/new_HiSeq-W44_Undetermined_R6000324_L004_001_GAAG_R2.fastq
+    jobid: 45
+    wildcards: read_id=new_HiSeq-W44_Undetermined_R6000324_L004_001_GAAG
+    resources: tmpdir=/tmp
+
+
+[Wed Apr  6 12:09:30 2022]
+rule extract_cappseq_barcodes:
+    input: /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq28_Undetermined_R6000204_L006001_CTTC_R1.fastq.gz, /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq28_Undetermined_R6000204_L006001_CTTC_R2.fastq.gz
+    output: /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq28_Undetermined_R6000204_L006001_CTTC_R1.fastq, /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq28_Undetermined_R6000204_L006001_CTTC_R2.fastq, /mnt/ris/aadel/mpnst/cappseq/extracted/new_HiSeq28_Undetermined_R6000204_L006001_CTTC_R1.fastq, /mnt/ris/aadel/mpnst/cappseq/extracted/new_HiSeq28_Undetermined_R6000204_L006001_CTTC_R2.fastq
+    jobid: 76
+    wildcards: read_id=new_HiSeq28_Undetermined_R6000204_L006001_CTTC
+    resources: tmpdir=/tmp
+
+
+[Wed Apr  6 12:09:56 2022]
+rule extract_cappseq_barcodes:
+    input: /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq-W48_Undetermined_R6000324_L008_001_GAAG_R1.fastq.gz, /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq-W48_Undetermined_R6000324_L008_001_GAAG_R2.fastq.gz
+    output: /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq-W48_Undetermined_R6000324_L008_001_GAAG_R1.fastq, /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq-W48_Undetermined_R6000324_L008_001_GAAG_R2.fastq, /mnt/ris/aadel/mpnst/cappseq/extracted/new_HiSeq-W48_Undetermined_R6000324_L008_001_GAAG_R1.fastq, /mnt/ris/aadel/mpnst/cappseq/extracted/new_HiSeq-W48_Undetermined_R6000324_L008_001_GAAG_R2.fastq
+    jobid: 108
+    wildcards: read_id=new_HiSeq-W48_Undetermined_R6000324_L008_001_GAAG
+    resources: tmpdir=/tmp
+
+
+[Wed Apr  6 12:10:24 2022]
+rule extract_cappseq_barcodes:
+    input: /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq-20_L007001_ATCG_R1.fastq.gz, /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq-20_L007001_ATCG_R2.fastq.gz
+    output: /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq-20_L007001_ATCG_R1.fastq, /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq-20_L007001_ATCG_R2.fastq, /mnt/ris/aadel/mpnst/cappseq/extracted/new_HiSeq-20_L007001_ATCG_R1.fastq, /mnt/ris/aadel/mpnst/cappseq/extracted/new_HiSeq-20_L007001_ATCG_R2.fastq
+    jobid: 109
+    wildcards: read_id=new_HiSeq-20_L007001_ATCG
+    resources: tmpdir=/tmp
+
+
+[Wed Apr  6 12:10:52 2022]
+rule extract_cappseq_barcodes:
+    input: /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq41_Undetermined_R6000281_L007_001_CTTC_R1.fastq.gz, /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq41_Undetermined_R6000281_L007_001_CTTC_R2.fastq.gz
+    output: /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq41_Undetermined_R6000281_L007_001_CTTC_R1.fastq, /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq41_Undetermined_R6000281_L007_001_CTTC_R2.fastq, /mnt/ris/aadel/mpnst/cappseq/extracted/new_HiSeq41_Undetermined_R6000281_L007_001_CTTC_R1.fastq, /mnt/ris/aadel/mpnst/cappseq/extracted/new_HiSeq41_Undetermined_R6000281_L007_001_CTTC_R2.fastq
+    jobid: 14
+    wildcards: read_id=new_HiSeq41_Undetermined_R6000281_L007_001_CTTC
+    resources: tmpdir=/tmp
+
+
+[Wed Apr  6 12:11:26 2022]
+rule extract_cappseq_barcodes:
+    input: /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq-19_L006001_AGGT_R1.fastq.gz, /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq-19_L006001_AGGT_R2.fastq.gz
+    output: /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq-19_L006001_AGGT_R1.fastq, /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq-19_L006001_AGGT_R2.fastq, /mnt/ris/aadel/mpnst/cappseq/extracted/new_HiSeq-19_L006001_AGGT_R1.fastq, /mnt/ris/aadel/mpnst/cappseq/extracted/new_HiSeq-19_L006001_AGGT_R2.fastq
+    jobid: 46
+    wildcards: read_id=new_HiSeq-19_L006001_AGGT
+    resources: tmpdir=/tmp
+
+
+[Wed Apr  6 12:12:00 2022]
+rule extract_cappseq_barcodes:
+    input: /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeqW72_Undetermined_R6000482_L001_AGGT_R1.fastq.gz, /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeqW72_Undetermined_R6000482_L001_AGGT_R2.fastq.gz
+    output: /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeqW72_Undetermined_R6000482_L001_AGGT_R1.fastq, /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeqW72_Undetermined_R6000482_L001_AGGT_R2.fastq, /mnt/ris/aadel/mpnst/cappseq/extracted/new_HiSeqW72_Undetermined_R6000482_L001_AGGT_R1.fastq, /mnt/ris/aadel/mpnst/cappseq/extracted/new_HiSeqW72_Undetermined_R6000482_L001_AGGT_R2.fastq
+    jobid: 77
+    wildcards: read_id=new_HiSeqW72_Undetermined_R6000482_L001_AGGT
+    resources: tmpdir=/tmp
+
+
+[Wed Apr  6 12:12:39 2022]
+rule extract_cappseq_barcodes:
+    input: /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeqW36_Undetermined_R6000244_L008_001_CTTC_R1.fastq.gz, /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeqW36_Undetermined_R6000244_L008_001_CTTC_R2.fastq.gz
+    output: /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeqW36_Undetermined_R6000244_L008_001_CTTC_R1.fastq, /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeqW36_Undetermined_R6000244_L008_001_CTTC_R2.fastq, /mnt/ris/aadel/mpnst/cappseq/extracted/new_HiSeqW36_Undetermined_R6000244_L008_001_CTTC_R1.fastq, /mnt/ris/aadel/mpnst/cappseq/extracted/new_HiSeqW36_Undetermined_R6000244_L008_001_CTTC_R2.fastq
+    jobid: 22
+    wildcards: read_id=new_HiSeqW36_Undetermined_R6000244_L008_001_CTTC
+    resources: tmpdir=/tmp
+
+
+[Wed Apr  6 12:13:14 2022]
+rule extract_cappseq_barcodes:
+    input: /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeqW72_Undetermined_R6000482_L001_CTTC_R1.fastq.gz, /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeqW72_Undetermined_R6000482_L001_CTTC_R2.fastq.gz
+    output: /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeqW72_Undetermined_R6000482_L001_CTTC_R1.fastq, /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeqW72_Undetermined_R6000482_L001_CTTC_R2.fastq, /mnt/ris/aadel/mpnst/cappseq/extracted/new_HiSeqW72_Undetermined_R6000482_L001_CTTC_R1.fastq, /mnt/ris/aadel/mpnst/cappseq/extracted/new_HiSeqW72_Undetermined_R6000482_L001_CTTC_R2.fastq
+    jobid: 15
+    wildcards: read_id=new_HiSeqW72_Undetermined_R6000482_L001_CTTC
+    resources: tmpdir=/tmp
+
+
+[Wed Apr  6 12:14:01 2022]
+rule extract_cappseq_barcodes:
+    input: /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq11GAAG_R1.fastq.gz, /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq11GAAG_R2.fastq.gz
+    output: /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq11GAAG_R1.fastq, /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq11GAAG_R2.fastq, /mnt/ris/aadel/mpnst/cappseq/extracted/new_HiSeq11GAAG_R1.fastq, /mnt/ris/aadel/mpnst/cappseq/extracted/new_HiSeq11GAAG_R2.fastq
+    jobid: 47
+    wildcards: read_id=new_HiSeq11GAAG
+    resources: tmpdir=/tmp
+
+
+[Wed Apr  6 12:14:51 2022]
+rule extract_cappseq_barcodes:
+    input: /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq11ACAC_R1.fastq.gz, /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq11ACAC_R2.fastq.gz
+    output: /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq11ACAC_R1.fastq, /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq11ACAC_R2.fastq, /mnt/ris/aadel/mpnst/cappseq/extracted/new_HiSeq11ACAC_R1.fastq, /mnt/ris/aadel/mpnst/cappseq/extracted/new_HiSeq11ACAC_R2.fastq
+    jobid: 78
+    wildcards: read_id=new_HiSeq11ACAC
+    resources: tmpdir=/tmp
+
+
+[Wed Apr  6 12:15:29 2022]
+rule extract_cappseq_barcodes:
+    input: /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq15_L002001_GTGT_R1.fastq.gz, /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq15_L002001_GTGT_R2.fastq.gz
+    output: /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq15_L002001_GTGT_R1.fastq, /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq15_L002001_GTGT_R2.fastq, /mnt/ris/aadel/mpnst/cappseq/extracted/new_HiSeq15_L002001_GTGT_R1.fastq, /mnt/ris/aadel/mpnst/cappseq/extracted/new_HiSeq15_L002001_GTGT_R2.fastq
+    jobid: 110
+    wildcards: read_id=new_HiSeq15_L002001_GTGT
+    resources: tmpdir=/tmp
+
+
+[Wed Apr  6 12:16:20 2022]
+rule extract_cappseq_barcodes:
+    input: /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeqW72_Undetermined_R6000482_L001_GAAG_R1.fastq.gz, /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeqW72_Undetermined_R6000482_L001_GAAG_R2.fastq.gz
+    output: /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeqW72_Undetermined_R6000482_L001_GAAG_R1.fastq, /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeqW72_Undetermined_R6000482_L001_GAAG_R2.fastq, /mnt/ris/aadel/mpnst/cappseq/extracted/new_HiSeqW72_Undetermined_R6000482_L001_GAAG_R1.fastq, /mnt/ris/aadel/mpnst/cappseq/extracted/new_HiSeqW72_Undetermined_R6000482_L001_GAAG_R2.fastq
+    jobid: 16
+    wildcards: read_id=new_HiSeqW72_Undetermined_R6000482_L001_GAAG
+    resources: tmpdir=/tmp
+
+
+[Wed Apr  6 12:17:08 2022]
+rule extract_cappseq_barcodes:
+    input: /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq-20_L007001_TCCT_R1.fastq.gz, /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq-20_L007001_TCCT_R2.fastq.gz
+    output: /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq-20_L007001_TCCT_R1.fastq, /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq-20_L007001_TCCT_R2.fastq, /mnt/ris/aadel/mpnst/cappseq/extracted/new_HiSeq-20_L007001_TCCT_R1.fastq, /mnt/ris/aadel/mpnst/cappseq/extracted/new_HiSeq-20_L007001_TCCT_R2.fastq
+    jobid: 48
+    wildcards: read_id=new_HiSeq-20_L007001_TCCT
+    resources: tmpdir=/tmp
+
+
+[Wed Apr  6 12:17:58 2022]
+rule extract_cappseq_barcodes:
+    input: /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeqW54_Undetermined_R6000373_L007_CACA_R1.fastq.gz, /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeqW54_Undetermined_R6000373_L007_CACA_R2.fastq.gz
+    output: /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeqW54_Undetermined_R6000373_L007_CACA_R1.fastq, /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeqW54_Undetermined_R6000373_L007_CACA_R2.fastq, /mnt/ris/aadel/mpnst/cappseq/extracted/new_HiSeqW54_Undetermined_R6000373_L007_CACA_R1.fastq, /mnt/ris/aadel/mpnst/cappseq/extracted/new_HiSeqW54_Undetermined_R6000373_L007_CACA_R2.fastq
+    jobid: 79
+    wildcards: read_id=new_HiSeqW54_Undetermined_R6000373_L007_CACA
+    resources: tmpdir=/tmp
+
+
+[Wed Apr  6 12:18:50 2022]
+rule extract_cappseq_barcodes:
+    input: /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq39_Undetermined_R6000281_L005_001_ACAC_R1.fastq.gz, /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq39_Undetermined_R6000281_L005_001_ACAC_R2.fastq.gz
+    output: /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq39_Undetermined_R6000281_L005_001_ACAC_R1.fastq, /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq39_Undetermined_R6000281_L005_001_ACAC_R2.fastq, /mnt/ris/aadel/mpnst/cappseq/extracted/new_HiSeq39_Undetermined_R6000281_L005_001_ACAC_R1.fastq, /mnt/ris/aadel/mpnst/cappseq/extracted/new_HiSeq39_Undetermined_R6000281_L005_001_ACAC_R2.fastq
+    jobid: 111
+    wildcards: read_id=new_HiSeq39_Undetermined_R6000281_L005_001_ACAC
+    resources: tmpdir=/tmp
+
+
+[Wed Apr  6 12:19:56 2022]
+rule extract_cappseq_barcodes:
+    input: /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq28_Undetermined_R6000204_L006001_AGGT_R1.fastq.gz, /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq28_Undetermined_R6000204_L006001_AGGT_R2.fastq.gz
+    output: /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq28_Undetermined_R6000204_L006001_AGGT_R1.fastq, /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq28_Undetermined_R6000204_L006001_AGGT_R2.fastq, /mnt/ris/aadel/mpnst/cappseq/extracted/new_HiSeq28_Undetermined_R6000204_L006001_AGGT_R1.fastq, /mnt/ris/aadel/mpnst/cappseq/extracted/new_HiSeq28_Undetermined_R6000204_L006001_AGGT_R2.fastq
+    jobid: 24
+    wildcards: read_id=new_HiSeq28_Undetermined_R6000204_L006001_AGGT
+    resources: tmpdir=/tmp
+
+
+[Wed Apr  6 12:20:47 2022]
+rule extract_cappseq_barcodes:
+    input: /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq-W45_Undetermined_R6000324_L005_001_ATCG_R1.fastq.gz, /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq-W45_Undetermined_R6000324_L005_001_ATCG_R2.fastq.gz
+    output: /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq-W45_Undetermined_R6000324_L005_001_ATCG_R1.fastq, /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq-W45_Undetermined_R6000324_L005_001_ATCG_R2.fastq, /mnt/ris/aadel/mpnst/cappseq/extracted/new_HiSeq-W45_Undetermined_R6000324_L005_001_ATCG_R1.fastq, /mnt/ris/aadel/mpnst/cappseq/extracted/new_HiSeq-W45_Undetermined_R6000324_L005_001_ATCG_R2.fastq
+    jobid: 56
+    wildcards: read_id=new_HiSeq-W45_Undetermined_R6000324_L005_001_ATCG
+    resources: tmpdir=/tmp
+
+
+[Wed Apr  6 12:21:45 2022]
+rule extract_cappseq_barcodes:
+    input: /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeqW30_Undetermined_R6000232_L006_001_ATCG_R1.fastq.gz, /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeqW30_Undetermined_R6000232_L006_001_ATCG_R2.fastq.gz
+    output: /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeqW30_Undetermined_R6000232_L006_001_ATCG_R1.fastq, /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeqW30_Undetermined_R6000232_L006_001_ATCG_R2.fastq, /mnt/ris/aadel/mpnst/cappseq/extracted/new_HiSeqW30_Undetermined_R6000232_L006_001_ATCG_R1.fastq, /mnt/ris/aadel/mpnst/cappseq/extracted/new_HiSeqW30_Undetermined_R6000232_L006_001_ATCG_R2.fastq
+    jobid: 87
+    wildcards: read_id=new_HiSeqW30_Undetermined_R6000232_L006_001_ATCG
+    resources: tmpdir=/tmp
+
+
+[Wed Apr  6 12:22:53 2022]
+rule extract_cappseq_barcodes:
+    input: /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq28_Undetermined_R6000204_L006001_TCCT_R1.fastq.gz, /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq28_Undetermined_R6000204_L006001_TCCT_R2.fastq.gz
+    output: /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq28_Undetermined_R6000204_L006001_TCCT_R1.fastq, /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq28_Undetermined_R6000204_L006001_TCCT_R2.fastq, /mnt/ris/aadel/mpnst/cappseq/extracted/new_HiSeq28_Undetermined_R6000204_L006001_TCCT_R1.fastq, /mnt/ris/aadel/mpnst/cappseq/extracted/new_HiSeq28_Undetermined_R6000204_L006001_TCCT_R2.fastq
+    jobid: 119
+    wildcards: read_id=new_HiSeq28_Undetermined_R6000204_L006001_TCCT
+    resources: tmpdir=/tmp
+
+Waiting at most 5 seconds for missing files.
+MissingOutputException in line 16 of /drive3/users/jszymanski/repos/mpnst-preprocessing/workflow/cappseq.smk:
+Job Missing files after 5 seconds:
+/mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeqW36_Undetermined_R6000244_L008_001_CTTC_R1.fastq
+/mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeqW36_Undetermined_R6000244_L008_001_CTTC_R2.fastq
+This might be due to filesystem latency. If that is the case, consider to increase the wait time with --latency-wait.
+Job id: 22 completed successfully, but some output files are missing. 22
+Removing output files of failed job extract_cappseq_barcodes since they might be corrupted:
+/mnt/ris/aadel/mpnst/cappseq/extracted/new_HiSeqW36_Undetermined_R6000244_L008_001_CTTC_R1.fastq, /mnt/ris/aadel/mpnst/cappseq/extracted/new_HiSeqW36_Undetermined_R6000244_L008_001_CTTC_R2.fastq
+Waiting at most 5 seconds for missing files.
+MissingOutputException in line 16 of /drive3/users/jszymanski/repos/mpnst-preprocessing/workflow/cappseq.smk:
+Job Missing files after 5 seconds:
+/mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeqW36_Undetermined_R6000244_L008_001_CTTC_R1.fastq
+/mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeqW36_Undetermined_R6000244_L008_001_CTTC_R2.fastq
+/mnt/ris/aadel/mpnst/cappseq/extracted/new_HiSeqW36_Undetermined_R6000244_L008_001_CTTC_R1.fastq
+/mnt/ris/aadel/mpnst/cappseq/extracted/new_HiSeqW36_Undetermined_R6000244_L008_001_CTTC_R2.fastq
+This might be due to filesystem latency. If that is the case, consider to increase the wait time with --latency-wait.
+Job id: 22 completed successfully, but some output files are missing. 22

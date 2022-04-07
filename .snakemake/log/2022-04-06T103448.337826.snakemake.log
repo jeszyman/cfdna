@@ -1,0 +1,6 @@
+Config file ./config/common.yaml is extended by additional config specified via the command line.
+Building DAG of jobs...
+MissingInputException in line 16 of /drive3/users/jszymanski/repos/mpnst-preprocessing/workflow/cappseq.smk:
+Missing input files for rule extract_cappseq_barcodes:
+/mnt/ris/aadel/mpnst/cappseq/renamenew_HiSeqW54_Undetermined_R6000373_L007_GTGT_R1.fastq.gz
+/mnt/ris/aadel/mpnst/cappseq/renamenew_HiSeqW54_Undetermined_R6000373_L007_GTGT_R2.fastq.gz

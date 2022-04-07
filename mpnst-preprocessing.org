@@ -140,12 +140,15 @@ git push -u origin master
 container: "/home/jszymanski/sing_containers/frag.sif"
 data_dir: "/mnt/ris/aadel/mpnst"
 threads: 40
+repo: "/drive3/users/jszymanski/repos/mpnst-preprocessing"
+cap_extract_script: "/drive3/users/jszymanski/repos/mpnst-preprocessing/workflow/scripts/cp_fastq_extract_auto.pl"
 #+end_src
 - [[file:config/common.yaml][common]]
   #+begin_src bash :tangle config/common.yaml
 inputs_dir: "/mnt/ris/aadel/mpnst/inputs"
 demultiplex_dir: "/mnt/ris/aadel/mpnst/cappseq/demultiplexed"
 rename_dir: "/mnt/ris/aadel/mpnst/cappseq/rename"
+extracted_dir: "/mnt/ris/aadel/mpnst/cappseq/extracted"
 hg38_fasta: "GCA_000001405.15_GRCh38_no_alt_analysis_set.fna.fai"
 hg38_fasta_ftp: "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/001/405/GCA_000001405.15_GRCh38/seqs_for_alignment_pipelines.ucsc_ids/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna.fai"
 hg38_bwa_index_ftp: "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/001/405/GCA_000001405.15_GRCh38/seqs_for_alignment_pipelines.ucsc_ids/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna.bwa_index.tar.gz"
@@ -157,6 +160,167 @@ log_dir: "/mnt/ris/aadel/mnpst/logs"
 :PROPERTIES:
 :header-args: :tangle no
 :END:
+#+begin_src bash :tangle ./src/smk_run.sh
+#!/bin/bash
+#########1#########2#########3#########4#########5#########6#########7#########8
+eval "$(command conda 'shell.bash' 'hook' 2> /dev/null)"
+####################################
+###   Choose and Run Snakefile   ###
+####################################
+
+# Setup
+#set -euxov pipefail
+
+source config/${HOSTNAME}.sh
+echo "The following `*.smk` archives were found; select one:"
+
+# set the prompt used by select, replacing "#?"
+PS3="Use number to select an option"
+
+select filename in ./workflow/*.smk
+
+do
+    if [[ "$filename" == "" ]]
+    then
+        echo "'$REPLY' is not a valid number"
+        continue
+    fi
+    echo $filename
+    select run_option in dry_run normal force_final force_all
+    do
+        echo selected $run_option
+        case $run_option in
+            dry_run)
+                conda activate snakemake
+                snakemake \
+                    --configfile config/${HOSTNAME}.yaml \
+                    --cores $threads \
+                    --directory ${repo} \
+                    --dry-run \
+                    --rerun-incomplete \
+                    --singularity-args "--bind $mntpt:$mntpt" \
+                    --use-singularity \
+                    --snakefile $filename
+                ;;
+            normal) 
+                conda activate snakemake
+                select nohup_option in no yes
+                do
+                    case $nohup_option in
+                        no)
+                            snakemake \
+                                --configfile config/${HOSTNAME}.yaml \
+                                --cores $threads \
+                                --directory ${repo} \
+                                --singularity-args "--bind $mntpt:$mntpt" \
+                                --use-singularity \
+                                --snakefile $filename
+                            ;;
+                        yes)
+                            nohup snakemake \
+                                  --configfile config/${HOSTNAME}.yaml \
+                                  --cores $threads \
+                                  --directory ${repo} \
+                                  --singularity-args "--bind $mntpt:$mntpt" \
+                                  --use-singularity \
+                                  --snakefile $filename
+                            ;;
+                    esac
+                done                
+                ;;
+            force_final)
+                conda activate snakemake
+                select nohup_option in no yes
+                do
+                    case $nohup_option in
+                        no)                                          
+                            snakemake \
+                                --configfile config/${HOSTNAME}.yaml \
+                                --cores $threads \
+                                --directory ${repo} \
+                                --force \
+                                --singularity-args "--bind $mntpt:$mntpt" \
+                                --use-singularity \
+                                --snakefile $filename
+                            ;;
+                        yes)
+                            nohup snakemake \
+                                  --configfile config/${HOSTNAME}.yaml \
+                                  --cores $threads \
+                                  --directory ${repo} \
+                                  --force \
+                                  --singularity-args "--bind $mntpt:$mntpt" \
+                                  --use-singularity \
+                                  --snakefile $filename
+                            ;;
+                    esac
+                done                
+                ;;            
+            force_all)
+                conda activate snakemake
+                select nohup_option in no yes
+                do
+                    case $nohup_option in
+                        no)                                          
+                
+                snakemake \
+                    --configfile config/${HOSTNAME}.yaml \
+                    --cores $threads \
+                    --directory ${repo} \
+                    -F \
+                    --singularity-args "--bind $mntpt:$mntpt" \
+                    --use-singularity \
+                    --snakefile $filename
+                                            ;;
+                        yes)
+                nohup snakemake \
+                    --configfile config/${HOSTNAME}.yaml \
+                    --cores $threads \
+                    --directory ${repo} \
+                    -F \
+                    --singularity-args "--bind $mntpt:$mntpt" \
+                    --use-singularity \
+                    --snakefile $filename
+                            ;;
+                    esac
+                done                
+                ;;            
+        esac
+        break
+    done
+    break
+done
+#+end_src
+
+#+begin_src bash :tangle ./src/smk_test.sh
+#!/bin/bash
+
+eval "$(command conda 'shell.bash' 'hook' 2> /dev/null)"
+
+echo "The following `*.smk` archives were found; select one:"
+
+# set the prompt used by select, replacing "#?"
+PS3="Use number to select an option"
+
+select filename in ./workflow/*.smk
+
+do
+    if [[ "$filename" == "" ]]
+    then
+        echo "'$REPLY' is not a valid number"
+        continue
+    fi
+    conda activate snakemake
+    snakemake --dry-run --snakefile $filename \
+              --configfile config/${HOSTNAME}.yaml \
+              --cores $threads \
+              --directory ${repo} \
+              --rerun-incomplete \
+              --singularity-args "--bind $mntpt:$mntpt" \
+              --use-singularity 
+done
+#+end_src
+
 #+begin_src bash :tangle ./src/smk_run.sh
 #!/bin/bash
 #########1#########2#########3#########4#########5#########6#########7#########8
@@ -360,7 +524,7 @@ snakemake \
   --rulegraph | dot -Tpdf > $repo/resources/frag_rules.pdf
 #+end_src
 
-** TODO CAPPseq WGS fastq processing                                    :smk:
+** CAPPseq WGS fastq processing                                         :smk:
 :PROPERTIES:
 :header-args:snakemake: :tangle ./workflow/cappseq.smk
 :END:
@@ -435,7 +599,12 @@ rename11="new_HiSeq-W44_Undetermined_R6000324_L004_001_AGGT_R1.fastq.gz"
 rename22="new_HiSeq-W44_Undetermined_R6000324_L004_001_AGGT_R2.fastq.gz"
 
 
-
+nohub
+for file in /mnt/ris/aadel/mpnst/cappseq/rename/*_R1.fastq.gz;
+do
+    r2=$(echo $file | sed -e "s/R1.fastq.gz/R2.fastq.gz/g")
+    perl ~/repos/mpnst-preprocessing/workflows/scripts/cp_fastq_extract_auto.pl $file $r2
+done
 
 
 #2 rule 2
@@ -594,24 +763,64 @@ rename -n s/_R2_/_/g *R2.fastq.gz
 
 
 #+end_src
-*** [[file:workflows/cappseq.smk][Snakefile]] :smk:
+*** [[file:workflow/cappseq.smk][Snakefile]] :smk:
 :PROPERTIES:
-:header-args:snakemake: :tangle ./workflows/cappseq.smk
+:header-args:snakemake: :tangle ./workflow/cappseq.smk
 :END:              
 **** Smk preamble
 #+begin_src snakemake
 configfile: "./config/common.yaml"
-demultiplex_fastqs, = glob_wildcards(config["demultiplex_dir"] + "/{id}.fastq.gz")
+READ_ID, = glob_wildcards(config["rename_dir"] + "/{id}_R1.fastq.gz")
 #+end_src              
 **** Smk rules
 ***** All rule
 #+begin_src snakemake
 rule all:
-    input: expand(config["rename_dir"] + "{id}.fastq.gz", id=demultiplex_fastqs)
-                    
+    input:
+        expand(config["extracted_dir"] + "/{read_id}_R1.fastq", read_id=READ_ID),
+        expand(config["extracted_dir"] + "/{read_id}_R2.fastq", read_id=READ_ID),
+        expand(config["headfix_dir"] + "/{read_id}_{read}.fastq", read_id=READ_ID, read=["R1", "R2"]),	
 #+end_src                            
+***** INPROCESS Extract cappseq barcodes
+- Snakemake
+  #+begin_src snakemake
+rule extract_cappseq_barcodes:
+    input:
+        read1 = config["rename_dir"] + "/{read_id}_R1.fastq.gz",
+        read2 = config["rename_dir"] + "/{read_id}_R2.fastq.gz",
+    output:
+        read1 = config["rename_dir"] + "/{read_id}_R1.fastq",
+        read2 = config["rename_dir"] + "/{read_id}_R2.fastq",	
+        read1mv = config["extracted_dir"] + "/{read_id}_R1.fastq",
+        read2mv = config["extracted_dir"] + "/{read_id}_R2.fastq",
+    shell:
+        """
+        perl {config[cap_extract_script]} {input.read1} {input.read2}
+        mv {output.read1} {output.read1mv}
+        mv {output.read2} {output.read2mv}
+        """
+#+end_src
+***** WAITING Fix headers                                          :smk_rule:
+- Snakemake
+#+begin_src snakemake
+rule fix_headers:
+    input:
+	config["extracted_dir"] + "/{read_id}_{read}.fastq",
+    output:
+        unzip = config["headfix_dir"] + "/{read_id}_{read}.fastq",
+	zip = config["headfix_dir"] + "/{read_id}_{read}.fastq.gz",
+    shell:
+        """
+        cat {input} | awk '{if(NR%4==1){print substr($0, 1, length($0)-21)}else{print $0}}' > ${output.unzip}
+        pigz -c -p {config[threads]} {output.unzip} > {output.zip} 
+        """
+#+end_src
 
-***** Rename :smk_rule:
+***** Dev
+:PROPERTIES:
+:header-args:snakemake: :tangle no
+:END:
+****** Rename                                                      :smk_rule:
 - Snakemake
 #+begin_src snakemake
 rule rename:
@@ -661,97 +870,111 @@ rule extract_cappseq_barcodes:
         """
 #+end_src
 
-** TODO Read QC
-- filter to min file size && expected by manual spreadsheet
-- fastqs too small (< 500 Mb)
-  #+begin_src bash :results replace
-find /mnt/ris/aadel/mpnst/inputs/cappseq-fastq -size -500M
+** TODO Read QC and pre-processing
+*** [[file:./workflow/read_qc.smk][Snakefile]]:smk:
+:PROPERTIES:
+:header-args:snakemake: :tangle ./workflow/read_qc.smk
+:END:              
+**** Smk preamble
+#+begin_src snakemake
+            
+#+end_src              
+**** Smk rules
+***** All rule
+#+begin_src snakemake
+rule all:
+    input:
+                    
+#+end_src                            
+- add rules with smk.rule
+***** TODO FastQC                                                  :smk_rule:
+- Snakemake
+#+begin_src snakemake
+#
+rule fastqc:
+    input:
+    output:
+    shell:
+        """
+        fastqc {snakemake.params} \
+        --outdir {qc_dir} \
+        --quiet \
+        --threads {config["threads"]} {input}
+        """
 #+end_src
-  #+RESULTS[09ee8ac249493789a7532cf4ab70bd8cee0f4d35]:
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq                                                              |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W46_Undetermined_R6000324_L006_R1_001_TAGC.fastq.gz    |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W48_Undetermined_R6000324_L008_R1_001_CGAT.fastq.gz    |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W48_Undetermined_R6000324_L008_R2_001_CGAT.fastq.gz    |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W45_Undetermined_R6000324_L005_R1_001_TAGC.fastq.gz    |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W44_Undetermined_R6000324_L004_R1_001_ATCG.fastq.gz    |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W46_Undetermined_R6000324_L006_R2_001_GTGT.fastq.gz    |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W45_Undetermined_R6000324_L005_R2_001_GCTA.fastq.gz    |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W44_Undetermined_R6000324_L004_R1_001_TGTG.fastq.gz    |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W47_Undetermined_R6000324_L007_R2_001_GCTA.fastq.gz    |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W45_Undetermined_R6000324_L005_R2_001_CGAT.fastq.gz    |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W46_Undetermined_R6000324_L006_R1_001_AGGT.fastq.gz    |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W47_Undetermined_R6000324_L007_R2_001_TAGC.fastq.gz    |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W47_Undetermined_R6000324_L007_R1_001_TGTG.fastq.gz    |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W46_Undetermined_R6000324_L006_R1_001_TGTG.fastq.gz    |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/new_HiSeq28_Undetermined_R6000204_L006001_AGGT_R1.fastq.gz   |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/new_HiSeq42_Undetermined_R6000281_L008_R2_001_GCTA.fastq.gz  |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/new_HiSeq28_Undetermined_R6000204_L006_R1_001_AGGT.fastq.gz  |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W46_Undetermined_R6000324_L006_R2_001_CACA.fastq.gz    |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W44_Undetermined_R6000324_L004_R1_001_CGAT.fastq.gz    |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/new_HiSeq42_Undetermined_R6000281_L008_R2_001_GTGT.fastq.gz  |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W46_Undetermined_R6000324_L006_R2_001_.fastq.gz        |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W45_Undetermined_R6000324_L005_R1_001_GCTA.fastq.gz    |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/new_HiSeq28_Undetermined_R6000204_L006_R2_001_GTGT.fastq.gz  |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/new_HiSeq28_Undetermined_R6000204_L006001_GTGT_R2.fastq.gz   |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W46_Undetermined_R6000324_L006_R2_001_TGTG.fastq.gz    |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W46_Undetermined_R6000324_L006_R1_001_CGAT.fastq.gz    |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W45_Undetermined_R6000324_L005_R2_001_TAGC.fastq.gz    |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W44_Undetermined_R6000324_L004_R1_001_CTTC.fastq.gz    |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W46_Undetermined_R6000324_L006_R2_001_GCTA.fastq.gz    |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/new_HiSeq-19_L006001_ACAC_R1.fastq.gz                        |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/new_HiSeq28_Undetermined_R6000204_L006_R1_001_GTGT.fastq.gz  |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/new_HiSeqW36_Undetermined_R6000244_L008_R2_001_CTTC.fastq.gz |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W45_Undetermined_R6000324_L005_R1_001_CACA.fastq.gz    |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W47_Undetermined_R6000324_L007_R1_001_TAGC.fastq.gz    |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W44_Undetermined_R6000324_L004_R2_001_GCTA.fastq.gz    |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W46_Undetermined_R6000324_L006_R1_001_GCTA.fastq.gz    |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W44_Undetermined_R6000324_L004_R2_001_GAAG.fastq.gz    |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/new_HiSeq42_Undetermined_R6000281_L008_R2_001_ATCG.fastq.gz  |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W45_Undetermined_R6000324_L005_R1_001_CTTC.fastq.gz    |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W45_Undetermined_R6000324_L005_R1_001_GAAG.fastq.gz    |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W45_Undetermined_R6000324_L005_R2_001_CACA.fastq.gz    |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/new_HiSeq42_Undetermined_R6000281_L008_R2_001_TGTG.fastq.gz  |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/new_HiSeq28_Undetermined_R6000204_L006001_GTGT_R1.fastq.gz   |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/new_HiSeq-19_L006_R2_001_ACAC.fastq.gz                       |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W45_Undetermined_R6000324_L005_R2_001_ATCG.fastq.gz    |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W46_Undetermined_R6000324_L006_R2_001_CGAT.fastq.gz    |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W46_Undetermined_R6000324_L006_R1_001_TCCT.fastq.gz    |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W44_Undetermined_R6000324_L004_R1_001_CACA.fastq.gz    |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W47_Undetermined_R6000324_L007_R2_001_ACAC.fastq.gz    |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W44_Undetermined_R6000324_L004_R2_001_CGAT.fastq.gz    |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W45_Undetermined_R6000324_L005_R2_001_GAAG.fastq.gz    |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/new_HiSeqW36_Undetermined_R6000244_L008_R1_001_CTTC.fastq.gz |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/new_HiSeq28_Undetermined_R6000204_L006_R2_001_AGGT.fastq.gz  |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W46_Undetermined_R6000324_L006_R2_001_TCCT.fastq.gz    |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/new_HiSeq28_Undetermined_R6000204_L006001_AGGT_R2.fastq.gz   |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W46_Undetermined_R6000324_L006_R1_001_CACA.fastq.gz    |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W44_Undetermined_R6000324_L004_R2_001_AGGT.fastq.gz    |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W48_Undetermined_R6000324_L008_R1_001_CACA.fastq.gz    |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W48_Undetermined_R6000324_L008_R1_001_GAAG.fastq.gz    |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W47_Undetermined_R6000324_L007_R1_001_ACAC.fastq.gz    |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W48_Undetermined_R6000324_L008_R2_001_CACA.fastq.gz    |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/new_HiSeq42_Undetermined_R6000281_L008_R2_001_TAGC.fastq.gz  |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W44_Undetermined_R6000324_L004_R2_001_TGTG.fastq.gz    |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W47_Undetermined_R6000324_L007_R1_001_GCTA.fastq.gz    |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W45_Undetermined_R6000324_L005_R1_001_TGTG.fastq.gz    |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W47_Undetermined_R6000324_L007_R2_001_TGTG.fastq.gz    |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W46_Undetermined_R6000324_L006_R2_001_TAGC.fastq.gz    |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W45_Undetermined_R6000324_L005_R2_001_TGTG.fastq.gz    |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W48_Undetermined_R6000324_L008_R2_001_GAAG.fastq.gz    |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W45_Undetermined_R6000324_L005_R1_001_ATCG.fastq.gz    |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W44_Undetermined_R6000324_L004_R2_001_CACA.fastq.gz    |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W44_Undetermined_R6000324_L004_R2_001_ATCG.fastq.gz    |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/new_HiSeq-19_L006_R1_001_ACAC.fastq.gz                       |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W46_Undetermined_R6000324_L006_R1_001_GTGT.fastq.gz    |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/new_HiSeq-19_L006001_ACAC_R2.fastq.gz                        |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W46_Undetermined_R6000324_L006_R2_001_AGGT.fastq.gz    |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W44_Undetermined_R6000324_L004_R1_001_GCTA.fastq.gz    |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W44_Undetermined_R6000324_L004_R2_001_CTTC.fastq.gz    |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W45_Undetermined_R6000324_L005_R2_001_CTTC.fastq.gz    |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W45_Undetermined_R6000324_L005_R1_001_CGAT.fastq.gz    |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W44_Undetermined_R6000324_L004_R1_001_AGGT.fastq.gz    |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W44_Undetermined_R6000324_L004_R1_001_GAAG.fastq.gz    |
-| /mnt/ris/aadel/mpnst/inputs/cappseq-fastq/HiSeq-W46_Undetermined_R6000324_L006_R1_001_.fastq.gz        |
+- [[file:./workflows/scripts/fastqc.sh][Base script]]
+,  #+begin_src bash :tangle ./workflows/scripts/fastqc.sh
+#!/usr/bin/env bash
+#########1#########2#########3#########4#########5#########6#########7#########8               
+###
+###    SCRIPT TITLE   ###                
+###
+
+#+end_src
+***** Read preprocessing :smk_rule:
+- Trimmomatic parameters based on Taylor's parameters ([[https://mail.google.com/mail/u/0/#search/sundby+fastq/FMfcgzGmvLWSbsmhDsffvSSWfjWdQhhR?projector=1&messagePartId=0.1][email]])
+
+https://github.com/AAFC-BICoE/snakemake-trimmomatic/blob/master/Snakefile
+java -jar 
+ml trimmomatic || exit 1
+java -Xmx64g  -jar $TRIMMOJAR PE -phred33 -threads 16 \
+    ${sampleName}_R1_001.fastq.gz ${sampleName}_R2_001.fastq.gz \
+    ${sampleName}_forward_paired.fastq.gz ${sampleName}_forward_unpaired.fastq.gz \
+    ${sampleName}_reverse_paired.fastq.gz ${sampleName}_reverse_unpaired.fastq.gz \
+        ILLUMINACLIP:/usr/local/apps/trimmomatic/Trimmomatic-0.36/adapters/TruSeq3-PE.fa:2:30:10 LEADING:10 TRAILING:10 MAXINFO:50:0.97 MINLEN:20
+mv ${sampleName}_forward_paired.fastq.gz ${sampleName}_trim_R1.fastq.gz
+mv ${sampleName}_reverse_paired.fastq.gz ${sampleName}_trim_R2.fastq.gz
+rm ${sampleName}_*_unpaired.fastq.gz
+mkdir ${sampleName}
+mv ${sampleName}_trim_*.fastq.gz ${sampleName}/.
+cd ${sampleName}
+gunzip ${sampleName}_trim_R1.fastq.gz
+gunzip ${sampleName}_trim_R2.fastq.gz
+ref=/fdb/igenomes/Homo_sapiens/UCSC/hg19/Sequence/BWAIndex/genome.fa /fdb/genome/GRCh38.p13/GCF_000001405.39_GRCh38.p13_genomic.fna
+RG="@RG\tID:${sampleName}\tLB:${sampleName}\tSM:${sampleName}\tPL:ILLUMINA"
+bwa mem -M -t 32 -R "$RG" $ref ${sampleName}_trim_R1.fastq ${sampleName}_trim_R2.fastq>${sampleName}.sam
+java -Xmx60g -XX:ParallelGCThreads=5 -jar $PICARDJARPATH/picard.jar  SortSam INPUT=${sampleName}.sam OUTPUT=${sampleName}.bam SORT_ORDER=coordinate
+samtools index ${sampleName}.bam ${sampleName}.bam.bai
+samtools flagstat ${sampleName}.bam  >${sampleName}.flagstat.txt
+java -Xmx60g -XX:ParallelGCThreads=5 -jar $PICARDJARPATH/picard.jar   MarkDuplicates I=${sampleName}.bam O=${sampleName}.dd.bam REMOVE_DUPLICATES=true M=${sampleName}.matrix.txt AS=true VALIDATION_STRINGENCY=LENIENT
+samtools index ${sampleName}.dd.bam ${sampleName}.dd.bam.bai
+rm ${sampleName}_trim_*.fastq
+cd ..
+- Snakemake
+#+begin_src snakemake
+rule read_preprocessing:
+    input:
+        fastq = config["inputs_dir"] + "/ANF/{ext_id}.fastq.gz"
+    output:
+    shell:
+        """
+        scripts/read_preprocessing.sh
+        """
+#+end_src
+- [[file:./workflows/scripts/read_preprocessing.sh][Base script]]
+#+begin_src bash :tangle ./workflows/scripts/read_preprocessing.sh
+#!/usr/bin/env bash
+#########1#########2#########3#########4#########5#########6#########7#########8               
+###
+###    SCRIPT TITLE   ###                
+###
+
+#+end_src
+**** Dev
+:PROPERTIES:
+:header-args:snakemake: :tangle no
+:END:
+**** Ideas
+:PROPERTIES:
+:header-args:snakemake: :tangle no
+:END:
+***** Ideas
+  - filter to min file size && expected by manual spreadsheet
+  - fastqs too small (< 500 Mb)
+    #+begin_src bash :results replace
+  find /mnt/ris/aadel/mpnst/inputs/cappseq-fastq -size -500M
+  #+end_src
+
 
 ** TODO Alignment 
 
@@ -956,54 +1179,6 @@ rule all:
         config["ref_dir"] + "/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna.bwt",
         config["ref_dir"] + "/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna.sa",	
 #+end_src                            
-***** Read preprocessing:smk_rule:
-https://mail.google.com/mail/u/0/#search/sundby+fastq/FMfcgzGmvLWSbsmhDsffvSSWfjWdQhhR?projector=1&messagePartId=0.1
-
-java -jar 
-ml trimmomatic || exit 1
-java -Xmx64g  -jar $TRIMMOJAR PE -phred33 -threads 16 \
-    ${sampleName}_R1_001.fastq.gz ${sampleName}_R2_001.fastq.gz \
-    ${sampleName}_forward_paired.fastq.gz ${sampleName}_forward_unpaired.fastq.gz \
-    ${sampleName}_reverse_paired.fastq.gz ${sampleName}_reverse_unpaired.fastq.gz \
-        ILLUMINACLIP:/usr/local/apps/trimmomatic/Trimmomatic-0.36/adapters/TruSeq3-PE.fa:2:30:10 LEADING:10 TRAILING:10 MAXINFO:50:0.97 MINLEN:20
-mv ${sampleName}_forward_paired.fastq.gz ${sampleName}_trim_R1.fastq.gz
-mv ${sampleName}_reverse_paired.fastq.gz ${sampleName}_trim_R2.fastq.gz
-rm ${sampleName}_*_unpaired.fastq.gz
-mkdir ${sampleName}
-mv ${sampleName}_trim_*.fastq.gz ${sampleName}/.
-cd ${sampleName}
-gunzip ${sampleName}_trim_R1.fastq.gz
-gunzip ${sampleName}_trim_R2.fastq.gz
-ref=/fdb/igenomes/Homo_sapiens/UCSC/hg19/Sequence/BWAIndex/genome.fa /fdb/genome/GRCh38.p13/GCF_000001405.39_GRCh38.p13_genomic.fna
-RG="@RG\tID:${sampleName}\tLB:${sampleName}\tSM:${sampleName}\tPL:ILLUMINA"
-bwa mem -M -t 32 -R "$RG" $ref ${sampleName}_trim_R1.fastq ${sampleName}_trim_R2.fastq>${sampleName}.sam
-java -Xmx60g -XX:ParallelGCThreads=5 -jar $PICARDJARPATH/picard.jar  SortSam INPUT=${sampleName}.sam OUTPUT=${sampleName}.bam SORT_ORDER=coordinate
-samtools index ${sampleName}.bam ${sampleName}.bam.bai
-samtools flagstat ${sampleName}.bam  >${sampleName}.flagstat.txt
-java -Xmx60g -XX:ParallelGCThreads=5 -jar $PICARDJARPATH/picard.jar   MarkDuplicates I=${sampleName}.bam O=${sampleName}.dd.bam REMOVE_DUPLICATES=true M=${sampleName}.matrix.txt AS=true VALIDATION_STRINGENCY=LENIENT
-samtools index ${sampleName}.dd.bam ${sampleName}.dd.bam.bai
-rm ${sampleName}_trim_*.fastq
-cd ..
-- Snakemake
-#+begin_src snakemake
-rule read_preprocessing:
-    input:
-        fastq = config["inputs_dir"] + "/ANF/{ext_id}.fastq.gz"
-    output:
-    shell:
-        """
-        scripts/read_preprocessing.sh
-        """
-#+end_src
-- [[file:./workflows/scripts/read_preprocessing.sh][Base script]]
-#+begin_src bash :tangle ./workflows/scripts/read_preprocessing.sh
-#!/usr/bin/env bash
-#########1#########2#########3#########4#########5#########6#########7#########8               
-###
-###    SCRIPT TITLE   ###                
-###
-
-#+end_src
 ***** Get fasta and index                                          :smk_rule:
 - [[file:/mnt/ris/aadel/mpnst/logs/get_fasta.log][Log file]]
 - Snakemake

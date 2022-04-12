@@ -1,0 +1,75 @@
+Building DAG of jobs...
+Using shell: /bin/bash
+Provided cores: 8
+Rules claiming more threads will be scaled down.
+Job stats:
+job       count    min threads    max threads
+------  -------  -------------  -------------
+all           1              1              1
+rename        4              1              1
+total         5              1              1
+
+Select jobs to execute...
+
+[Tue Apr 12 11:54:06 2022]
+rule rename:
+    output: test/symlink_fastq/lib001_R1.fastq.gz
+    jobid: 1
+    wildcards: f=lib001
+    resources: tmpdir=/tmp
+
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+
+[Tue Apr 12 11:54:06 2022]
+rule rename:
+    output: test/symlink_fastq/lib004_R1.fastq.gz
+    jobid: 4
+    wildcards: f=lib004
+    resources: tmpdir=/tmp
+
+
+[Tue Apr 12 11:54:06 2022]
+rule rename:
+    output: test/symlink_fastq/lib002_R1.fastq.gz
+    jobid: 2
+    wildcards: f=lib002
+    resources: tmpdir=/tmp
+
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+
+[Tue Apr 12 11:54:06 2022]
+rule rename:
+    output: test/symlink_fastq/lib003_R1.fastq.gz
+    jobid: 3
+    wildcards: f=lib003
+    resources: tmpdir=/tmp
+
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+Waiting at most 5 seconds for missing files.
+MissingOutputException in line 12 of /home/jeszyman/repos/mpnst-preprocessing/workflow/read_qc.smk:
+Job Missing files after 5 seconds:
+test/symlink_fastq/lib001_R1.fastq.gz
+This might be due to filesystem latency. If that is the case, consider to increase the wait time with --latency-wait.
+Job id: 1 completed successfully, but some output files are missing. 1
+Waiting at most 5 seconds for missing files.
+MissingOutputException in line 12 of /home/jeszyman/repos/mpnst-preprocessing/workflow/read_qc.smk:
+Job Missing files after 5 seconds:
+test/symlink_fastq/lib004_R1.fastq.gz
+This might be due to filesystem latency. If that is the case, consider to increase the wait time with --latency-wait.
+Job id: 4 completed successfully, but some output files are missing. 4
+Waiting at most 5 seconds for missing files.
+MissingOutputException in line 12 of /home/jeszyman/repos/mpnst-preprocessing/workflow/read_qc.smk:
+Job Missing files after 5 seconds:
+test/symlink_fastq/lib003_R1.fastq.gz
+This might be due to filesystem latency. If that is the case, consider to increase the wait time with --latency-wait.
+Job id: 3 completed successfully, but some output files are missing. 3
+Waiting at most 5 seconds for missing files.
+MissingOutputException in line 12 of /home/jeszyman/repos/mpnst-preprocessing/workflow/read_qc.smk:
+Job Missing files after 5 seconds:
+test/symlink_fastq/lib002_R1.fastq.gz
+This might be due to filesystem latency. If that is the case, consider to increase the wait time with --latency-wait.
+Job id: 2 completed successfully, but some output files are missing. 2
+Shutting down, this might take some time.
+Exiting because a job execution failed. Look above for error message
+Complete log: /home/jeszyman/repos/mpnst-preprocessing/.snakemake/log/2022-04-12T115406.236626.snakemake.log

@@ -1,0 +1,3 @@
+NameError in line 14 of /home/jeszyman/repos/mpnst-preprocessing/workflow/cappseq.smk:
+name 'tmp' is not defined
+  File "/home/jeszyman/repos/mpnst-preprocessing/workflow/cappseq.smk", line 14, in <module>

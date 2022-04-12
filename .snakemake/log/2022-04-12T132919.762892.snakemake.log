@@ -1,0 +1,5 @@
+Building DAG of jobs...
+MissingInputException in line 34 of /home/jeszyman/repos/mpnst-preprocessing/workflow/TMPread_qc.smk:
+Missing input files for rule trimmomatic:
+test/symlink_fastq/lib001_R2.fastq.gz
+test/symlink_fastq/lib001_R1.fastq.gz

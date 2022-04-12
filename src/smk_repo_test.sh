@@ -10,7 +10,10 @@ snakemake \
     --dry-run \
     --rerun-incomplete \
     --use-singularity \
-    --snakefile ./workflow/read_qc.smk &&
+    --snakefile ./workflow/read_qc.smk
+
+    &&
+    
     snakemake \
         --configfile config/repo_test.yaml \
         --cores $threads \

@@ -1,0 +1,12 @@
+Building DAG of jobs...
+AmbiguousRuleException:
+Rules fastqc_proc and fastqc_raw are ambiguous for the file test/qc/lib001_proc_R1_fastqc.html.
+Consider starting rule output with a unique prefix, constrain your wildcards, or use the ruleorder directive.
+Wildcards:
+	fastqc_proc: read=R1,read_id=lib001
+	fastqc_raw: fq_id=lib001_proc,read=R1
+Expected input files:
+	fastqc_proc: test/processed-fastq/lib001_proc_R1.fastq.gz
+	fastqc_raw: test/symlink_fastq/lib001_proc_R1.fastq.gzExpected output files:
+	fastqc_proc: test/qc/lib001_proc_R1_fastqc.html test/qc/lib001_proc_R1_fastqc.zip
+	fastqc_raw: test/qc/lib001_proc_R1_fastqc.html test/qc/lib001_proc_R1_fastqc.zip

@@ -1,0 +1,78 @@
+Punctuation distribution and per-base mean quality:
+Mark	%	Count	B1Q	B2Q
+GT	95.32	47658	32.6	34.9
+TT	0.58	289	21.1	30.9
+GA	0.47	233	30.2	29.0
+GC	0.46	232	28.3	27.4
+AT	0.42	210	25.9	32.7
+GG	0.40	199	29.2	22.3
+AA	0.33	166	27.3	31.0
+CT	0.32	160	24.0	30.1
+CA	0.26	129	27.1	31.1
+TC	0.24	120	25.2	32.5
+TG	0.23	116	23.9	28.4
+AG	0.22	112	27.9	30.0
+CC	0.21	107	26.0	29.9
+AC	0.20	99	28.3	32.0
+CG	0.17	86	28.0	29.7
+TA	0.17	84	26.5	31.9
+Valid punctuation: GT
+Total reads: 50000
+Valid punctuation: 47658
+N-containing punctuation: 0
+Percentage valid punctuation: 95.32
+Percentage N-content punctuation: 0.00
+
+Accepted barcode distribution and per-base mean quality:
+Barcode	%	Count	B1Q	B2Q
+CC	10.96	5143	30.1	31.4
+AT	8.37	3927	30.4	31.0
+TG	8.23	3863	29.7	30.5
+GG	7.59	3564	30.1	31.1
+GT	7.54	3540	30.1	30.5
+GA	6.99	3280	30.1	31.3
+CT	6.05	2838	30.2	30.7
+AC	5.93	2783	30.3	31.2
+AG	5.56	2609	30.1	31.0
+TA	5.33	2500	29.8	31.4
+TC	5.23	2456	29.9	31.4
+TT	5.18	2430	29.5	30.9
+AA	4.69	2203	30.5	31.4
+GC	4.49	2106	29.9	31.3
+CG	3.42	1604	30.4	31.4
+CA	2.94	1381	30.2	31.5
+NC	0.45	210	2.0	31.5
+NT	0.42	196	2.0	30.2
+NG	0.36	167	2.0	30.9
+NA	0.29	138	2.0	30.9
+GN	0.00	1	32.0	2.0
+AN	0.00	1	32.0	2.0
+Total accepted barcodes: 46940
+N-containing barcodes: 713
+Percentage N-content accepted barcodes: 1.52
+
+Unused barcode distribution and per-base mean quality:
+Barcode	%	Count	B1Q	B2Q
+AA	8.33	255	28.7	30.1
+AT	7.29	223	27.8	28.7
+TG	7.29	223	28.7	28.9
+TT	6.96	213	27.5	30.1
+CT	6.50	199	28.3	29.3
+GA	6.44	197	28.6	29.9
+CC	6.27	192	28.0	29.8
+AG	6.01	184	29.0	29.7
+TA	5.92	181	28.9	30.2
+CA	5.65	173	27.2	29.6
+GT	5.62	172	28.0	28.4
+AC	5.62	172	28.8	29.2
+GG	5.26	161	28.0	28.8
+CG	5.26	161	29.0	29.3
+TC	5.20	159	27.6	29.2
+GC	4.58	140	28.9	29.2
+NT	0.56	17	2.0	30.8
+NC	0.52	16	2.0	28.6
+NA	0.46	14	2.0	32.0
+NG	0.26	8	2.0	32.0
+Total unused barcodes: 3060
+N-containing unused barcodes: 55
+Percentage N-content unused barcodes: 1.80

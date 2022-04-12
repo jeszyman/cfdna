@@ -7,6 +7,24 @@ mkdir -p "${repo}/workflow/scripts"
 *** Bash
 **** Configurations
 - Local (by $HOSTNAME)
+  - jeff-mac-book
+    #+begin_src bash :noweb yes :tangle ./config/jeff-mac-book.sh
+#!/usr/bin/env bash
+#########1#########2#########3#########4#########5#########6#########7#########8
+
+#####################################################################
+###   Bash configuration script for MPNST fragmentomics project   ###
+#####################################################################
+
+# Host-local variables
+data_dir=/mnt/ris/aadel/mpnst
+mntpt=/mnt/ris/aadel
+repo=/home/jeszyman/repos/mpnst-preprocessing
+sif_dir=/home/jeszyman/sing_containers
+threads=8
+
+<<bash_common_config>>
+    #+end_src
   - [[file:config/jeszyman-work.sh][jeszyman-work]]
     #+begin_src bash :noweb yes :tangle ./config/jeszyman-work.sh 
 #!/usr/bin/env bash
@@ -59,8 +77,7 @@ fi
 if grep -qs $mntpt /proc/mounts; then
     echo "RIS storage mounted."
 else
-    echo "RIS storage NOT mounted, exiting."
-    exit 1
+    echo "RIS storage NOT mounted!!!"
 fi
 
 # Check local singularity build present
@@ -124,6 +141,7 @@ singularity shell --bind /mnt:/mnt ~/sing_containers/biotools.sif
 
 
 *** Snakemake
+- consider a workdir: "/output/dir" 
 **** Configuration YAMLs
 - [[file:config/aclm350.yaml][ACLM350]]
   #+begin_src bash :tangle config/aclm350.yaml
@@ -135,10 +153,9 @@ cap_extract_script: "/drive3/users/jszymanski/repos/mpnst-preprocessing/workflow
 #+end_src
 - [[file:config/common.yaml][common]]
   #+begin_src bash :tangle config/common.yaml
+cap_extract_script: "src/cp_fastq_extract_auto.pl"
 inputs_dir: "/mnt/ris/aadel/mpnst/inputs"
 demultiplex_dir: "/mnt/ris/aadel/mpnst/cappseq/demultiplexed"
-rename_dir: "/mnt/ris/aadel/mpnst/cappseq/rename"
-extracted_dir: "/mnt/ris/aadel/mpnst/cappseq/extracted"
 hg38_fasta: "GCA_000001405.15_GRCh38_no_alt_analysis_set.fna.fai"
 hg38_fasta_ftp: "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/001/405/GCA_000001405.15_GRCh38/seqs_for_alignment_pipelines.ucsc_ids/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna.fai"
 hg38_bwa_index_ftp: "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/001/405/GCA_000001405.15_GRCh38/seqs_for_alignment_pipelines.ucsc_ids/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna.bwa_index.tar.gz"
@@ -158,6 +175,9 @@ processed_fq_dir: "test/processed-fastq"
 unpr_fq_dir: "test/unpaired-fastq"
 bwa_index: "test/ref/chr8"
 bam_dir: "test/bam"
+rename_dir: "test/cappseq_fastq"
+extracted_dir: "test/extracted_fastq"
+fq_symlink_dir: "test/symlink_fastq"
 #+end_src
 **** Run commands
 :PROPERTIES:
@@ -176,7 +196,10 @@ snakemake \
     --dry-run \
     --rerun-incomplete \
     --use-singularity \
-    --snakefile ./workflow/read_qc.smk &&
+    --snakefile ./workflow/read_qc.smk
+
+    &&
+    
     snakemake \
         --configfile config/repo_test.yaml \
         --cores $threads \
@@ -554,8 +577,153 @@ snakemake \
 :PROPERTIES:
 :header-args:snakemake: :tangle ./workflow/cappseq.smk
 :END:
-add resources call to capppseq perl 
 - starts with DE-multiplexed capp fastqs as inputs
+*** Setup integration testing
+#+begin_src bash
+source config/${HOSTNAME}.sh            
+
+\rm -rf "${repo}/test/cappseq_fastq"
+mkdir -p "${repo}/test/cappseq_fastq"
+
+zcat /mnt/ris/aadel/mpnst/cappseq/demultiplexed/new_HiSeq-W44_Undetermined_R6000324_L004_R1_001_AGGT.fastq.gz | head -n 100000 > "${repo}/test/cappseq_fastq/capp1_R1.fastq"
+zcat /mnt/ris/aadel/mpnst/cappseq/demultiplexed/new_HiSeq-W44_Undetermined_R6000324_L004_R2_001_AGGT.fastq.gz | head -n 100000 > "${repo}/test/cappseq_fastq/capp1_R2.fastq"
+zcat /mnt/ris/aadel/mpnst/cappseq/demultiplexed/new_HiSeq-W44_Undetermined_R6000324_L004_R1_001_ATCG.fastq.gz | head -n 100000 > "${repo}/test/cappseq_fastq/capp2_R1.fastq"
+zcat /mnt/ris/aadel/mpnst/cappseq/demultiplexed/new_HiSeq-W44_Undetermined_R6000324_L004_R2_001_ATCG.fastq.gz | head -n 100000 > "${repo}/test/cappseq_fastq/capp2_R2.fastq"
+for file in "${repo}/test/cappseq_fastq/*.fastq"; do gzip $file; done
+#+end_src
+*** TODO [[file:workflow/cappseq.smk][Snakefile]]                                                      :smk:
+:PROPERTIES:
+:header-args:snakemake: :tangle ./workflow/cappseq.smk
+:END:              
+**** Smk preamble
+#+begin_src snakemake
+configfile: "./config/common.yaml"
+READ_ID, = glob_wildcards(config["rename_dir"] + "/{id}_R1.fastq.gz")
+#+end_src              
+**** Smk rules
+***** All rule
+#+begin_src snakemake
+rule all:
+    input:
+        expand(config["extracted_dir"] + "/{read_id}_extract_{read}.fastq.gz", read_id=READ_ID, read=["R1","R2"]),	
+#+end_src                            
+***** INPROCESS Extract cappseq barcodes
+- Snakemake
+  #+begin_src snakemake
+rule extract_cappseq_barcodes:
+    input:
+        read1 = config["rename_dir"] + "/{read_id}_R1.fastq.gz",
+        read2 = config["rename_dir"] + "/{read_id}_R2.fastq.gz",
+    output:
+        read1 = temp(config["rename_dir"] + "/{read_id}_R1.fastq"),
+        read2 = temp(config["rename_dir"] + "/{read_id}_R2.fastq"),
+        read1mv = config["extracted_dir"] + "/{read_id}_R1.fastq",
+        read2mv = config["extracted_dir"] + "/{read_id}_R2.fastq",
+    resources:
+        mem_mb=10000	
+    shell:
+        """
+        perl {config[cap_extract_script]} {input.read1} {input.read2}
+        cp {output.read1} {output.read1mv}
+        cp {output.read2} {output.read2mv}
+        """
+#+end_src
+***** WAITING Fix headers                                          :smk_rule:
+- Snakemake
+#+begin_src snakemake
+rule fix_headers:
+    input:
+        config["extracted_dir"] + "/{read_id}_{read}.fastq",
+    output:
+        unzip = config["extracted_dir"] + "/{read_id}_extract_{read}.fastq",
+        zip = config["extracted_dir"] + "/{read_id}_extract_{read}.fastq.gz",	
+    shell:
+        """
+        workflow/scripts/test.sh {input} {output.unzip}
+        pigz -c -p {config[threads]} {output.unzip} > {output.zip} 
+        """
+#+end_src
+
+***** Dev
+:PROPERTIES:
+:header-args:snakemake: :tangle no
+:END:
+****** Rename                                                      :smk_rule:
+- Snakemake
+#+begin_src snakemake
+rule rename:
+    input: config["demultiplex_dir"] + "/{id}.fastq.gz",
+    output: config["rename_dir"] + "/{id}.fastq.gz",
+    shell:
+        """
+        ln -s {input} {output}
+        """
+#+end_src
+- [[file:./workflow/scripts/rename.sh][Base script]]
+#+begin_src bash
+#!/usr/bin/env bash
+cp 
+#+end_src
+****** Rename                                                      :smk_rule:
+- Snakemake
+#+begin_src snakemake
+rule rename:
+    input:
+        read1 =config["demultiplex_dir"] + "/{capp_id1}_R1_{capp_id2}.fastq.gz",
+        read2 =config["demultiplex_dir"] + "/{capp_id1}_R1_{capp_id2}.fastq.gz",	
+    output:
+        read1 =config["rename_dir"] + "/{capp_id1}_{capp_id2}_R1.fastq.gz",
+        read2 =config["rename_dir"] + "/{capp_id1}_{capp_id2}_R2.fastq.gz",	
+    shell:
+        """
+        ln --symbolic --relative {input.read1} {output.read1}
+        ln --symbolic --relative {input.read2} {output.read2}
+        """
+#+end_src
+- [[file:./workflows/scripts/rename.sh][Base script]]
+,  #+begin_src bash :tangle ./workflows/scripts/rename.sh
+#!/usr/bin/env bash
+#########1#########2#########3#########4#########5#########6#########7#########8               
+###
+###    SCRIPT TITLE   ###                
+###
+
+#+end_src
+**** Ideas
+:PROPERTIES:
+:header-args:snakemake: :tangle no
+:END:
+***** Smk preamble
+#+begin_src snakemake
+IDS, = glob_wildcards(config["data_dir"] + "{id}_R1.fastq.gz")            
+#+end_src              
+***** Smk rules
+****** All rule
+#+begin_src snakemake
+rule all:
+    input:
+                    
+#+end_src                            
+
+****** Extract CAPPseq barcodes                                    :smk_rule:
+- Snakemake
+  #+begin_src snakemake
+rule extract_cappseq_barcodes:
+    input:
+        read1 = config["data_dir"] + "/inputs/cappseq-fastqs/
+        bcode_fq_R2 = config["data_dir"] + "/tmp_capp_fastq/{capp_id}_R2.fastq.gz"
+    params:
+        outdir = config["data_dir"] + "/tmp/extract_fastq/"
+    output:
+        extract_fq_R1 = config["data_dir"] + "/tmp_extract_fastq/{capp_id}_R1.fastq"
+        extract_fq_R2 = config["data_dir"] + "/tmp_extract_fastq/{capp_id}_R2.fastq"
+    shell:
+        """
+        scripts/extract_cappseq_barcodes.sh {input.bcode_fq_R1} {input.bcode_fq_R2} {params.outdir}
+        """
+#+end_src
+
+*** Dev
 - Barcode extraction
   #+begin_src bash
 # Setup test
@@ -714,21 +882,23 @@ capp_extract \
 # @E00521:255:H3HJ5CCX2:6:1101:2443:2909:CGTAACAC
 
 #+end_src
-- d
+- For barcode-extracted fastqs, correct headers for use with bwa  
   #+begin_src bash
-mkdir -p /mnt/ris/aadel/mpnst/cappseq/rename
+source config/jeszyman-server.sh
+launch_frag
 
-ln -s /mnt/ris/aadel/mpnst/cappseq//demultiplexed/new_HiSeq-W44* /mnt/ris/aadel/mpnst/cappseq/rename
+source config/jeszyman-server.sh
+mkdir $data_dir/tmp_capp_fastq
 
-rename 's/([^_]+)_([^_]+)_([^_]+)_([^_]+)\.fastq.gz$/$1_$3_$4_$2.fastq.gz/' /mnt/ris/aadel/mpnst/cappseq/rename/*.fastq.gz
+cp $data_dir/inputs/cappseq-fastq/* $data_dir/tmp_capp_fastq
 
-mkdir -p /mnt/ris/aadel/mpnst/cappseq/barcode
+cd $data_dir/tmp_capp_fastq
 
-repo=/home/jeszyman/repos/mpnst-preprocessing
-cd $repo
+rename -n s/\.fastq.gz/_R1.fastq.gz/g *_R1_*.fastq.gz
+rename -n s/\.fastq.gz/_R2.fastq.gz/g *_R2_*.fastq.gz
 
-perl ../cappseq/bin/cp-fastq-extract-auto.pl /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq-W44_Undetermined_R6000324_L004_001_AGGT_R1.fastq.gz \
-     /mnt/ris/aadel/mpnst/cappseq/rename/new_HiSeq-W44_Undetermined_R6000324_L004_001_AGGT_R1.fastq.gz
+rename -n s/_R1_/_/g *R1.fastq.gz
+rename -n s/_R2_/_/g *R2.fastq.gz
 
 
 #+end_src
@@ -770,169 +940,60 @@ cappseq_demultiplex() {
 
 perl ~/repos/mpnst-preprocessing/src/cp_fastq_demultiplex.pl /mnt/ris/aadel/capp-seq/capp-fastqs/HiSeqW38,39,40,41,42/new_HiSeq42_Undetermined_R6000281_L008_R1_001.fastq.gz /mnt/ris/aadel/mpnst/tmp/demulti 
 #+end_src
-- For barcode-extracted fastqs, correct headers for use with bwa  
-  #+begin_src bash
-source config/jeszyman-server.sh
-launch_frag
-
-source config/jeszyman-server.sh
-mkdir $data_dir/tmp_capp_fastq
-
-cp $data_dir/inputs/cappseq-fastq/* $data_dir/tmp_capp_fastq
-
-cd $data_dir/tmp_capp_fastq
-
-rename -n s/\.fastq.gz/_R1.fastq.gz/g *_R1_*.fastq.gz
-rename -n s/\.fastq.gz/_R2.fastq.gz/g *_R2_*.fastq.gz
-
-rename -n s/_R1_/_/g *R1.fastq.gz
-rename -n s/_R2_/_/g *R2.fastq.gz
-
-
-#+end_src
-*** [[file:workflow/cappseq.smk][Snakefile]] :smk:
-:PROPERTIES:
-:header-args:snakemake: :tangle ./workflow/cappseq.smk
-:END:              
-**** Smk preamble
-#+begin_src snakemake
-configfile: "./config/common.yaml"
-READ_ID, = glob_wildcards(config["rename_dir"] + "/{id}_R1.fastq.gz")
-#+end_src              
-**** Smk rules
-***** All rule
-#+begin_src snakemake
-rule all:
-    input:
-        expand(config["extracted_dir"] + "/{read_id}_R1.fastq", read_id=READ_ID),
-        expand(config["extracted_dir"] + "/{read_id}_R2.fastq", read_id=READ_ID),
-        expand(config["headfix_dir"] + "/{read_id}_{read}.fastq", read_id=READ_ID, read=["R1", "R2"]),	
-#+end_src                            
-***** INPROCESS Extract cappseq barcodes
-- Snakemake
-  #+begin_src snakemake
-rule extract_cappseq_barcodes:
-    input:
-        read1 = config["rename_dir"] + "/{read_id}_R1.fastq.gz",
-        read2 = config["rename_dir"] + "/{read_id}_R2.fastq.gz",
-    output:
-        read1 = config["rename_dir"] + "/{read_id}_R1.fastq",
-        read2 = config["rename_dir"] + "/{read_id}_R2.fastq",	
-        read1mv = config["extracted_dir"] + "/{read_id}_R1.fastq",
-        read2mv = config["extracted_dir"] + "/{read_id}_R2.fastq",
-    shell:
-        """
-        perl {config[cap_extract_script]} {input.read1} {input.read2}
-        mv {output.read1} {output.read1mv}
-        mv {output.read2} {output.read2mv}
-        """
-#+end_src
-***** WAITING Fix headers                                          :smk_rule:
-- Snakemake
-#+begin_src snakemake
-rule fix_headers:
-    input:
-	config["extracted_dir"] + "/{read_id}_{read}.fastq",
-    output:
-        unzip = config["headfix_dir"] + "/{read_id}_{read}.fastq",
-	zip = config["headfix_dir"] + "/{read_id}_{read}.fastq.gz",
-    shell:
-        """
-        cat {input} | awk '{if(NR%4==1){print substr($0, 1, length($0)-21)}else{print $0}}' > ${output.unzip}
-        pigz -c -p {config[threads]} {output.unzip} > {output.zip} 
-        """
-#+end_src
-
-***** Dev
-:PROPERTIES:
-:header-args:snakemake: :tangle no
-:END:
-****** Rename                                                      :smk_rule:
-- Snakemake
-#+begin_src snakemake
-rule rename:
-    input: config["demultiplex_dir"] + "/{id}.fastq.gz",
-    output: config["rename_dir"] + "/{id}.fastq.gz",
-    shell:
-        """
-        ln -s {input} {output}
-        """
-#+end_src
-- [[file:./workflow/scripts/rename.sh][Base script]]
-#+begin_src bash
-#!/usr/bin/env bash
-cp 
-#+end_src
-**** Ideas
-:PROPERTIES:
-:header-args:snakemake: :tangle no
-:END:
-***** Smk preamble
-#+begin_src snakemake
-IDS, = glob_wildcards(config["data_dir"] + "{id}_R1.fastq.gz")            
-#+end_src              
-***** Smk rules
-****** All rule
-#+begin_src snakemake
-rule all:
-    input:
-                    
-#+end_src                            
-
-****** Extract CAPPseq barcodes                                    :smk_rule:
-- Snakemake
-  #+begin_src snakemake
-rule extract_cappseq_barcodes:
-    input:
-        read1 = config["data_dir"] + "/inputs/cappseq-fastqs/
-        bcode_fq_R2 = config["data_dir"] + "/tmp_capp_fastq/{capp_id}_R2.fastq.gz"
-    params:
-        outdir = config["data_dir"] + "/tmp/extract_fastq/"
-    output:
-        extract_fq_R1 = config["data_dir"] + "/tmp_extract_fastq/{capp_id}_R1.fastq"
-        extract_fq_R2 = config["data_dir"] + "/tmp_extract_fastq/{capp_id}_R2.fastq"
-    shell:
-        """
-        scripts/extract_cappseq_barcodes.sh {input.bcode_fq_R1} {input.bcode_fq_R2} {params.outdir}
-        """
-#+end_src
-
 ** TODO Pre-processing and alignment
-*** [[file:./workflow/read_qc.smk][Snakefile]]:smk:
+*** [[file:./workflow/read_qc.smk][Snakefile]]                                                           :smk:
 :PROPERTIES:
 :header-args:snakemake: :tangle ./workflow/read_qc.smk
 :END:              
-note- excluded readgroup
 **** Smk preamble
 #+begin_src snakemake
 container: config["container"]
+import pandas as pd
+import numpy as np
 
-FQ_ID_RAW, = glob_wildcards(config["raw_fq_dir"] + "/{id}_R1.fastq.gz")
+samples = pd.read_table(config["inputs_dir"] + "/samples.tsv")
+sampledict = dict(zip(samples['new_name'], samples['old_name']))
+
+wildcard_constraints:
+    read_id='|'.join([re.escape(x) for x in sampledict.keys()]),
+    
 #+end_src              
 **** Smk rules
 ***** All rule
 #+begin_src snakemake
 rule all:
     input:
-        expand(config["processed_fq_dir"] + "/{fq_id}_proc_R1.fastq.gz", fq_id=FQ_ID_RAW),
-        expand(config["processed_fq_dir"] + "/{fq_id}_proc_R2.fastq.gz", fq_id=FQ_ID_RAW),
-        expand(config["unpr_fq_dir"] + "/{fq_id}_unpr_R1.fastq.gz", fq_id=FQ_ID_RAW),
-        expand(config["unpr_fq_dir"] + "/{fq_id}_unpr_R2.fastq.gz", fq_id=FQ_ID_RAW),
-        expand(config["qc_dir"] + "/{fq_id}_{read}_fastqc.html", fq_id=FQ_ID_RAW, read=["R1", "R2"]),
-        expand(config["qc_dir"] + "/{fq_id}_proc_{read}_fastqc.html", fq_id=FQ_ID_RAW, read=["R1", "R2"]),
-        expand(config["bam_dir"] + "/{fq_id}.sam", fq_id=FQ_ID_RAW),
-        expand(config["bam_dir"] + "/{fq_id}.bam", fq_id=FQ_ID_RAW),
-        expand(config["bam_dir"] + "/{fq_id}_dedup.bam", fq_id=FQ_ID_RAW),
-        expand(config["bam_dir"] + "/{fq_id}_dedup_sort.bam", fq_id=FQ_ID_RAW),
-        expand(config["bam_dir"] + "/{fq_id}_dedup_sort.bam.bai", fq_id=FQ_ID_RAW),
+        expand(config["processed_fq_dir"] + "/{read_id}_proc_{read}.fastq.gz", read_id = sampledict.keys(), read = ["R1","R2"]),
+        expand(config["unpr_fq_dir"] + "/{read_id}_unpr_R1.fastq.gz", read_id = sampledict.keys(), read = ["R1","R2"]),
+        expand(config["qc_dir"] + "/{read_id}_{read}_fastqc.html", read_id = sampledict.keys(), read = ["R1","R2"]),
+        expand(config["qc_dir"] + "/{read_id}_proc_{read}_fastqc.html", read_id = sampledict.keys(), read = ["R1","R2"]),
+	expand(config["bam_dir"] + "/{read_id}_dedup_sort.bam", read_id = sampledict.keys())
 #+end_src                            
+***** Rename :smk_rule:
+- Snakemake
+#+begin_src snakemake
+rule rename:
+    params:
+        old_sample_id=lambda wcs: sampledict[wcs.f],
+    output:
+        read1=config["fq_symlink_dir"] + "/{f}_R1.fastq.gz",
+        read2=config["fq_symlink_dir"] + "/{f}_R2.fastq.gz",	
+    shell:
+        """
+        if [ -f {output.read1} ]; then \\rm {output.read1}; fi
+        if [ -f {output.read2} ]; then \\rm {output.read2}; fi
+        ln -s --relative "{config[raw_fq_dir]}/{params.old_sample_id}_R1.fastq.gz" {output.read1}
+        ln -s --relative "{config[raw_fq_dir]}/{params.old_sample_id}_R2.fastq.gz" {output.read2}
+        """
+#+end_src
+
 ***** Read preprocessing                                           :smk_rule:
 - Snakemake
   #+begin_src snakemake
 rule trimmomatic:
     input:
-        read1 = config["raw_fq_dir"] + "/{fq_id}_R1.fastq.gz",
-        read2 = config["raw_fq_dir"] + "/{fq_id}_R2.fastq.gz",
+        read1 = config["fq_symlink_dir"] + "/{fq_id}_R1.fastq.gz",
+        read2 = config["fq_symlink_dir"] + "/{fq_id}_R2.fastq.gz",
     params:
         adapter_fasta = config["inputs_dir"] + "/TruSeq3-PE.fa",
     output:
@@ -975,42 +1036,27 @@ trimmomatic PE \
 ***** FastQC                                                       :smk_rule:
 - Snakemake
   #+begin_src snakemake
-rule fastqc_raw:
+rule fastqc:
     input: 
-        config["raw_fq_dir"] + "/{fq_id}_{read}.fastq.gz",
+        raw=config["fq_symlink_dir"] + "/{read_id}_{read}.fastq.gz",
+	proc=config["processed_fq_dir"] + "/{read_id}_proc_{read}.fastq.gz",
     params: 
         out_dir = config["qc_dir"],
     output:
-        html = config["qc_dir"] + "/{fq_id}_{read}_fastqc.html", 
-        zip = config["qc_dir"] + "/{fq_id}_{read}_fastqc.zip", 
+        raw_html = config["qc_dir"] + "/{read_id}_{read}_fastqc.html",
+        proc_html = config["qc_dir"] + "/{read_id}_proc_{read}_fastqc.html", 	
     log: 
-        config["log_dir"] + "/fastqc_raw_{fq_id}_{read}.log",
+        raw = config["log_dir"] + "/fastqc_raw_{read_id}_{read}.log",
+        proc = config["log_dir"] + "/fastqc_proc_{read_id}_{read}.log",	
     shell:
         """
 	fastqc --outdir {params.out_dir} \
 	--quiet \
-	--threads {config[threads]} {input} &> {log}
-        """
-#+end_src
-- Snakemake
-  #+begin_src snakemake
-rule fastqc_proc:
-    input: 
-        config["processed_fq_dir"] + "/{fq_id}_proc_{read}.fastq.gz",
-    params: 
-        out_dir = config["qc_dir"],
-    output:
-        html = config["qc_dir"] + "/{fq_id}_proc_{read}_fastqc.html", 
-        zip = config["qc_dir"] + "/{fq_id}_proc_{read}_fastqc.zip", 
-    log: 
-        config["log_dir"] + "/fastqc_raw_{fq_id}_{read}.log",
-    shell:
-        """
+	--threads {config[threads]} {input.raw} &> {log}
 	fastqc --outdir {params.out_dir} \
 	--quiet \
-	--threads {config[threads]} {input} &> {log}
+	--threads {config[threads]} {input.proc} &> {log}
         """
-#+end_src
 - https://snakemake.readthedocs.io/en/stable/snakefiles/rules.html see multiext
 - [[file:./workflows/scripts/fastqc.sh][Base script]]
   #+begin_src bash :tangle ./workflow/scripts/fastqc.sh
@@ -1034,6 +1080,40 @@ rule align:
         bwa mem -M -t 4 {config[bwa_index]} {input.read1} {input.read2} > {output}
 	"""
 #+end_src
+***** Rename bams
+- Snakemake
+  #+begin_src snakemake
+
+rule all: 
+    input:
+        expand(config["rename_dir"] + "/{newname}.bam", newname=libids)
+
+rule rename_bams:
+    input:
+        config["bam_dir"] + "/{sample_id}.bam"
+    output: 
+        config["rename_dir"] + "/{newname}.bam"
+    shell:
+        """
+	cp {input} {output}
+	"""
+
+rule move_and_rename_fastqs:
+    input:  fastq = lambda w: units_table[units_table.SampleSM == w.sample]
+    output: temp(SCRATCH + "/01RAW_fqs/{sample}")
+    log:    SCRATCH + "/00logs/01RAW_fqs/{sample}.log"
+    shell:
+            """cp {input.fastq} {output} 2> {log}"""
+
+samples= list(units_table.SampleSM.unique())
+# rule move_and_rename_fastqs:
+#     input:  fastq = lambda w: sample_df[sample_df.sampleID == w.sample].fastq.tolist()
+#     output: temp(SCRATCH + "/01RAW_fqs/{sample}")
+#     log:    SCRATCH + "/00logs/01RAW_fqs/{sample}.log"
+#     shell:
+#             """cp {input.fastq} {output} 2> {log}"""
+
+#+end_src
 ***** TODO Alignment processing
 - Snakemake
   #+begin_src snakemake
@@ -1055,10 +1135,10 @@ rule alignment_processing:
         sambamba index -t {config[threads]} {output.sort}
         """
 #+end_src
-
-
-
-
+**** Hold
+:PROPERTIES:
+:header-args:snakemake: :tangle no
+:END:
 **** Dev
 :PROPERTIES:
 :header-args:snakemake: :tangle no

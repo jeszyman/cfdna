@@ -1,0 +1,2 @@
+SyntaxError in line 5 of /home/jeszyman/repos/mpnst-preprocessing/workflow/cappseq.smk:
+EOF in multi-line statement (cappseq.smk, line 5)

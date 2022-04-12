@@ -1,0 +1,250 @@
+Building DAG of jobs...
+Using shell: /bin/bash
+Provided cores: 8
+Rules claiming more threads will be scaled down.
+Job stats:
+job            count    min threads    max threads
+-----------  -------  -------------  -------------
+all                1              1              1
+fastqc_raw         8              1              1
+rename             4              1              1
+trimmomatic        4              1              1
+total             17              1              1
+
+Select jobs to execute...
+
+[Tue Apr 12 12:29:31 2022]
+rule rename:
+    output: test/symlink_fastq/lib001_R1.fastq.gz, test/symlink_fastq/lib001_R2.fastq.gz
+    jobid: 2
+    wildcards: f=lib001
+    resources: tmpdir=/tmp
+
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+
+[Tue Apr 12 12:29:31 2022]
+rule rename:
+    output: test/symlink_fastq/lib003_R1.fastq.gz, test/symlink_fastq/lib003_R2.fastq.gz
+    jobid: 6
+    wildcards: f=lib003
+    resources: tmpdir=/tmp
+
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+
+[Tue Apr 12 12:29:31 2022]
+rule rename:
+    output: test/symlink_fastq/lib002_R1.fastq.gz, test/symlink_fastq/lib002_R2.fastq.gz
+    jobid: 4
+    wildcards: f=lib002
+    resources: tmpdir=/tmp
+
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+
+[Tue Apr 12 12:29:31 2022]
+rule rename:
+    output: test/symlink_fastq/lib004_R1.fastq.gz, test/symlink_fastq/lib004_R2.fastq.gz
+    jobid: 8
+    wildcards: f=lib004
+    resources: tmpdir=/tmp
+
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+[Tue Apr 12 12:29:31 2022]
+Finished job 6.
+1 of 17 steps (6%) done
+Select jobs to execute...
+
+[Tue Apr 12 12:29:31 2022]
+rule fastqc_raw:
+    input: test/symlink_fastq/lib003_R2.fastq.gz
+    output: test/qc/lib003_R2_fastqc.html, test/qc/lib003_R2_fastqc.zip
+    log: test/logs/fastqc_raw_lib003_R2.log
+    jobid: 14
+    wildcards: fq_id=lib003, read=R2
+    resources: tmpdir=/tmp
+
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+
+[Tue Apr 12 12:29:31 2022]
+rule trimmomatic:
+    input: test/symlink_fastq/lib003_R1.fastq.gz, test/symlink_fastq/lib003_R2.fastq.gz
+    output: test/processed-fastq/lib003_proc_R1.fastq.gz, test/unpaired-fastq/lib003_unpr_R1.fastq.gz, test/processed-fastq/lib003_proc_R2.fastq.gz, test/unpaired-fastq/lib003_unpr_R2.fastq.gz
+    log: test/logs/trimmomatic_trimlog_lib003.log, test/logs/trimmomatic_lib003.log
+    jobid: 5
+    wildcards: fq_id=lib003
+    resources: tmpdir=/tmp
+
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+
+[Tue Apr 12 12:29:31 2022]
+rule fastqc_raw:
+    input: test/symlink_fastq/lib003_R1.fastq.gz
+    output: test/qc/lib003_R1_fastqc.html, test/qc/lib003_R1_fastqc.zip
+    log: test/logs/fastqc_raw_lib003_R1.log
+    jobid: 13
+    wildcards: fq_id=lib003, read=R1
+    resources: tmpdir=/tmp
+
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+[Tue Apr 12 12:29:31 2022]
+Finished job 2.
+2 of 17 steps (12%) done
+Select jobs to execute...
+
+[Tue Apr 12 12:29:31 2022]
+rule trimmomatic:
+    input: test/symlink_fastq/lib001_R1.fastq.gz, test/symlink_fastq/lib001_R2.fastq.gz
+    output: test/processed-fastq/lib001_proc_R1.fastq.gz, test/unpaired-fastq/lib001_unpr_R1.fastq.gz, test/processed-fastq/lib001_proc_R2.fastq.gz, test/unpaired-fastq/lib001_unpr_R2.fastq.gz
+    log: test/logs/trimmomatic_trimlog_lib001.log, test/logs/trimmomatic_lib001.log
+    jobid: 1
+    wildcards: fq_id=lib001
+    resources: tmpdir=/tmp
+
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+
+[Tue Apr 12 12:29:31 2022]
+rule fastqc_raw:
+    input: test/symlink_fastq/lib001_R1.fastq.gz
+    output: test/qc/lib001_R1_fastqc.html, test/qc/lib001_R1_fastqc.zip
+    log: test/logs/fastqc_raw_lib001_R1.log
+    jobid: 9
+    wildcards: fq_id=lib001, read=R1
+    resources: tmpdir=/tmp
+
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+
+[Tue Apr 12 12:29:31 2022]
+rule fastqc_raw:
+    input: test/symlink_fastq/lib001_R2.fastq.gz
+    output: test/qc/lib001_R2_fastqc.html, test/qc/lib001_R2_fastqc.zip
+    log: test/logs/fastqc_raw_lib001_R2.log
+    jobid: 10
+    wildcards: fq_id=lib001, read=R2
+    resources: tmpdir=/tmp
+
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+[Tue Apr 12 12:29:31 2022]
+Finished job 4.
+3 of 17 steps (18%) done
+[Tue Apr 12 12:29:31 2022]
+Finished job 8.
+4 of 17 steps (24%) done
+Select jobs to execute...
+
+[Tue Apr 12 12:29:31 2022]
+rule trimmomatic:
+    input: test/symlink_fastq/lib002_R1.fastq.gz, test/symlink_fastq/lib002_R2.fastq.gz
+    output: test/processed-fastq/lib002_proc_R1.fastq.gz, test/unpaired-fastq/lib002_unpr_R1.fastq.gz, test/processed-fastq/lib002_proc_R2.fastq.gz, test/unpaired-fastq/lib002_unpr_R2.fastq.gz
+    log: test/logs/trimmomatic_trimlog_lib002.log, test/logs/trimmomatic_lib002.log
+    jobid: 3
+    wildcards: fq_id=lib002
+    resources: tmpdir=/tmp
+
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+
+[Tue Apr 12 12:29:31 2022]
+rule fastqc_raw:
+    input: test/symlink_fastq/lib004_R2.fastq.gz
+    output: test/qc/lib004_R2_fastqc.html, test/qc/lib004_R2_fastqc.zip
+    log: test/logs/fastqc_raw_lib004_R2.log
+    jobid: 16
+    wildcards: fq_id=lib004, read=R2
+    resources: tmpdir=/tmp
+
+Select jobs to execute...
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+[Tue Apr 12 12:29:34 2022]
+Finished job 5.
+5 of 17 steps (29%) done
+Select jobs to execute...
+
+[Tue Apr 12 12:29:35 2022]
+rule fastqc_raw:
+    input: test/symlink_fastq/lib002_R2.fastq.gz
+    output: test/qc/lib002_R2_fastqc.html, test/qc/lib002_R2_fastqc.zip
+    log: test/logs/fastqc_raw_lib002_R2.log
+    jobid: 12
+    wildcards: fq_id=lib002, read=R2
+    resources: tmpdir=/tmp
+
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+[Tue Apr 12 12:29:36 2022]
+Finished job 3.
+6 of 17 steps (35%) done
+Select jobs to execute...
+
+[Tue Apr 12 12:29:36 2022]
+rule fastqc_raw:
+    input: test/symlink_fastq/lib002_R1.fastq.gz
+    output: test/qc/lib002_R1_fastqc.html, test/qc/lib002_R1_fastqc.zip
+    log: test/logs/fastqc_raw_lib002_R1.log
+    jobid: 11
+    wildcards: fq_id=lib002, read=R1
+    resources: tmpdir=/tmp
+
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+[Tue Apr 12 12:29:36 2022]
+Finished job 1.
+7 of 17 steps (41%) done
+Select jobs to execute...
+
+[Tue Apr 12 12:29:36 2022]
+rule fastqc_raw:
+    input: test/symlink_fastq/lib004_R1.fastq.gz
+    output: test/qc/lib004_R1_fastqc.html, test/qc/lib004_R1_fastqc.zip
+    log: test/logs/fastqc_raw_lib004_R1.log
+    jobid: 15
+    wildcards: fq_id=lib004, read=R1
+    resources: tmpdir=/tmp
+
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+[Tue Apr 12 12:29:37 2022]
+Finished job 13.
+8 of 17 steps (47%) done
+Select jobs to execute...
+
+[Tue Apr 12 12:29:37 2022]
+rule trimmomatic:
+    input: test/symlink_fastq/lib004_R1.fastq.gz, test/symlink_fastq/lib004_R2.fastq.gz
+    output: test/processed-fastq/lib004_proc_R1.fastq.gz, test/unpaired-fastq/lib004_unpr_R1.fastq.gz, test/processed-fastq/lib004_proc_R2.fastq.gz, test/unpaired-fastq/lib004_unpr_R2.fastq.gz
+    log: test/logs/trimmomatic_trimlog_lib004.log, test/logs/trimmomatic_lib004.log
+    jobid: 7
+    wildcards: fq_id=lib004
+    resources: tmpdir=/tmp
+
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+[Tue Apr 12 12:29:38 2022]
+Finished job 9.
+9 of 17 steps (53%) done
+[Tue Apr 12 12:29:38 2022]
+Finished job 10.
+10 of 17 steps (59%) done
+[Tue Apr 12 12:29:38 2022]
+Finished job 14.
+11 of 17 steps (65%) done
+[Tue Apr 12 12:29:38 2022]
+Finished job 16.
+12 of 17 steps (71%) done
+[Tue Apr 12 12:29:40 2022]
+Finished job 7.
+13 of 17 steps (76%) done
+[Tue Apr 12 12:29:40 2022]
+Finished job 12.
+14 of 17 steps (82%) done
+[Tue Apr 12 12:29:40 2022]
+Finished job 11.
+15 of 17 steps (88%) done
+[Tue Apr 12 12:29:40 2022]
+Finished job 15.
+16 of 17 steps (94%) done
+Select jobs to execute...
+
+[Tue Apr 12 12:29:40 2022]
+localrule all:
+    input: test/processed-fastq/lib001_proc_R1.fastq.gz, test/processed-fastq/lib001_proc_R2.fastq.gz, test/processed-fastq/lib002_proc_R1.fastq.gz, test/processed-fastq/lib002_proc_R2.fastq.gz, test/processed-fastq/lib003_proc_R1.fastq.gz, test/processed-fastq/lib003_proc_R2.fastq.gz, test/processed-fastq/lib004_proc_R1.fastq.gz, test/processed-fastq/lib004_proc_R2.fastq.gz, test/unpaired-fastq/lib001_unpr_R1.fastq.gz, test/unpaired-fastq/lib002_unpr_R1.fastq.gz, test/unpaired-fastq/lib003_unpr_R1.fastq.gz, test/unpaired-fastq/lib004_unpr_R1.fastq.gz, test/qc/lib001_R1_fastqc.html, test/qc/lib001_R2_fastqc.html, test/qc/lib002_R1_fastqc.html, test/qc/lib002_R2_fastqc.html, test/qc/lib003_R1_fastqc.html, test/qc/lib003_R2_fastqc.html, test/qc/lib004_R1_fastqc.html, test/qc/lib004_R2_fastqc.html
+    jobid: 0
+    resources: tmpdir=/tmp
+
+[Tue Apr 12 12:29:40 2022]
+Finished job 0.
+17 of 17 steps (100%) done
+Complete log: /home/jeszyman/repos/mpnst-preprocessing/.snakemake/log/2022-04-12T122931.064696.snakemake.log

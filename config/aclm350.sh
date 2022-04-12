@@ -25,8 +25,7 @@ fi
 if grep -qs $mntpt /proc/mounts; then
     echo "RIS storage mounted."
 else
-    echo "RIS storage NOT mounted, exiting."
-    exit 1
+    echo "RIS storage NOT mounted!!!"
 fi
 
 # Check local singularity build present

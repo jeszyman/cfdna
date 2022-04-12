@@ -1,0 +1,4 @@
+Building DAG of jobs...
+MissingInputException in line 62 of /home/jeszyman/repos/mpnst-preprocessing/workflow/TMPread_qc.smk:
+Missing input files for rule fastqc_raw:
+test/symlink_fastq/lib003_R1_proc.fastq.gz

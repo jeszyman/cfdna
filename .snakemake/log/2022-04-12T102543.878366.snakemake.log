@@ -1,0 +1,48 @@
+Building DAG of jobs...
+Using shell: /bin/bash
+Provided cores: 8
+Rules claiming more threads will be scaled down.
+Job stats:
+job                         count    min threads    max threads
+------------------------  -------  -------------  -------------
+all                             1              1              1
+extract_cappseq_barcodes        2              1              1
+total                           3              1              1
+
+Select jobs to execute...
+
+[Tue Apr 12 10:25:44 2022]
+rule extract_cappseq_barcodes:
+    input: test/cappseq_fastq/capp1_R1.fastq.gz, test/cappseq_fastq/capp1_R2.fastq.gz
+    output: test/cappseq_fastq/capp1_R1.fastq, test/cappseq_fastq/capp1_R2.fastq, extracted_fastq/capp1_R1.fastq, extracted_fastq/capp1_R2.fastq
+    jobid: 2
+    wildcards: read_id=capp1
+    resources: tmpdir=/tmp
+
+
+[Tue Apr 12 10:25:44 2022]
+rule extract_cappseq_barcodes:
+    input: test/cappseq_fastq/capp2_R1.fastq.gz, test/cappseq_fastq/capp2_R2.fastq.gz
+    output: test/cappseq_fastq/capp2_R1.fastq, test/cappseq_fastq/capp2_R2.fastq, extracted_fastq/capp2_R1.fastq, extracted_fastq/capp2_R2.fastq
+    jobid: 1
+    wildcards: read_id=capp2
+    resources: tmpdir=/tmp
+
+[Tue Apr 12 10:25:44 2022]
+Finished job 1.
+1 of 3 steps (33%) done
+[Tue Apr 12 10:25:44 2022]
+Finished job 2.
+2 of 3 steps (67%) done
+Select jobs to execute...
+
+[Tue Apr 12 10:25:44 2022]
+localrule all:
+    input: test/cappseq_fastq/capp2_R1.fastq, test/cappseq_fastq/capp1_R1.fastq, test/cappseq_fastq/capp2_R2.fastq, test/cappseq_fastq/capp1_R2.fastq
+    jobid: 0
+    resources: tmpdir=/tmp
+
+[Tue Apr 12 10:25:44 2022]
+Finished job 0.
+3 of 3 steps (100%) done
+Complete log: /home/jeszyman/repos/mpnst-preprocessing/.snakemake/log/2022-04-12T102543.878366.snakemake.log

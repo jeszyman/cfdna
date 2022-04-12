@@ -1,0 +1,29 @@
+Building DAG of jobs...
+Using shell: /bin/bash
+Provided cores: 8
+Rules claiming more threads will be scaled down.
+Job stats:
+job            count    min threads    max threads
+-----------  -------  -------------  -------------
+all                1              1              1
+fastqc_raw        16              1              1
+rename             8              1              1
+trimmomatic        4              1              1
+total             29              1              1
+
+Select jobs to execute...
+
+[Tue Apr 12 12:45:37 2022]
+rule rename:
+    output: test/symlink_fastq/lib004_proc_R1.fastq.gz, test/symlink_fastq/lib004_proc_R2.fastq.gz
+    jobid: 27
+    wildcards: f=lib004_proc
+    resources: tmpdir=/tmp
+
+InputFunctionException in line 18 of /home/jeszyman/repos/mpnst-preprocessing/workflow/TMPread_qc.smk:
+Error:
+  KeyError: 'lib004_proc'
+Wildcards:
+  f=lib004_proc
+Traceback:
+  File "/home/jeszyman/repos/mpnst-preprocessing/workflow/TMPread_qc.smk", line 20, in <lambda>

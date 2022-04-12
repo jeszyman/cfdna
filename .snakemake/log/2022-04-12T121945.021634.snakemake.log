@@ -1,0 +1,47 @@
+Building DAG of jobs...
+Using shell: /bin/bash
+Provided cores: 8
+Rules claiming more threads will be scaled down.
+Job stats:
+job            count    min threads    max threads
+-----------  -------  -------------  -------------
+all                1              1              1
+fastqc_raw        16              1              1
+rename             8              1              1
+trimmomatic        4              1              1
+total             29              1              1
+
+Select jobs to execute...
+
+[Tue Apr 12 12:19:45 2022]
+rule rename:
+    output: test/symlink_fastq/lib004_R1.fastq.gz, test/symlink_fastq/lib004_R2.fastq.gz
+    jobid: 4
+    wildcards: f=lib004
+    resources: tmpdir=/tmp
+
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+
+[Tue Apr 12 12:19:45 2022]
+rule rename:
+    output: test/symlink_fastq/lib002_R1.fastq.gz, test/symlink_fastq/lib002_R2.fastq.gz
+    jobid: 2
+    wildcards: f=lib002
+    resources: tmpdir=/tmp
+
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+
+[Tue Apr 12 12:19:45 2022]
+rule rename:
+    output: test/symlink_fastq/lib003_proc_R1.fastq.gz, test/symlink_fastq/lib003_proc_R2.fastq.gz
+    jobid: 18
+    wildcards: f=lib003_proc
+    resources: tmpdir=/tmp
+
+InputFunctionException in line 20 of /home/jeszyman/repos/mpnst-preprocessing/workflow/TMPread_qc.smk:
+Error:
+  KeyError: 'lib003_proc'
+Wildcards:
+  f=lib003_proc
+Traceback:
+  File "/home/jeszyman/repos/mpnst-preprocessing/workflow/TMPread_qc.smk", line 22, in <lambda>

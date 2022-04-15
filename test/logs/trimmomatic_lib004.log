@@ -1,5 +1,5 @@
 TrimmomaticPE: Started with arguments:
- -threads 4 -trimlog test/logs/trimmomatic_trimlog_lib004.log test/symlink_fastq/lib004_R1.fastq.gz test/symlink_fastq/lib004_R2.fastq.gz test/processed-fastq/lib004_proc_R1.fastq.gz test/unpaired-fastq/lib004_unpr_R1.fastq.gz test/processed-fastq/lib004_proc_R2.fastq.gz test/unpaired-fastq/lib004_unpr_R2.fastq.gz ILLUMINACLIP:test/inputs/TruSeq3-PE.fa:2:30:10 LEADING:10 TRAILING:10 MAXINFO:50:0.97 MINLEN:20
+ -threads 4 -trimlog test/logs/trimmomatic_trimlog_lib004.log test/symlink-fastq/lib004_R1.fastq.gz test/symlink-fastq/lib004_R2.fastq.gz test/processed-fastq/lib004_proc_R1.fastq.gz test/unpaired-fastq/lib004_unpr_R1.fastq.gz test/processed-fastq/lib004_proc_R2.fastq.gz test/unpaired-fastq/lib004_unpr_R2.fastq.gz ILLUMINACLIP:test/inputs/TruSeq3-PE.fa:2:30:10 LEADING:10 TRAILING:10 MAXINFO:50:0.97 MINLEN:20
 Using PrefixPair: 'TACACTCTTTCCCTACACGACGCTCTTCCGATCT' and 'GTGACTGGAGTTCAGACGTGTGCTCTTCCGATCT'
 ILLUMINACLIP: Using 1 prefix pairs, 0 forward/reverse sequences, 0 forward only sequences, 0 reverse only sequences
 Quality encoding detected as phred33

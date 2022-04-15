@@ -1,0 +1,36 @@
+Building DAG of jobs...
+Using shell: /bin/bash
+Provided cores: 4
+Rules claiming more threads will be scaled down.
+Job stats:
+job        count    min threads    max threads
+-------  -------  -------------  -------------
+all            1              1              1
+multiqc        1              1              1
+total          2              1              1
+
+Select jobs to execute...
+
+[Wed Apr 13 13:05:18 2022]
+rule multiqc:
+    input: test/qc/lib001_R1_fastqc.html, test/qc/lib001_R2_fastqc.html, test/qc/lib002_R1_fastqc.html, test/qc/lib002_R2_fastqc.html, test/qc/lib003_R1_fastqc.html, test/qc/lib003_R2_fastqc.html, test/qc/lib004_R1_fastqc.html, test/qc/lib004_R2_fastqc.html, test/qc/lib001_proc_R1_fastqc.html, test/qc/lib001_proc_R2_fastqc.html, test/qc/lib002_proc_R1_fastqc.html, test/qc/lib002_proc_R2_fastqc.html, test/qc/lib003_proc_R1_fastqc.html, test/qc/lib003_proc_R2_fastqc.html, test/qc/lib004_proc_R1_fastqc.html, test/qc/lib004_proc_R2_fastqc.html, test/qc/lib001_raw_samstats.txt, test/qc/lib001_dedup_samstats.txt, test/qc/lib002_raw_samstats.txt, test/qc/lib002_dedup_samstats.txt, test/qc/lib003_raw_samstats.txt, test/qc/lib003_dedup_samstats.txt, test/qc/lib004_raw_samstats.txt, test/qc/lib004_dedup_samstats.txt, test/qc/lib001_raw_flagstat.txt, test/qc/lib001_dedup_flagstat.txt, test/qc/lib002_raw_flagstat.txt, test/qc/lib002_dedup_flagstat.txt, test/qc/lib003_raw_flagstat.txt, test/qc/lib003_dedup_flagstat.txt, test/qc/lib004_raw_flagstat.txt, test/qc/lib004_dedup_flagstat.txt
+    output: test/qc/all_qc.html
+    jobid: 17
+    resources: tmpdir=/tmp
+
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+[Wed Apr 13 13:05:27 2022]
+Finished job 17.
+1 of 2 steps (50%) done
+Select jobs to execute...
+
+[Wed Apr 13 13:05:27 2022]
+localrule all:
+    input: test/processed-fastq/lib001_proc_R1.fastq.gz, test/processed-fastq/lib001_proc_R2.fastq.gz, test/processed-fastq/lib002_proc_R1.fastq.gz, test/processed-fastq/lib002_proc_R2.fastq.gz, test/processed-fastq/lib003_proc_R1.fastq.gz, test/processed-fastq/lib003_proc_R2.fastq.gz, test/processed-fastq/lib004_proc_R1.fastq.gz, test/processed-fastq/lib004_proc_R2.fastq.gz, test/unpaired-fastq/lib001_unpr_R1.fastq.gz, test/unpaired-fastq/lib002_unpr_R1.fastq.gz, test/unpaired-fastq/lib003_unpr_R1.fastq.gz, test/unpaired-fastq/lib004_unpr_R1.fastq.gz, test/bam/lib001_dedup.bam, test/bam/lib002_dedup.bam, test/bam/lib003_dedup.bam, test/bam/lib004_dedup.bam, test/qc/all_qc.html
+    jobid: 0
+    resources: tmpdir=/tmp
+
+[Wed Apr 13 13:05:27 2022]
+Finished job 0.
+2 of 2 steps (100%) done
+Complete log: /home/jeszyman/repos/mpnst-preprocessing/.snakemake/log/2022-04-13T130518.367166.snakemake.log

@@ -1,0 +1,2 @@
+SyntaxError in line 133 of /home/jeszyman/repos/mpnst-preprocessing/workflow/read_preprocess.smk:
+EOF in multi-line string (read_preprocess.smk, line 133)

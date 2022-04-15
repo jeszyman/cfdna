@@ -1,0 +1,132 @@
+Building DAG of jobs...
+Using shell: /bin/bash
+Provided cores: 4
+Rules claiming more threads will be scaled down.
+Job stats:
+job                count    min threads    max threads
+---------------  -------  -------------  -------------
+all                    1              1              1
+downsample_bams        8              1              1
+total                  9              1              1
+
+Select jobs to execute...
+
+[Wed Apr 13 17:38:45 2022]
+rule downsample_bams:
+    input: test/bam/lib001_dedup.bam
+    output: test/bam/lib001_ds10.bam
+    jobid: 34
+    wildcards: fq_id=lib001, milreads=10
+    resources: tmpdir=/tmp
+
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+
+[Wed Apr 13 17:38:45 2022]
+rule downsample_bams:
+    input: test/bam/lib002_dedup.bam
+    output: test/bam/lib002_ds10.bam
+    jobid: 36
+    wildcards: fq_id=lib002, milreads=10
+    resources: tmpdir=/tmp
+
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+
+[Wed Apr 13 17:38:45 2022]
+rule downsample_bams:
+    input: test/bam/lib002_dedup.bam
+    output: test/bam/lib002_ds20.bam
+    jobid: 37
+    wildcards: fq_id=lib002, milreads=20
+    resources: tmpdir=/tmp
+
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+
+[Wed Apr 13 17:38:45 2022]
+rule downsample_bams:
+    input: test/bam/lib003_dedup.bam
+    output: test/bam/lib003_ds20.bam
+    jobid: 39
+    wildcards: fq_id=lib003, milreads=20
+    resources: tmpdir=/tmp
+
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+[Wed Apr 13 17:38:45 2022]
+Finished job 36.
+1 of 9 steps (11%) done
+Select jobs to execute...
+
+[Wed Apr 13 17:38:45 2022]
+rule downsample_bams:
+    input: test/bam/lib004_dedup.bam
+    output: test/bam/lib004_ds10.bam
+    jobid: 40
+    wildcards: fq_id=lib004, milreads=10
+    resources: tmpdir=/tmp
+
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+[Wed Apr 13 17:38:45 2022]
+Finished job 39.
+2 of 9 steps (22%) done
+Select jobs to execute...
+
+[Wed Apr 13 17:38:45 2022]
+rule downsample_bams:
+    input: test/bam/lib003_dedup.bam
+    output: test/bam/lib003_ds10.bam
+    jobid: 38
+    wildcards: fq_id=lib003, milreads=10
+    resources: tmpdir=/tmp
+
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+[Wed Apr 13 17:38:45 2022]
+Finished job 37.
+3 of 9 steps (33%) done
+Select jobs to execute...
+
+[Wed Apr 13 17:38:45 2022]
+rule downsample_bams:
+    input: test/bam/lib001_dedup.bam
+    output: test/bam/lib001_ds20.bam
+    jobid: 35
+    wildcards: fq_id=lib001, milreads=20
+    resources: tmpdir=/tmp
+
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+[Wed Apr 13 17:38:45 2022]
+Finished job 34.
+4 of 9 steps (44%) done
+Select jobs to execute...
+
+[Wed Apr 13 17:38:45 2022]
+rule downsample_bams:
+    input: test/bam/lib004_dedup.bam
+    output: test/bam/lib004_ds20.bam
+    jobid: 41
+    wildcards: fq_id=lib004, milreads=20
+    resources: tmpdir=/tmp
+
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+[Wed Apr 13 17:38:45 2022]
+Finished job 40.
+5 of 9 steps (56%) done
+[Wed Apr 13 17:38:45 2022]
+Finished job 38.
+6 of 9 steps (67%) done
+[Wed Apr 13 17:38:45 2022]
+Finished job 41.
+7 of 9 steps (78%) done
+[Wed Apr 13 17:38:45 2022]
+Finished job 35.
+8 of 9 steps (89%) done
+Select jobs to execute...
+
+[Wed Apr 13 17:38:45 2022]
+localrule all:
+    input: test/processed-fastq/lib001_proc_R1.fastq.gz, test/processed-fastq/lib001_proc_R2.fastq.gz, test/processed-fastq/lib002_proc_R1.fastq.gz, test/processed-fastq/lib002_proc_R2.fastq.gz, test/processed-fastq/lib003_proc_R1.fastq.gz, test/processed-fastq/lib003_proc_R2.fastq.gz, test/processed-fastq/lib004_proc_R1.fastq.gz, test/processed-fastq/lib004_proc_R2.fastq.gz, test/unpaired-fastq/lib001_unpr_R1.fastq.gz, test/unpaired-fastq/lib002_unpr_R1.fastq.gz, test/unpaired-fastq/lib003_unpr_R1.fastq.gz, test/unpaired-fastq/lib004_unpr_R1.fastq.gz, test/bam/lib001_dedup.bam, test/bam/lib002_dedup.bam, test/bam/lib003_dedup.bam, test/bam/lib004_dedup.bam, test/qc/all_qc.html, test/bam/lib001_ds10.bam, test/bam/lib001_ds20.bam, test/bam/lib002_ds10.bam, test/bam/lib002_ds20.bam, test/bam/lib003_ds10.bam, test/bam/lib003_ds20.bam, test/bam/lib004_ds10.bam, test/bam/lib004_ds20.bam
+    jobid: 0
+    resources: tmpdir=/tmp
+
+[Wed Apr 13 17:38:45 2022]
+Finished job 0.
+9 of 9 steps (100%) done
+Complete log: /home/jeszyman/repos/mpnst-preprocessing/.snakemake/log/2022-04-13T173844.432876.snakemake.log

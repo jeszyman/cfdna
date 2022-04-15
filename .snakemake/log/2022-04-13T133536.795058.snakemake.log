@@ -1,0 +1,103 @@
+Building DAG of jobs...
+Using shell: /bin/bash
+Provided cores: 4
+Rules claiming more threads will be scaled down.
+Job stats:
+job                count    min threads    max threads
+---------------  -------  -------------  -------------
+all                    1              1              1
+downsample_bams        4              1              1
+total                  5              1              1
+
+Select jobs to execute...
+
+[Wed Apr 13 13:35:37 2022]
+rule downsample_bams:
+    input: test/bam/lib002_dedup.bam
+    output: test/bam/lib002_ds10.bam
+    jobid: 18
+    wildcards: fq_id=lib002
+    resources: tmpdir=/tmp
+
+
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+[Wed Apr 13 13:35:37 2022]
+rule downsample_bams:
+    input: test/bam/lib003_dedup.bam
+    output: test/bam/lib003_ds10.bam
+    jobid: 19
+    wildcards: fq_id=lib003
+    resources: tmpdir=/tmp
+
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+
+[Wed Apr 13 13:35:37 2022]
+rule downsample_bams:
+    input: test/bam/lib001_dedup.bam
+    output: test/bam/lib001_ds10.bam
+    jobid: 17
+    wildcards: fq_id=lib001
+    resources: tmpdir=/tmp
+
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+
+[Wed Apr 13 13:35:37 2022]
+rule downsample_bams:
+    input: test/bam/lib004_dedup.bam
+    output: test/bam/lib004_ds10.bam
+    jobid: 20
+    wildcards: fq_id=lib004
+    resources: tmpdir=/tmp
+
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+[Wed Apr 13 13:35:37 2022]
+Error in rule downsample_bams:
+    jobid: 18
+    output: test/bam/lib002_ds10.bam
+    shell:
+        
+        workflow/scripts/downsample_bam.sh test/bam/lib002_dedup.bam 10000000 > test/bam/lib002_ds10.bam
+        
+        (one of the commands exited with non-zero exit code; note that snakemake uses bash strict mode!)
+
+Removing output files of failed job downsample_bams since they might be corrupted:
+test/bam/lib002_ds10.bam
+[Wed Apr 13 13:35:37 2022]
+Error in rule downsample_bams:
+    jobid: 19
+    output: test/bam/lib003_ds10.bam
+    shell:
+        
+        workflow/scripts/downsample_bam.sh test/bam/lib003_dedup.bam 10000000 > test/bam/lib003_ds10.bam
+        
+        (one of the commands exited with non-zero exit code; note that snakemake uses bash strict mode!)
+
+Removing output files of failed job downsample_bams since they might be corrupted:
+test/bam/lib003_ds10.bam
+[Wed Apr 13 13:35:37 2022]
+Error in rule downsample_bams:
+    jobid: 20
+    output: test/bam/lib004_ds10.bam
+    shell:
+        
+        workflow/scripts/downsample_bam.sh test/bam/lib004_dedup.bam 10000000 > test/bam/lib004_ds10.bam
+        
+        (one of the commands exited with non-zero exit code; note that snakemake uses bash strict mode!)
+
+Removing output files of failed job downsample_bams since they might be corrupted:
+test/bam/lib004_ds10.bam
+[Wed Apr 13 13:35:37 2022]
+Error in rule downsample_bams:
+    jobid: 17
+    output: test/bam/lib001_ds10.bam
+    shell:
+        
+        workflow/scripts/downsample_bam.sh test/bam/lib001_dedup.bam 10000000 > test/bam/lib001_ds10.bam
+        
+        (one of the commands exited with non-zero exit code; note that snakemake uses bash strict mode!)
+
+Removing output files of failed job downsample_bams since they might be corrupted:
+test/bam/lib001_ds10.bam
+Shutting down, this might take some time.
+Exiting because a job execution failed. Look above for error message
+Complete log: /home/jeszyman/repos/mpnst-preprocessing/.snakemake/log/2022-04-13T133536.795058.snakemake.log

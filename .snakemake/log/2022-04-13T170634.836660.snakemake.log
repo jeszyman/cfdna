@@ -1,0 +1,23 @@
+Building DAG of jobs...
+Using shell: /bin/bash
+Provided cores: 4
+Rules claiming more threads will be scaled down.
+Job stats:
+job                count    min threads    max threads
+---------------  -------  -------------  -------------
+all                    1              1              1
+downsample_bams        4              1              1
+total                  5              1              1
+
+Select jobs to execute...
+
+[Wed Apr 13 17:06:35 2022]
+rule downsample_bams:
+    input: test/bam/lib002_dedup.bam
+    output: test/bam/lib002_ds10.bam
+    jobid: 18
+    wildcards: fq_id=lib002
+    resources: tmpdir=/tmp
+
+RuleException in line 281 of /home/jeszyman/repos/mpnst-preprocessing/workflow/read_preprocess.smk:
+NameError: The name 'milreads' is unknown in this context. Please make sure that you defined that variable. Also note that braces not used for variable access have to be escaped by repeating them, i.e. {{print $1}}

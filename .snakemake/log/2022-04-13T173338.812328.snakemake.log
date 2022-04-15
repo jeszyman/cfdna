@@ -1,0 +1,12 @@
+Building DAG of jobs...
+AmbiguousRuleException:
+Rules downsample_bams10 and downsample_bams20 are ambiguous for the file test/bam/lib001_ds10.bam.
+Consider starting rule output with a unique prefix, constrain your wildcards, or use the ruleorder directive.
+Wildcards:
+	downsample_bams10: fq_id=lib001,milreads=10
+	downsample_bams20: fq_id=lib001,milreads=10
+Expected input files:
+	downsample_bams10: test/bam/lib001_dedup.bam
+	downsample_bams20: test/bam/lib001_dedup.bamExpected output files:
+	downsample_bams10: test/bam/lib001_ds10.bam
+	downsample_bams20: test/bam/lib001_ds10.bam

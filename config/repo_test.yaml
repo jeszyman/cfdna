@@ -10,4 +10,7 @@ bwa_index: "test/ref/chr8"
 bam_dir: "test/bam"
 rename_dir: "test/cappseq_fastq"
 extracted_dir: "test/extracted_fastq"
-fq_symlink_dir: "test/symlink_fastq"
+fq_symlink_dir: "test/symlink-fastq"
+MILREADS:
+  - "10"
+  - "20"

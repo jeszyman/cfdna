@@ -53,7 +53,7 @@ else
 fi
 
 sing_biotools() {
-    singularity shell --bind /mnt:/mnt ~/sing_containers/biotools.sif            
+    singularit shell --bind /mnt:/mnt ~/sing_containers/biotools.sif            
 }
 
 launch_frag() { 

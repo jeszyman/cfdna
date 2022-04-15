@@ -132,8 +132,7 @@ git branch -M master
 git push -u origin master
 #+end_src
 
-=======
->>>>>>> 13100f2e636cf025b3635db5ccf481b075cdf1a5
+
 *** Docker and singularity - none; use biotools submodule
 #+begin_src bash :tangle ./src/launch_singularity_shell.sh
 singularity shell --bind /mnt:/mnt ~/sing_containers/biotools.sif            

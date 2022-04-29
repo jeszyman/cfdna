@@ -1,0 +1,4 @@
+WorkflowError:
+Failed to open source file /home/jeszyman/repos/cfdna-wgs/workflow/workflow/read_preprocess.smk
+FileNotFoundError: [Errno 2] No such file or directory: '/home/jeszyman/repos/cfdna-wgs/workflow/workflow/read_preprocess.smk'
+  File "/home/jeszyman/repos/cfdna-wgs/workflow/repo_test.smk", line 27, in <module>

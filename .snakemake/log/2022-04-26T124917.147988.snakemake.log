@@ -1,0 +1,4 @@
+CreateRuleException:
+The name rename is already used by another rule
+  File "/home/jeszyman/repos/cfdna-wgs/workflow/repo_test.smk", line 58, in <module>
+  File "/home/jeszyman/repos/cfdna-wgs/workflow/read_preprocess.smk", line 1, in <module>

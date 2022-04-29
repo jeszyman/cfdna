@@ -1,0 +1,161 @@
+Building DAG of jobs...
+Using shell: /bin/bash
+Provided cores: 4
+Rules claiming more threads will be scaled down.
+Job stats:
+job                     count    min threads    max threads
+--------------------  -------  -------------  -------------
+align                       4              1              1
+alignment_processing        4              1              1
+alignment_qc                8              1              1
+all                         1              1              1
+downsample_bams             8              1              1
+fastqc                      8              1              1
+multiqc                     1              1              1
+rename                      4              1              1
+trimmomatic                 4              1              1
+total                      42              1              1
+
+Select jobs to execute...
+
+[Tue Apr 26 10:08:44 2022]
+rule rename:
+    output: test/symlink-fastq/lib001_R1.fastq.gz, test/symlink-fastq/lib001_R2.fastq.gz
+    jobid: 2
+    wildcards: f=lib001
+    resources: tmpdir=/tmp
+
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+
+[Tue Apr 26 10:08:44 2022]
+rule rename:
+    output: test/symlink-fastq/lib002_R1.fastq.gz, test/symlink-fastq/lib002_R2.fastq.gz
+    jobid: 4
+    wildcards: f=lib002
+    resources: tmpdir=/tmp
+
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+
+[Tue Apr 26 10:08:44 2022]
+rule rename:
+    output: test/symlink-fastq/lib003_R1.fastq.gz, test/symlink-fastq/lib003_R2.fastq.gz
+    jobid: 6
+    wildcards: f=lib003
+    resources: tmpdir=/tmp
+
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+
+[Tue Apr 26 10:08:44 2022]
+rule rename:
+    output: test/symlink-fastq/lib004_R1.fastq.gz, test/symlink-fastq/lib004_R2.fastq.gz
+    jobid: 8
+    wildcards: f=lib004
+    resources: tmpdir=/tmp
+
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+[Tue Apr 26 10:08:45 2022]
+Finished job 6.
+1 of 42 steps (2%) done
+Select jobs to execute...
+
+[Tue Apr 26 10:08:45 2022]
+rule trimmomatic:
+    input: test/symlink-fastq/lib003_R1.fastq.gz, test/symlink-fastq/lib003_R2.fastq.gz
+    output: test/processed-fastq/lib003_proc_R1.fastq.gz, test/unpaired-fastq/lib003_unpr_R1.fastq.gz, test/processed-fastq/lib003_proc_R2.fastq.gz, test/unpaired-fastq/lib003_unpr_R2.fastq.gz
+    log: test/logs/trimmomatic_trimlog_lib003.log, test/logs/trimmomatic_lib003.log
+    jobid: 5
+    wildcards: fq_id=lib003
+    resources: tmpdir=/tmp
+
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+[Tue Apr 26 10:08:45 2022]
+Finished job 8.
+2 of 42 steps (5%) done
+[Tue Apr 26 10:08:45 2022]
+Finished job 4.
+3 of 42 steps (7%) done
+Select jobs to execute...
+
+[Tue Apr 26 10:08:45 2022]
+rule trimmomatic:
+    input: test/symlink-fastq/lib002_R1.fastq.gz, test/symlink-fastq/lib002_R2.fastq.gz
+    output: test/processed-fastq/lib002_proc_R1.fastq.gz, test/unpaired-fastq/lib002_unpr_R1.fastq.gz, test/processed-fastq/lib002_proc_R2.fastq.gz, test/unpaired-fastq/lib002_unpr_R2.fastq.gz
+    log: test/logs/trimmomatic_trimlog_lib002.log, test/logs/trimmomatic_lib002.log
+    jobid: 3
+    wildcards: fq_id=lib002
+    resources: tmpdir=/tmp
+
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+
+[Tue Apr 26 10:08:45 2022]
+rule trimmomatic:
+    input: test/symlink-fastq/lib004_R1.fastq.gz, test/symlink-fastq/lib004_R2.fastq.gz
+    output: test/processed-fastq/lib004_proc_R1.fastq.gz, test/unpaired-fastq/lib004_unpr_R1.fastq.gz, test/processed-fastq/lib004_proc_R2.fastq.gz, test/unpaired-fastq/lib004_unpr_R2.fastq.gz
+    log: test/logs/trimmomatic_trimlog_lib004.log, test/logs/trimmomatic_lib004.log
+    jobid: 7
+    wildcards: fq_id=lib004
+    resources: tmpdir=/tmp
+
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+[Tue Apr 26 10:08:45 2022]
+Finished job 2.
+4 of 42 steps (10%) done
+Select jobs to execute...
+
+[Tue Apr 26 10:08:45 2022]
+rule trimmomatic:
+    input: test/symlink-fastq/lib001_R1.fastq.gz, test/symlink-fastq/lib001_R2.fastq.gz
+    output: test/processed-fastq/lib001_proc_R1.fastq.gz, test/unpaired-fastq/lib001_unpr_R1.fastq.gz, test/processed-fastq/lib001_proc_R2.fastq.gz, test/unpaired-fastq/lib001_unpr_R2.fastq.gz
+    log: test/logs/trimmomatic_trimlog_lib001.log, test/logs/trimmomatic_lib001.log
+    jobid: 1
+    wildcards: fq_id=lib001
+    resources: tmpdir=/tmp
+
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+[Tue Apr 26 10:08:45 2022]
+Error in rule trimmomatic:
+    jobid: 5
+    output: test/processed-fastq/lib003_proc_R1.fastq.gz, test/unpaired-fastq/lib003_unpr_R1.fastq.gz, test/processed-fastq/lib003_proc_R2.fastq.gz, test/unpaired-fastq/lib003_unpr_R2.fastq.gz
+    log: test/logs/trimmomatic_trimlog_lib003.log, test/logs/trimmomatic_lib003.log (check log file(s) for error message)
+    shell:
+        
+        trimmomatic PE                     -threads 4                     -trimlog test/logs/trimmomatic_trimlog_lib003.log                     test/symlink-fastq/lib003_R1.fastq.gz test/symlink-fastq/lib003_R2.fastq.gz                     test/processed-fastq/lib003_proc_R1.fastq.gz test/unpaired-fastq/lib003_unpr_R1.fastq.gz                     test/processed-fastq/lib003_proc_R2.fastq.gz test/unpaired-fastq/lib003_unpr_R2.fastq.gz                     ILLUMINACLIP:test/inputs/TruSeq3-PE.fa:2:30:10                     LEADING:10 TRAILING:10 MAXINFO:50:0.97 MINLEN:20 &> test/logs/trimmomatic_lib003.log
+        
+        (one of the commands exited with non-zero exit code; note that snakemake uses bash strict mode!)
+
+[Tue Apr 26 10:08:45 2022]
+Error in rule trimmomatic:
+    jobid: 3
+    output: test/processed-fastq/lib002_proc_R1.fastq.gz, test/unpaired-fastq/lib002_unpr_R1.fastq.gz, test/processed-fastq/lib002_proc_R2.fastq.gz, test/unpaired-fastq/lib002_unpr_R2.fastq.gz
+    log: test/logs/trimmomatic_trimlog_lib002.log, test/logs/trimmomatic_lib002.log (check log file(s) for error message)
+    shell:
+        
+        trimmomatic PE                     -threads 4                     -trimlog test/logs/trimmomatic_trimlog_lib002.log                     test/symlink-fastq/lib002_R1.fastq.gz test/symlink-fastq/lib002_R2.fastq.gz                     test/processed-fastq/lib002_proc_R1.fastq.gz test/unpaired-fastq/lib002_unpr_R1.fastq.gz                     test/processed-fastq/lib002_proc_R2.fastq.gz test/unpaired-fastq/lib002_unpr_R2.fastq.gz                     ILLUMINACLIP:test/inputs/TruSeq3-PE.fa:2:30:10                     LEADING:10 TRAILING:10 MAXINFO:50:0.97 MINLEN:20 &> test/logs/trimmomatic_lib002.log
+        
+        (one of the commands exited with non-zero exit code; note that snakemake uses bash strict mode!)
+
+[Tue Apr 26 10:08:45 2022]
+Error in rule trimmomatic:
+    jobid: 7
+    output: test/processed-fastq/lib004_proc_R1.fastq.gz, test/unpaired-fastq/lib004_unpr_R1.fastq.gz, test/processed-fastq/lib004_proc_R2.fastq.gz, test/unpaired-fastq/lib004_unpr_R2.fastq.gz
+    log: test/logs/trimmomatic_trimlog_lib004.log, test/logs/trimmomatic_lib004.log (check log file(s) for error message)
+    shell:
+        
+        trimmomatic PE                     -threads 4                     -trimlog test/logs/trimmomatic_trimlog_lib004.log                     test/symlink-fastq/lib004_R1.fastq.gz test/symlink-fastq/lib004_R2.fastq.gz                     test/processed-fastq/lib004_proc_R1.fastq.gz test/unpaired-fastq/lib004_unpr_R1.fastq.gz                     test/processed-fastq/lib004_proc_R2.fastq.gz test/unpaired-fastq/lib004_unpr_R2.fastq.gz                     ILLUMINACLIP:test/inputs/TruSeq3-PE.fa:2:30:10                     LEADING:10 TRAILING:10 MAXINFO:50:0.97 MINLEN:20 &> test/logs/trimmomatic_lib004.log
+        
+        (one of the commands exited with non-zero exit code; note that snakemake uses bash strict mode!)
+
+[Tue Apr 26 10:08:45 2022]
+Error in rule trimmomatic:
+    jobid: 1
+    output: test/processed-fastq/lib001_proc_R1.fastq.gz, test/unpaired-fastq/lib001_unpr_R1.fastq.gz, test/processed-fastq/lib001_proc_R2.fastq.gz, test/unpaired-fastq/lib001_unpr_R2.fastq.gz
+    log: test/logs/trimmomatic_trimlog_lib001.log, test/logs/trimmomatic_lib001.log (check log file(s) for error message)
+    shell:
+        
+        trimmomatic PE                     -threads 4                     -trimlog test/logs/trimmomatic_trimlog_lib001.log                     test/symlink-fastq/lib001_R1.fastq.gz test/symlink-fastq/lib001_R2.fastq.gz                     test/processed-fastq/lib001_proc_R1.fastq.gz test/unpaired-fastq/lib001_unpr_R1.fastq.gz                     test/processed-fastq/lib001_proc_R2.fastq.gz test/unpaired-fastq/lib001_unpr_R2.fastq.gz                     ILLUMINACLIP:test/inputs/TruSeq3-PE.fa:2:30:10                     LEADING:10 TRAILING:10 MAXINFO:50:0.97 MINLEN:20 &> test/logs/trimmomatic_lib001.log
+        
+        (one of the commands exited with non-zero exit code; note that snakemake uses bash strict mode!)
+
+Shutting down, this might take some time.
+Exiting because a job execution failed. Look above for error message
+Complete log: /home/jeszyman/repos/cfdna-wgs/.snakemake/log/2022-04-26T100844.148880.snakemake.log

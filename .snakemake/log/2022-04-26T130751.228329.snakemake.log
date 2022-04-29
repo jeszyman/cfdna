@@ -1,0 +1,2 @@
+SyntaxError in line 6 of /home/jeszyman/repos/cfdna-wgs/workflow/repo_test.smk:
+EOF in multi-line statement (repo_test.smk, line 6)

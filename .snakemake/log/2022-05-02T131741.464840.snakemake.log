@@ -1,0 +1,713 @@
+Building DAG of jobs...
+Using shell: /bin/bash
+Provided cores: 4
+Rules claiming more threads will be scaled down.
+Job stats:
+job                     count    min threads    max threads
+--------------------  -------  -------------  -------------
+align                       4              1              1
+alignment_processing        4              1              1
+alignment_qc                8              1              1
+all                         1              1              1
+downsample_bams             8              1              1
+fastqc                      8              1              1
+multiqc                     1              1              1
+trimmomatic                 4              1              1
+total                      38              1              1
+
+Select jobs to execute...
+
+[Mon May  2 13:17:41 2022]
+rule trimmomatic:
+    input: test/fastq/mpnst2_R1.fastq.gz, test/fastq/mpnst2_R2.fastq.gz
+    output: test/processed-fastq/mpnst2_proc_R1.fastq.gz, test/unpaired-fastq/mpnst2_unpr_R1.fastq.gz, test/processed-fastq/mpnst2_proc_R2.fastq.gz, test/unpaired-fastq/mpnst2_unpr_R2.fastq.gz
+    log: test/logs/trimmomatic_trimlog_mpnst2.log, test/logs/trimmomatic_mpnst2.log
+    jobid: 3
+    wildcards: read_id=mpnst2
+    resources: tmpdir=/tmp
+
+
+        trimmomatic PE                     -threads 4                     -trimlog test/logs/trimmomatic_trimlog_mpnst2.log                     test/fastq/mpnst2_R1.fastq.gz test/fastq/mpnst2_R2.fastq.gz                     test/processed-fastq/mpnst2_proc_R1.fastq.gz test/unpaired-fastq/mpnst2_unpr_R1.fastq.gz                     test/processed-fastq/mpnst2_proc_R2.fastq.gz test/unpaired-fastq/mpnst2_unpr_R2.fastq.gz                     ILLUMINACLIP:test/inputs/TruSeq3-PE.fa:2:30:10                     LEADING:10 TRAILING:10 MAXINFO:50:0.97 MINLEN:20 &> test/logs/trimmomatic_mpnst2.log
+        
+Activating singularity image /home/jszymanski/sing_containers/biotools.sif
+
+[Mon May  2 13:17:41 2022]
+rule trimmomatic:
+    input: test/fastq/plex1_R1.fastq.gz, test/fastq/plex1_R2.fastq.gz
+    output: test/processed-fastq/plex1_proc_R1.fastq.gz, test/unpaired-fastq/plex1_unpr_R1.fastq.gz, test/processed-fastq/plex1_proc_R2.fastq.gz, test/unpaired-fastq/plex1_unpr_R2.fastq.gz
+    log: test/logs/trimmomatic_trimlog_plex1.log, test/logs/trimmomatic_plex1.log
+    jobid: 1
+    wildcards: read_id=plex1
+    resources: tmpdir=/tmp
+
+
+        trimmomatic PE                     -threads 4                     -trimlog test/logs/trimmomatic_trimlog_plex1.log                     test/fastq/plex1_R1.fastq.gz test/fastq/plex1_R2.fastq.gz                     test/processed-fastq/plex1_proc_R1.fastq.gz test/unpaired-fastq/plex1_unpr_R1.fastq.gz                     test/processed-fastq/plex1_proc_R2.fastq.gz test/unpaired-fastq/plex1_unpr_R2.fastq.gz                     ILLUMINACLIP:test/inputs/TruSeq3-PE.fa:2:30:10                     LEADING:10 TRAILING:10 MAXINFO:50:0.97 MINLEN:20 &> test/logs/trimmomatic_plex1.log
+        
+Activating singularity image /home/jszymanski/sing_containers/biotools.sif
+
+[Mon May  2 13:17:41 2022]
+rule trimmomatic:
+    input: test/fastq/mpnst1_R1.fastq.gz, test/fastq/mpnst1_R2.fastq.gz
+    output: test/processed-fastq/mpnst1_proc_R1.fastq.gz, test/unpaired-fastq/mpnst1_unpr_R1.fastq.gz, test/processed-fastq/mpnst1_proc_R2.fastq.gz, test/unpaired-fastq/mpnst1_unpr_R2.fastq.gz
+    log: test/logs/trimmomatic_trimlog_mpnst1.log, test/logs/trimmomatic_mpnst1.log
+    jobid: 2
+    wildcards: read_id=mpnst1
+    resources: tmpdir=/tmp
+
+
+        trimmomatic PE                     -threads 4                     -trimlog test/logs/trimmomatic_trimlog_mpnst1.log                     test/fastq/mpnst1_R1.fastq.gz test/fastq/mpnst1_R2.fastq.gz                     test/processed-fastq/mpnst1_proc_R1.fastq.gz test/unpaired-fastq/mpnst1_unpr_R1.fastq.gz                     test/processed-fastq/mpnst1_proc_R2.fastq.gz test/unpaired-fastq/mpnst1_unpr_R2.fastq.gz                     ILLUMINACLIP:test/inputs/TruSeq3-PE.fa:2:30:10                     LEADING:10 TRAILING:10 MAXINFO:50:0.97 MINLEN:20 &> test/logs/trimmomatic_mpnst1.log
+        
+Activating singularity image /home/jszymanski/sing_containers/biotools.sif
+
+[Mon May  2 13:17:41 2022]
+rule trimmomatic:
+    input: test/fastq/plex2_R1.fastq.gz, test/fastq/plex2_R2.fastq.gz
+    output: test/processed-fastq/plex2_proc_R1.fastq.gz, test/unpaired-fastq/plex2_unpr_R1.fastq.gz, test/processed-fastq/plex2_proc_R2.fastq.gz, test/unpaired-fastq/plex2_unpr_R2.fastq.gz
+    log: test/logs/trimmomatic_trimlog_plex2.log, test/logs/trimmomatic_plex2.log
+    jobid: 4
+    wildcards: read_id=plex2
+    resources: tmpdir=/tmp
+
+
+        trimmomatic PE                     -threads 4                     -trimlog test/logs/trimmomatic_trimlog_plex2.log                     test/fastq/plex2_R1.fastq.gz test/fastq/plex2_R2.fastq.gz                     test/processed-fastq/plex2_proc_R1.fastq.gz test/unpaired-fastq/plex2_unpr_R1.fastq.gz                     test/processed-fastq/plex2_proc_R2.fastq.gz test/unpaired-fastq/plex2_unpr_R2.fastq.gz                     ILLUMINACLIP:test/inputs/TruSeq3-PE.fa:2:30:10                     LEADING:10 TRAILING:10 MAXINFO:50:0.97 MINLEN:20 &> test/logs/trimmomatic_plex2.log
+        
+Activating singularity image /home/jszymanski/sing_containers/biotools.sif
+[Mon May  2 13:17:44 2022]
+Finished job 2.
+1 of 38 steps (3%) done
+Select jobs to execute...
+
+[Mon May  2 13:17:44 2022]
+rule fastqc:
+    input: test/fastq/mpnst1_R1.fastq.gz, test/processed-fastq/mpnst1_proc_R1.fastq.gz
+    output: test/qc/mpnst1_R1_fastqc.html, test/qc/mpnst1_proc_R1_fastqc.html
+    log: test/logs/fastqc_raw_mpnst1_R1.log, test/logs/fastqc_proc_mpnst1_R1.log
+    jobid: 11
+    wildcards: read_id=mpnst1, read=R1
+    resources: tmpdir=/tmp
+
+
+        fastqc --outdir test/qc         --quiet         --threads 4 test/fastq/mpnst1_R1.fastq.gz &> test/logs/fastqc_raw_mpnst1_R1.log test/logs/fastqc_proc_mpnst1_R1.log
+        fastqc --outdir test/qc         --quiet         --threads 4 test/processed-fastq/mpnst1_proc_R1.fastq.gz &> test/logs/fastqc_raw_mpnst1_R1.log test/logs/fastqc_proc_mpnst1_R1.log
+        
+Activating singularity image /home/jszymanski/sing_containers/biotools.sif
+[Mon May  2 13:17:44 2022]
+Finished job 3.
+2 of 38 steps (5%) done
+Select jobs to execute...
+
+[Mon May  2 13:17:44 2022]
+rule fastqc:
+    input: test/fastq/mpnst2_R1.fastq.gz, test/processed-fastq/mpnst2_proc_R1.fastq.gz
+    output: test/qc/mpnst2_R1_fastqc.html, test/qc/mpnst2_proc_R1_fastqc.html
+    log: test/logs/fastqc_raw_mpnst2_R1.log, test/logs/fastqc_proc_mpnst2_R1.log
+    jobid: 13
+    wildcards: read_id=mpnst2, read=R1
+    resources: tmpdir=/tmp
+
+
+        fastqc --outdir test/qc         --quiet         --threads 4 test/fastq/mpnst2_R1.fastq.gz &> test/logs/fastqc_raw_mpnst2_R1.log test/logs/fastqc_proc_mpnst2_R1.log
+        fastqc --outdir test/qc         --quiet         --threads 4 test/processed-fastq/mpnst2_proc_R1.fastq.gz &> test/logs/fastqc_raw_mpnst2_R1.log test/logs/fastqc_proc_mpnst2_R1.log
+        
+Activating singularity image /home/jszymanski/sing_containers/biotools.sif
+[Mon May  2 13:17:45 2022]
+Finished job 1.
+3 of 38 steps (8%) done
+Select jobs to execute...
+
+[Mon May  2 13:17:45 2022]
+rule fastqc:
+    input: test/fastq/plex1_R1.fastq.gz, test/processed-fastq/plex1_proc_R1.fastq.gz
+    output: test/qc/plex1_R1_fastqc.html, test/qc/plex1_proc_R1_fastqc.html
+    log: test/logs/fastqc_raw_plex1_R1.log, test/logs/fastqc_proc_plex1_R1.log
+    jobid: 9
+    wildcards: read_id=plex1, read=R1
+    resources: tmpdir=/tmp
+
+
+        fastqc --outdir test/qc         --quiet         --threads 4 test/fastq/plex1_R1.fastq.gz &> test/logs/fastqc_raw_plex1_R1.log test/logs/fastqc_proc_plex1_R1.log
+        fastqc --outdir test/qc         --quiet         --threads 4 test/processed-fastq/plex1_proc_R1.fastq.gz &> test/logs/fastqc_raw_plex1_R1.log test/logs/fastqc_proc_plex1_R1.log
+        
+Activating singularity image /home/jszymanski/sing_containers/biotools.sif
+[Mon May  2 13:17:45 2022]
+Finished job 4.
+4 of 38 steps (11%) done
+Select jobs to execute...
+
+[Mon May  2 13:17:45 2022]
+rule fastqc:
+    input: test/fastq/plex2_R1.fastq.gz, test/processed-fastq/plex2_proc_R1.fastq.gz
+    output: test/qc/plex2_R1_fastqc.html, test/qc/plex2_proc_R1_fastqc.html
+    log: test/logs/fastqc_raw_plex2_R1.log, test/logs/fastqc_proc_plex2_R1.log
+    jobid: 15
+    wildcards: read_id=plex2, read=R1
+    resources: tmpdir=/tmp
+
+
+        fastqc --outdir test/qc         --quiet         --threads 4 test/fastq/plex2_R1.fastq.gz &> test/logs/fastqc_raw_plex2_R1.log test/logs/fastqc_proc_plex2_R1.log
+        fastqc --outdir test/qc         --quiet         --threads 4 test/processed-fastq/plex2_proc_R1.fastq.gz &> test/logs/fastqc_raw_plex2_R1.log test/logs/fastqc_proc_plex2_R1.log
+        
+Activating singularity image /home/jszymanski/sing_containers/biotools.sif
+[Mon May  2 13:17:53 2022]
+Finished job 11.
+5 of 38 steps (13%) done
+Select jobs to execute...
+
+[Mon May  2 13:17:53 2022]
+rule align:
+    input: test/processed-fastq/plex1_proc_R1.fastq.gz, test/processed-fastq/plex1_proc_R2.fastq.gz
+    output: test/bam/plex1.sam
+    log: test/logs/align_plex1.log
+    jobid: 5
+    wildcards: read_id=plex1
+    resources: tmpdir=/tmp
+
+
+        bwa mem -M -t 4 test/ref/chr8 test/processed-fastq/plex1_proc_R1.fastq.gz test/processed-fastq/plex1_proc_R2.fastq.gz > test/bam/plex1.sam
+	
+Activating singularity image /home/jszymanski/sing_containers/biotools.sif
+[Mon May  2 13:17:53 2022]
+Finished job 13.
+6 of 38 steps (16%) done
+Select jobs to execute...
+
+[Mon May  2 13:17:53 2022]
+rule align:
+    input: test/processed-fastq/mpnst2_proc_R1.fastq.gz, test/processed-fastq/mpnst2_proc_R2.fastq.gz
+    output: test/bam/mpnst2.sam
+    log: test/logs/align_mpnst2.log
+    jobid: 7
+    wildcards: read_id=mpnst2
+    resources: tmpdir=/tmp
+
+
+        bwa mem -M -t 4 test/ref/chr8 test/processed-fastq/mpnst2_proc_R1.fastq.gz test/processed-fastq/mpnst2_proc_R2.fastq.gz > test/bam/mpnst2.sam
+	
+Activating singularity image /home/jszymanski/sing_containers/biotools.sif
+[Mon May  2 13:17:54 2022]
+Finished job 9.
+7 of 38 steps (18%) done
+Select jobs to execute...
+
+[Mon May  2 13:17:54 2022]
+rule fastqc:
+    input: test/fastq/plex2_R2.fastq.gz, test/processed-fastq/plex2_proc_R2.fastq.gz
+    output: test/qc/plex2_R2_fastqc.html, test/qc/plex2_proc_R2_fastqc.html
+    log: test/logs/fastqc_raw_plex2_R2.log, test/logs/fastqc_proc_plex2_R2.log
+    jobid: 16
+    wildcards: read_id=plex2, read=R2
+    resources: tmpdir=/tmp
+
+
+        fastqc --outdir test/qc         --quiet         --threads 4 test/fastq/plex2_R2.fastq.gz &> test/logs/fastqc_raw_plex2_R2.log test/logs/fastqc_proc_plex2_R2.log
+        fastqc --outdir test/qc         --quiet         --threads 4 test/processed-fastq/plex2_proc_R2.fastq.gz &> test/logs/fastqc_raw_plex2_R2.log test/logs/fastqc_proc_plex2_R2.log
+        
+Activating singularity image /home/jszymanski/sing_containers/biotools.sif
+[Mon May  2 13:17:54 2022]
+Finished job 5.
+8 of 38 steps (21%) done
+Select jobs to execute...
+
+[Mon May  2 13:17:54 2022]
+rule alignment_processing:
+    input: test/bam/plex1.sam
+    output: test/bam/plex1_raw.bam, test/bam/plex1_dedup_unsort.bam, test/bam/plex1_dedup.bam, test/bam/plex1_dedup.bam.bai
+    log: test/logs/alignment_processing_plex1.log
+    jobid: 17
+    wildcards: read_id=plex1
+    resources: tmpdir=/tmp
+
+
+        sambamba view -t 4 -S -f bam test/bam/plex1.sam > test/bam/plex1_raw.bam
+        sambamba markdup -r -t 4 test/bam/plex1_raw.bam test/bam/plex1_dedup_unsort.bam
+        sambamba sort -t 4 test/bam/plex1_dedup_unsort.bam -o test/bam/plex1_dedup.bam
+        sambamba index -t 4 test/bam/plex1_dedup.bam
+        
+Activating singularity image /home/jszymanski/sing_containers/biotools.sif
+[Mon May  2 13:17:54 2022]
+Finished job 7.
+9 of 38 steps (24%) done
+Select jobs to execute...
+
+[Mon May  2 13:17:54 2022]
+rule alignment_processing:
+    input: test/bam/mpnst2.sam
+    output: test/bam/mpnst2_raw.bam, test/bam/mpnst2_dedup_unsort.bam, test/bam/mpnst2_dedup.bam, test/bam/mpnst2_dedup.bam.bai
+    log: test/logs/alignment_processing_mpnst2.log
+    jobid: 19
+    wildcards: read_id=mpnst2
+    resources: tmpdir=/tmp
+
+
+        sambamba view -t 4 -S -f bam test/bam/mpnst2.sam > test/bam/mpnst2_raw.bam
+        sambamba markdup -r -t 4 test/bam/mpnst2_raw.bam test/bam/mpnst2_dedup_unsort.bam
+        sambamba sort -t 4 test/bam/mpnst2_dedup_unsort.bam -o test/bam/mpnst2_dedup.bam
+        sambamba index -t 4 test/bam/mpnst2_dedup.bam
+        
+Activating singularity image /home/jszymanski/sing_containers/biotools.sif
+[Mon May  2 13:17:54 2022]
+Finished job 15.
+10 of 38 steps (26%) done
+Select jobs to execute...
+
+[Mon May  2 13:17:54 2022]
+rule fastqc:
+    input: test/fastq/mpnst2_R2.fastq.gz, test/processed-fastq/mpnst2_proc_R2.fastq.gz
+    output: test/qc/mpnst2_R2_fastqc.html, test/qc/mpnst2_proc_R2_fastqc.html
+    log: test/logs/fastqc_raw_mpnst2_R2.log, test/logs/fastqc_proc_mpnst2_R2.log
+    jobid: 14
+    wildcards: read_id=mpnst2, read=R2
+    resources: tmpdir=/tmp
+
+
+        fastqc --outdir test/qc         --quiet         --threads 4 test/fastq/mpnst2_R2.fastq.gz &> test/logs/fastqc_raw_mpnst2_R2.log test/logs/fastqc_proc_mpnst2_R2.log
+        fastqc --outdir test/qc         --quiet         --threads 4 test/processed-fastq/mpnst2_proc_R2.fastq.gz &> test/logs/fastqc_raw_mpnst2_R2.log test/logs/fastqc_proc_mpnst2_R2.log
+        
+Activating singularity image /home/jszymanski/sing_containers/biotools.sif
+Removing temporary output file test/bam/mpnst2_dedup_unsort.bam.
+[Mon May  2 13:17:56 2022]
+Finished job 19.
+11 of 38 steps (29%) done
+Select jobs to execute...
+
+[Mon May  2 13:17:56 2022]
+rule alignment_qc:
+    input: test/bam/mpnst2_dedup.bam
+    output: test/qc/mpnst2_dedup_samstats.txt, test/qc/mpnst2_dedup_flagstat.txt
+    jobid: 25
+    wildcards: read_id=mpnst2, bam_step=dedup
+    resources: tmpdir=/tmp
+
+
+        samtools stats test/bam/mpnst2_dedup.bam > test/qc/mpnst2_dedup_samstats.txt
+        samtools flagstat test/bam/mpnst2_dedup.bam > test/qc/mpnst2_dedup_flagstat.txt
+        
+Activating singularity image /home/jszymanski/sing_containers/biotools.sif
+Removing temporary output file test/bam/plex1_dedup_unsort.bam.
+[Mon May  2 13:17:56 2022]
+Finished job 17.
+12 of 38 steps (32%) done
+Select jobs to execute...
+
+[Mon May  2 13:17:56 2022]
+rule downsample_bams:
+    input: test/bam/mpnst2_dedup.bam
+    output: test/bam/mpnst2_ds10.bam
+    jobid: 33
+    wildcards: read_id=mpnst2, milreads=10
+    resources: tmpdir=/tmp
+
+
+        reads=$(echo 10000000)
+        workflow/scripts/downsample_bam.sh test/bam/mpnst2_dedup.bam $reads test/bam/mpnst2_ds10.bam
+        
+Activating singularity image /home/jszymanski/sing_containers/biotools.sif
+[Mon May  2 13:17:56 2022]
+Finished job 25.
+13 of 38 steps (34%) done
+Select jobs to execute...
+
+[Mon May  2 13:17:56 2022]
+rule alignment_qc:
+    input: test/bam/plex1_dedup.bam
+    output: test/qc/plex1_dedup_samstats.txt, test/qc/plex1_dedup_flagstat.txt
+    jobid: 21
+    wildcards: read_id=plex1, bam_step=dedup
+    resources: tmpdir=/tmp
+
+
+        samtools stats test/bam/plex1_dedup.bam > test/qc/plex1_dedup_samstats.txt
+        samtools flagstat test/bam/plex1_dedup.bam > test/qc/plex1_dedup_flagstat.txt
+        
+Activating singularity image /home/jszymanski/sing_containers/biotools.sif
+[Mon May  2 13:17:56 2022]
+Finished job 33.
+14 of 38 steps (37%) done
+Select jobs to execute...
+
+[Mon May  2 13:17:56 2022]
+rule downsample_bams:
+    input: test/bam/plex1_dedup.bam
+    output: test/bam/plex1_ds10.bam
+    jobid: 29
+    wildcards: read_id=plex1, milreads=10
+    resources: tmpdir=/tmp
+
+
+        reads=$(echo 10000000)
+        workflow/scripts/downsample_bam.sh test/bam/plex1_dedup.bam $reads test/bam/plex1_ds10.bam
+        
+Activating singularity image /home/jszymanski/sing_containers/biotools.sif
+[Mon May  2 13:17:57 2022]
+Finished job 29.
+15 of 38 steps (39%) done
+Select jobs to execute...
+
+[Mon May  2 13:17:57 2022]
+rule downsample_bams:
+    input: test/bam/plex1_dedup.bam
+    output: test/bam/plex1_ds20.bam
+    jobid: 30
+    wildcards: read_id=plex1, milreads=20
+    resources: tmpdir=/tmp
+
+
+        reads=$(echo 20000000)
+        workflow/scripts/downsample_bam.sh test/bam/plex1_dedup.bam $reads test/bam/plex1_ds20.bam
+        
+Activating singularity image /home/jszymanski/sing_containers/biotools.sif
+[Mon May  2 13:17:57 2022]
+Finished job 21.
+16 of 38 steps (42%) done
+Select jobs to execute...
+
+[Mon May  2 13:17:57 2022]
+rule alignment_qc:
+    input: test/bam/plex1_raw.bam
+    output: test/qc/plex1_raw_samstats.txt, test/qc/plex1_raw_flagstat.txt
+    jobid: 22
+    wildcards: read_id=plex1, bam_step=raw
+    resources: tmpdir=/tmp
+
+
+        samtools stats test/bam/plex1_raw.bam > test/qc/plex1_raw_samstats.txt
+        samtools flagstat test/bam/plex1_raw.bam > test/qc/plex1_raw_flagstat.txt
+        
+Activating singularity image /home/jszymanski/sing_containers/biotools.sif
+[Mon May  2 13:17:57 2022]
+Finished job 30.
+17 of 38 steps (45%) done
+Select jobs to execute...
+
+[Mon May  2 13:17:57 2022]
+rule alignment_qc:
+    input: test/bam/mpnst2_raw.bam
+    output: test/qc/mpnst2_raw_samstats.txt, test/qc/mpnst2_raw_flagstat.txt
+    jobid: 26
+    wildcards: read_id=mpnst2, bam_step=raw
+    resources: tmpdir=/tmp
+
+
+        samtools stats test/bam/mpnst2_raw.bam > test/qc/mpnst2_raw_samstats.txt
+        samtools flagstat test/bam/mpnst2_raw.bam > test/qc/mpnst2_raw_flagstat.txt
+        
+Activating singularity image /home/jszymanski/sing_containers/biotools.sif
+[Mon May  2 13:17:57 2022]
+Finished job 22.
+18 of 38 steps (47%) done
+Select jobs to execute...
+
+[Mon May  2 13:17:57 2022]
+rule downsample_bams:
+    input: test/bam/mpnst2_dedup.bam
+    output: test/bam/mpnst2_ds20.bam
+    jobid: 34
+    wildcards: read_id=mpnst2, milreads=20
+    resources: tmpdir=/tmp
+
+
+        reads=$(echo 20000000)
+        workflow/scripts/downsample_bam.sh test/bam/mpnst2_dedup.bam $reads test/bam/mpnst2_ds20.bam
+        
+Activating singularity image /home/jszymanski/sing_containers/biotools.sif
+[Mon May  2 13:17:58 2022]
+Finished job 26.
+19 of 38 steps (50%) done
+Select jobs to execute...
+
+[Mon May  2 13:17:58 2022]
+rule fastqc:
+    input: test/fastq/mpnst1_R2.fastq.gz, test/processed-fastq/mpnst1_proc_R2.fastq.gz
+    output: test/qc/mpnst1_R2_fastqc.html, test/qc/mpnst1_proc_R2_fastqc.html
+    log: test/logs/fastqc_raw_mpnst1_R2.log, test/logs/fastqc_proc_mpnst1_R2.log
+    jobid: 12
+    wildcards: read_id=mpnst1, read=R2
+    resources: tmpdir=/tmp
+
+
+        fastqc --outdir test/qc         --quiet         --threads 4 test/fastq/mpnst1_R2.fastq.gz &> test/logs/fastqc_raw_mpnst1_R2.log test/logs/fastqc_proc_mpnst1_R2.log
+        fastqc --outdir test/qc         --quiet         --threads 4 test/processed-fastq/mpnst1_proc_R2.fastq.gz &> test/logs/fastqc_raw_mpnst1_R2.log test/logs/fastqc_proc_mpnst1_R2.log
+        
+Activating singularity image /home/jszymanski/sing_containers/biotools.sif
+[Mon May  2 13:17:58 2022]
+Finished job 34.
+20 of 38 steps (53%) done
+Select jobs to execute...
+
+[Mon May  2 13:17:58 2022]
+rule align:
+    input: test/processed-fastq/mpnst1_proc_R1.fastq.gz, test/processed-fastq/mpnst1_proc_R2.fastq.gz
+    output: test/bam/mpnst1.sam
+    log: test/logs/align_mpnst1.log
+    jobid: 6
+    wildcards: read_id=mpnst1
+    resources: tmpdir=/tmp
+
+
+        bwa mem -M -t 4 test/ref/chr8 test/processed-fastq/mpnst1_proc_R1.fastq.gz test/processed-fastq/mpnst1_proc_R2.fastq.gz > test/bam/mpnst1.sam
+	
+Activating singularity image /home/jszymanski/sing_containers/biotools.sif
+[Mon May  2 13:18:00 2022]
+Finished job 6.
+21 of 38 steps (55%) done
+Select jobs to execute...
+
+[Mon May  2 13:18:00 2022]
+rule alignment_processing:
+    input: test/bam/mpnst1.sam
+    output: test/bam/mpnst1_raw.bam, test/bam/mpnst1_dedup_unsort.bam, test/bam/mpnst1_dedup.bam, test/bam/mpnst1_dedup.bam.bai
+    log: test/logs/alignment_processing_mpnst1.log
+    jobid: 18
+    wildcards: read_id=mpnst1
+    resources: tmpdir=/tmp
+
+
+        sambamba view -t 4 -S -f bam test/bam/mpnst1.sam > test/bam/mpnst1_raw.bam
+        sambamba markdup -r -t 4 test/bam/mpnst1_raw.bam test/bam/mpnst1_dedup_unsort.bam
+        sambamba sort -t 4 test/bam/mpnst1_dedup_unsort.bam -o test/bam/mpnst1_dedup.bam
+        sambamba index -t 4 test/bam/mpnst1_dedup.bam
+        
+Activating singularity image /home/jszymanski/sing_containers/biotools.sif
+[Mon May  2 13:18:01 2022]
+Finished job 14.
+22 of 38 steps (58%) done
+Select jobs to execute...
+
+[Mon May  2 13:18:01 2022]
+rule align:
+    input: test/processed-fastq/plex2_proc_R1.fastq.gz, test/processed-fastq/plex2_proc_R2.fastq.gz
+    output: test/bam/plex2.sam
+    log: test/logs/align_plex2.log
+    jobid: 8
+    wildcards: read_id=plex2
+    resources: tmpdir=/tmp
+
+
+        bwa mem -M -t 4 test/ref/chr8 test/processed-fastq/plex2_proc_R1.fastq.gz test/processed-fastq/plex2_proc_R2.fastq.gz > test/bam/plex2.sam
+	
+Activating singularity image /home/jszymanski/sing_containers/biotools.sif
+Removing temporary output file test/bam/mpnst1_dedup_unsort.bam.
+[Mon May  2 13:18:02 2022]
+Finished job 18.
+23 of 38 steps (61%) done
+Select jobs to execute...
+
+[Mon May  2 13:18:02 2022]
+rule downsample_bams:
+    input: test/bam/mpnst1_dedup.bam
+    output: test/bam/mpnst1_ds10.bam
+    jobid: 31
+    wildcards: read_id=mpnst1, milreads=10
+    resources: tmpdir=/tmp
+
+
+        reads=$(echo 10000000)
+        workflow/scripts/downsample_bam.sh test/bam/mpnst1_dedup.bam $reads test/bam/mpnst1_ds10.bam
+        
+Activating singularity image /home/jszymanski/sing_containers/biotools.sif
+[Mon May  2 13:18:02 2022]
+Finished job 31.
+24 of 38 steps (63%) done
+Select jobs to execute...
+
+[Mon May  2 13:18:02 2022]
+rule downsample_bams:
+    input: test/bam/mpnst1_dedup.bam
+    output: test/bam/mpnst1_ds20.bam
+    jobid: 32
+    wildcards: read_id=mpnst1, milreads=20
+    resources: tmpdir=/tmp
+
+
+        reads=$(echo 20000000)
+        workflow/scripts/downsample_bam.sh test/bam/mpnst1_dedup.bam $reads test/bam/mpnst1_ds20.bam
+        
+Activating singularity image /home/jszymanski/sing_containers/biotools.sif
+[Mon May  2 13:18:02 2022]
+Finished job 16.
+25 of 38 steps (66%) done
+Select jobs to execute...
+
+[Mon May  2 13:18:02 2022]
+rule alignment_qc:
+    input: test/bam/mpnst1_raw.bam
+    output: test/qc/mpnst1_raw_samstats.txt, test/qc/mpnst1_raw_flagstat.txt
+    jobid: 24
+    wildcards: read_id=mpnst1, bam_step=raw
+    resources: tmpdir=/tmp
+
+
+        samtools stats test/bam/mpnst1_raw.bam > test/qc/mpnst1_raw_samstats.txt
+        samtools flagstat test/bam/mpnst1_raw.bam > test/qc/mpnst1_raw_flagstat.txt
+        
+Activating singularity image /home/jszymanski/sing_containers/biotools.sif
+[Mon May  2 13:18:02 2022]
+Finished job 8.
+26 of 38 steps (68%) done
+Select jobs to execute...
+
+[Mon May  2 13:18:02 2022]
+rule alignment_processing:
+    input: test/bam/plex2.sam
+    output: test/bam/plex2_raw.bam, test/bam/plex2_dedup_unsort.bam, test/bam/plex2_dedup.bam, test/bam/plex2_dedup.bam.bai
+    log: test/logs/alignment_processing_plex2.log
+    jobid: 20
+    wildcards: read_id=plex2
+    resources: tmpdir=/tmp
+
+
+        sambamba view -t 4 -S -f bam test/bam/plex2.sam > test/bam/plex2_raw.bam
+        sambamba markdup -r -t 4 test/bam/plex2_raw.bam test/bam/plex2_dedup_unsort.bam
+        sambamba sort -t 4 test/bam/plex2_dedup_unsort.bam -o test/bam/plex2_dedup.bam
+        sambamba index -t 4 test/bam/plex2_dedup.bam
+        
+Activating singularity image /home/jszymanski/sing_containers/biotools.sif
+[Mon May  2 13:18:03 2022]
+Finished job 32.
+27 of 38 steps (71%) done
+Select jobs to execute...
+
+[Mon May  2 13:18:03 2022]
+rule alignment_qc:
+    input: test/bam/mpnst1_dedup.bam
+    output: test/qc/mpnst1_dedup_samstats.txt, test/qc/mpnst1_dedup_flagstat.txt
+    jobid: 23
+    wildcards: read_id=mpnst1, bam_step=dedup
+    resources: tmpdir=/tmp
+
+
+        samtools stats test/bam/mpnst1_dedup.bam > test/qc/mpnst1_dedup_samstats.txt
+        samtools flagstat test/bam/mpnst1_dedup.bam > test/qc/mpnst1_dedup_flagstat.txt
+        
+Activating singularity image /home/jszymanski/sing_containers/biotools.sif
+[Mon May  2 13:18:03 2022]
+Finished job 24.
+28 of 38 steps (74%) done
+Select jobs to execute...
+
+[Mon May  2 13:18:03 2022]
+rule fastqc:
+    input: test/fastq/plex1_R2.fastq.gz, test/processed-fastq/plex1_proc_R2.fastq.gz
+    output: test/qc/plex1_R2_fastqc.html, test/qc/plex1_proc_R2_fastqc.html
+    log: test/logs/fastqc_raw_plex1_R2.log, test/logs/fastqc_proc_plex1_R2.log
+    jobid: 10
+    wildcards: read_id=plex1, read=R2
+    resources: tmpdir=/tmp
+
+
+        fastqc --outdir test/qc         --quiet         --threads 4 test/fastq/plex1_R2.fastq.gz &> test/logs/fastqc_raw_plex1_R2.log test/logs/fastqc_proc_plex1_R2.log
+        fastqc --outdir test/qc         --quiet         --threads 4 test/processed-fastq/plex1_proc_R2.fastq.gz &> test/logs/fastqc_raw_plex1_R2.log test/logs/fastqc_proc_plex1_R2.log
+        
+Activating singularity image /home/jszymanski/sing_containers/biotools.sif
+[Mon May  2 13:18:03 2022]
+Finished job 23.
+29 of 38 steps (76%) done
+Removing temporary output file test/bam/plex2_dedup_unsort.bam.
+[Mon May  2 13:18:04 2022]
+Finished job 20.
+30 of 38 steps (79%) done
+Select jobs to execute...
+
+[Mon May  2 13:18:04 2022]
+rule alignment_qc:
+    input: test/bam/plex2_raw.bam
+    output: test/qc/plex2_raw_samstats.txt, test/qc/plex2_raw_flagstat.txt
+    jobid: 28
+    wildcards: read_id=plex2, bam_step=raw
+    resources: tmpdir=/tmp
+
+
+        samtools stats test/bam/plex2_raw.bam > test/qc/plex2_raw_samstats.txt
+        samtools flagstat test/bam/plex2_raw.bam > test/qc/plex2_raw_flagstat.txt
+        
+Activating singularity image /home/jszymanski/sing_containers/biotools.sif
+
+[Mon May  2 13:18:04 2022]
+rule alignment_qc:
+    input: test/bam/plex2_dedup.bam
+    output: test/qc/plex2_dedup_samstats.txt, test/qc/plex2_dedup_flagstat.txt
+    jobid: 27
+    wildcards: read_id=plex2, bam_step=dedup
+    resources: tmpdir=/tmp
+
+
+        samtools stats test/bam/plex2_dedup.bam > test/qc/plex2_dedup_samstats.txt
+        samtools flagstat test/bam/plex2_dedup.bam > test/qc/plex2_dedup_flagstat.txt
+        
+Activating singularity image /home/jszymanski/sing_containers/biotools.sif
+[Mon May  2 13:18:05 2022]
+Finished job 28.
+31 of 38 steps (82%) done
+Select jobs to execute...
+
+[Mon May  2 13:18:05 2022]
+rule downsample_bams:
+    input: test/bam/plex2_dedup.bam
+    output: test/bam/plex2_ds10.bam
+    jobid: 35
+    wildcards: read_id=plex2, milreads=10
+    resources: tmpdir=/tmp
+
+
+        reads=$(echo 10000000)
+        workflow/scripts/downsample_bam.sh test/bam/plex2_dedup.bam $reads test/bam/plex2_ds10.bam
+        
+Activating singularity image /home/jszymanski/sing_containers/biotools.sif
+[Mon May  2 13:18:05 2022]
+Finished job 27.
+32 of 38 steps (84%) done
+Select jobs to execute...
+
+[Mon May  2 13:18:05 2022]
+rule downsample_bams:
+    input: test/bam/plex2_dedup.bam
+    output: test/bam/plex2_ds20.bam
+    jobid: 36
+    wildcards: read_id=plex2, milreads=20
+    resources: tmpdir=/tmp
+
+
+        reads=$(echo 20000000)
+        workflow/scripts/downsample_bam.sh test/bam/plex2_dedup.bam $reads test/bam/plex2_ds20.bam
+        
+Activating singularity image /home/jszymanski/sing_containers/biotools.sif
+[Mon May  2 13:18:05 2022]
+Finished job 12.
+33 of 38 steps (87%) done
+[Mon May  2 13:18:05 2022]
+Finished job 35.
+34 of 38 steps (89%) done
+[Mon May  2 13:18:05 2022]
+Finished job 36.
+35 of 38 steps (92%) done
+[Mon May  2 13:18:11 2022]
+Finished job 10.
+36 of 38 steps (95%) done
+Select jobs to execute...
+
+[Mon May  2 13:18:11 2022]
+rule multiqc:
+    input: test/qc/plex1_R1_fastqc.html, test/qc/plex1_R2_fastqc.html, test/qc/mpnst1_R1_fastqc.html, test/qc/mpnst1_R2_fastqc.html, test/qc/mpnst2_R1_fastqc.html, test/qc/mpnst2_R2_fastqc.html, test/qc/plex2_R1_fastqc.html, test/qc/plex2_R2_fastqc.html, test/qc/plex1_proc_R1_fastqc.html, test/qc/plex1_proc_R2_fastqc.html, test/qc/mpnst1_proc_R1_fastqc.html, test/qc/mpnst1_proc_R2_fastqc.html, test/qc/mpnst2_proc_R1_fastqc.html, test/qc/mpnst2_proc_R2_fastqc.html, test/qc/plex2_proc_R1_fastqc.html, test/qc/plex2_proc_R2_fastqc.html, test/qc/plex1_dedup_samstats.txt, test/qc/plex1_raw_samstats.txt, test/qc/mpnst1_dedup_samstats.txt, test/qc/mpnst1_raw_samstats.txt, test/qc/mpnst2_dedup_samstats.txt, test/qc/mpnst2_raw_samstats.txt, test/qc/plex2_dedup_samstats.txt, test/qc/plex2_raw_samstats.txt, test/qc/plex1_dedup_flagstat.txt, test/qc/plex1_raw_flagstat.txt, test/qc/mpnst1_dedup_flagstat.txt, test/qc/mpnst1_raw_flagstat.txt, test/qc/mpnst2_dedup_flagstat.txt, test/qc/mpnst2_raw_flagstat.txt, test/qc/plex2_dedup_flagstat.txt, test/qc/plex2_raw_flagstat.txt
+    output: test/qc/all_qc.html
+    jobid: 37
+    resources: tmpdir=/tmp
+
+
+        multiqc test/qc         --force         --outdir test/qc         --filename all_qc 
+        
+Activating singularity image /home/jszymanski/sing_containers/biotools.sif
+[Mon May  2 13:18:23 2022]
+Finished job 37.
+37 of 38 steps (97%) done
+Select jobs to execute...
+
+[Mon May  2 13:18:23 2022]
+localrule all:
+    input: test/processed-fastq/plex1_proc_R1.fastq.gz, test/processed-fastq/plex1_proc_R2.fastq.gz, test/processed-fastq/mpnst1_proc_R1.fastq.gz, test/processed-fastq/mpnst1_proc_R2.fastq.gz, test/processed-fastq/mpnst2_proc_R1.fastq.gz, test/processed-fastq/mpnst2_proc_R2.fastq.gz, test/processed-fastq/plex2_proc_R1.fastq.gz, test/processed-fastq/plex2_proc_R2.fastq.gz, test/unpaired-fastq/plex1_unpr_R1.fastq.gz, test/unpaired-fastq/mpnst1_unpr_R1.fastq.gz, test/unpaired-fastq/mpnst2_unpr_R1.fastq.gz, test/unpaired-fastq/plex2_unpr_R1.fastq.gz, test/bam/plex1.sam, test/bam/mpnst1.sam, test/bam/mpnst2.sam, test/bam/plex2.sam, test/qc/plex1_R1_fastqc.html, test/qc/plex1_R2_fastqc.html, test/qc/mpnst1_R1_fastqc.html, test/qc/mpnst1_R2_fastqc.html, test/qc/mpnst2_R1_fastqc.html, test/qc/mpnst2_R2_fastqc.html, test/qc/plex2_R1_fastqc.html, test/qc/plex2_R2_fastqc.html, test/qc/plex1_proc_R1_fastqc.html, test/qc/plex1_proc_R2_fastqc.html, test/qc/mpnst1_proc_R1_fastqc.html, test/qc/mpnst1_proc_R2_fastqc.html, test/qc/mpnst2_proc_R1_fastqc.html, test/qc/mpnst2_proc_R2_fastqc.html, test/qc/plex2_proc_R1_fastqc.html, test/qc/plex2_proc_R2_fastqc.html, test/bam/plex1_dedup.bam, test/bam/mpnst1_dedup.bam, test/bam/mpnst2_dedup.bam, test/bam/plex2_dedup.bam, test/bam/plex1_dedup.bam.bai, test/bam/mpnst1_dedup.bam.bai, test/bam/mpnst2_dedup.bam.bai, test/bam/plex2_dedup.bam.bai, test/qc/plex1_dedup_samstats.txt, test/qc/plex1_raw_samstats.txt, test/qc/mpnst1_dedup_samstats.txt, test/qc/mpnst1_raw_samstats.txt, test/qc/mpnst2_dedup_samstats.txt, test/qc/mpnst2_raw_samstats.txt, test/qc/plex2_dedup_samstats.txt, test/qc/plex2_raw_samstats.txt, test/qc/plex1_dedup_flagstat.txt, test/qc/plex1_raw_flagstat.txt, test/qc/mpnst1_dedup_flagstat.txt, test/qc/mpnst1_raw_flagstat.txt, test/qc/mpnst2_dedup_flagstat.txt, test/qc/mpnst2_raw_flagstat.txt, test/qc/plex2_dedup_flagstat.txt, test/qc/plex2_raw_flagstat.txt, test/bam/plex1_ds10.bam, test/bam/plex1_ds20.bam, test/bam/mpnst1_ds10.bam, test/bam/mpnst1_ds20.bam, test/bam/mpnst2_ds10.bam, test/bam/mpnst2_ds20.bam, test/bam/plex2_ds10.bam, test/bam/plex2_ds20.bam, test/qc/all_qc.html
+    jobid: 0
+    resources: tmpdir=/tmp
+
+[Mon May  2 13:18:23 2022]
+Finished job 0.
+38 of 38 steps (100%) done
+Complete log: /home/jszymanski/repos/cfdna-wgs/.snakemake/log/2022-05-02T131741.464840.snakemake.log

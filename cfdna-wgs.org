@@ -148,18 +148,9 @@ singularity shell --bind /mnt:/mnt ~/sing_containers/biotools.sif
 
 *** Snakemake
 **** Configuration YAMLs
-- consider a workdir: "/output/dir" 
-- [[file:config/aclm350.yaml][ACLM350]]
-  #+begin_src bash :tangle config/aclm350.yaml
-container: "/home/jszymanski/sing_containers/frag.sif"
-data_dir: "/mnt/ris/aadel/mpnst"
-threads: 40
-repo: "/drive3/users/jszymanski/repos/mpnst-preprocessing"
-cap_extract_script: "/drive3/users/jszymanski/repos/mpnst-preprocessing/workflow/scripts/cp_fastq_extract_auto.pl"
-#+end_src
-- repo_test
-  #+begin_src bash :tangle ./config/repo_test.yaml
-container: "/home/jeszyman/sing_containers/biotools.sif"        
+- Repo integration testing
+  #+begin_src bash :tangle ./config/int_repo_test.yaml
+container: "~/sing_containers/biotools.sif"        
 fq_dir: "test/fastq"
 qc_dir: "test/qc"
 log_dir: "test/logs"
@@ -175,6 +166,16 @@ fq_symlink_dir: "test/symlink-fastq"
 MILREADS:
   - "10"
   - "20"
+cfdna_wgs_script_dir: "workflow/scripts"
+#+end_src
+- consider a workdir: "/output/dir" 
+- [[file:config/aclm350.yaml][ACLM350]]
+  #+begin_src bash :tangle config/aclm350.yaml
+container: "/home/jszymanski/sing_containers/frag.sif"
+data_dir: "/mnt/ris/aadel/mpnst"
+threads: 40
+repo: "/drive3/users/jszymanski/repos/mpnst-preprocessing"
+cap_extract_script: "/drive3/users/jszymanski/repos/mpnst-preprocessing/workflow/scripts/cp_fastq_extract_auto.pl"
 #+end_src
 - [[file:config/common.yaml][common]]
   #+begin_src bash :tangle config/common.yaml
@@ -192,6 +193,76 @@ log_dir: "/mnt/ris/aadel/mnpst/logs"
 :PROPERTIES:
 :header-args: :tangle no
 :END:
+
+#+begin_src bash :tangle ./src/smk_dry_run.sh
+# Check for parameters, return usage if empty
+if [[ $# -eq 0 ]] || [[ smk_dry_run.sh == "h" ]] ; then
+    printf "\n usage: smk_dry_run.sh config_file smk_file
+\n This run will not test singularity container is working 
+            \n "
+else
+eval "$(command conda 'shell.bash' 'hook' 2> /dev/null)"
+
+conda activate snakemake
+
+snakemake \
+    --configfile $1 --cores 4 \
+    --use-singularity \
+    --dry-run \
+    --forceall \
+    --printshellcmds \
+    --snakefile $2
+fi
+#+end_src
+
+#+begin_src bash :tangle ./src/smk_forced_run.sh
+# Check for parameters, return usage if empty
+if [[ $# -eq 0 ]] || [[ smk_dry_run.sh == "h" ]] ; then
+    printf "\n usage: smk_forced_run.sh config_file smk_file
+           \n "
+else
+eval "$(command conda 'shell.bash' 'hook' 2> /dev/null)"
+
+conda activate snakemake
+
+snakemake \
+    --configfile $1 --cores 4 \
+    --use-singularity \
+    --forceall \
+    --printshellcmds \
+    --snakefile $2
+fi
+#+end_src
+
+
+#+begin_src bash :tangle ./src/smk_test.sh
+#!/bin/bash
+
+eval "$(command conda 'shell.bash' 'hook' 2> /dev/null)"
+
+echo "The following `*.smk` archives were found; select one:"
+
+# set the prompt used by select, replacing "#?"
+PS3="Use number to select an option"
+
+select filename in ./workflow/*.smk
+
+do
+    if [[ "$filename" == "" ]]
+    then
+        echo "'$REPLY' is not a valid number"
+        continue
+    fi
+    conda activate snakemake
+    snakemake --dry-run --snakefile $filename \
+              --configfile config/${HOSTNAME}.yaml \
+              --cores $threads \
+              --directory ${repo} \
+              --rerun-incomplete \
+              --singularity-args "--bind $mntpt:$mntpt" \
+              --use-singularity 
+done
+#+end_src
 #+begin_src bash :tangle ./src/smk_draw.sh
 eval "$(command conda 'shell.bash' 'hook' 2> /dev/null)"
 
@@ -358,34 +429,7 @@ do
 done
 #+end_src
 
-#+begin_src bash :tangle ./src/smk_test.sh
-#!/bin/bash
 
-eval "$(command conda 'shell.bash' 'hook' 2> /dev/null)"
-
-echo "The following `*.smk` archives were found; select one:"
-
-# set the prompt used by select, replacing "#?"
-PS3="Use number to select an option"
-
-select filename in ./workflow/*.smk
-
-do
-    if [[ "$filename" == "" ]]
-    then
-        echo "'$REPLY' is not a valid number"
-        continue
-    fi
-    conda activate snakemake
-    snakemake --dry-run --snakefile $filename \
-              --configfile config/${HOSTNAME}.yaml \
-              --cores $threads \
-              --directory ${repo} \
-              --rerun-incomplete \
-              --singularity-args "--bind $mntpt:$mntpt" \
-              --use-singularity 
-done
-#+end_src
 
 #+begin_src bash :tangle ./src/smk_run.sh
 #!/bin/bash
@@ -627,7 +671,7 @@ exit
 *** Changlog
 - [2022-04-29 Fri] - Moved multiqc to integration testing as inputs are dependent on final sample labels. Integration testing works per this commit. 
 ** Integration testing
-#+begin_src snakemake :tangle ./workflow/repo_test.smk
+#+begin_src snakemake :tangle ./workflow/cfdna_wgs_int_test.smk
 container: config["container"]
 
 IDS, = glob_wildcards(config["fq_dir"] + "/{id}_R1.fastq.gz")
@@ -644,7 +688,6 @@ rule all:
         expand(config["bam_dir"] + "/{read_id}_dedup.bam.bai", read_id = IDS),
         expand(config["qc_dir"] + "/{read_id}_{bam_step}_samstats.txt", read_id = IDS, bam_step= ["dedup","raw"]),
         expand(config["qc_dir"] + "/{read_id}_{bam_step}_flagstat.txt", read_id = IDS, bam_step =["dedup","raw"]),
-        expand(config["bam_dir"] + "/{read_id}_ds{milreads}.bam", read_id = IDS, milreads = MILREADS),
         config["qc_dir"] + "/all_qc.html",
 
 include: "read_preprocess.smk"
@@ -668,6 +711,11 @@ rule multiqc:
         """
             
 #+end_src
+*** Repository-local integration testing
+#+begin_src bash
+src/smk_dry_run.sh config/int_repo_test.yaml workflow/int_test.smk            
+#+end_src
+*** Ideas
 #+begin_src snakemake
 container: config["container"]
 
@@ -739,12 +787,10 @@ include: "read_preprocess.smk"
 #+end_src
 
 ** Sequence pre-processing, alignment, and quality control
-*** [[file:workflow/read_preprocess.smk][Snakefile]]                                                           :smk:
 :PROPERTIES:
 :header-args:snakemake: :tangle ./workflow/read_preprocess.smk
 :END:              
-**** Smk rules
-***** Read pre-processing                                          :smk_rule:
+*** Read pre-processing                                            :smk_rule:
 - Snakemake
   #+begin_src snakemake
 rule trimmomatic:
@@ -776,7 +822,7 @@ rule trimmomatic:
 - Reference
   - Trimmomatic parameters based on Taylor's parameters ([[https://mail.google.com/mail/u/0/#search/sundby+fastq/FMfcgzGmvLWSbsmhDsffvSSWfjWdQhhR?projector=1&messagePartId=0.1][email]])
   - https://github.com/AAFC-BICoE/snakemake-trimmomatic/blob/master/Snakefile
-***** Alignment 
+*** Alignment 
 #+begin_src snakemake
 rule align:
     input:
@@ -792,7 +838,7 @@ rule align:
 	"""
 #+end_src
 
-***** FastQC                                                       :smk_rule:
+*** FastQC                                                         :smk_rule:
 - Snakemake
   #+begin_src snakemake
 rule fastqc:
@@ -817,7 +863,7 @@ rule fastqc:
         --threads {config[threads]} {input.proc} &> {log}
         """
 #+end_src
-***** Alignment processing
+*** Alignment processing
 #+begin_src snakemake
 rule alignment_processing:
     input:
@@ -837,7 +883,7 @@ rule alignment_processing:
         sambamba index -t {config[threads]} {output.sort}
         """
 #+end_src
-***** Alignment QC
+*** Alignment QC
 #+begin_src snakemake
 rule alignment_qc:
     input:
@@ -851,7 +897,7 @@ rule alignment_qc:
         samtools flagstat {input} > {output.flagstat}
         """
 #+end_src
-****** Downsample Bams
+**** Downsample Bams
 #+name: downsample_bam
 #+begin_src bash 
 function downsample_bam {
@@ -884,38 +930,11 @@ fi
 
 #+end_src
 
-***** Downsample bams
-#+begin_src snakemake
-rule downsample_bams:
-    input:
-        bam = config["bam_dir"] + "/{read_id}_dedup.bam",
-    output:
-        config["bam_dir"] + "/{read_id}_ds{milreads}.bam",
-    shell:
-        """
-        reads=$(echo {wildcards.milreads}000000)
-        workflow/scripts/downsample_bam.sh {input} $reads {output}
-        """
-#+end_src
-
-#+begin_src bash :tangle ./workflow/scripts/downsample_bam.sh
-## Calculate the sampling factor based on the intended number of reads:
-FACTOR=$(samtools idxstats $1 | cut -f3 | awk -v COUNT=$2 'BEGIN {total=0} {total += $1} END {print COUNT/total}')
-
-if [[ $FACTOR > 1 ]]; then 
-    echo "DS reads exceeds total for $1"
-    cp $1 $3
-else
-    sambamba view -s $FACTOR -f bam -l 5 $1 > $3
-fi
-#+end_src
-
-
-**** Dev
+*** Dev
 :PROPERTIES:
 :header-args:snakemake: :tangle no
 :END:
-***** Library QC Dataframe
+**** Library QC Dataframe
 #+begin_src R
 library(tidyverse)
 
@@ -939,6 +958,7 @@ samstats_mod =
 samstats_mod
 
 #+end_src
+
 ***** Make bwa index                                               :smk_rule:
 - Snakemake
   #+begin_src snakemake
@@ -965,6 +985,9 @@ bwa index -p $2 -a bwtsw $3
 #+end_src
 
 *** Ideas
+
+**** Ideas
+
 :PROPERTIES:
 :header-args:snakemake: :tangle no
 :END:
@@ -1298,7 +1321,7 @@ fi
       #     fi
       # done
       # readarray -t small_bam < /drive3/users/jszymanski/repos/mpnst/data/small_bams         
-**** Ideas
+***** Ideas
   - filter to min file size && expected by manual spreadsheet
   - fastqs too small (< 500 Mb)
     #+begin_src bash :results replace
@@ -1311,7 +1334,7 @@ fi
 
 
 
-**** Rename                                                        :smk_rule:
+***** Rename                                                       :smk_rule:
 - Snakemake
 #+begin_src snakemake
 rule rename:
@@ -1328,4 +1351,36 @@ rule rename:
         ln -s --relative "{config[raw_fq_dir]}/{params.old_sample_id}_R2.fastq.gz" {output.read2}
         """
 #+end_src
+
+**** Downsample bams
+- fails in mpnst int testing- "/bin/bash: line 1: cfdna-wgs/workflow/scripts/downsample_bam.sh: No such file or directory"
+#+begin_src snakemake
+rule downsample_bams:
+    input:
+        bam = config["bam_dir"] + "/{read_id}_dedup.bam",
+    output:
+        config["bam_dir"] + "/{read_id}_ds{milreads}.bam",
+    shell:
+        """
+        {config[cfdna_wgs_script_dir]}/downsample_bam.sh {input} {wildcards.milreads}000000 {output}
+        """
+#+end_src
+
+#+begin_src bash :tangle ./workflow/scripts/downsample_bam.sh
+## Calculate the sampling factor based on the intended number of reads:
+cp $1 $3
+#+end_src
+
+#+begin_src bash :tangle ./workflow/scripts/downsample_bam.sh
+## Calculate the sampling factor based on the intended number of reads:
+FACTOR=$(samtools idxstats $1 | cut -f3 | awk -v COUNT=$2 'BEGIN {total=0} {total += $1} END {print COUNT/total}')
+
+if [[ $FACTOR > 1 ]]; then 
+    echo "DS reads exceeds total for $1"
+    cp $1 $3
+else
+    sambamba view -s $FACTOR -f bam -l 5 $1 > $3
+fi
+#+end_src
+
 

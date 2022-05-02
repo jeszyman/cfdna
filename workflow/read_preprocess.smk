@@ -88,14 +88,3 @@ rule alignment_qc:
         samtools stats {input} > {output.samstat}
         samtools flagstat {input} > {output.flagstat}
         """
-
-rule downsample_bams:
-    input:
-        bam = config["bam_dir"] + "/{read_id}_dedup.bam",
-    output:
-        config["bam_dir"] + "/{read_id}_ds{milreads}.bam",
-    shell:
-        """
-        reads=$(echo {wildcards.milreads}000000)
-        workflow/scripts/downsample_bam.sh {input} $reads {output}
-        """

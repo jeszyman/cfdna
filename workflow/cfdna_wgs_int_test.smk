@@ -14,6 +14,7 @@ rule all:
         expand(config["bam_dir"] + "/{read_id}_dedup.bam.bai", read_id = IDS),
         expand(config["qc_dir"] + "/{read_id}_{bam_step}_samstats.txt", read_id = IDS, bam_step= ["dedup","raw"]),
         expand(config["qc_dir"] + "/{read_id}_{bam_step}_flagstat.txt", read_id = IDS, bam_step =["dedup","raw"]),
+        expand(config["bam_dir"] + "/{read_id}_ds{milreads}.bam", read_id = IDS, milreads = MILREADS),
         config["qc_dir"] + "/all_qc.html",
 
 include: "read_preprocess.smk"

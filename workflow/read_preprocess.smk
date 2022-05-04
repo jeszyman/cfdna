@@ -88,3 +88,13 @@ rule alignment_qc:
         samtools stats {input} > {output.samstat}
         samtools flagstat {input} > {output.flagstat}
         """
+
+rule downsample_bams:
+    input:
+        config["bam_dir"] + "/{read_id}_dedup.bam",
+    output:
+        config["bam_dir"] + "/{read_id}_ds{milreads}.bam",
+    shell:
+        """
+        {config[cfdna_wgs_script_dir]}/downsample_bam.sh {input} {wildcards.milreads}000000 {output}
+        """

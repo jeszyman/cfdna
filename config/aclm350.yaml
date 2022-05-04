@@ -1,5 +1,0 @@
-container: "/home/jszymanski/sing_containers/frag.sif"
-data_dir: "/mnt/ris/aadel/mpnst"
-threads: 40
-repo: "/drive3/users/jszymanski/repos/mpnst-preprocessing"
-cap_extract_script: "/drive3/users/jszymanski/repos/mpnst-preprocessing/workflow/scripts/cp_fastq_extract_auto.pl"

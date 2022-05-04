@@ -4,6 +4,16 @@
 :logging: nil
 :END:
 ** Setup
+#+begin_src bash
+ls -d1 test/* | grep -v -e inputs -e ref -e fastq 
+
+ls -d ./test/
+
+results_dirs=test/*
+results_dirs=
+if [ -d test/bam]
+basecamp/src/smk_forced_run.sh config/int_repo_test.yaml workflow/int_test.smk             
+#+end_src
 *** Emacs and Org-mode
 #+startup: shrink
 *** Repository
@@ -169,14 +179,6 @@ MILREADS:
 cfdna_wgs_script_dir: "workflow/scripts"
 #+end_src
 - consider a workdir: "/output/dir" 
-- [[file:config/aclm350.yaml][ACLM350]]
-  #+begin_src bash :tangle config/aclm350.yaml
-container: "/home/jszymanski/sing_containers/frag.sif"
-data_dir: "/mnt/ris/aadel/mpnst"
-threads: 40
-repo: "/drive3/users/jszymanski/repos/mpnst-preprocessing"
-cap_extract_script: "/drive3/users/jszymanski/repos/mpnst-preprocessing/workflow/scripts/cp_fastq_extract_auto.pl"
-#+end_src
 - [[file:config/common.yaml][common]]
   #+begin_src bash :tangle config/common.yaml
 cap_extract_script: "src/cp_fastq_extract_auto.pl"
@@ -193,48 +195,22 @@ log_dir: "/mnt/ris/aadel/mnpst/logs"
 :PROPERTIES:
 :header-args: :tangle no
 :END:
+#+begin_src bash :tangle ./src/full_repo_int_test.sh
+# Remove results directories 
+results_dirs=()
+readarray -t results_dirs <<< $(ls -d1 test/* | grep -v -e '^test/f' -e ref -e inputs)
+printf '%s\n' "${results_dirs[@]}"
 
-#+begin_src bash :tangle ./src/smk_dry_run.sh
-# Check for parameters, return usage if empty
-if [[ $# -eq 0 ]] || [[ smk_dry_run.sh == "h" ]] ; then
-    printf "\n usage: smk_dry_run.sh config_file smk_file
-\n This run will not test singularity container is working 
-            \n "
-else
-eval "$(command conda 'shell.bash' 'hook' 2> /dev/null)"
 
-conda activate snakemake
+for dir in "${results_dirs[@]}"; 
+do
+\rm -rf $dir
+done
 
-snakemake \
-    --configfile $1 --cores 4 \
-    --use-singularity \
-    --dry-run \
-    --forceall \
-    --printshellcmds \
-    --snakefile $2
-fi
+# Run test 
+basecamp/src/smk_dry_run.sh config/int_repo_test.yaml workflow/cfdna_wgs_int_test.smk
+basecamp/src/smk_forced_run.sh config/int_repo_test.yaml workflow/cfdna_wgs_int_test.smk
 #+end_src
-
-#+begin_src bash :tangle ./src/smk_forced_run.sh
-# Check for parameters, return usage if empty
-if [[ $# -eq 0 ]] || [[ smk_dry_run.sh == "h" ]] ; then
-    printf "\n usage: smk_forced_run.sh config_file smk_file
-           \n "
-else
-eval "$(command conda 'shell.bash' 'hook' 2> /dev/null)"
-
-conda activate snakemake
-
-snakemake \
-    --configfile $1 --cores 4 \
-    --use-singularity \
-    --forceall \
-    --printshellcmds \
-    --snakefile $2
-fi
-#+end_src
-
-
 #+begin_src bash :tangle ./src/smk_test.sh
 #!/bin/bash
 
@@ -670,7 +646,7 @@ exit
 ** README
 *** Changlog
 - [2022-04-29 Fri] - Moved multiqc to integration testing as inputs are dependent on final sample labels. Integration testing works per this commit. 
-** Integration testing
+** [[file:workflow/cfdna_wgs_int_test.smk][Integration testing]] :smk:
 #+begin_src snakemake :tangle ./workflow/cfdna_wgs_int_test.smk
 container: config["container"]
 
@@ -688,6 +664,7 @@ rule all:
         expand(config["bam_dir"] + "/{read_id}_dedup.bam.bai", read_id = IDS),
         expand(config["qc_dir"] + "/{read_id}_{bam_step}_samstats.txt", read_id = IDS, bam_step= ["dedup","raw"]),
         expand(config["qc_dir"] + "/{read_id}_{bam_step}_flagstat.txt", read_id = IDS, bam_step =["dedup","raw"]),
+        expand(config["bam_dir"] + "/{read_id}_ds{milreads}.bam", read_id = IDS, milreads = MILREADS),
         config["qc_dir"] + "/all_qc.html",
 
 include: "read_preprocess.smk"
@@ -713,9 +690,12 @@ rule multiqc:
 #+end_src
 *** Repository-local integration testing
 #+begin_src bash
-src/smk_dry_run.sh config/int_repo_test.yaml workflow/int_test.smk            
+src/full_repo_int_test.sh 
 #+end_src
-*** Ideas
+*** Dev Ideas
+:PROPERTIES:
+:header-args:snakemake: :tangle no
+:END:
 #+begin_src snakemake
 container: config["container"]
 
@@ -786,11 +766,11 @@ rule rename:
 include: "read_preprocess.smk"
 #+end_src
 
-** Sequence pre-processing, alignment, and quality control
+** [[file:workflow/read_preprocess.smk][Sequence pre-processing, alignment, and quality control]] :smk:
 :PROPERTIES:
 :header-args:snakemake: :tangle ./workflow/read_preprocess.smk
 :END:              
-*** Read pre-processing                                            :smk_rule:
+*** DONE Read pre-processing                                          :smk_rule:
 - Snakemake
   #+begin_src snakemake
 rule trimmomatic:
@@ -822,7 +802,7 @@ rule trimmomatic:
 - Reference
   - Trimmomatic parameters based on Taylor's parameters ([[https://mail.google.com/mail/u/0/#search/sundby+fastq/FMfcgzGmvLWSbsmhDsffvSSWfjWdQhhR?projector=1&messagePartId=0.1][email]])
   - https://github.com/AAFC-BICoE/snakemake-trimmomatic/blob/master/Snakefile
-*** Alignment 
+*** DONE Alignment 
 #+begin_src snakemake
 rule align:
     input:
@@ -838,7 +818,7 @@ rule align:
 	"""
 #+end_src
 
-*** FastQC                                                         :smk_rule:
+*** DONE FastQC                                                       :smk_rule:
 - Snakemake
   #+begin_src snakemake
 rule fastqc:
@@ -863,7 +843,7 @@ rule fastqc:
         --threads {config[threads]} {input.proc} &> {log}
         """
 #+end_src
-*** Alignment processing
+*** DONE Alignment processing
 #+begin_src snakemake
 rule alignment_processing:
     input:
@@ -883,7 +863,7 @@ rule alignment_processing:
         sambamba index -t {config[threads]} {output.sort}
         """
 #+end_src
-*** Alignment QC
+*** DONE Alignment QC
 #+begin_src snakemake
 rule alignment_qc:
     input:
@@ -897,95 +877,37 @@ rule alignment_qc:
         samtools flagstat {input} > {output.flagstat}
         """
 #+end_src
-**** Downsample Bams
-#+name: downsample_bam
-#+begin_src bash 
-function downsample_bam {
-
-## Calculate the sampling factor based on the intended number of reads:
-FACTOR=$(samtools idxstats $1 | cut -f3 | awk -v COUNT=$2 'BEGIN {total=0} {total += $1} END {print COUNT/total}')
-
-if [[ $FACTOR > 1 ]]; then 
-    echo "DS reads exceeds total for $1"
-else
-    sambamba view -s $FACTOR -f bam -l 5 $1    
-fi
-}
-
+*** DONE Downsample bams
+- fails in mpnst int testing- "/bin/bash: line 1: cfdna-wgs/workflow/scripts/downsample_bam.sh: No such file or directory"
+#+begin_src snakemake
+rule downsample_bams:
+    input:
+        config["bam_dir"] + "/{read_id}_dedup.bam",
+    output:
+        config["bam_dir"] + "/{read_id}_ds{milreads}.bam",
+    shell:
+        """
+        {config[cfdna_wgs_script_dir]}/downsample_bam.sh {input} {wildcards.milreads}000000 {output}
+        """
 #+end_src
 
-#+name: downsample_bam
-#+begin_src bash :tangle ./src/functions.sh
-function downsample_bam {
-
+#+begin_src bash :tangle ./workflow/scripts/downsample_bam.sh
 ## Calculate the sampling factor based on the intended number of reads:
 FACTOR=$(samtools idxstats $1 | cut -f3 | awk -v COUNT=$2 'BEGIN {total=0} {total += $1} END {print COUNT/total}')
 
 if [[ $FACTOR > 1 ]]; then 
     echo "DS reads exceeds total for $1"
+    cp $1 $3
 else
-    sambamba view -s $FACTOR -f bam -l 5 $1    
+    sambamba view -s $FACTOR -f bam -l 5 $1 > $3
 fi
-}
-
 #+end_src
 
 *** Dev
 :PROPERTIES:
 :header-args:snakemake: :tangle no
 :END:
-**** Library QC Dataframe
-#+begin_src R
-library(tidyverse)
-
-flagstat_raw = as_tibble(read.table("/home/jeszyman/repos/mpnst-preprocessing/test/qc/all_qc_data/multiqc_samtools_flagstat.txt", header = T, sep = '\t'))
-
-flagstat_mod =
-  flagstat_raw %>%
-  mutate(library_id = substr(Sample, 1, 6)) %>%
-  mutate(bam_type = gsub("_.*$","", gsub("^.......","",Sample))) %>%
-  pivot_wider(names_from = bam_type, values_from = -c(library_id, bam_type), everything()) %>%
-  select(library_id, everything(), -starts_with("Sample"))
-
-samstats_raw = as_tibble(read.table("/home/jeszyman/repos/mpnst-preprocessing/test/qc/all_qc_data/multiqc_samtools_stats.txt", header = T, sep = '\t'))
-
-samstats_mod =
-  samstats_raw %>%
-  mutate(library_id = substr(Sample, 1, 6)) %>%
-  mutate(bam_type = gsub("_.*$","", gsub("^.......","",Sample))) %>%
-  pivot_wider(names_from = bam_type, values_from = -c(library_id, bam_type), everything()) %>%
-  select(library_id, everything(), -starts_with("Sample"))  
-samstats_mod
-
-#+end_src
-
-***** Make bwa index                                               :smk_rule:
-- Snakemake
-  #+begin_src snakemake
-rule make_bwa_index_:
-    input:
-        fasta = config["data_dir"] + "/inputs/hg19.fa.gz",
-    params:
-        out_dir = config["data_dir"] + "/ref/hg19_bwa"	
-        prefix = config["data_dir"] + "/ref/hg19_bwa/hg19"
-    output:
-        config["data_dir"] + "/ref/hg19_bwa/hg19.amb"
-    shell:
-        """
-        scripts/make_bwa_index_.sh {params.out_dir} {params.prefix} {input.fasta}
-        """
-#+end_src
-- [[file:./workflow/scripts/make_bwa_index_.sh][Base script]]
-  #+begin_src bash :tangle ./workflow/scripts/make_bwa_index_.sh
-mkdir -p $1
-bwa index -p $2 -a bwtsw $3
-# Snakemake variables
-# Function
-# Run command
-#+end_src
-
-*** Ideas
-
+**** Ideas
 **** Ideas
 
 :PROPERTIES:
@@ -1352,35 +1274,86 @@ rule rename:
         """
 #+end_src
 
-**** Downsample bams
-- fails in mpnst int testing- "/bin/bash: line 1: cfdna-wgs/workflow/scripts/downsample_bam.sh: No such file or directory"
-#+begin_src snakemake
-rule downsample_bams:
+**** Library QC Dataframe
+#+begin_src R
+library(tidyverse)
+
+flagstat_raw = as_tibble(read.table("/home/jeszyman/repos/mpnst-preprocessing/test/qc/all_qc_data/multiqc_samtools_flagstat.txt", header = T, sep = '\t'))
+
+flagstat_mod =
+  flagstat_raw %>%
+  mutate(library_id = substr(Sample, 1, 6)) %>%
+  mutate(bam_type = gsub("_.*$","", gsub("^.......","",Sample))) %>%
+  pivot_wider(names_from = bam_type, values_from = -c(library_id, bam_type), everything()) %>%
+  select(library_id, everything(), -starts_with("Sample"))
+
+samstats_raw = as_tibble(read.table("/home/jeszyman/repos/mpnst-preprocessing/test/qc/all_qc_data/multiqc_samtools_stats.txt", header = T, sep = '\t'))
+
+samstats_mod =
+  samstats_raw %>%
+  mutate(library_id = substr(Sample, 1, 6)) %>%
+  mutate(bam_type = gsub("_.*$","", gsub("^.......","",Sample))) %>%
+  pivot_wider(names_from = bam_type, values_from = -c(library_id, bam_type), everything()) %>%
+  select(library_id, everything(), -starts_with("Sample"))  
+samstats_mod
+
+#+end_src
+
+***** Make bwa index                                               :smk_rule:
+- Snakemake
+  #+begin_src snakemake
+rule make_bwa_index_:
     input:
-        bam = config["bam_dir"] + "/{read_id}_dedup.bam",
+        fasta = config["data_dir"] + "/inputs/hg19.fa.gz",
+    params:
+        out_dir = config["data_dir"] + "/ref/hg19_bwa"	
+        prefix = config["data_dir"] + "/ref/hg19_bwa/hg19"
     output:
-        config["bam_dir"] + "/{read_id}_ds{milreads}.bam",
+        config["data_dir"] + "/ref/hg19_bwa/hg19.amb"
     shell:
         """
-        {config[cfdna_wgs_script_dir]}/downsample_bam.sh {input} {wildcards.milreads}000000 {output}
+        scripts/make_bwa_index_.sh {params.out_dir} {params.prefix} {input.fasta}
         """
 #+end_src
-
-#+begin_src bash :tangle ./workflow/scripts/downsample_bam.sh
-## Calculate the sampling factor based on the intended number of reads:
-cp $1 $3
+- [[file:./workflow/scripts/make_bwa_index_.sh][Base script]]
+  #+begin_src bash :tangle ./workflow/scripts/make_bwa_index_.sh
+mkdir -p $1
+bwa index -p $2 -a bwtsw $3
+# Snakemake variables
+# Function
+# Run command
 #+end_src
 
-#+begin_src bash :tangle ./workflow/scripts/downsample_bam.sh
+**** Downsample Bams
+#+name: downsample_bam
+#+begin_src bash 
+function downsample_bam {
+
 ## Calculate the sampling factor based on the intended number of reads:
 FACTOR=$(samtools idxstats $1 | cut -f3 | awk -v COUNT=$2 'BEGIN {total=0} {total += $1} END {print COUNT/total}')
 
 if [[ $FACTOR > 1 ]]; then 
     echo "DS reads exceeds total for $1"
-    cp $1 $3
 else
-    sambamba view -s $FACTOR -f bam -l 5 $1 > $3
+    sambamba view -s $FACTOR -f bam -l 5 $1    
 fi
+}
+
 #+end_src
 
+#+name: downsample_bam
+#+begin_src bash :tangle ./src/functions.sh
+function downsample_bam {
+
+## Calculate the sampling factor based on the intended number of reads:
+FACTOR=$(samtools idxstats $1 | cut -f3 | awk -v COUNT=$2 'BEGIN {total=0} {total += $1} END {print COUNT/total}')
+
+if [[ $FACTOR > 1 ]]; then 
+    echo "DS reads exceeds total for $1"
+else
+    sambamba view -s $FACTOR -f bam -l 5 $1    
+fi
+}
+
+#+end_src
 

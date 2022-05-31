@@ -85,10 +85,10 @@ rule trimmomatic:
         read1 = config["data_dir"] + "/fastq/processed/{read_id}_proc_R1.fastq.gz",
         read1_unpr = config["data_dir"] + "/fastq/unpaired/{read_id}_unpr_R1.fastq.gz",
         read2 = config["data_dir"] + "/fastq/processed/{read_id}_proc_R2.fastq.gz",
-        read2_unpr = config["data_dir"] + "fastq/unpaired/{read_id}_unpr_R2.fastq.gz",
+        read2_unpr = config["data_dir"] + "/fastq/unpaired/{read_id}_unpr_R2.fastq.gz",
     log:
-        int = config["data_dir"] + "logs/trimmomatic_trimlog_{read_id}.log",
-        main = config["data_dir"] + "logs/trimmomatic_{read_id}.log",
+        int = config["data_dir"] + "/logs/trimmomatic_trimlog_{read_id}.log",
+        main = config["data_dir"] + "/logs/trimmomatic_{read_id}.log",
     shell:
         """
         trimmomatic PE \

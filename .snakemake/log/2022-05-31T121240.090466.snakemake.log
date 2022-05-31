@@ -1,0 +1,32 @@
+Building DAG of jobs...
+Full Traceback (most recent call last):
+  File "/opt/miniconda3/envs/snakemake/lib/python3.9/site-packages/snakemake/__init__.py", line 696, in snakemake
+    success = workflow.execute(
+  File "/opt/miniconda3/envs/snakemake/lib/python3.9/site-packages/snakemake/workflow.py", line 748, in execute
+    dag.init()
+  File "/opt/miniconda3/envs/snakemake/lib/python3.9/site-packages/snakemake/dag.py", line 179, in init
+    job = self.update([job], progress=progress, create_inventory=True)
+  File "/opt/miniconda3/envs/snakemake/lib/python3.9/site-packages/snakemake/dag.py", line 793, in update
+    raise exceptions[0]
+  File "/opt/miniconda3/envs/snakemake/lib/python3.9/site-packages/snakemake/dag.py", line 749, in update
+    self.update_(
+  File "/opt/miniconda3/envs/snakemake/lib/python3.9/site-packages/snakemake/dag.py", line 878, in update_
+    raise ex
+  File "/opt/miniconda3/envs/snakemake/lib/python3.9/site-packages/snakemake/dag.py", line 860, in update_
+    selected_job = self.update(
+  File "/opt/miniconda3/envs/snakemake/lib/python3.9/site-packages/snakemake/dag.py", line 793, in update
+    raise exceptions[0]
+  File "/opt/miniconda3/envs/snakemake/lib/python3.9/site-packages/snakemake/dag.py", line 749, in update
+    self.update_(
+  File "/opt/miniconda3/envs/snakemake/lib/python3.9/site-packages/snakemake/dag.py", line 906, in update_
+    raise MissingInputException(job.rule, missing_input)
+snakemake.exceptions.MissingInputException: Missing input files for rule align:
+testfastq/processed/lib001_proc_R2.fastq.gz
+testfastq/processed/lib001_proc_R1.fastq.gz
+
+MissingInputException in line 27 of /home/jeszyman/repos/cfdna-wgs/workflow/read_preprocess.smk:
+Missing input files for rule align:
+testfastq/processed/lib001_proc_R2.fastq.gz
+testfastq/processed/lib001_proc_R1.fastq.gz
+unlocking
+removed all locks

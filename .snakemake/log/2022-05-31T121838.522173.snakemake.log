@@ -1,0 +1,21 @@
+Full Traceback (most recent call last):
+  File "/opt/miniconda3/envs/snakemake/lib/python3.9/site-packages/snakemake/__init__.py", line 591, in snakemake
+    workflow.include(
+  File "/opt/miniconda3/envs/snakemake/lib/python3.9/site-packages/snakemake/workflow.py", line 1173, in include
+    exec(compile(code, snakefile, "exec"), self.globals)
+  File "/home/jeszyman/repos/cfdna-wgs/workflow/int_test.smk", line 56, in <module>
+  File "/opt/miniconda3/envs/snakemake/lib/python3.9/site-packages/snakemake/workflow.py", line 1173, in include
+    exec(compile(code, snakefile, "exec"), self.globals)
+  File "/home/jeszyman/repos/cfdna-wgs/workflow/read_preprocess.smk", line 211, in <module>
+  File "/opt/miniconda3/envs/snakemake/lib/python3.9/site-packages/snakemake/workflow.py", line 1399, in decorate
+    rule.set_log(*ruleinfo.log[0], **ruleinfo.log[1])
+  File "/opt/miniconda3/envs/snakemake/lib/python3.9/site-packages/snakemake/rules.py", line 644, in set_log
+    self.register_wildcards(item.get_wildcard_names())
+  File "/opt/miniconda3/envs/snakemake/lib/python3.9/site-packages/snakemake/rules.py", line 386, in register_wildcards
+    raise SyntaxError(
+SyntaxError: Not all output, log and benchmark files of rule downsample_bams contain the same wildcards. This is crucial though, in order to avoid that two or more jobs write to the same file.
+
+SyntaxError:
+Not all output, log and benchmark files of rule downsample_bams contain the same wildcards. This is crucial though, in order to avoid that two or more jobs write to the same file.
+  File "/home/jeszyman/repos/cfdna-wgs/workflow/int_test.smk", line 36, in <module>
+  File "/home/jeszyman/repos/cfdna-wgs/workflow/read_preprocess.smk", line 106, in <module>

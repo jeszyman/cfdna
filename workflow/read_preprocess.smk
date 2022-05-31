@@ -1,17 +1,18 @@
+# Read trimming per NCI
 rule trimmomatic:
     input:
-        read1 = config["fq_dir"] + "/{read_id}_R1.fastq.gz",
-        read2 = config["fq_dir"] + "/{read_id}_R2.fastq.gz",
+        read1 = config["data_dir"] + "/fastq/raw/{read_id}_R1.fastq.gz",
+        read2 = config["data_dir"] + "/fastq/raw/{read_id}_R2.fastq.gz",
     params:
-        adapter_fasta = config["inputs_dir"] + "/TruSeq3-PE.fa",
+        adapter_fasta = config["adapter_fastq"],
     output:
-        read1 = config["processed_fq_dir"] + "/{read_id}_proc_R1.fastq.gz",
-        read1_unpr = config["unpr_fq_dir"] + "/{read_id}_unpr_R1.fastq.gz",
-        read2 = config["processed_fq_dir"] + "/{read_id}_proc_R2.fastq.gz",
-        read2_unpr = config["unpr_fq_dir"] + "/{read_id}_unpr_R2.fastq.gz",	
+        read1 = config["data_dir"] + "/fastq/processed/{read_id}_proc_R1.fastq.gz",
+        read1_unpr = config["data_dir"] + "/fastq/unpaired/{read_id}_unpr_R1.fastq.gz",
+        read2 = config["data_dir"] + "/fastq/processed/{read_id}_proc_R2.fastq.gz",
+        read2_unpr = config["data_dir"] + "fastq/unpaired/{read_id}_unpr_R2.fastq.gz",
     log:
-        int = config["log_dir"] + "/trimmomatic_trimlog_{read_id}.log",
-        main = config["log_dir"] + "/trimmomatic_{read_id}.log",
+        int = config["data_dir"] + "logs/trimmomatic_trimlog_{read_id}.log",
+        main = config["data_dir"] + "logs/trimmomatic_{read_id}.log",
     shell:
         """
         trimmomatic PE \
@@ -24,31 +25,33 @@ rule trimmomatic:
                     LEADING:10 TRAILING:10 MAXINFO:50:0.97 MINLEN:20 &> {log.main}
         """
 
+# BWA alignment
 rule align:
     input:
-        read1 = config["processed_fq_dir"] + "/{read_id}_proc_R1.fastq.gz",
-        read2 = config["processed_fq_dir"] + "/{read_id}_proc_R2.fastq.gz",
+        read1 = config["data_dir"] + "/fastq/processed/{read_id}_proc_R1.fastq.gz",
+        read2 = config["data_dir"] + "/fastq/processed/{read_id}_proc_R2.fastq.gz",
     output:
-        config["bam_dir"] + "/{read_id}.sam",
+        config["data_dir"] + "/bam/{read_id}.sam",
     log:
-        config["log_dir"] + "/align_{read_id}.log"
+        config["data_dir"] + "/logs/align_{read_id}.log"
     shell:
         """
         bwa mem -M -t 4 {config[bwa_index]} {input.read1} {input.read2} > {output}
 	"""
 
+# FastQC
 rule fastqc:
-    input: 
-        raw=config["fq_dir"] + "/{read_id}_{read}.fastq.gz",
-        proc=config["processed_fq_dir"] + "/{read_id}_proc_{read}.fastq.gz",
-    params: 
-        out_dir = config["qc_dir"],
+    input:
+        raw =  config["data_dir"] + "/fastq/raw/{read_id}_{read}.fastq.gz",
+        proc = config["data_dir"] + "/fastq/processed/{read_id}_proc_{read}.fastq.gz",
+    params:
+        out_dir = config["data_dir"] + "/qc",
     output:
-        raw_html = config["qc_dir"] + "/{read_id}_{read}_fastqc.html",
-        proc_html = config["qc_dir"] + "/{read_id}_proc_{read}_fastqc.html", 	
-    log: 
-        raw = config["log_dir"] + "/fastqc_raw_{read_id}_{read}.log",
-        proc = config["log_dir"] + "/fastqc_proc_{read_id}_{read}.log",	
+        raw_html = config["data_dir"] + "/qc/{read_id}_{read}_fastqc.html",
+        proc_html = config["data_dir"] + "/qc/{read_id}_proc_{read}_fastqc.html",
+    log:
+        raw = config["data_dir"] + "/logs/fastqc_raw_{read_id}_{read}.log",
+        proc = config["data_dir"] + "/logs/fastqc_proc_{read_id}_{read}.log",
     shell:
         """
         fastqc --outdir {params.out_dir} \
@@ -59,16 +62,17 @@ rule fastqc:
         --threads {config[threads]} {input.proc} &> {log}
         """
 
+# Alignment deduplication and sorting
 rule alignment_processing:
     input:
-        config["bam_dir"] + "/{read_id}.sam",
+        config["data_dir"] + "/bam/{read_id}.sam",
     output:
-        bam = config["bam_dir"] + "/{read_id}_raw.bam",
-        dedup = temp(config["bam_dir"] + "/{read_id}_dedup_unsort.bam"),
-        sort = config["bam_dir"] + "/{read_id}_dedup.bam",
-        index = config["bam_dir"] + "/{read_id}_dedup.bam.bai",
+        bam = config["data_dir"] + "/bam/{read_id}_raw.bam",
+        dedup = temp(config["data_dir"] + "/bam/{read_id}_dedup_unsort.bam"),
+        sort = config["data_dir"] + "/bam/{read_id}_dedup.bam",
+        index = config["data_dir"] + "/bam/{read_id}_dedup.bam.bai",
     log:
-        config["log_dir"] + "/alignment_processing_{read_id}.log"
+        config["data_dir"] + "/logs/alignment_processing_{read_id}.log"
     shell:
         """
         sambamba view -t {config[threads]} -S -f bam {input} > {output.bam}
@@ -77,24 +81,30 @@ rule alignment_processing:
         sambamba index -t {config[threads]} {output.sort}
         """
 
+# Alignment samtools QC
 rule alignment_qc:
     input:
-        config["bam_dir"] + "/{read_id}_{bam_step}.bam",
+        config["data_dir"] + "/bam/{read_id}_{bam_step}.bam",
     output:
-        samstat = config["qc_dir"] + "/{read_id}_{bam_step}_samstats.txt",
-        flagstat = config["qc_dir"] + "/{read_id}_{bam_step}_flagstat.txt",        
+        samstat = config["data_dir"] + "/qc/{read_id}_{bam_step}_samstats.txt",
+        flagstat = config["data_dir"] + "/qc/{read_id}_{bam_step}_flagstat.txt",
+    log:
+        config["data_dir"] + "/logs/alignment_qc_{read_id}_{bam_step}.err",
     shell:
         """
-        samtools stats {input} > {output.samstat}
-        samtools flagstat {input} > {output.flagstat}
+        samtools stats {input} > {output.samstat} 2>{log}
+        samtools flagstat {input} > {output.flagstat} 2>>{log}
         """
 
+# Alignment downsampling
 rule downsample_bams:
     input:
-        config["bam_dir"] + "/{read_id}_dedup.bam",
+        config["data_dir"] + "/bam/{read_id}_dedup.bam",
     output:
-        config["bam_dir"] + "/{read_id}_ds{milreads}.bam",
+        config["data_dir"] + "/bam/{read_id}_ds{milreads}.bam",
+    log:
+        config["data_dir"] + "/logs/downsample_bam_{read_id}_{milreads}.err"
     shell:
         """
-        {config[cfdna_wgs_script_dir]}/downsample_bam.sh {input} {wildcards.milreads}000000 {output}
+        {config[cfdna_wgs_script_dir]}/downsample_bam.sh {input} {wildcards.milreads}000000 {output} 2>{log}
         """

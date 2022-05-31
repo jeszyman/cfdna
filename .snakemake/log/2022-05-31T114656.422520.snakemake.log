@@ -1,0 +1,3 @@
+KeyError in line 14 of /home/jeszyman/repos/cfdna-wgs/workflow/int_test.smk:
+'unpr_fq_dir'
+  File "/home/jeszyman/repos/cfdna-wgs/workflow/int_test.smk", line 14, in <module>

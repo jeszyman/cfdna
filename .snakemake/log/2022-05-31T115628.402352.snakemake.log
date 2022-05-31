@@ -1,0 +1,3 @@
+KeyError in line 39 of /home/jeszyman/repos/cfdna-wgs/workflow/int_test.smk:
+'qc_dir'
+  File "/home/jeszyman/repos/cfdna-wgs/workflow/int_test.smk", line 39, in <module>

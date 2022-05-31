@@ -1,6 +1,6 @@
 #!/bin/echo Run:.
 
-# For documentation, not intended to be executable 
+# For documentation, not intended to be executable
 
 if [ -d test ]; then \rm -rf test; fi
 mkdir -p test/fastq

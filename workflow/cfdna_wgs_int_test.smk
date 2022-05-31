@@ -2,7 +2,7 @@ container: config["container"]
 
 IDS, = glob_wildcards(config["fq_dir"] + "/{id}_R1.fastq.gz")
 MILREADS = config["MILREADS"]
-	   
+
 rule all:
     input:
         expand(config["processed_fq_dir"] + "/{read_id}_proc_{read}.fastq.gz", read_id = IDS, read = ["R1","R2"]),
@@ -34,5 +34,5 @@ rule multiqc:
         multiqc {params.out_dir} \
         --force \
         --outdir {params.out_dir} \
-        --filename all_qc 
+        --filename all_qc
         """

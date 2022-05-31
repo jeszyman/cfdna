@@ -1,0 +1,214 @@
+Building DAG of jobs...
+Using shell: /bin/bash
+Provided cores: 4
+Rules claiming more threads will be scaled down.
+Job stats:
+job        count    min threads    max threads
+-------  -------  -------------  -------------
+all            1              1              1
+symlink        8              1              1
+total          9              1              1
+
+Resources before job selection: {'_cores': 4, '_nodes': 9223372036854775807}
+Ready jobs (8):
+	symlink
+	symlink
+	symlink
+	symlink
+	symlink
+	symlink
+	symlink
+	symlink
+Select jobs to execute...
+Selected jobs (4):
+	symlink
+	symlink
+	symlink
+	symlink
+Resources after job selection: {'_cores': 0, '_nodes': 9223372036854775803}
+
+[Tue May 31 12:06:46 2022]
+rule symlink:
+    input: test/inputs/lib001_R2.fastq.gz
+    output: test/fastq/raw/lib001_R2.fastq.gz
+    jobid: 2
+    wildcards: library_id=lib001, read=R2
+    resources: tmpdir=/tmp
+
+
+        ln --force --relative --symbolic test/inputs/lib001_R2.fastq.gz test/fastq/raw/lib001_R2.fastq.gz
+        
+ singularity  exec --home /home/jeszyman/repos/cfdna-wgs --bind /home/jeszyman:/home/jeszyman --bind /mnt:/mnt --bind /opt/miniconda3/envs/snakemake/lib/python3.9/site-packages:/mnt/snakemake /home/jeszyman/sing_containers/biotools.sif bash -c 'ln --force --relative --symbolic test/inputs/lib001_R2.fastq.gz test/fastq/raw/lib001_R2.fastq.gz'
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+
+[Tue May 31 12:06:46 2022]
+rule symlink:
+    input: test/inputs/lib002_R2.fastq.gz
+    output: test/fastq/raw/lib002_R2.fastq.gz
+    jobid: 4
+    wildcards: library_id=lib002, read=R2
+    resources: tmpdir=/tmp
+
+
+        ln --force --relative --symbolic test/inputs/lib002_R2.fastq.gz test/fastq/raw/lib002_R2.fastq.gz
+        
+ singularity  exec --home /home/jeszyman/repos/cfdna-wgs --bind /home/jeszyman:/home/jeszyman --bind /mnt:/mnt --bind /opt/miniconda3/envs/snakemake/lib/python3.9/site-packages:/mnt/snakemake /home/jeszyman/sing_containers/biotools.sif bash -c 'ln --force --relative --symbolic test/inputs/lib002_R2.fastq.gz test/fastq/raw/lib002_R2.fastq.gz'
+
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+[Tue May 31 12:06:46 2022]
+rule symlink:
+    input: test/inputs/lib001_R1.fastq.gz
+    output: test/fastq/raw/lib001_R1.fastq.gz
+    jobid: 1
+    wildcards: library_id=lib001, read=R1
+    resources: tmpdir=/tmp
+
+
+        ln --force --relative --symbolic test/inputs/lib001_R1.fastq.gz test/fastq/raw/lib001_R1.fastq.gz
+        
+ singularity  exec --home /home/jeszyman/repos/cfdna-wgs --bind /home/jeszyman:/home/jeszyman --bind /mnt:/mnt --bind /opt/miniconda3/envs/snakemake/lib/python3.9/site-packages:/mnt/snakemake /home/jeszyman/sing_containers/biotools.sif bash -c 'ln --force --relative --symbolic test/inputs/lib001_R1.fastq.gz test/fastq/raw/lib001_R1.fastq.gz'
+
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+[Tue May 31 12:06:46 2022]
+rule symlink:
+    input: test/inputs/lib004_R1.fastq.gz
+    output: test/fastq/raw/lib004_R1.fastq.gz
+    jobid: 7
+    wildcards: library_id=lib004, read=R1
+    resources: tmpdir=/tmp
+
+
+        ln --force --relative --symbolic test/inputs/lib004_R1.fastq.gz test/fastq/raw/lib004_R1.fastq.gz
+        
+ singularity  exec --home /home/jeszyman/repos/cfdna-wgs --bind /home/jeszyman:/home/jeszyman --bind /mnt:/mnt --bind /opt/miniconda3/envs/snakemake/lib/python3.9/site-packages:/mnt/snakemake /home/jeszyman/sing_containers/biotools.sif bash -c 'ln --force --relative --symbolic test/inputs/lib004_R1.fastq.gz test/fastq/raw/lib004_R1.fastq.gz'
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+[Tue May 31 12:06:47 2022]
+Finished job 4.
+1 of 9 steps (11%) done
+Resources before job selection: {'_cores': 1, '_nodes': 9223372036854775804}
+Ready jobs (4):
+	symlink
+	symlink
+	symlink
+	symlink
+Select jobs to execute...
+Selected jobs (1):
+	symlink
+Resources after job selection: {'_cores': 0, '_nodes': 9223372036854775803}
+
+[Tue May 31 12:06:47 2022]
+rule symlink:
+    input: test/inputs/lib004_R2.fastq.gz
+    output: test/fastq/raw/lib004_R2.fastq.gz
+    jobid: 8
+    wildcards: library_id=lib004, read=R2
+    resources: tmpdir=/tmp
+
+
+        ln --force --relative --symbolic test/inputs/lib004_R2.fastq.gz test/fastq/raw/lib004_R2.fastq.gz
+        
+ singularity  exec --home /home/jeszyman/repos/cfdna-wgs --bind /home/jeszyman:/home/jeszyman --bind /mnt:/mnt --bind /opt/miniconda3/envs/snakemake/lib/python3.9/site-packages:/mnt/snakemake /home/jeszyman/sing_containers/biotools.sif bash -c 'ln --force --relative --symbolic test/inputs/lib004_R2.fastq.gz test/fastq/raw/lib004_R2.fastq.gz'
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+[Tue May 31 12:06:47 2022]
+Finished job 2.
+2 of 9 steps (22%) done
+Resources before job selection: {'_cores': 1, '_nodes': 9223372036854775804}
+Ready jobs (3):
+	symlink
+	symlink
+	symlink
+Select jobs to execute...
+Selected jobs (1):
+	symlink
+Resources after job selection: {'_cores': 0, '_nodes': 9223372036854775803}
+
+[Tue May 31 12:06:47 2022]
+rule symlink:
+    input: test/inputs/lib003_R2.fastq.gz
+    output: test/fastq/raw/lib003_R2.fastq.gz
+    jobid: 6
+    wildcards: library_id=lib003, read=R2
+    resources: tmpdir=/tmp
+
+
+        ln --force --relative --symbolic test/inputs/lib003_R2.fastq.gz test/fastq/raw/lib003_R2.fastq.gz
+        
+ singularity  exec --home /home/jeszyman/repos/cfdna-wgs --bind /home/jeszyman:/home/jeszyman --bind /mnt:/mnt --bind /opt/miniconda3/envs/snakemake/lib/python3.9/site-packages:/mnt/snakemake /home/jeszyman/sing_containers/biotools.sif bash -c 'ln --force --relative --symbolic test/inputs/lib003_R2.fastq.gz test/fastq/raw/lib003_R2.fastq.gz'
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+[Tue May 31 12:06:47 2022]
+Finished job 1.
+3 of 9 steps (33%) done
+[Tue May 31 12:06:47 2022]
+Finished job 7.
+4 of 9 steps (44%) done
+Resources before job selection: {'_cores': 2, '_nodes': 9223372036854775805}
+Ready jobs (2):
+	symlink
+	symlink
+Select jobs to execute...
+Selected jobs (2):
+	symlink
+	symlink
+Resources after job selection: {'_cores': 0, '_nodes': 9223372036854775803}
+
+[Tue May 31 12:06:47 2022]
+rule symlink:
+    input: test/inputs/lib002_R1.fastq.gz
+    output: test/fastq/raw/lib002_R1.fastq.gz
+    jobid: 3
+    wildcards: library_id=lib002, read=R1
+    resources: tmpdir=/tmp
+
+
+        ln --force --relative --symbolic test/inputs/lib002_R1.fastq.gz test/fastq/raw/lib002_R1.fastq.gz
+        
+ singularity  exec --home /home/jeszyman/repos/cfdna-wgs --bind /home/jeszyman:/home/jeszyman --bind /mnt:/mnt --bind /opt/miniconda3/envs/snakemake/lib/python3.9/site-packages:/mnt/snakemake /home/jeszyman/sing_containers/biotools.sif bash -c 'ln --force --relative --symbolic test/inputs/lib002_R1.fastq.gz test/fastq/raw/lib002_R1.fastq.gz'
+
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+[Tue May 31 12:06:47 2022]
+rule symlink:
+    input: test/inputs/lib003_R1.fastq.gz
+    output: test/fastq/raw/lib003_R1.fastq.gz
+    jobid: 5
+    wildcards: library_id=lib003, read=R1
+    resources: tmpdir=/tmp
+
+
+        ln --force --relative --symbolic test/inputs/lib003_R1.fastq.gz test/fastq/raw/lib003_R1.fastq.gz
+        
+ singularity  exec --home /home/jeszyman/repos/cfdna-wgs --bind /home/jeszyman:/home/jeszyman --bind /mnt:/mnt --bind /opt/miniconda3/envs/snakemake/lib/python3.9/site-packages:/mnt/snakemake /home/jeszyman/sing_containers/biotools.sif bash -c 'ln --force --relative --symbolic test/inputs/lib003_R1.fastq.gz test/fastq/raw/lib003_R1.fastq.gz'
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+[Tue May 31 12:06:47 2022]
+Finished job 8.
+5 of 9 steps (56%) done
+[Tue May 31 12:06:47 2022]
+Finished job 6.
+6 of 9 steps (67%) done
+[Tue May 31 12:06:47 2022]
+Finished job 3.
+7 of 9 steps (78%) done
+[Tue May 31 12:06:47 2022]
+Finished job 5.
+8 of 9 steps (89%) done
+Resources before job selection: {'_cores': 4, '_nodes': 9223372036854775807}
+Ready jobs (1):
+	all
+Select jobs to execute...
+Selected jobs (1):
+	all
+Resources after job selection: {'_cores': 3, '_nodes': 9223372036854775806}
+
+[Tue May 31 12:06:47 2022]
+localrule all:
+    input: test/fastq/raw/lib001_R1.fastq.gz, test/fastq/raw/lib001_R2.fastq.gz, test/fastq/raw/lib002_R1.fastq.gz, test/fastq/raw/lib002_R2.fastq.gz, test/fastq/raw/lib003_R1.fastq.gz, test/fastq/raw/lib003_R2.fastq.gz, test/fastq/raw/lib004_R1.fastq.gz, test/fastq/raw/lib004_R2.fastq.gz
+    jobid: 0
+    resources: tmpdir=/tmp
+
+[Tue May 31 12:06:47 2022]
+Finished job 0.
+9 of 9 steps (100%) done
+Complete log: /home/jeszyman/repos/cfdna-wgs/.snakemake/log/2022-05-31T120646.385533.snakemake.log
+unlocking
+removing lock
+removing lock
+removed all locks

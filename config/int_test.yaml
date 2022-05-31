@@ -1,0 +1,18 @@
+container: "~/sing_containers/biotools.sif"
+threads: 4
+
+# Note, need full repository path when calling from another directory.
+cfdna_wgs_repo: "./"
+data_dir: "test"
+adapter_fastq: "test/inputs/TruSeq3-PE.fa"
+bwa_index: "test/ref/chr8"
+
+
+bam_dir: "test/bam"
+rename_dir: "test/cappseq_fastq"
+extracted_dir: "test/extracted_fastq"
+fq_symlink_dir: "test/symlink-fastq"
+MILREADS:
+  - "10"
+  - "20"
+cfdna_wgs_script_dir: "workflow/scripts"

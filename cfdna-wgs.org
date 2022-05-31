@@ -4,6 +4,28 @@
 :logging: nil
 :END:
 ** Setup
+*** Snakemake configuration YAML
+#+begin_src bash :tangle ./config/int_test.yaml
+container: "~/sing_containers/biotools.sif"
+threads: 4
+
+# Note, need full repository path when calling from another directory.
+cfdna_wgs_repo: "./"
+data_dir: "test"
+adapter_fastq: "test/inputs/TruSeq3-PE.fa"
+bwa_index: "test/ref/chr8"
+
+
+bam_dir: "test/bam"
+rename_dir: "test/cappseq_fastq"
+extracted_dir: "test/extracted_fastq"
+fq_symlink_dir: "test/symlink-fastq"
+MILREADS:
+  - "10"
+  - "20"
+cfdna_wgs_script_dir: "workflow/scripts"
+#+end_src
+*** Integration testing inputs setup
 #+begin_src bash
 ls -d1 test/* | grep -v -e inputs -e ref -e fastq
 
@@ -14,31 +36,6 @@ results_dirs=
 if [ -d test/bam]
 basecamp/src/smk_forced_run.sh config/int_repo_test.yaml workflow/int_test.smk
 #+end_src
-*** Snakemake
-**** Configuration YAMLs
-- Repo integration testing
-  #+begin_src bash :tangle ./config/int_repo_test.yaml
-container: "~/sing_containers/biotools.sif"
-fq_dir: "test/fastq"
-qc_dir: "test/qc"
-log_dir: "test/logs"
-threads: 4
-inputs_dir: "test/inputs"
-processed_fq_dir: "test/processed-fastq"
-unpr_fq_dir: "test/unpaired-fastq"
-bwa_index: "test/ref/chr8"
-bam_dir: "test/bam"
-rename_dir: "test/cappseq_fastq"
-extracted_dir: "test/extracted_fastq"
-fq_symlink_dir: "test/symlink-fastq"
-MILREADS:
-  - "10"
-  - "20"
-cfdna_wgs_script_dir: "workflow/scripts"
-#+end_src
-
-
-*** Integration testing inputs setup
 #+begin_src bash :tangle ./src/seq_preprocess_integration_setup.sh
 #!/bin/echo Run:.
 
@@ -70,9 +67,6 @@ singularity shell ~/sing_containers/biotools.sif
 bwa index -p test/ref/chr8 test/inputs/chr8.fa
 exit
 #+end_src
-** README
-*** Changlog
-- [2022-04-29 Fri] - Moved multiqc to integration testing as inputs are dependent on final sample labels. Integration testing works per this commit.
 ** [[file:workflow/read_preprocess.smk][Sequence pre-processing, alignment, and quality control]] :smk:
 :PROPERTIES:
 :header-args:snakemake: :tangle ./workflow/read_preprocess.smk
@@ -80,20 +74,21 @@ exit
 *** DONE Read pre-processing                                          :smk_rule:
 - Snakemake
   #+begin_src snakemake
+# Read trimming per NCI
 rule trimmomatic:
     input:
-        read1 = config["fq_dir"] + "/{read_id}_R1.fastq.gz",
-        read2 = config["fq_dir"] + "/{read_id}_R2.fastq.gz",
+        read1 = config["data_dir"] + "/fastq/raw/{read_id}_R1.fastq.gz",
+        read2 = config["data_dir"] + "/fastq/raw/{read_id}_R2.fastq.gz",
     params:
-        adapter_fasta = config["inputs_dir"] + "/TruSeq3-PE.fa",
+        adapter_fasta = config["adapter_fastq"],
     output:
-        read1 = config["processed_fq_dir"] + "/{read_id}_proc_R1.fastq.gz",
-        read1_unpr = config["unpr_fq_dir"] + "/{read_id}_unpr_R1.fastq.gz",
-        read2 = config["processed_fq_dir"] + "/{read_id}_proc_R2.fastq.gz",
-        read2_unpr = config["unpr_fq_dir"] + "/{read_id}_unpr_R2.fastq.gz",
+        read1 = config["data_dir"] + "/fastq/processed/{read_id}_proc_R1.fastq.gz",
+        read1_unpr = config["data_dir"] + "/fastq/unpaired/{read_id}_unpr_R1.fastq.gz",
+        read2 = config["data_dir"] + "/fastq/processed/{read_id}_proc_R2.fastq.gz",
+        read2_unpr = config["data_dir"] + "fastq/unpaired/{read_id}_unpr_R2.fastq.gz",
     log:
-        int = config["log_dir"] + "/trimmomatic_trimlog_{read_id}.log",
-        main = config["log_dir"] + "/trimmomatic_{read_id}.log",
+        int = config["data_dir"] + "logs/trimmomatic_trimlog_{read_id}.log",
+        main = config["data_dir"] + "logs/trimmomatic_{read_id}.log",
     shell:
         """
         trimmomatic PE \
@@ -111,14 +106,15 @@ rule trimmomatic:
   - https://github.com/AAFC-BICoE/snakemake-trimmomatic/blob/master/Snakefile
 *** DONE Alignment
 #+begin_src snakemake
+# BWA alignment
 rule align:
     input:
-        read1 = config["processed_fq_dir"] + "/{read_id}_proc_R1.fastq.gz",
-        read2 = config["processed_fq_dir"] + "/{read_id}_proc_R2.fastq.gz",
+        read1 = config["data_dir"] + "/fastq/processed/{read_id}_proc_R1.fastq.gz",
+        read2 = config["data_dir"] + "/fastq/processed/{read_id}_proc_R2.fastq.gz",
     output:
-        config["bam_dir"] + "/{read_id}.sam",
+        config["data_dir"] + "/bam/{read_id}.sam",
     log:
-        config["log_dir"] + "/align_{read_id}.log"
+        config["data_dir"] + "/logs/align_{read_id}.log"
     shell:
         """
         bwa mem -M -t 4 {config[bwa_index]} {input.read1} {input.read2} > {output}
@@ -128,18 +124,19 @@ rule align:
 *** DONE FastQC                                                       :smk_rule:
 - Snakemake
   #+begin_src snakemake
+# FastQC
 rule fastqc:
     input:
-        raw=config["fq_dir"] + "/{read_id}_{read}.fastq.gz",
-        proc=config["processed_fq_dir"] + "/{read_id}_proc_{read}.fastq.gz",
+        raw =  config["data_dir"] + "/fastq/raw/{read_id}_{read}.fastq.gz",
+        proc = config["data_dir"] + "/fastq/processed/{read_id}_proc_{read}.fastq.gz",
     params:
-        out_dir = config["qc_dir"],
+        out_dir = config["data_dir"] + "/qc",
     output:
-        raw_html = config["qc_dir"] + "/{read_id}_{read}_fastqc.html",
-        proc_html = config["qc_dir"] + "/{read_id}_proc_{read}_fastqc.html",
+        raw_html = config["data_dir"] + "/qc/{read_id}_{read}_fastqc.html",
+        proc_html = config["data_dir"] + "/qc/{read_id}_proc_{read}_fastqc.html",
     log:
-        raw = config["log_dir"] + "/fastqc_raw_{read_id}_{read}.log",
-        proc = config["log_dir"] + "/fastqc_proc_{read_id}_{read}.log",
+        raw = config["data_dir"] + "/logs/fastqc_raw_{read_id}_{read}.log",
+        proc = config["data_dir"] + "/logs/fastqc_proc_{read_id}_{read}.log",
     shell:
         """
         fastqc --outdir {params.out_dir} \
@@ -152,16 +149,17 @@ rule fastqc:
 #+end_src
 *** DONE Alignment processing
 #+begin_src snakemake
+# Alignment deduplication and sorting
 rule alignment_processing:
     input:
-        config["bam_dir"] + "/{read_id}.sam",
+        config["data_dir"] + "/bam/{read_id}.sam",
     output:
-        bam = config["bam_dir"] + "/{read_id}_raw.bam",
-        dedup = temp(config["bam_dir"] + "/{read_id}_dedup_unsort.bam"),
-        sort = config["bam_dir"] + "/{read_id}_dedup.bam",
-        index = config["bam_dir"] + "/{read_id}_dedup.bam.bai",
+        bam = config["data_dir"] + "/bam/{read_id}_raw.bam",
+        dedup = temp(config["data_dir"] + "/bam/{read_id}_dedup_unsort.bam"),
+        sort = config["data_dir"] + "/bam/{read_id}_dedup.bam",
+        index = config["data_dir"] + "/bam/{read_id}_dedup.bam.bai",
     log:
-        config["log_dir"] + "/alignment_processing_{read_id}.log"
+        config["data_dir"] + "/logs/alignment_processing_{read_id}.log"
     shell:
         """
         sambamba view -t {config[threads]} -S -f bam {input} > {output.bam}
@@ -172,29 +170,34 @@ rule alignment_processing:
 #+end_src
 *** DONE Alignment QC
 #+begin_src snakemake
+# Alignment samtools QC
 rule alignment_qc:
     input:
-        config["bam_dir"] + "/{read_id}_{bam_step}.bam",
+        config["data_dir"] + "/bam/{read_id}_{bam_step}.bam",
     output:
-        samstat = config["qc_dir"] + "/{read_id}_{bam_step}_samstats.txt",
-        flagstat = config["qc_dir"] + "/{read_id}_{bam_step}_flagstat.txt",
+        samstat = config["data_dir"] + "/qc/{read_id}_{bam_step}_samstats.txt",
+        flagstat = config["data_dir"] + "/qc/{read_id}_{bam_step}_flagstat.txt",
+    log:
+        config["data_dir"] + "/logs/alignment_qc_{read_id}_{bam_step}.err",
     shell:
         """
-        samtools stats {input} > {output.samstat}
-        samtools flagstat {input} > {output.flagstat}
+        samtools stats {input} > {output.samstat} 2>{log}
+        samtools flagstat {input} > {output.flagstat} 2>>{log}
         """
 #+end_src
 *** DONE Downsample bams
-- fails in mpnst int testing- "/bin/bash: line 1: cfdna-wgs/workflow/scripts/downsample_bam.sh: No such file or directory"
 #+begin_src snakemake
+# Alignment downsampling
 rule downsample_bams:
     input:
-        config["bam_dir"] + "/{read_id}_dedup.bam",
+        config["data_dir"] + "/bam/{read_id}_dedup.bam",
     output:
-        config["bam_dir"] + "/{read_id}_ds{milreads}.bam",
+        config["data_dir"] + "/bam/{read_id}_ds{milreads}.bam",
+    log:
+        config["data_dir"] + "/logs/downsample_bam_{read_id}_{milreads}.err"
     shell:
         """
-        {config[cfdna_wgs_script_dir]}/downsample_bam.sh {input} {wildcards.milreads}000000 {output}
+        {config[cfdna_wgs_script_dir]}/downsample_bam.sh {input} {wildcards.milreads}000000 {output} 2>{log}
         """
 #+end_src
 
@@ -215,7 +218,7 @@ fi
 :header-args:snakemake: :tangle no
 :END:
 **** Ideas
-**** Ideas
+***** Ideas
 
 :PROPERTIES:
 :header-args:snakemake: :tangle no
@@ -550,7 +553,7 @@ fi
       #     fi
       # done
       # readarray -t small_bam < /drive3/users/jszymanski/repos/mpnst/data/small_bams
-***** Ideas
+****** Ideas
   - filter to min file size && expected by manual spreadsheet
   - fastqs too small (< 500 Mb)
     #+begin_src bash :results replace
@@ -563,7 +566,7 @@ fi
 
 
 
-***** Rename                                                       :smk_rule:
+****** Rename                                                      :smk_rule:
 - Snakemake
 #+begin_src snakemake
 rule rename:
@@ -581,7 +584,7 @@ rule rename:
         """
 #+end_src
 
-**** Library QC Dataframe
+***** Library QC Dataframe
 #+begin_src R
 library(tidyverse)
 
@@ -606,7 +609,7 @@ samstats_mod
 
 #+end_src
 
-***** Make bwa index                                               :smk_rule:
+****** Make bwa index                                              :smk_rule:
 - Snakemake
   #+begin_src snakemake
 rule make_bwa_index_:
@@ -631,7 +634,7 @@ bwa index -p $2 -a bwtsw $3
 # Run command
 #+end_src
 
-**** Downsample Bams
+***** Downsample Bams
 #+name: downsample_bam
 #+begin_src bash
 function downsample_bam {
@@ -665,38 +668,54 @@ fi
 #+end_src
 
 ** [[file:workflow/cfdna_wgs_int_test.smk][Integration testing]] :smk:
-#+begin_src snakemake :tangle ./workflow/cfdna_wgs_int_test.smk
+#+begin_src snakemake :tangle ./workflow/int_test.smk
+import pandas as pd
+
 container: config["container"]
 
-IDS, = glob_wildcards(config["fq_dir"] + "/{id}_R1.fastq.gz")
+libraries = pd.read_table(config["data_dir"] + "/inputs/libraries.tsv")
+
+LIBRARY_IDS = list(libraries.library.unique())
+
 MILREADS = config["MILREADS"]
 
 rule all:
     input:
-        expand(config["processed_fq_dir"] + "/{read_id}_proc_{read}.fastq.gz", read_id = IDS, read = ["R1","R2"]),
-        expand(config["unpr_fq_dir"] + "/{read_id}_unpr_R1.fastq.gz", read_id = IDS, read = ["R1","R2"]),
-        expand(config["bam_dir"] + "/{read_id}.sam", read_id = IDS),
-        expand(config["qc_dir"] + "/{read_id}_{read}_fastqc.html", read_id = IDS, read = ["R1","R2"]),
-        expand(config["qc_dir"] + "/{read_id}_proc_{read}_fastqc.html", read_id = IDS, read = ["R1","R2"]),
-        expand(config["bam_dir"] + "/{read_id}_dedup.bam", read_id = IDS),
-        expand(config["bam_dir"] + "/{read_id}_dedup.bam.bai", read_id = IDS),
-        expand(config["qc_dir"] + "/{read_id}_{bam_step}_samstats.txt", read_id = IDS, bam_step= ["dedup","raw"]),
-        expand(config["qc_dir"] + "/{read_id}_{bam_step}_flagstat.txt", read_id = IDS, bam_step =["dedup","raw"]),
-        expand(config["bam_dir"] + "/{read_id}_ds{milreads}.bam", read_id = IDS, milreads = MILREADS),
-        config["qc_dir"] + "/all_qc.html",
+        expand(config["data_dir"] + "/fastq/raw/{library_id}_{read}.fastq.gz", library_id = LIBRARY_IDS, read = ["R1", "R2"]),
+        expand(config["data_dir"] + "/fastq/processed/{library_id}_proc_{read}.fastq.gz", library_id = LIBRARY_IDS, read = ["R1","R2"]),
+        expand(config["data_dir"] + "/fastq/unpaired/{library_id}_unpr_R1.fastq.gz", library_id = LIBRARY_IDS, read = ["R1","R2"]),
+        expand(config["data_dir"] + "/bam/{library_id}.sam", library_id = LIBRARY_IDS),
+        expand(config["data_dir"] + "/qc/{library_id}_{read}_fastqc.html", library_id = LIBRARY_IDS, read = ["R1","R2"]),
+        expand(config["data_dir"] + "/qc/{library_id}_proc_{read}_fastqc.html", library_id = LIBRARY_IDS, read = ["R1","R2"]),
+        expand(config["data_dir"] + "/bam/{library_id}_dedup.bam", library_id = LIBRARY_IDS),
+        expand(config["data_dir"] + "/bam/{library_id}_dedup.bam.bai", library_id = LIBRARY_IDS),
+        expand(config["data_dir"] + "/qc/{library_id}_{bam_step}_samstats.txt", library_id = LIBRARY_IDS, bam_step= ["dedup","raw"]),
+        expand(config["data_dir"] + "/qc/{library_id}_{bam_step}_flagstat.txt", library_id = LIBRARY_IDS, bam_step =["dedup","raw"]),
+        expand(config["data_dir"] + "/bam/{library_id}_ds{milreads}.bam", library_id = LIBRARY_IDS, milreads = MILREADS),
+        config["data_dir"] + "/qc/all_qc.html",
+
+rule symlink:
+    input:
+        config["data_dir"] + "/inputs/{library_id}_{read}.fastq.gz",
+    output:
+        config["data_dir"] + "/fastq/raw/{library_id}_{read}.fastq.gz",
+    shell:
+        """
+        ln --force --relative --symbolic {input} {output}
+        """
 
 include: "read_preprocess.smk"
 
 rule multiqc:
     input:
-        expand(config["qc_dir"] + "/{read_id}_{read}_fastqc.html", read_id = IDS, read = ["R1","R2"]),
-        expand(config["qc_dir"] + "/{read_id}_proc_{read}_fastqc.html", read_id = IDS, read = ["R1","R2"]),
-        expand(config["qc_dir"] + "/{read_id}_{bam_step}_samstats.txt", read_id = IDS, bam_step= ["dedup","raw"]),
-        expand(config["qc_dir"] + "/{read_id}_{bam_step}_flagstat.txt", read_id = IDS, bam_step =["dedup","raw"]),
+        expand(config["data_dir"] + "/qc/{library_id}_{read}_fastqc.html", library_id = LIBRARY_IDS, read = ["R1","R2"]),
+        expand(config["data_dir"] + "/qc/{library_id}_proc_{read}_fastqc.html", library_id = LIBRARY_IDS, read = ["R1","R2"]),
+        expand(config["data_dir"] + "/qc/{library_id}_{bam_step}_samstats.txt", library_id = LIBRARY_IDS, bam_step= ["dedup","raw"]),
+        expand(config["data_dir"] + "/qc/{library_id}_{bam_step}_flagstat.txt", library_id = LIBRARY_IDS, bam_step =["dedup","raw"]),
     params:
-        out_dir = config["qc_dir"]
+        out_dir = config["data_dir"] + "/qc"
     output:
-        config["qc_dir"] + "/all_qc.html"
+        config["data_dir"] + "/qc/all_qc.html"
     shell:
         """
         multiqc {params.out_dir} \
@@ -783,3 +802,7 @@ rule rename:
 
 include: "read_preprocess.smk"
 #+end_src
+** README
+*** Changlog
+- [2022-05-31 Tue] -
+- [2022-04-29 Fri] - Moved multiqc to integration testing as inputs are dependent on final sample labels. Integration testing works per this commit.

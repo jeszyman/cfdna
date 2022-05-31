@@ -1,0 +1,857 @@
+Building DAG of jobs...
+Using shell: /bin/bash
+Provided cores: 4
+Rules claiming more threads will be scaled down.
+Job stats:
+job                     count    min threads    max threads
+--------------------  -------  -------------  -------------
+align                       4              1              1
+alignment_processing        4              1              1
+alignment_qc                8              1              1
+all                         1              1              1
+fastqc                      8              1              1
+multiqc                     1              1              1
+trimmomatic                 4              1              1
+total                      30              1              1
+
+Resources before job selection: {'_cores': 4, '_nodes': 9223372036854775807}
+Ready jobs (4):
+	trimmomatic
+	trimmomatic
+	trimmomatic
+	trimmomatic
+Select jobs to execute...
+Selected jobs (4):
+	trimmomatic
+	trimmomatic
+	trimmomatic
+	trimmomatic
+Resources after job selection: {'_cores': 0, '_nodes': 9223372036854775803}
+
+[Tue May 31 11:05:47 2022]
+rule trimmomatic:
+    input: test/fastq/plex2_R1.fastq.gz, test/fastq/plex2_R2.fastq.gz
+    output: test/processed-fastq/plex2_proc_R1.fastq.gz, test/unpaired-fastq/plex2_unpr_R1.fastq.gz, test/processed-fastq/plex2_proc_R2.fastq.gz, test/unpaired-fastq/plex2_unpr_R2.fastq.gz
+    log: test/logs/trimmomatic_trimlog_plex2.log, test/logs/trimmomatic_plex2.log
+    jobid: 1
+    wildcards: read_id=plex2
+    resources: tmpdir=/tmp
+
+
+        trimmomatic PE                     -threads 4                     -trimlog test/logs/trimmomatic_trimlog_plex2.log                     test/fastq/plex2_R1.fastq.gz test/fastq/plex2_R2.fastq.gz                     test/processed-fastq/plex2_proc_R1.fastq.gz test/unpaired-fastq/plex2_unpr_R1.fastq.gz                     test/processed-fastq/plex2_proc_R2.fastq.gz test/unpaired-fastq/plex2_unpr_R2.fastq.gz                     ILLUMINACLIP:test/inputs/TruSeq3-PE.fa:2:30:10                     LEADING:10 TRAILING:10 MAXINFO:50:0.97 MINLEN:20 &> test/logs/trimmomatic_plex2.log
+        
+ singularity  exec --home /home/jeszyman/repos/cfdna-wgs --bind /home/jeszyman:/home/jeszyman --bind /mnt:/mnt --bind /opt/miniconda3/envs/snakemake/lib/python3.9/site-packages:/mnt/snakemake /home/jeszyman/sing_containers/biotools.sif bash -c 'trimmomatic PE                     -threads 4                     -trimlog test/logs/trimmomatic_trimlog_plex2.log                     test/fastq/plex2_R1.fastq.gz test/fastq/plex2_R2.fastq.gz                     test/processed-fastq/plex2_proc_R1.fastq.gz test/unpaired-fastq/plex2_unpr_R1.fastq.gz                     test/processed-fastq/plex2_proc_R2.fastq.gz test/unpaired-fastq/plex2_unpr_R2.fastq.gz                     ILLUMINACLIP:test/inputs/TruSeq3-PE.fa:2:30:10                     LEADING:10 TRAILING:10 MAXINFO:50:0.97 MINLEN:20 &> test/logs/trimmomatic_plex2.log'
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+
+[Tue May 31 11:05:47 2022]
+rule trimmomatic:
+    input: test/fastq/plex1_R1.fastq.gz, test/fastq/plex1_R2.fastq.gz
+    output: test/processed-fastq/plex1_proc_R1.fastq.gz, test/unpaired-fastq/plex1_unpr_R1.fastq.gz, test/processed-fastq/plex1_proc_R2.fastq.gz, test/unpaired-fastq/plex1_unpr_R2.fastq.gz
+    log: test/logs/trimmomatic_trimlog_plex1.log, test/logs/trimmomatic_plex1.log
+    jobid: 2
+    wildcards: read_id=plex1
+    resources: tmpdir=/tmp
+
+
+        trimmomatic PE                     -threads 4                     -trimlog test/logs/trimmomatic_trimlog_plex1.log                     test/fastq/plex1_R1.fastq.gz test/fastq/plex1_R2.fastq.gz                     test/processed-fastq/plex1_proc_R1.fastq.gz test/unpaired-fastq/plex1_unpr_R1.fastq.gz                     test/processed-fastq/plex1_proc_R2.fastq.gz test/unpaired-fastq/plex1_unpr_R2.fastq.gz                     ILLUMINACLIP:test/inputs/TruSeq3-PE.fa:2:30:10                     LEADING:10 TRAILING:10 MAXINFO:50:0.97 MINLEN:20 &> test/logs/trimmomatic_plex1.log
+        
+ singularity  exec --home /home/jeszyman/repos/cfdna-wgs --bind /home/jeszyman:/home/jeszyman --bind /mnt:/mnt --bind /opt/miniconda3/envs/snakemake/lib/python3.9/site-packages:/mnt/snakemake /home/jeszyman/sing_containers/biotools.sif bash -c 'trimmomatic PE                     -threads 4                     -trimlog test/logs/trimmomatic_trimlog_plex1.log                     test/fastq/plex1_R1.fastq.gz test/fastq/plex1_R2.fastq.gz                     test/processed-fastq/plex1_proc_R1.fastq.gz test/unpaired-fastq/plex1_unpr_R1.fastq.gz                     test/processed-fastq/plex1_proc_R2.fastq.gz test/unpaired-fastq/plex1_unpr_R2.fastq.gz                     ILLUMINACLIP:test/inputs/TruSeq3-PE.fa:2:30:10                     LEADING:10 TRAILING:10 MAXINFO:50:0.97 MINLEN:20 &> test/logs/trimmomatic_plex1.log'
+
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+[Tue May 31 11:05:47 2022]
+rule trimmomatic:
+    input: test/fastq/mpnst2_R1.fastq.gz, test/fastq/mpnst2_R2.fastq.gz
+    output: test/processed-fastq/mpnst2_proc_R1.fastq.gz, test/unpaired-fastq/mpnst2_unpr_R1.fastq.gz, test/processed-fastq/mpnst2_proc_R2.fastq.gz, test/unpaired-fastq/mpnst2_unpr_R2.fastq.gz
+    log: test/logs/trimmomatic_trimlog_mpnst2.log, test/logs/trimmomatic_mpnst2.log
+    jobid: 4
+    wildcards: read_id=mpnst2
+    resources: tmpdir=/tmp
+
+
+        trimmomatic PE                     -threads 4                     -trimlog test/logs/trimmomatic_trimlog_mpnst2.log                     test/fastq/mpnst2_R1.fastq.gz test/fastq/mpnst2_R2.fastq.gz                     test/processed-fastq/mpnst2_proc_R1.fastq.gz test/unpaired-fastq/mpnst2_unpr_R1.fastq.gz                     test/processed-fastq/mpnst2_proc_R2.fastq.gz test/unpaired-fastq/mpnst2_unpr_R2.fastq.gz                     ILLUMINACLIP:test/inputs/TruSeq3-PE.fa:2:30:10                     LEADING:10 TRAILING:10 MAXINFO:50:0.97 MINLEN:20 &> test/logs/trimmomatic_mpnst2.log
+        
+ singularity  exec --home /home/jeszyman/repos/cfdna-wgs --bind /home/jeszyman:/home/jeszyman --bind /mnt:/mnt --bind /opt/miniconda3/envs/snakemake/lib/python3.9/site-packages:/mnt/snakemake /home/jeszyman/sing_containers/biotools.sif bash -c 'trimmomatic PE                     -threads 4                     -trimlog test/logs/trimmomatic_trimlog_mpnst2.log                     test/fastq/mpnst2_R1.fastq.gz test/fastq/mpnst2_R2.fastq.gz                     test/processed-fastq/mpnst2_proc_R1.fastq.gz test/unpaired-fastq/mpnst2_unpr_R1.fastq.gz                     test/processed-fastq/mpnst2_proc_R2.fastq.gz test/unpaired-fastq/mpnst2_unpr_R2.fastq.gz                     ILLUMINACLIP:test/inputs/TruSeq3-PE.fa:2:30:10                     LEADING:10 TRAILING:10 MAXINFO:50:0.97 MINLEN:20 &> test/logs/trimmomatic_mpnst2.log'
+
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+[Tue May 31 11:05:47 2022]
+rule trimmomatic:
+    input: test/fastq/mpnst1_R1.fastq.gz, test/fastq/mpnst1_R2.fastq.gz
+    output: test/processed-fastq/mpnst1_proc_R1.fastq.gz, test/unpaired-fastq/mpnst1_unpr_R1.fastq.gz, test/processed-fastq/mpnst1_proc_R2.fastq.gz, test/unpaired-fastq/mpnst1_unpr_R2.fastq.gz
+    log: test/logs/trimmomatic_trimlog_mpnst1.log, test/logs/trimmomatic_mpnst1.log
+    jobid: 3
+    wildcards: read_id=mpnst1
+    resources: tmpdir=/tmp
+
+
+        trimmomatic PE                     -threads 4                     -trimlog test/logs/trimmomatic_trimlog_mpnst1.log                     test/fastq/mpnst1_R1.fastq.gz test/fastq/mpnst1_R2.fastq.gz                     test/processed-fastq/mpnst1_proc_R1.fastq.gz test/unpaired-fastq/mpnst1_unpr_R1.fastq.gz                     test/processed-fastq/mpnst1_proc_R2.fastq.gz test/unpaired-fastq/mpnst1_unpr_R2.fastq.gz                     ILLUMINACLIP:test/inputs/TruSeq3-PE.fa:2:30:10                     LEADING:10 TRAILING:10 MAXINFO:50:0.97 MINLEN:20 &> test/logs/trimmomatic_mpnst1.log
+        
+ singularity  exec --home /home/jeszyman/repos/cfdna-wgs --bind /home/jeszyman:/home/jeszyman --bind /mnt:/mnt --bind /opt/miniconda3/envs/snakemake/lib/python3.9/site-packages:/mnt/snakemake /home/jeszyman/sing_containers/biotools.sif bash -c 'trimmomatic PE                     -threads 4                     -trimlog test/logs/trimmomatic_trimlog_mpnst1.log                     test/fastq/mpnst1_R1.fastq.gz test/fastq/mpnst1_R2.fastq.gz                     test/processed-fastq/mpnst1_proc_R1.fastq.gz test/unpaired-fastq/mpnst1_unpr_R1.fastq.gz                     test/processed-fastq/mpnst1_proc_R2.fastq.gz test/unpaired-fastq/mpnst1_unpr_R2.fastq.gz                     ILLUMINACLIP:test/inputs/TruSeq3-PE.fa:2:30:10                     LEADING:10 TRAILING:10 MAXINFO:50:0.97 MINLEN:20 &> test/logs/trimmomatic_mpnst1.log'
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+[Tue May 31 11:05:51 2022]
+Finished job 4.
+1 of 30 steps (3%) done
+Resources before job selection: {'_cores': 1, '_nodes': 9223372036854775804}
+Ready jobs (3):
+	fastqc
+	align
+	fastqc
+Select jobs to execute...
+Selected jobs (1):
+	fastqc
+Resources after job selection: {'_cores': 0, '_nodes': 9223372036854775803}
+
+[Tue May 31 11:05:51 2022]
+rule fastqc:
+    input: test/fastq/mpnst2_R1.fastq.gz, test/processed-fastq/mpnst2_proc_R1.fastq.gz
+    output: test/qc/mpnst2_R1_fastqc.html, test/qc/mpnst2_proc_R1_fastqc.html
+    log: test/logs/fastqc_raw_mpnst2_R1.log, test/logs/fastqc_proc_mpnst2_R1.log
+    jobid: 15
+    wildcards: read_id=mpnst2, read=R1
+    resources: tmpdir=/tmp
+
+
+        fastqc --outdir test/qc         --quiet         --threads 4 test/fastq/mpnst2_R1.fastq.gz &> test/logs/fastqc_raw_mpnst2_R1.log test/logs/fastqc_proc_mpnst2_R1.log
+        fastqc --outdir test/qc         --quiet         --threads 4 test/processed-fastq/mpnst2_proc_R1.fastq.gz &> test/logs/fastqc_raw_mpnst2_R1.log test/logs/fastqc_proc_mpnst2_R1.log
+        
+ singularity  exec --home /home/jeszyman/repos/cfdna-wgs --bind /home/jeszyman:/home/jeszyman --bind /mnt:/mnt --bind /opt/miniconda3/envs/snakemake/lib/python3.9/site-packages:/mnt/snakemake /home/jeszyman/sing_containers/biotools.sif bash -c 'fastqc --outdir test/qc         --quiet         --threads 4 test/fastq/mpnst2_R1.fastq.gz &> test/logs/fastqc_raw_mpnst2_R1.log test/logs/fastqc_proc_mpnst2_R1.log
+        fastqc --outdir test/qc         --quiet         --threads 4 test/processed-fastq/mpnst2_proc_R1.fastq.gz &> test/logs/fastqc_raw_mpnst2_R1.log test/logs/fastqc_proc_mpnst2_R1.log'
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+[Tue May 31 11:05:51 2022]
+Finished job 3.
+2 of 30 steps (7%) done
+Resources before job selection: {'_cores': 1, '_nodes': 9223372036854775804}
+Ready jobs (5):
+	align
+	fastqc
+	fastqc
+	align
+	fastqc
+Select jobs to execute...
+Selected jobs (1):
+	fastqc
+Resources after job selection: {'_cores': 0, '_nodes': 9223372036854775803}
+
+[Tue May 31 11:05:51 2022]
+rule fastqc:
+    input: test/fastq/mpnst1_R2.fastq.gz, test/processed-fastq/mpnst1_proc_R2.fastq.gz
+    output: test/qc/mpnst1_R2_fastqc.html, test/qc/mpnst1_proc_R2_fastqc.html
+    log: test/logs/fastqc_raw_mpnst1_R2.log, test/logs/fastqc_proc_mpnst1_R2.log
+    jobid: 14
+    wildcards: read_id=mpnst1, read=R2
+    resources: tmpdir=/tmp
+
+
+        fastqc --outdir test/qc         --quiet         --threads 4 test/fastq/mpnst1_R2.fastq.gz &> test/logs/fastqc_raw_mpnst1_R2.log test/logs/fastqc_proc_mpnst1_R2.log
+        fastqc --outdir test/qc         --quiet         --threads 4 test/processed-fastq/mpnst1_proc_R2.fastq.gz &> test/logs/fastqc_raw_mpnst1_R2.log test/logs/fastqc_proc_mpnst1_R2.log
+        
+ singularity  exec --home /home/jeszyman/repos/cfdna-wgs --bind /home/jeszyman:/home/jeszyman --bind /mnt:/mnt --bind /opt/miniconda3/envs/snakemake/lib/python3.9/site-packages:/mnt/snakemake /home/jeszyman/sing_containers/biotools.sif bash -c 'fastqc --outdir test/qc         --quiet         --threads 4 test/fastq/mpnst1_R2.fastq.gz &> test/logs/fastqc_raw_mpnst1_R2.log test/logs/fastqc_proc_mpnst1_R2.log
+        fastqc --outdir test/qc         --quiet         --threads 4 test/processed-fastq/mpnst1_proc_R2.fastq.gz &> test/logs/fastqc_raw_mpnst1_R2.log test/logs/fastqc_proc_mpnst1_R2.log'
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+[Tue May 31 11:05:51 2022]
+Finished job 2.
+3 of 30 steps (10%) done
+Resources before job selection: {'_cores': 1, '_nodes': 9223372036854775804}
+Ready jobs (7):
+	align
+	align
+	fastqc
+	fastqc
+	fastqc
+	align
+	fastqc
+Select jobs to execute...
+Selected jobs (1):
+	fastqc
+Resources after job selection: {'_cores': 0, '_nodes': 9223372036854775803}
+
+[Tue May 31 11:05:51 2022]
+rule fastqc:
+    input: test/fastq/plex1_R2.fastq.gz, test/processed-fastq/plex1_proc_R2.fastq.gz
+    output: test/qc/plex1_R2_fastqc.html, test/qc/plex1_proc_R2_fastqc.html
+    log: test/logs/fastqc_raw_plex1_R2.log, test/logs/fastqc_proc_plex1_R2.log
+    jobid: 12
+    wildcards: read_id=plex1, read=R2
+    resources: tmpdir=/tmp
+
+
+        fastqc --outdir test/qc         --quiet         --threads 4 test/fastq/plex1_R2.fastq.gz &> test/logs/fastqc_raw_plex1_R2.log test/logs/fastqc_proc_plex1_R2.log
+        fastqc --outdir test/qc         --quiet         --threads 4 test/processed-fastq/plex1_proc_R2.fastq.gz &> test/logs/fastqc_raw_plex1_R2.log test/logs/fastqc_proc_plex1_R2.log
+        
+ singularity  exec --home /home/jeszyman/repos/cfdna-wgs --bind /home/jeszyman:/home/jeszyman --bind /mnt:/mnt --bind /opt/miniconda3/envs/snakemake/lib/python3.9/site-packages:/mnt/snakemake /home/jeszyman/sing_containers/biotools.sif bash -c 'fastqc --outdir test/qc         --quiet         --threads 4 test/fastq/plex1_R2.fastq.gz &> test/logs/fastqc_raw_plex1_R2.log test/logs/fastqc_proc_plex1_R2.log
+        fastqc --outdir test/qc         --quiet         --threads 4 test/processed-fastq/plex1_proc_R2.fastq.gz &> test/logs/fastqc_raw_plex1_R2.log test/logs/fastqc_proc_plex1_R2.log'
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+[Tue May 31 11:05:52 2022]
+Finished job 1.
+4 of 30 steps (13%) done
+Resources before job selection: {'_cores': 1, '_nodes': 9223372036854775804}
+Ready jobs (9):
+	align
+	align
+	fastqc
+	fastqc
+	fastqc
+	fastqc
+	align
+	align
+	fastqc
+Select jobs to execute...
+Selected jobs (1):
+	fastqc
+Resources after job selection: {'_cores': 0, '_nodes': 9223372036854775803}
+
+[Tue May 31 11:05:52 2022]
+rule fastqc:
+    input: test/fastq/plex2_R2.fastq.gz, test/processed-fastq/plex2_proc_R2.fastq.gz
+    output: test/qc/plex2_R2_fastqc.html, test/qc/plex2_proc_R2_fastqc.html
+    log: test/logs/fastqc_raw_plex2_R2.log, test/logs/fastqc_proc_plex2_R2.log
+    jobid: 10
+    wildcards: read_id=plex2, read=R2
+    resources: tmpdir=/tmp
+
+
+        fastqc --outdir test/qc         --quiet         --threads 4 test/fastq/plex2_R2.fastq.gz &> test/logs/fastqc_raw_plex2_R2.log test/logs/fastqc_proc_plex2_R2.log
+        fastqc --outdir test/qc         --quiet         --threads 4 test/processed-fastq/plex2_proc_R2.fastq.gz &> test/logs/fastqc_raw_plex2_R2.log test/logs/fastqc_proc_plex2_R2.log
+        
+ singularity  exec --home /home/jeszyman/repos/cfdna-wgs --bind /home/jeszyman:/home/jeszyman --bind /mnt:/mnt --bind /opt/miniconda3/envs/snakemake/lib/python3.9/site-packages:/mnt/snakemake /home/jeszyman/sing_containers/biotools.sif bash -c 'fastqc --outdir test/qc         --quiet         --threads 4 test/fastq/plex2_R2.fastq.gz &> test/logs/fastqc_raw_plex2_R2.log test/logs/fastqc_proc_plex2_R2.log
+        fastqc --outdir test/qc         --quiet         --threads 4 test/processed-fastq/plex2_proc_R2.fastq.gz &> test/logs/fastqc_raw_plex2_R2.log test/logs/fastqc_proc_plex2_R2.log'
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+[Tue May 31 11:05:58 2022]
+Finished job 15.
+5 of 30 steps (17%) done
+Resources before job selection: {'_cores': 1, '_nodes': 9223372036854775804}
+Ready jobs (8):
+	align
+	align
+	fastqc
+	fastqc
+	fastqc
+	fastqc
+	align
+	align
+Select jobs to execute...
+Selected jobs (1):
+	align
+Resources after job selection: {'_cores': 0, '_nodes': 9223372036854775803}
+
+[Tue May 31 11:05:58 2022]
+rule align:
+    input: test/processed-fastq/plex2_proc_R1.fastq.gz, test/processed-fastq/plex2_proc_R2.fastq.gz
+    output: test/bam/plex2.sam
+    log: test/logs/align_plex2.log
+    jobid: 5
+    wildcards: read_id=plex2
+    resources: tmpdir=/tmp
+
+
+        bwa mem -M -t 4 test/ref/chr8 test/processed-fastq/plex2_proc_R1.fastq.gz test/processed-fastq/plex2_proc_R2.fastq.gz > test/bam/plex2.sam
+	
+ singularity  exec --home /home/jeszyman/repos/cfdna-wgs --bind /home/jeszyman:/home/jeszyman --bind /mnt:/mnt --bind /opt/miniconda3/envs/snakemake/lib/python3.9/site-packages:/mnt/snakemake /home/jeszyman/sing_containers/biotools.sif bash -c 'bwa mem -M -t 4 test/ref/chr8 test/processed-fastq/plex2_proc_R1.fastq.gz test/processed-fastq/plex2_proc_R2.fastq.gz > test/bam/plex2.sam'
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+[Tue May 31 11:05:58 2022]
+Finished job 12.
+6 of 30 steps (20%) done
+Resources before job selection: {'_cores': 1, '_nodes': 9223372036854775804}
+Ready jobs (7):
+	align
+	align
+	fastqc
+	fastqc
+	fastqc
+	fastqc
+	align
+Select jobs to execute...
+Selected jobs (1):
+	align
+Resources after job selection: {'_cores': 0, '_nodes': 9223372036854775803}
+
+[Tue May 31 11:05:58 2022]
+rule align:
+    input: test/processed-fastq/mpnst1_proc_R1.fastq.gz, test/processed-fastq/mpnst1_proc_R2.fastq.gz
+    output: test/bam/mpnst1.sam
+    log: test/logs/align_mpnst1.log
+    jobid: 7
+    wildcards: read_id=mpnst1
+    resources: tmpdir=/tmp
+
+
+        bwa mem -M -t 4 test/ref/chr8 test/processed-fastq/mpnst1_proc_R1.fastq.gz test/processed-fastq/mpnst1_proc_R2.fastq.gz > test/bam/mpnst1.sam
+	
+ singularity  exec --home /home/jeszyman/repos/cfdna-wgs --bind /home/jeszyman:/home/jeszyman --bind /mnt:/mnt --bind /opt/miniconda3/envs/snakemake/lib/python3.9/site-packages:/mnt/snakemake /home/jeszyman/sing_containers/biotools.sif bash -c 'bwa mem -M -t 4 test/ref/chr8 test/processed-fastq/mpnst1_proc_R1.fastq.gz test/processed-fastq/mpnst1_proc_R2.fastq.gz > test/bam/mpnst1.sam'
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+[Tue May 31 11:05:58 2022]
+Finished job 14.
+7 of 30 steps (23%) done
+Resources before job selection: {'_cores': 1, '_nodes': 9223372036854775804}
+Ready jobs (6):
+	align
+	align
+	fastqc
+	fastqc
+	fastqc
+	fastqc
+Select jobs to execute...
+Selected jobs (1):
+	fastqc
+Resources after job selection: {'_cores': 0, '_nodes': 9223372036854775803}
+
+[Tue May 31 11:05:58 2022]
+rule fastqc:
+    input: test/fastq/mpnst2_R2.fastq.gz, test/processed-fastq/mpnst2_proc_R2.fastq.gz
+    output: test/qc/mpnst2_R2_fastqc.html, test/qc/mpnst2_proc_R2_fastqc.html
+    log: test/logs/fastqc_raw_mpnst2_R2.log, test/logs/fastqc_proc_mpnst2_R2.log
+    jobid: 16
+    wildcards: read_id=mpnst2, read=R2
+    resources: tmpdir=/tmp
+
+
+        fastqc --outdir test/qc         --quiet         --threads 4 test/fastq/mpnst2_R2.fastq.gz &> test/logs/fastqc_raw_mpnst2_R2.log test/logs/fastqc_proc_mpnst2_R2.log
+        fastqc --outdir test/qc         --quiet         --threads 4 test/processed-fastq/mpnst2_proc_R2.fastq.gz &> test/logs/fastqc_raw_mpnst2_R2.log test/logs/fastqc_proc_mpnst2_R2.log
+        
+ singularity  exec --home /home/jeszyman/repos/cfdna-wgs --bind /home/jeszyman:/home/jeszyman --bind /mnt:/mnt --bind /opt/miniconda3/envs/snakemake/lib/python3.9/site-packages:/mnt/snakemake /home/jeszyman/sing_containers/biotools.sif bash -c 'fastqc --outdir test/qc         --quiet         --threads 4 test/fastq/mpnst2_R2.fastq.gz &> test/logs/fastqc_raw_mpnst2_R2.log test/logs/fastqc_proc_mpnst2_R2.log
+        fastqc --outdir test/qc         --quiet         --threads 4 test/processed-fastq/mpnst2_proc_R2.fastq.gz &> test/logs/fastqc_raw_mpnst2_R2.log test/logs/fastqc_proc_mpnst2_R2.log'
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+[Tue May 31 11:05:59 2022]
+Finished job 10.
+8 of 30 steps (27%) done
+Resources before job selection: {'_cores': 1, '_nodes': 9223372036854775804}
+Ready jobs (5):
+	align
+	align
+	fastqc
+	fastqc
+	fastqc
+Select jobs to execute...
+Selected jobs (1):
+	fastqc
+Resources after job selection: {'_cores': 0, '_nodes': 9223372036854775803}
+
+[Tue May 31 11:05:59 2022]
+rule fastqc:
+    input: test/fastq/mpnst1_R1.fastq.gz, test/processed-fastq/mpnst1_proc_R1.fastq.gz
+    output: test/qc/mpnst1_R1_fastqc.html, test/qc/mpnst1_proc_R1_fastqc.html
+    log: test/logs/fastqc_raw_mpnst1_R1.log, test/logs/fastqc_proc_mpnst1_R1.log
+    jobid: 13
+    wildcards: read_id=mpnst1, read=R1
+    resources: tmpdir=/tmp
+
+
+        fastqc --outdir test/qc         --quiet         --threads 4 test/fastq/mpnst1_R1.fastq.gz &> test/logs/fastqc_raw_mpnst1_R1.log test/logs/fastqc_proc_mpnst1_R1.log
+        fastqc --outdir test/qc         --quiet         --threads 4 test/processed-fastq/mpnst1_proc_R1.fastq.gz &> test/logs/fastqc_raw_mpnst1_R1.log test/logs/fastqc_proc_mpnst1_R1.log
+        
+ singularity  exec --home /home/jeszyman/repos/cfdna-wgs --bind /home/jeszyman:/home/jeszyman --bind /mnt:/mnt --bind /opt/miniconda3/envs/snakemake/lib/python3.9/site-packages:/mnt/snakemake /home/jeszyman/sing_containers/biotools.sif bash -c 'fastqc --outdir test/qc         --quiet         --threads 4 test/fastq/mpnst1_R1.fastq.gz &> test/logs/fastqc_raw_mpnst1_R1.log test/logs/fastqc_proc_mpnst1_R1.log
+        fastqc --outdir test/qc         --quiet         --threads 4 test/processed-fastq/mpnst1_proc_R1.fastq.gz &> test/logs/fastqc_raw_mpnst1_R1.log test/logs/fastqc_proc_mpnst1_R1.log'
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+[Tue May 31 11:05:59 2022]
+Finished job 5.
+9 of 30 steps (30%) done
+Resources before job selection: {'_cores': 1, '_nodes': 9223372036854775804}
+Ready jobs (5):
+	alignment_processing
+	align
+	align
+	fastqc
+	fastqc
+Select jobs to execute...
+Selected jobs (1):
+	fastqc
+Resources after job selection: {'_cores': 0, '_nodes': 9223372036854775803}
+
+[Tue May 31 11:05:59 2022]
+rule fastqc:
+    input: test/fastq/plex1_R1.fastq.gz, test/processed-fastq/plex1_proc_R1.fastq.gz
+    output: test/qc/plex1_R1_fastqc.html, test/qc/plex1_proc_R1_fastqc.html
+    log: test/logs/fastqc_raw_plex1_R1.log, test/logs/fastqc_proc_plex1_R1.log
+    jobid: 11
+    wildcards: read_id=plex1, read=R1
+    resources: tmpdir=/tmp
+
+
+        fastqc --outdir test/qc         --quiet         --threads 4 test/fastq/plex1_R1.fastq.gz &> test/logs/fastqc_raw_plex1_R1.log test/logs/fastqc_proc_plex1_R1.log
+        fastqc --outdir test/qc         --quiet         --threads 4 test/processed-fastq/plex1_proc_R1.fastq.gz &> test/logs/fastqc_raw_plex1_R1.log test/logs/fastqc_proc_plex1_R1.log
+        
+ singularity  exec --home /home/jeszyman/repos/cfdna-wgs --bind /home/jeszyman:/home/jeszyman --bind /mnt:/mnt --bind /opt/miniconda3/envs/snakemake/lib/python3.9/site-packages:/mnt/snakemake /home/jeszyman/sing_containers/biotools.sif bash -c 'fastqc --outdir test/qc         --quiet         --threads 4 test/fastq/plex1_R1.fastq.gz &> test/logs/fastqc_raw_plex1_R1.log test/logs/fastqc_proc_plex1_R1.log
+        fastqc --outdir test/qc         --quiet         --threads 4 test/processed-fastq/plex1_proc_R1.fastq.gz &> test/logs/fastqc_raw_plex1_R1.log test/logs/fastqc_proc_plex1_R1.log'
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+[Tue May 31 11:06:01 2022]
+Finished job 7.
+10 of 30 steps (33%) done
+Resources before job selection: {'_cores': 1, '_nodes': 9223372036854775804}
+Ready jobs (5):
+	alignment_processing
+	alignment_processing
+	align
+	align
+	fastqc
+Select jobs to execute...
+Selected jobs (1):
+	fastqc
+Resources after job selection: {'_cores': 0, '_nodes': 9223372036854775803}
+
+[Tue May 31 11:06:01 2022]
+rule fastqc:
+    input: test/fastq/plex2_R1.fastq.gz, test/processed-fastq/plex2_proc_R1.fastq.gz
+    output: test/qc/plex2_R1_fastqc.html, test/qc/plex2_proc_R1_fastqc.html
+    log: test/logs/fastqc_raw_plex2_R1.log, test/logs/fastqc_proc_plex2_R1.log
+    jobid: 9
+    wildcards: read_id=plex2, read=R1
+    resources: tmpdir=/tmp
+
+
+        fastqc --outdir test/qc         --quiet         --threads 4 test/fastq/plex2_R1.fastq.gz &> test/logs/fastqc_raw_plex2_R1.log test/logs/fastqc_proc_plex2_R1.log
+        fastqc --outdir test/qc         --quiet         --threads 4 test/processed-fastq/plex2_proc_R1.fastq.gz &> test/logs/fastqc_raw_plex2_R1.log test/logs/fastqc_proc_plex2_R1.log
+        
+ singularity  exec --home /home/jeszyman/repos/cfdna-wgs --bind /home/jeszyman:/home/jeszyman --bind /mnt:/mnt --bind /opt/miniconda3/envs/snakemake/lib/python3.9/site-packages:/mnt/snakemake /home/jeszyman/sing_containers/biotools.sif bash -c 'fastqc --outdir test/qc         --quiet         --threads 4 test/fastq/plex2_R1.fastq.gz &> test/logs/fastqc_raw_plex2_R1.log test/logs/fastqc_proc_plex2_R1.log
+        fastqc --outdir test/qc         --quiet         --threads 4 test/processed-fastq/plex2_proc_R1.fastq.gz &> test/logs/fastqc_raw_plex2_R1.log test/logs/fastqc_proc_plex2_R1.log'
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+[Tue May 31 11:06:06 2022]
+Finished job 16.
+11 of 30 steps (37%) done
+Resources before job selection: {'_cores': 1, '_nodes': 9223372036854775804}
+Ready jobs (4):
+	alignment_processing
+	alignment_processing
+	align
+	align
+Select jobs to execute...
+Selected jobs (1):
+	align
+Resources after job selection: {'_cores': 0, '_nodes': 9223372036854775803}
+
+[Tue May 31 11:06:06 2022]
+rule align:
+    input: test/processed-fastq/mpnst2_proc_R1.fastq.gz, test/processed-fastq/mpnst2_proc_R2.fastq.gz
+    output: test/bam/mpnst2.sam
+    log: test/logs/align_mpnst2.log
+    jobid: 8
+    wildcards: read_id=mpnst2
+    resources: tmpdir=/tmp
+
+
+        bwa mem -M -t 4 test/ref/chr8 test/processed-fastq/mpnst2_proc_R1.fastq.gz test/processed-fastq/mpnst2_proc_R2.fastq.gz > test/bam/mpnst2.sam
+	
+ singularity  exec --home /home/jeszyman/repos/cfdna-wgs --bind /home/jeszyman:/home/jeszyman --bind /mnt:/mnt --bind /opt/miniconda3/envs/snakemake/lib/python3.9/site-packages:/mnt/snakemake /home/jeszyman/sing_containers/biotools.sif bash -c 'bwa mem -M -t 4 test/ref/chr8 test/processed-fastq/mpnst2_proc_R1.fastq.gz test/processed-fastq/mpnst2_proc_R2.fastq.gz > test/bam/mpnst2.sam'
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+[Tue May 31 11:06:06 2022]
+Finished job 13.
+12 of 30 steps (40%) done
+Resources before job selection: {'_cores': 1, '_nodes': 9223372036854775804}
+Ready jobs (3):
+	alignment_processing
+	alignment_processing
+	align
+Select jobs to execute...
+Selected jobs (1):
+	align
+Resources after job selection: {'_cores': 0, '_nodes': 9223372036854775803}
+
+[Tue May 31 11:06:06 2022]
+rule align:
+    input: test/processed-fastq/plex1_proc_R1.fastq.gz, test/processed-fastq/plex1_proc_R2.fastq.gz
+    output: test/bam/plex1.sam
+    log: test/logs/align_plex1.log
+    jobid: 6
+    wildcards: read_id=plex1
+    resources: tmpdir=/tmp
+
+
+        bwa mem -M -t 4 test/ref/chr8 test/processed-fastq/plex1_proc_R1.fastq.gz test/processed-fastq/plex1_proc_R2.fastq.gz > test/bam/plex1.sam
+	
+ singularity  exec --home /home/jeszyman/repos/cfdna-wgs --bind /home/jeszyman:/home/jeszyman --bind /mnt:/mnt --bind /opt/miniconda3/envs/snakemake/lib/python3.9/site-packages:/mnt/snakemake /home/jeszyman/sing_containers/biotools.sif bash -c 'bwa mem -M -t 4 test/ref/chr8 test/processed-fastq/plex1_proc_R1.fastq.gz test/processed-fastq/plex1_proc_R2.fastq.gz > test/bam/plex1.sam'
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+[Tue May 31 11:06:07 2022]
+Finished job 8.
+13 of 30 steps (43%) done
+Resources before job selection: {'_cores': 1, '_nodes': 9223372036854775804}
+Ready jobs (3):
+	alignment_processing
+	alignment_processing
+	alignment_processing
+Select jobs to execute...
+Selected jobs (1):
+	alignment_processing
+Resources after job selection: {'_cores': 0, '_nodes': 9223372036854775803}
+
+[Tue May 31 11:06:07 2022]
+rule alignment_processing:
+    input: test/bam/plex2.sam
+    output: test/bam/plex2_raw.bam, test/bam/plex2_dedup_unsort.bam, test/bam/plex2_dedup.bam, test/bam/plex2_dedup.bam.bai
+    log: test/logs/alignment_processing_plex2.log
+    jobid: 17
+    wildcards: read_id=plex2
+    resources: tmpdir=/tmp
+
+
+        sambamba view -t 4 -S -f bam test/bam/plex2.sam > test/bam/plex2_raw.bam
+        sambamba markdup -r -t 4 test/bam/plex2_raw.bam test/bam/plex2_dedup_unsort.bam
+        sambamba sort -t 4 test/bam/plex2_dedup_unsort.bam -o test/bam/plex2_dedup.bam
+        sambamba index -t 4 test/bam/plex2_dedup.bam
+        
+ singularity  exec --home /home/jeszyman/repos/cfdna-wgs --bind /home/jeszyman:/home/jeszyman --bind /mnt:/mnt --bind /opt/miniconda3/envs/snakemake/lib/python3.9/site-packages:/mnt/snakemake /home/jeszyman/sing_containers/biotools.sif bash -c 'sambamba view -t 4 -S -f bam test/bam/plex2.sam > test/bam/plex2_raw.bam
+        sambamba markdup -r -t 4 test/bam/plex2_raw.bam test/bam/plex2_dedup_unsort.bam
+        sambamba sort -t 4 test/bam/plex2_dedup_unsort.bam -o test/bam/plex2_dedup.bam
+        sambamba index -t 4 test/bam/plex2_dedup.bam'
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+[Tue May 31 11:06:07 2022]
+Finished job 11.
+14 of 30 steps (47%) done
+Resources before job selection: {'_cores': 1, '_nodes': 9223372036854775804}
+Ready jobs (2):
+	alignment_processing
+	alignment_processing
+Select jobs to execute...
+Selected jobs (1):
+	alignment_processing
+Resources after job selection: {'_cores': 0, '_nodes': 9223372036854775803}
+
+[Tue May 31 11:06:07 2022]
+rule alignment_processing:
+    input: test/bam/mpnst2.sam
+    output: test/bam/mpnst2_raw.bam, test/bam/mpnst2_dedup_unsort.bam, test/bam/mpnst2_dedup.bam, test/bam/mpnst2_dedup.bam.bai
+    log: test/logs/alignment_processing_mpnst2.log
+    jobid: 20
+    wildcards: read_id=mpnst2
+    resources: tmpdir=/tmp
+
+
+        sambamba view -t 4 -S -f bam test/bam/mpnst2.sam > test/bam/mpnst2_raw.bam
+        sambamba markdup -r -t 4 test/bam/mpnst2_raw.bam test/bam/mpnst2_dedup_unsort.bam
+        sambamba sort -t 4 test/bam/mpnst2_dedup_unsort.bam -o test/bam/mpnst2_dedup.bam
+        sambamba index -t 4 test/bam/mpnst2_dedup.bam
+        
+ singularity  exec --home /home/jeszyman/repos/cfdna-wgs --bind /home/jeszyman:/home/jeszyman --bind /mnt:/mnt --bind /opt/miniconda3/envs/snakemake/lib/python3.9/site-packages:/mnt/snakemake /home/jeszyman/sing_containers/biotools.sif bash -c 'sambamba view -t 4 -S -f bam test/bam/mpnst2.sam > test/bam/mpnst2_raw.bam
+        sambamba markdup -r -t 4 test/bam/mpnst2_raw.bam test/bam/mpnst2_dedup_unsort.bam
+        sambamba sort -t 4 test/bam/mpnst2_dedup_unsort.bam -o test/bam/mpnst2_dedup.bam
+        sambamba index -t 4 test/bam/mpnst2_dedup.bam'
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+[Tue May 31 11:06:08 2022]
+Finished job 6.
+15 of 30 steps (50%) done
+Resources before job selection: {'_cores': 1, '_nodes': 9223372036854775804}
+Ready jobs (2):
+	alignment_processing
+	alignment_processing
+Select jobs to execute...
+Selected jobs (1):
+	alignment_processing
+Resources after job selection: {'_cores': 0, '_nodes': 9223372036854775803}
+
+[Tue May 31 11:06:08 2022]
+rule alignment_processing:
+    input: test/bam/plex1.sam
+    output: test/bam/plex1_raw.bam, test/bam/plex1_dedup_unsort.bam, test/bam/plex1_dedup.bam, test/bam/plex1_dedup.bam.bai
+    log: test/logs/alignment_processing_plex1.log
+    jobid: 18
+    wildcards: read_id=plex1
+    resources: tmpdir=/tmp
+
+
+        sambamba view -t 4 -S -f bam test/bam/plex1.sam > test/bam/plex1_raw.bam
+        sambamba markdup -r -t 4 test/bam/plex1_raw.bam test/bam/plex1_dedup_unsort.bam
+        sambamba sort -t 4 test/bam/plex1_dedup_unsort.bam -o test/bam/plex1_dedup.bam
+        sambamba index -t 4 test/bam/plex1_dedup.bam
+        
+ singularity  exec --home /home/jeszyman/repos/cfdna-wgs --bind /home/jeszyman:/home/jeszyman --bind /mnt:/mnt --bind /opt/miniconda3/envs/snakemake/lib/python3.9/site-packages:/mnt/snakemake /home/jeszyman/sing_containers/biotools.sif bash -c 'sambamba view -t 4 -S -f bam test/bam/plex1.sam > test/bam/plex1_raw.bam
+        sambamba markdup -r -t 4 test/bam/plex1_raw.bam test/bam/plex1_dedup_unsort.bam
+        sambamba sort -t 4 test/bam/plex1_dedup_unsort.bam -o test/bam/plex1_dedup.bam
+        sambamba index -t 4 test/bam/plex1_dedup.bam'
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+[Tue May 31 11:06:08 2022]
+Finished job 9.
+16 of 30 steps (53%) done
+Resources before job selection: {'_cores': 1, '_nodes': 9223372036854775804}
+Ready jobs (1):
+	alignment_processing
+Select jobs to execute...
+Selected jobs (1):
+	alignment_processing
+Resources after job selection: {'_cores': 0, '_nodes': 9223372036854775803}
+
+[Tue May 31 11:06:08 2022]
+rule alignment_processing:
+    input: test/bam/mpnst1.sam
+    output: test/bam/mpnst1_raw.bam, test/bam/mpnst1_dedup_unsort.bam, test/bam/mpnst1_dedup.bam, test/bam/mpnst1_dedup.bam.bai
+    log: test/logs/alignment_processing_mpnst1.log
+    jobid: 19
+    wildcards: read_id=mpnst1
+    resources: tmpdir=/tmp
+
+
+        sambamba view -t 4 -S -f bam test/bam/mpnst1.sam > test/bam/mpnst1_raw.bam
+        sambamba markdup -r -t 4 test/bam/mpnst1_raw.bam test/bam/mpnst1_dedup_unsort.bam
+        sambamba sort -t 4 test/bam/mpnst1_dedup_unsort.bam -o test/bam/mpnst1_dedup.bam
+        sambamba index -t 4 test/bam/mpnst1_dedup.bam
+        
+ singularity  exec --home /home/jeszyman/repos/cfdna-wgs --bind /home/jeszyman:/home/jeszyman --bind /mnt:/mnt --bind /opt/miniconda3/envs/snakemake/lib/python3.9/site-packages:/mnt/snakemake /home/jeszyman/sing_containers/biotools.sif bash -c 'sambamba view -t 4 -S -f bam test/bam/mpnst1.sam > test/bam/mpnst1_raw.bam
+        sambamba markdup -r -t 4 test/bam/mpnst1_raw.bam test/bam/mpnst1_dedup_unsort.bam
+        sambamba sort -t 4 test/bam/mpnst1_dedup_unsort.bam -o test/bam/mpnst1_dedup.bam
+        sambamba index -t 4 test/bam/mpnst1_dedup.bam'
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+Removing temporary output file test/bam/plex2_dedup_unsort.bam.
+[Tue May 31 11:06:08 2022]
+Finished job 17.
+17 of 30 steps (57%) done
+Resources before job selection: {'_cores': 1, '_nodes': 9223372036854775804}
+Ready jobs (2):
+	alignment_qc
+	alignment_qc
+Select jobs to execute...
+Selected jobs (1):
+	alignment_qc
+Resources after job selection: {'_cores': 0, '_nodes': 9223372036854775803}
+
+[Tue May 31 11:06:08 2022]
+rule alignment_qc:
+    input: test/bam/plex2_raw.bam
+    output: test/qc/plex2_raw_samstats.txt, test/qc/plex2_raw_flagstat.txt
+    jobid: 22
+    wildcards: read_id=plex2, bam_step=raw
+    resources: tmpdir=/tmp
+
+
+        samtools stats test/bam/plex2_raw.bam > test/qc/plex2_raw_samstats.txt
+        samtools flagstat test/bam/plex2_raw.bam > test/qc/plex2_raw_flagstat.txt
+        
+ singularity  exec --home /home/jeszyman/repos/cfdna-wgs --bind /home/jeszyman:/home/jeszyman --bind /mnt:/mnt --bind /opt/miniconda3/envs/snakemake/lib/python3.9/site-packages:/mnt/snakemake /home/jeszyman/sing_containers/biotools.sif bash -c 'samtools stats test/bam/plex2_raw.bam > test/qc/plex2_raw_samstats.txt
+        samtools flagstat test/bam/plex2_raw.bam > test/qc/plex2_raw_flagstat.txt'
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+Removing temporary output file test/bam/mpnst2_dedup_unsort.bam.
+[Tue May 31 11:06:08 2022]
+Finished job 20.
+18 of 30 steps (60%) done
+Resources before job selection: {'_cores': 1, '_nodes': 9223372036854775804}
+Ready jobs (3):
+	alignment_qc
+	alignment_qc
+	alignment_qc
+Select jobs to execute...
+Selected jobs (1):
+	alignment_qc
+Resources after job selection: {'_cores': 0, '_nodes': 9223372036854775803}
+
+[Tue May 31 11:06:08 2022]
+rule alignment_qc:
+    input: test/bam/mpnst2_raw.bam
+    output: test/qc/mpnst2_raw_samstats.txt, test/qc/mpnst2_raw_flagstat.txt
+    jobid: 28
+    wildcards: read_id=mpnst2, bam_step=raw
+    resources: tmpdir=/tmp
+
+
+        samtools stats test/bam/mpnst2_raw.bam > test/qc/mpnst2_raw_samstats.txt
+        samtools flagstat test/bam/mpnst2_raw.bam > test/qc/mpnst2_raw_flagstat.txt
+        
+ singularity  exec --home /home/jeszyman/repos/cfdna-wgs --bind /home/jeszyman:/home/jeszyman --bind /mnt:/mnt --bind /opt/miniconda3/envs/snakemake/lib/python3.9/site-packages:/mnt/snakemake /home/jeszyman/sing_containers/biotools.sif bash -c 'samtools stats test/bam/mpnst2_raw.bam > test/qc/mpnst2_raw_samstats.txt
+        samtools flagstat test/bam/mpnst2_raw.bam > test/qc/mpnst2_raw_flagstat.txt'
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+[Tue May 31 11:06:09 2022]
+Finished job 22.
+19 of 30 steps (63%) done
+Resources before job selection: {'_cores': 1, '_nodes': 9223372036854775804}
+Ready jobs (2):
+	alignment_qc
+	alignment_qc
+Select jobs to execute...
+Selected jobs (1):
+	alignment_qc
+Resources after job selection: {'_cores': 0, '_nodes': 9223372036854775803}
+
+[Tue May 31 11:06:09 2022]
+rule alignment_qc:
+    input: test/bam/plex2_dedup.bam
+    output: test/qc/plex2_dedup_samstats.txt, test/qc/plex2_dedup_flagstat.txt
+    jobid: 21
+    wildcards: read_id=plex2, bam_step=dedup
+    resources: tmpdir=/tmp
+
+
+        samtools stats test/bam/plex2_dedup.bam > test/qc/plex2_dedup_samstats.txt
+        samtools flagstat test/bam/plex2_dedup.bam > test/qc/plex2_dedup_flagstat.txt
+        
+ singularity  exec --home /home/jeszyman/repos/cfdna-wgs --bind /home/jeszyman:/home/jeszyman --bind /mnt:/mnt --bind /opt/miniconda3/envs/snakemake/lib/python3.9/site-packages:/mnt/snakemake /home/jeszyman/sing_containers/biotools.sif bash -c 'samtools stats test/bam/plex2_dedup.bam > test/qc/plex2_dedup_samstats.txt
+        samtools flagstat test/bam/plex2_dedup.bam > test/qc/plex2_dedup_flagstat.txt'
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+[Tue May 31 11:06:09 2022]
+Finished job 28.
+20 of 30 steps (67%) done
+Resources before job selection: {'_cores': 1, '_nodes': 9223372036854775804}
+Ready jobs (1):
+	alignment_qc
+Select jobs to execute...
+Selected jobs (1):
+	alignment_qc
+Resources after job selection: {'_cores': 0, '_nodes': 9223372036854775803}
+
+[Tue May 31 11:06:09 2022]
+rule alignment_qc:
+    input: test/bam/mpnst2_dedup.bam
+    output: test/qc/mpnst2_dedup_samstats.txt, test/qc/mpnst2_dedup_flagstat.txt
+    jobid: 27
+    wildcards: read_id=mpnst2, bam_step=dedup
+    resources: tmpdir=/tmp
+
+
+        samtools stats test/bam/mpnst2_dedup.bam > test/qc/mpnst2_dedup_samstats.txt
+        samtools flagstat test/bam/mpnst2_dedup.bam > test/qc/mpnst2_dedup_flagstat.txt
+        
+ singularity  exec --home /home/jeszyman/repos/cfdna-wgs --bind /home/jeszyman:/home/jeszyman --bind /mnt:/mnt --bind /opt/miniconda3/envs/snakemake/lib/python3.9/site-packages:/mnt/snakemake /home/jeszyman/sing_containers/biotools.sif bash -c 'samtools stats test/bam/mpnst2_dedup.bam > test/qc/mpnst2_dedup_samstats.txt
+        samtools flagstat test/bam/mpnst2_dedup.bam > test/qc/mpnst2_dedup_flagstat.txt'
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+[Tue May 31 11:06:09 2022]
+Finished job 21.
+21 of 30 steps (70%) done
+Removing temporary output file test/bam/plex1_dedup_unsort.bam.
+[Tue May 31 11:06:09 2022]
+Finished job 18.
+22 of 30 steps (73%) done
+Resources before job selection: {'_cores': 2, '_nodes': 9223372036854775805}
+Ready jobs (2):
+	alignment_qc
+	alignment_qc
+Select jobs to execute...
+Selected jobs (2):
+	alignment_qc
+	alignment_qc
+Resources after job selection: {'_cores': 0, '_nodes': 9223372036854775803}
+
+[Tue May 31 11:06:09 2022]
+rule alignment_qc:
+    input: test/bam/plex1_raw.bam
+    output: test/qc/plex1_raw_samstats.txt, test/qc/plex1_raw_flagstat.txt
+    jobid: 24
+    wildcards: read_id=plex1, bam_step=raw
+    resources: tmpdir=/tmp
+
+
+        samtools stats test/bam/plex1_raw.bam > test/qc/plex1_raw_samstats.txt
+        samtools flagstat test/bam/plex1_raw.bam > test/qc/plex1_raw_flagstat.txt
+        
+
+ singularity  exec --home /home/jeszyman/repos/cfdna-wgs --bind /home/jeszyman:/home/jeszyman --bind /mnt:/mnt --bind /opt/miniconda3/envs/snakemake/lib/python3.9/site-packages:/mnt/snakemake /home/jeszyman/sing_containers/biotools.sif bash -c 'samtools stats test/bam/plex1_raw.bam > test/qc/plex1_raw_samstats.txt
+        samtools flagstat test/bam/plex1_raw.bam > test/qc/plex1_raw_flagstat.txt'
+[Tue May 31 11:06:09 2022]
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+rule alignment_qc:
+    input: test/bam/plex1_dedup.bam
+    output: test/qc/plex1_dedup_samstats.txt, test/qc/plex1_dedup_flagstat.txt
+    jobid: 23
+    wildcards: read_id=plex1, bam_step=dedup
+    resources: tmpdir=/tmp
+
+
+        samtools stats test/bam/plex1_dedup.bam > test/qc/plex1_dedup_samstats.txt
+        samtools flagstat test/bam/plex1_dedup.bam > test/qc/plex1_dedup_flagstat.txt
+        
+ singularity  exec --home /home/jeszyman/repos/cfdna-wgs --bind /home/jeszyman:/home/jeszyman --bind /mnt:/mnt --bind /opt/miniconda3/envs/snakemake/lib/python3.9/site-packages:/mnt/snakemake /home/jeszyman/sing_containers/biotools.sif bash -c 'samtools stats test/bam/plex1_dedup.bam > test/qc/plex1_dedup_samstats.txt
+        samtools flagstat test/bam/plex1_dedup.bam > test/qc/plex1_dedup_flagstat.txt'
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+Removing temporary output file test/bam/mpnst1_dedup_unsort.bam.
+[Tue May 31 11:06:09 2022]
+Finished job 19.
+23 of 30 steps (77%) done
+Resources before job selection: {'_cores': 1, '_nodes': 9223372036854775804}
+Ready jobs (2):
+	alignment_qc
+	alignment_qc
+Select jobs to execute...
+Selected jobs (1):
+	alignment_qc
+Resources after job selection: {'_cores': 0, '_nodes': 9223372036854775803}
+
+[Tue May 31 11:06:09 2022]
+rule alignment_qc:
+    input: test/bam/mpnst1_dedup.bam
+    output: test/qc/mpnst1_dedup_samstats.txt, test/qc/mpnst1_dedup_flagstat.txt
+    jobid: 25
+    wildcards: read_id=mpnst1, bam_step=dedup
+    resources: tmpdir=/tmp
+
+
+        samtools stats test/bam/mpnst1_dedup.bam > test/qc/mpnst1_dedup_samstats.txt
+        samtools flagstat test/bam/mpnst1_dedup.bam > test/qc/mpnst1_dedup_flagstat.txt
+        
+ singularity  exec --home /home/jeszyman/repos/cfdna-wgs --bind /home/jeszyman:/home/jeszyman --bind /mnt:/mnt --bind /opt/miniconda3/envs/snakemake/lib/python3.9/site-packages:/mnt/snakemake /home/jeszyman/sing_containers/biotools.sif bash -c 'samtools stats test/bam/mpnst1_dedup.bam > test/qc/mpnst1_dedup_samstats.txt
+        samtools flagstat test/bam/mpnst1_dedup.bam > test/qc/mpnst1_dedup_flagstat.txt'
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+[Tue May 31 11:06:10 2022]
+Finished job 27.
+24 of 30 steps (80%) done
+Resources before job selection: {'_cores': 1, '_nodes': 9223372036854775804}
+Ready jobs (1):
+	alignment_qc
+Select jobs to execute...
+Selected jobs (1):
+	alignment_qc
+Resources after job selection: {'_cores': 0, '_nodes': 9223372036854775803}
+
+[Tue May 31 11:06:10 2022]
+rule alignment_qc:
+    input: test/bam/mpnst1_raw.bam
+    output: test/qc/mpnst1_raw_samstats.txt, test/qc/mpnst1_raw_flagstat.txt
+    jobid: 26
+    wildcards: read_id=mpnst1, bam_step=raw
+    resources: tmpdir=/tmp
+
+
+        samtools stats test/bam/mpnst1_raw.bam > test/qc/mpnst1_raw_samstats.txt
+        samtools flagstat test/bam/mpnst1_raw.bam > test/qc/mpnst1_raw_flagstat.txt
+        
+ singularity  exec --home /home/jeszyman/repos/cfdna-wgs --bind /home/jeszyman:/home/jeszyman --bind /mnt:/mnt --bind /opt/miniconda3/envs/snakemake/lib/python3.9/site-packages:/mnt/snakemake /home/jeszyman/sing_containers/biotools.sif bash -c 'samtools stats test/bam/mpnst1_raw.bam > test/qc/mpnst1_raw_samstats.txt
+        samtools flagstat test/bam/mpnst1_raw.bam > test/qc/mpnst1_raw_flagstat.txt'
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+[Tue May 31 11:06:10 2022]
+Finished job 24.
+25 of 30 steps (83%) done
+[Tue May 31 11:06:10 2022]
+Finished job 25.
+26 of 30 steps (87%) done
+[Tue May 31 11:06:10 2022]
+Finished job 23.
+27 of 30 steps (90%) done
+[Tue May 31 11:06:10 2022]
+Finished job 26.
+28 of 30 steps (93%) done
+Resources before job selection: {'_cores': 4, '_nodes': 9223372036854775807}
+Ready jobs (1):
+	multiqc
+Select jobs to execute...
+Selected jobs (1):
+	multiqc
+Resources after job selection: {'_cores': 3, '_nodes': 9223372036854775806}
+
+[Tue May 31 11:06:10 2022]
+rule multiqc:
+    input: test/qc/plex2_R1_fastqc.html, test/qc/plex2_R2_fastqc.html, test/qc/plex1_R1_fastqc.html, test/qc/plex1_R2_fastqc.html, test/qc/mpnst1_R1_fastqc.html, test/qc/mpnst1_R2_fastqc.html, test/qc/mpnst2_R1_fastqc.html, test/qc/mpnst2_R2_fastqc.html, test/qc/plex2_proc_R1_fastqc.html, test/qc/plex2_proc_R2_fastqc.html, test/qc/plex1_proc_R1_fastqc.html, test/qc/plex1_proc_R2_fastqc.html, test/qc/mpnst1_proc_R1_fastqc.html, test/qc/mpnst1_proc_R2_fastqc.html, test/qc/mpnst2_proc_R1_fastqc.html, test/qc/mpnst2_proc_R2_fastqc.html, test/qc/plex2_dedup_samstats.txt, test/qc/plex2_raw_samstats.txt, test/qc/plex1_dedup_samstats.txt, test/qc/plex1_raw_samstats.txt, test/qc/mpnst1_dedup_samstats.txt, test/qc/mpnst1_raw_samstats.txt, test/qc/mpnst2_dedup_samstats.txt, test/qc/mpnst2_raw_samstats.txt, test/qc/plex2_dedup_flagstat.txt, test/qc/plex2_raw_flagstat.txt, test/qc/plex1_dedup_flagstat.txt, test/qc/plex1_raw_flagstat.txt, test/qc/mpnst1_dedup_flagstat.txt, test/qc/mpnst1_raw_flagstat.txt, test/qc/mpnst2_dedup_flagstat.txt, test/qc/mpnst2_raw_flagstat.txt
+    output: test/qc/all_qc.html
+    jobid: 29
+    resources: tmpdir=/tmp
+
+
+        multiqc test/qc         --force         --outdir test/qc         --filename all_qc 
+        
+ singularity  exec --home /home/jeszyman/repos/cfdna-wgs --bind /home/jeszyman:/home/jeszyman --bind /mnt:/mnt --bind /opt/miniconda3/envs/snakemake/lib/python3.9/site-packages:/mnt/snakemake /home/jeszyman/sing_containers/biotools.sif bash -c 'multiqc test/qc         --force         --outdir test/qc         --filename all_qc'
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+[Tue May 31 11:06:16 2022]
+Finished job 29.
+29 of 30 steps (97%) done
+Resources before job selection: {'_cores': 4, '_nodes': 9223372036854775807}
+Ready jobs (1):
+	all
+Select jobs to execute...
+Selected jobs (1):
+	all
+Resources after job selection: {'_cores': 3, '_nodes': 9223372036854775806}
+
+[Tue May 31 11:06:16 2022]
+localrule all:
+    input: test/processed-fastq/plex2_proc_R1.fastq.gz, test/processed-fastq/plex2_proc_R2.fastq.gz, test/processed-fastq/plex1_proc_R1.fastq.gz, test/processed-fastq/plex1_proc_R2.fastq.gz, test/processed-fastq/mpnst1_proc_R1.fastq.gz, test/processed-fastq/mpnst1_proc_R2.fastq.gz, test/processed-fastq/mpnst2_proc_R1.fastq.gz, test/processed-fastq/mpnst2_proc_R2.fastq.gz, test/unpaired-fastq/plex2_unpr_R1.fastq.gz, test/unpaired-fastq/plex1_unpr_R1.fastq.gz, test/unpaired-fastq/mpnst1_unpr_R1.fastq.gz, test/unpaired-fastq/mpnst2_unpr_R1.fastq.gz, test/bam/plex2.sam, test/bam/plex1.sam, test/bam/mpnst1.sam, test/bam/mpnst2.sam, test/qc/plex2_R1_fastqc.html, test/qc/plex2_R2_fastqc.html, test/qc/plex1_R1_fastqc.html, test/qc/plex1_R2_fastqc.html, test/qc/mpnst1_R1_fastqc.html, test/qc/mpnst1_R2_fastqc.html, test/qc/mpnst2_R1_fastqc.html, test/qc/mpnst2_R2_fastqc.html, test/qc/plex2_proc_R1_fastqc.html, test/qc/plex2_proc_R2_fastqc.html, test/qc/plex1_proc_R1_fastqc.html, test/qc/plex1_proc_R2_fastqc.html, test/qc/mpnst1_proc_R1_fastqc.html, test/qc/mpnst1_proc_R2_fastqc.html, test/qc/mpnst2_proc_R1_fastqc.html, test/qc/mpnst2_proc_R2_fastqc.html, test/bam/plex2_dedup.bam, test/bam/plex1_dedup.bam, test/bam/mpnst1_dedup.bam, test/bam/mpnst2_dedup.bam, test/bam/plex2_dedup.bam.bai, test/bam/plex1_dedup.bam.bai, test/bam/mpnst1_dedup.bam.bai, test/bam/mpnst2_dedup.bam.bai, test/qc/plex2_dedup_samstats.txt, test/qc/plex2_raw_samstats.txt, test/qc/plex1_dedup_samstats.txt, test/qc/plex1_raw_samstats.txt, test/qc/mpnst1_dedup_samstats.txt, test/qc/mpnst1_raw_samstats.txt, test/qc/mpnst2_dedup_samstats.txt, test/qc/mpnst2_raw_samstats.txt, test/qc/plex2_dedup_flagstat.txt, test/qc/plex2_raw_flagstat.txt, test/qc/plex1_dedup_flagstat.txt, test/qc/plex1_raw_flagstat.txt, test/qc/mpnst1_dedup_flagstat.txt, test/qc/mpnst1_raw_flagstat.txt, test/qc/mpnst2_dedup_flagstat.txt, test/qc/mpnst2_raw_flagstat.txt, test/qc/all_qc.html
+    jobid: 0
+    resources: tmpdir=/tmp
+
+[Tue May 31 11:06:16 2022]
+Finished job 0.
+30 of 30 steps (100%) done
+Complete log: /home/jeszyman/repos/cfdna-wgs/.snakemake/log/2022-05-31T110547.682710.snakemake.log
+unlocking
+removing lock
+removing lock
+removed all locks

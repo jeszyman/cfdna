@@ -1,0 +1,4 @@
+Building DAG of jobs...
+MissingInputException in line 26 of /home/jeszyman/repos/cfdna-wgs/workflow/int_test.smk:
+Missing input files for rule symlink:
+test/inputs/lib001_unpr_R1.fastq.gz

@@ -5,162 +5,20 @@
 :END:
 ** Setup
 #+begin_src bash
-ls -d1 test/* | grep -v -e inputs -e ref -e fastq 
+ls -d1 test/* | grep -v -e inputs -e ref -e fastq
 
 ls -d ./test/
 
 results_dirs=test/*
 results_dirs=
 if [ -d test/bam]
-basecamp/src/smk_forced_run.sh config/int_repo_test.yaml workflow/int_test.smk             
+basecamp/src/smk_forced_run.sh config/int_repo_test.yaml workflow/int_test.smk
 #+end_src
-*** Emacs and Org-mode
-#+startup: shrink
-*** Repository
-#+begin_src bash
-mkdir -p "${repo}/workflow/scripts"            
-#+end_src
-*** Bash
-**** Configurations
-- Local (by $HOSTNAME)
-  - jeff-mac-book
-    #+begin_src bash :noweb yes :tangle ./config/jeff-mac-book.sh
-#!/usr/bin/env bash
-#########1#########2#########3#########4#########5#########6#########7#########8
-
-#####################################################################
-###   Bash configuration script for MPNST fragmentomics project   ###
-#####################################################################
-
-# Host-local variables
-data_dir=/mnt/ris/aadel/mpnst
-mntpt=/mnt/ris/aadel
-repo=/home/jeszyman/repos/mpnst-preprocessing
-sif_dir=/home/jeszyman/sing_containers
-threads=8
-
-<<bash_common_config>>
-    #+end_src
-  - [[file:config/jeszyman-work.sh][jeszyman-work]]
-    #+begin_src bash :noweb yes :tangle ./config/jeszyman-work.sh 
-#!/usr/bin/env bash
-#########1#########2#########3#########4#########5#########6#########7#########8
-
-#####################################################################
-###   Bash configuration script for MPNST fragmentomics project   ###
-#####################################################################
-
-# Host-local variables
-data_dir=/mnt/ris/aadel/mpnst
-mntpt=/mnt/ris/aadel
-repo=/home/jeszyman/repos/mpnst-preprocessing
-sif_dir=/home/jeszyman/sing_containers
-threads=8
-
-<<bash_common_config>>
-    #+end_src
-  - [[file:config/aclm350.sh][aclm350]]
-    #+begin_src bash :noweb yes :tangle ./config/aclm350.sh 
-#!/usr/bin/env bash
-#########1#########2#########3#########4#########5#########6#########7#########8
-
-################################################################################
-###   Bash configuration script for MPNST fragmentomics project on ACLM350   ###
-################################################################################
-
-# Host-local variables
-data_dir=/mnt/ris/aadel/mpnst
-mntpt=/mnt/ris/aadel
-repo=/home/jszymanski/repos/mpnst-preprocessing
-sif_dir=/home/jszymanski/sing_containers
-threads=40
-
-<<bash_common_config>>
-    #+end_src
-- Common
-  #+name: bash_common_config
-  #+begin_src bash :noweb yes
-# Check git file hook is read-able
-if [ -r "${repo}/.git/hooks/precommit" ]; then
-   echo "Git size check is read-able"
-else
-    echo
-    "Git size check is not read-able"
-    exit 1
-fi
-          
-# Check mount point  
-if grep -qs $mntpt /proc/mounts; then
-    echo "RIS storage mounted."
-else
-    echo "RIS storage NOT mounted!!!"
-fi
-
-# Check local singularity build present
-if [ -r ${sif_dir}/frag.sif ]; then
-    echo "Local singularity file present"
-else
-    echo "Local singularity file not found."
-fi
-
-# Check if local singularity container is present and up-to-date
-if [ -r "${HOME}/sing_containers/biotools.sif" ]; then
-    echo "Local biotools singularity container exists"
-else
-    echo "No local biotools singularity container, attempting to fetch..."
-    mkdir -p "${HOME}/sing_containers"
-    cp /mnt/ris/aadel/jeszyman/sing_containers/biotools.sif "${HOME}/sing_containers"
-fi 
-
-if [ ${HOME}/sing_containers/biotools.sif -ot /mnt/ris/aadel/jeszyman/sing_containers/biotools.sif ];
-then
-    echo "Local biotools container out of date, updating..."
-    cp /mnt/ris/aadel/jeszyman/sing_containers/biotools.sif "${HOME}/sing_containers"
-else
-    echo "Local biotools singularity container is up to date"
-fi
-
-sing_biotools() {
-    singularit shell --bind /mnt:/mnt ~/sing_containers/biotools.sif            
-}
-
-launch_frag() { 
-    if [ -f /.dockerenv ]; then
-        echo "shell already in docker, exiting";
-        exit 1;
-    else
-        docker run --env HOME=${HOME} --hostname ${HOSTNAME} --interactive --tty --volume /home/:/home/ --volume /tmp/:/tmp/ --volume /mnt/:/mnt/ --user $(id -u ${USER}) -w "$repo" jeszyman/frag /bin/bash;
-    fi
-}
-#+end_src           
-
-*** Git and github
-#+begin_src bash
-repo=/home/jeszyman/repos/mpnst-preprocessing
-cd $repo
-
-git init
-git add -A 
-git commit -m "first commit"
-
-git remote rm origin
-git remote add origin git@github.com:jeszyman/cfdna-wgs
-git branch -M master
-git push -u origin master
-#+end_src
-
-
-*** Docker and singularity - none; use biotools submodule
-#+begin_src bash :tangle ./src/launch_singularity_shell.sh
-singularity shell --bind /mnt:/mnt ~/sing_containers/biotools.sif            
-#+end_src
-
-
 *** Snakemake
 **** Configuration YAMLs
 - Repo integration testing
   #+begin_src bash :tangle ./config/int_repo_test.yaml
-container: "~/sing_containers/biotools.sif"        
+container: "~/sing_containers/biotools.sif"
 fq_dir: "test/fastq"
 qc_dir: "test/qc"
 log_dir: "test/logs"
@@ -178,444 +36,13 @@ MILREADS:
   - "20"
 cfdna_wgs_script_dir: "workflow/scripts"
 #+end_src
-- consider a workdir: "/output/dir" 
-- [[file:config/common.yaml][common]]
-  #+begin_src bash :tangle config/common.yaml
-cap_extract_script: "src/cp_fastq_extract_auto.pl"
-inputs_dir: "/mnt/ris/aadel/mpnst/inputs"
-demultiplex_dir: "/mnt/ris/aadel/mpnst/cappseq/demultiplexed"
-hg38_fasta: "GCA_000001405.15_GRCh38_no_alt_analysis_set.fna.fai"
-hg38_fasta_ftp: "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/001/405/GCA_000001405.15_GRCh38/seqs_for_alignment_pipelines.ucsc_ids/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna.fai"
-hg38_bwa_index_ftp: "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/001/405/GCA_000001405.15_GRCh38/seqs_for_alignment_pipelines.ucsc_ids/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna.bwa_index.tar.gz"
-hg38_bwa_index_zip: "GCA_000001405.15_GRCh38_no_alt_analysis_set.fna.bwa_index.tar.gz"
-ref_dir: "/mnt/ris/aadel/mpnst/ref"
-log_dir: "/mnt/ris/aadel/mnpst/logs"
-#+end_src
-**** Run commands
-:PROPERTIES:
-:header-args: :tangle no
-:END:
-#+begin_src bash :tangle ./src/full_repo_int_test.sh
-# Remove results directories 
-results_dirs=()
-readarray -t results_dirs <<< $(ls -d1 test/* | grep -v -e '^test/f' -e ref -e inputs)
-printf '%s\n' "${results_dirs[@]}"
-
-
-for dir in "${results_dirs[@]}"; 
-do
-\rm -rf $dir
-done
-
-# Run test 
-basecamp/src/smk_dry_run.sh config/int_repo_test.yaml workflow/cfdna_wgs_int_test.smk
-basecamp/src/smk_forced_run.sh config/int_repo_test.yaml workflow/cfdna_wgs_int_test.smk
-#+end_src
-#+begin_src bash :tangle ./src/smk_test.sh
-#!/bin/bash
-
-eval "$(command conda 'shell.bash' 'hook' 2> /dev/null)"
-
-echo "The following `*.smk` archives were found; select one:"
-
-# set the prompt used by select, replacing "#?"
-PS3="Use number to select an option"
-
-select filename in ./workflow/*.smk
-
-do
-    if [[ "$filename" == "" ]]
-    then
-        echo "'$REPLY' is not a valid number"
-        continue
-    fi
-    conda activate snakemake
-    snakemake --dry-run --snakefile $filename \
-              --configfile config/${HOSTNAME}.yaml \
-              --cores $threads \
-              --directory ${repo} \
-              --rerun-incomplete \
-              --singularity-args "--bind $mntpt:$mntpt" \
-              --use-singularity 
-done
-#+end_src
-#+begin_src bash :tangle ./src/smk_draw.sh
-eval "$(command conda 'shell.bash' 'hook' 2> /dev/null)"
-
-conda activate snakemake
-
-snakemake \
-    --configfile config/repo_test.yaml \
-    --cores $threads \
-    --rulegraph \
-    --snakefile ./workflow/read_preprocess.smk | dot -Tpdf > resources/read_preprocess_dagtmp/test.pdf
-#+end_src
-- Repo test
-  #+begin_src bash :tangle ./src/repo_test.sh
-eval "$(command conda 'shell.bash' 'hook' 2> /dev/null)"
-
-conda activate snakemake
-
-output_dirs=( "bam" "processed-fastq" "qc" "symlink-fastq" "unpaired-fastq" )
-
-for dir in ${output_dirs[@]};
-do
-               if [ -d test/${dir} ]; then \rm -rf test/${dir}; fi
-done
-
-snakemake \
-    --configfile config/repo_test.yaml \
-    --cores 4 \
-    --rerun-incomplete \
-    --use-singularity \
-    --forceall \
-    --snakefile ./workflow/repo_test.smk
-#+end_src
-
-
-#+begin_src bash :tangle ./src/smk_run.sh
-#!/bin/bash
-#########1#########2#########3#########4#########5#########6#########7#########8
-eval "$(command conda 'shell.bash' 'hook' 2> /dev/null)"
-####################################
-###   Choose and Run Snakefile   ###
-####################################
-
-# Setup
-#set -euxov pipefail
-
-source config/${HOSTNAME}.sh
-echo "The following `*.smk` archives were found; select one:"
-
-# set the prompt used by select, replacing "#?"
-PS3="Use number to select an option"
-
-select filename in ./workflow/*.smk
-
-do
-    if [[ "$filename" == "" ]]
-    then
-        echo "'$REPLY' is not a valid number"
-        continue
-    fi
-    echo $filename
-    select run_option in dry_run normal force_final force_all
-    do
-        echo selected $run_option
-        case $run_option in
-            dry_run)
-                conda activate snakemake
-                snakemake \
-                    --configfile config/${HOSTNAME}.yaml \
-                    --cores $threads \
-                    --directory ${repo} \
-                    --dry-run \
-                    --rerun-incomplete \
-                    --singularity-args "--bind $mntpt:$mntpt" \
-                    --use-singularity \
-                    --snakefile $filename
-                ;;
-            normal) 
-                conda activate snakemake
-                select nohup_option in no yes
-                do
-                    case $nohup_option in
-                        no)
-                            snakemake \
-                                --configfile config/${HOSTNAME}.yaml \
-                                --cores $threads \
-                                --directory ${repo} \
-                                --singularity-args "--bind $mntpt:$mntpt" \
-                                --use-singularity \
-                                --snakefile $filename
-                            ;;
-                        yes)
-                            nohup snakemake \
-                                  --configfile config/${HOSTNAME}.yaml \
-                                  --cores $threads \
-                                  --directory ${repo} \
-                                  --singularity-args "--bind $mntpt:$mntpt" \
-                                  --use-singularity \
-                                  --snakefile $filename
-                            ;;
-                    esac
-                done                
-                ;;
-            force_final)
-                conda activate snakemake
-                select nohup_option in no yes
-                do
-                    case $nohup_option in
-                        no)                                          
-                            snakemake \
-                                --configfile config/${HOSTNAME}.yaml \
-                                --cores $threads \
-                                --directory ${repo} \
-                                --force \
-                                --singularity-args "--bind $mntpt:$mntpt" \
-                                --use-singularity \
-                                --snakefile $filename
-                            ;;
-                        yes)
-                            nohup snakemake \
-                                  --configfile config/${HOSTNAME}.yaml \
-                                  --cores $threads \
-                                  --directory ${repo} \
-                                  --force \
-                                  --singularity-args "--bind $mntpt:$mntpt" \
-                                  --use-singularity \
-                                  --snakefile $filename
-                            ;;
-                    esac
-                done                
-                ;;            
-            force_all)
-                conda activate snakemake
-                select nohup_option in no yes
-                do
-                    case $nohup_option in
-                        no)                                          
-                
-                snakemake \
-                    --configfile config/${HOSTNAME}.yaml \
-                    --cores $threads \
-                    --directory ${repo} \
-                    -F \
-                    --singularity-args "--bind $mntpt:$mntpt" \
-                    --use-singularity \
-                    --snakefile $filename
-                                            ;;
-                        yes)
-                nohup snakemake \
-                    --configfile config/${HOSTNAME}.yaml \
-                    --cores $threads \
-                    --directory ${repo} \
-                    -F \
-                    --singularity-args "--bind $mntpt:$mntpt" \
-                    --use-singularity \
-                    --snakefile $filename
-                            ;;
-                    esac
-                done                
-                ;;            
-        esac
-        break
-    done
-    break
-done
-#+end_src
-
-
-
-#+begin_src bash :tangle ./src/smk_run.sh
-#!/bin/bash
-#########1#########2#########3#########4#########5#########6#########7#########8
-
-####################################
-###   Choose and Run Snakefile   ###
-####################################
-
-# Setup
-#set -euxov pipefail
-source config/${HOSTNAME}.sh
-echo "The following `*.smk` archives were found; select one:"
-
-# set the prompt used by select, replacing "#?"
-PS3="Use number to select an option"
-
-select filename in ./workflow/*.smk
-
-do
-    if [[ "$filename" == "" ]]
-    then
-        echo "'$REPLY' is not a valid number"
-        continue
-    fi
-    echo $filename
-    select run_option in dry_run normal force_final force_all
-    do
-        echo selected $run_option
-        case $run_option in
-            dry_run)
-                source activate snakemake
-                snakemake \
-                    --configfile config/${HOSTNAME}.yaml \
-                    --cores $threads \
-                    --directory ${repo} \
-                    --dry-run \
-                    --rerun-incomplete \
-                    --singularity-args "--bind $mntpt:$mntpt" \
-                    --use-singularity \
-                    --snakefile $filename
-                ;;
-            normal) 
-                source activate snakemake
-                select nohup_option in no yes
-                do
-                    case $nohup_option in
-                        no)
-                            snakemake \
-                                --configfile config/${HOSTNAME}.yaml \
-                                --cores $threads \
-                                --directory ${repo} \
-                                --singularity-args "--bind $mntpt:$mntpt" \
-                                --use-singularity \
-                                --snakefile $filename
-                            ;;
-                        yes)
-                            nohup snakemake \
-                                  --configfile config/${HOSTNAME}.yaml \
-                                  --cores $threads \
-                                  --directory ${repo} \
-                                  --singularity-args "--bind $mntpt:$mntpt" \
-                                  --use-singularity \
-                                  --snakefile $filename
-                            ;;
-                    esac
-                done                
-                ;;
-            force_final)
-                source activate snakemake
-                select nohup_option in no yes
-                do
-                    case $nohup_option in
-                        no)                                          
-                            snakemake \
-                                --configfile config/${HOSTNAME}.yaml \
-                                --cores $threads \
-                                --directory ${repo} \
-                                --force \
-                                --singularity-args "--bind $mntpt:$mntpt" \
-                                --use-singularity \
-                                --snakefile $filename
-                            ;;
-                        yes)
-                            nohup snakemake \
-                                  --configfile config/${HOSTNAME}.yaml \
-                                  --cores $threads \
-                                  --directory ${repo} \
-                                  --force \
-                                  --singularity-args "--bind $mntpt:$mntpt" \
-                                  --use-singularity \
-                                  --snakefile $filename
-                            ;;
-                    esac
-                done                
-                ;;            
-            force_all)
-                source activate snakemake
-                select nohup_option in no yes
-                do
-                    case $nohup_option in
-                        no)                                          
-                
-                snakemake \
-                    --configfile config/${HOSTNAME}.yaml \
-                    --cores $threads \
-                    --directory ${repo} \
-                    -F \
-                    --singularity-args "--bind $mntpt:$mntpt" \
-                    --use-singularity \
-                    --snakefile $filename
-                                            ;;
-                        yes)
-                nohup snakemake \
-                    --configfile config/${HOSTNAME}.yaml \
-                    --cores $threads \
-                    --directory ${repo} \
-                    -F \
-                    --singularity-args "--bind $mntpt:$mntpt" \
-                    --use-singularity \
-                    --snakefile $filename
-                            ;;
-                    esac
-                done                
-                ;;            
-        esac
-        break
-    done
-    break
-done
-#+end_src
-
-#+begin_src bash
-#cd ~/repos/mpnst
-conda activate snakemake
-source config/"${HOSTNAME}.sh"                                                   
-
-nohup snakemake \
-  --configfile config/${HOSTNAME}.yaml \
-  --directory "${repo}" \
-  --cores 10 \
-  --printshellcmds \
-  --singularity-args "--bind $mntpt:$mntpt" \
-  --snakefile workflows/cappseq.smk \
-  --use-singularity 
-
-
-nohup snakemake \
-    --configfile config/${HOSTNAME}.yaml \
-    --cores $threads \
-    --directory "${repo}" \
-    --printshellcmds \
-    --singularity-args "--bind $mntpt:$mntpt" \
-    --snakefile workflow/frag.smk \
-    --use-singularity 
-
-
-nohup snakemake \
-  --configfile config/${HOSTNAME}.yaml \
-  --cores $threads \
-  --directory "${repo}" \
-  --printshellcmds \
-  --singularity-args "--bind $mntpt:$mntpt" \
-  --snakefile workflow/frag.smk \
-  --use-singularity \
-  --rerun-incomplete
-#+end_src
-
-#+begin_src bash
-#cd ~/repos/mpnst
-conda activate snakemake
-source config/"${HOSTNAME}.sh"
-
-snakemake \
-  --configfile config/${HOSTNAME}.yaml \
-  --cores $threads \
-  --directory "${repo}" \
-  --dry-run \
-  --printshellcmds \
-  --singularity-args "--bind $mntpt:$mntpt" \
-  --snakefile workflow/frag.smk \
-  --use-singularity 
-
-snakemake \
-  --configfile config/${HOSTNAME}.yaml \
-  --cores $threads \
-  --directory "${repo}" \
-  --printshellcmds \
-  --singularity-args "--bind $mntpt:$mntpt" \
-  --snakefile workflow/frag.smk \
-  --use-singularity 
-
-
-snakemake \
-  --configfile config/${HOSTNAME}.yaml \
-  --cores $threads \
-  --directory "${repo}" \
-  --printshellcmds \
-  --singularity-args "--bind $mntpt:$mntpt" \
-  --snakefile workflow/frag.smk \
-  --use-singularity \
-  --rulegraph | dot -Tpdf > $repo/resources/frag_rules.pdf
-#+end_src
 
 
 *** Integration testing inputs setup
 #+begin_src bash :tangle ./src/seq_preprocess_integration_setup.sh
 #!/bin/echo Run:.
 
-# For documentation, not intended to be executable 
+# For documentation, not intended to be executable
 
 if [ -d test ]; then \rm -rf test; fi
 mkdir -p test/fastq
@@ -645,131 +72,11 @@ exit
 #+end_src
 ** README
 *** Changlog
-- [2022-04-29 Fri] - Moved multiqc to integration testing as inputs are dependent on final sample labels. Integration testing works per this commit. 
-** [[file:workflow/cfdna_wgs_int_test.smk][Integration testing]] :smk:
-#+begin_src snakemake :tangle ./workflow/cfdna_wgs_int_test.smk
-container: config["container"]
-
-IDS, = glob_wildcards(config["fq_dir"] + "/{id}_R1.fastq.gz")
-MILREADS = config["MILREADS"]
-	   
-rule all:
-    input:
-        expand(config["processed_fq_dir"] + "/{read_id}_proc_{read}.fastq.gz", read_id = IDS, read = ["R1","R2"]),
-        expand(config["unpr_fq_dir"] + "/{read_id}_unpr_R1.fastq.gz", read_id = IDS, read = ["R1","R2"]),
-        expand(config["bam_dir"] + "/{read_id}.sam", read_id = IDS),
-        expand(config["qc_dir"] + "/{read_id}_{read}_fastqc.html", read_id = IDS, read = ["R1","R2"]),
-        expand(config["qc_dir"] + "/{read_id}_proc_{read}_fastqc.html", read_id = IDS, read = ["R1","R2"]),
-        expand(config["bam_dir"] + "/{read_id}_dedup.bam", read_id = IDS),
-        expand(config["bam_dir"] + "/{read_id}_dedup.bam.bai", read_id = IDS),
-        expand(config["qc_dir"] + "/{read_id}_{bam_step}_samstats.txt", read_id = IDS, bam_step= ["dedup","raw"]),
-        expand(config["qc_dir"] + "/{read_id}_{bam_step}_flagstat.txt", read_id = IDS, bam_step =["dedup","raw"]),
-        expand(config["bam_dir"] + "/{read_id}_ds{milreads}.bam", read_id = IDS, milreads = MILREADS),
-        config["qc_dir"] + "/all_qc.html",
-
-include: "read_preprocess.smk"
-
-rule multiqc:
-    input:
-        expand(config["qc_dir"] + "/{read_id}_{read}_fastqc.html", read_id = IDS, read = ["R1","R2"]),
-        expand(config["qc_dir"] + "/{read_id}_proc_{read}_fastqc.html", read_id = IDS, read = ["R1","R2"]),
-        expand(config["qc_dir"] + "/{read_id}_{bam_step}_samstats.txt", read_id = IDS, bam_step= ["dedup","raw"]),
-        expand(config["qc_dir"] + "/{read_id}_{bam_step}_flagstat.txt", read_id = IDS, bam_step =["dedup","raw"]),
-    params:
-        out_dir = config["qc_dir"]
-    output:
-        config["qc_dir"] + "/all_qc.html"
-    shell:
-        """
-        multiqc {params.out_dir} \
-        --force \
-        --outdir {params.out_dir} \
-        --filename all_qc 
-        """
-            
-#+end_src
-*** Repository-local integration testing
-#+begin_src bash
-src/full_repo_int_test.sh 
-#+end_src
-*** Dev Ideas
-:PROPERTIES:
-:header-args:snakemake: :tangle no
-:END:
-#+begin_src snakemake
-container: config["container"]
-
-IDS, = glob_wildcards(config["fq_dir"] + "/{id}_R1.fastq.gz")
-	   
-rule all:
-    input:
-        expand(config["processed_fq_dir"] + "/{read_id}_proc_{read}.fastq.gz", read_id = IDS, read = ["R1","R2"]),
-        expand(config["unpr_fq_dir"] + "/{read_id}_unpr_R1.fastq.gz", read_id = IDS, read = ["R1","R2"]),
-        expand(config["bam_dir"] + "/{read_id}_dedup.bam", read_id = IDS),
-        expand(config["bam_dir"] + "/{read_id}_ds{milreads}.bam", read_id = IDS, milreads = config["MILREADS"]),
-        expand(config["qc_dir"] + "/{read_id}_{read}_fastqc.html", read_id = IDS, read = ["R1","R2"]),
-        expand(config["qc_dir"] + "/{read_id}_proc_{read}_fastqc.html", read_id = IDS, read = ["R1","R2"]),
-        config["qc_dir"] + "/all_qc.html",
-	
-rule rename:
-    params:
-        old_sample_id=lambda wcs: sampledict[wcs.f],
-    output:
-        read1=config["fq_symlink_dir"] + "/{f}_R1.fastq.gz",
-        read2=config["fq_symlink_dir"] + "/{f}_R2.fastq.gz",	
-    shell:
-        """
-        if [ -f {output.read1} ]; then \\rm {output.read1}; fi
-        if [ -f {output.read2} ]; then \\rm {output.read2}; fi
-        ln -s --relative "{config[raw_fq_dir]}/{params.old_sample_id}_R1.fastq.gz" {output.read1}
-        ln -s --relative "{config[raw_fq_dir]}/{params.old_sample_id}_R2.fastq.gz" {output.read2}
-        """
-
-
-include: "read_preprocess.smk"
-#+end_src
-- Ideas
-  #+begin_src snakemake 
-container: config["container"]
-import pandas as pd
-import numpy as np
-
-samples = pd.read_table(config["inputs_dir"] + "/samples.tsv")
-sampledict = dict(zip(samples['new_name'], samples['old_name']))
-
-wildcard_constraints:
-    read_id='|'.join([re.escape(x) for x in sampledict.keys()]),
-
-rule all:
-    input:
-        expand(config["processed_fq_dir"] + "/{read_id}_proc_{read}.fastq.gz", read_id = sampledict.keys(), read = ["R1","R2"]),
-        expand(config["unpr_fq_dir"] + "/{read_id}_unpr_R1.fastq.gz", read_id = sampledict.keys(), read = ["R1","R2"]),
-	expand(config["bam_dir"] + "/{read_id}_dedup.bam", read_id = sampledict.keys()),
-        config["qc_dir"] + "/all_qc.html",
-        expand(config["bam_dir"] + "/{read_id}_ds{milreads}.bam", read_id = sampledict.keys(), milreads = config["MILREADS"]),
-
-rule rename:
-    params:
-        old_sample_id=lambda wcs: sampledict[wcs.f],
-    output:
-        read1=config["fq_symlink_dir"] + "/{f}_R1.fastq.gz",
-        read2=config["fq_symlink_dir"] + "/{f}_R2.fastq.gz",	
-    shell:
-        """
-        if [ -f {output.read1} ]; then \\rm {output.read1}; fi
-        if [ -f {output.read2} ]; then \\rm {output.read2}; fi
-        ln -s --relative "{config[raw_fq_dir]}/{params.old_sample_id}_R1.fastq.gz" {output.read1}
-        ln -s --relative "{config[raw_fq_dir]}/{params.old_sample_id}_R2.fastq.gz" {output.read2}
-        """
-
-
-include: "read_preprocess.smk"
-#+end_src
-
+- [2022-04-29 Fri] - Moved multiqc to integration testing as inputs are dependent on final sample labels. Integration testing works per this commit.
 ** [[file:workflow/read_preprocess.smk][Sequence pre-processing, alignment, and quality control]] :smk:
 :PROPERTIES:
 :header-args:snakemake: :tangle ./workflow/read_preprocess.smk
-:END:              
+:END:
 *** DONE Read pre-processing                                          :smk_rule:
 - Snakemake
   #+begin_src snakemake
@@ -783,7 +90,7 @@ rule trimmomatic:
         read1 = config["processed_fq_dir"] + "/{read_id}_proc_R1.fastq.gz",
         read1_unpr = config["unpr_fq_dir"] + "/{read_id}_unpr_R1.fastq.gz",
         read2 = config["processed_fq_dir"] + "/{read_id}_proc_R2.fastq.gz",
-        read2_unpr = config["unpr_fq_dir"] + "/{read_id}_unpr_R2.fastq.gz",	
+        read2_unpr = config["unpr_fq_dir"] + "/{read_id}_unpr_R2.fastq.gz",
     log:
         int = config["log_dir"] + "/trimmomatic_trimlog_{read_id}.log",
         main = config["log_dir"] + "/trimmomatic_{read_id}.log",
@@ -802,7 +109,7 @@ rule trimmomatic:
 - Reference
   - Trimmomatic parameters based on Taylor's parameters ([[https://mail.google.com/mail/u/0/#search/sundby+fastq/FMfcgzGmvLWSbsmhDsffvSSWfjWdQhhR?projector=1&messagePartId=0.1][email]])
   - https://github.com/AAFC-BICoE/snakemake-trimmomatic/blob/master/Snakefile
-*** DONE Alignment 
+*** DONE Alignment
 #+begin_src snakemake
 rule align:
     input:
@@ -822,17 +129,17 @@ rule align:
 - Snakemake
   #+begin_src snakemake
 rule fastqc:
-    input: 
+    input:
         raw=config["fq_dir"] + "/{read_id}_{read}.fastq.gz",
         proc=config["processed_fq_dir"] + "/{read_id}_proc_{read}.fastq.gz",
-    params: 
+    params:
         out_dir = config["qc_dir"],
     output:
         raw_html = config["qc_dir"] + "/{read_id}_{read}_fastqc.html",
-        proc_html = config["qc_dir"] + "/{read_id}_proc_{read}_fastqc.html", 	
-    log: 
+        proc_html = config["qc_dir"] + "/{read_id}_proc_{read}_fastqc.html",
+    log:
         raw = config["log_dir"] + "/fastqc_raw_{read_id}_{read}.log",
-        proc = config["log_dir"] + "/fastqc_proc_{read_id}_{read}.log",	
+        proc = config["log_dir"] + "/fastqc_proc_{read_id}_{read}.log",
     shell:
         """
         fastqc --outdir {params.out_dir} \
@@ -870,7 +177,7 @@ rule alignment_qc:
         config["bam_dir"] + "/{read_id}_{bam_step}.bam",
     output:
         samstat = config["qc_dir"] + "/{read_id}_{bam_step}_samstats.txt",
-        flagstat = config["qc_dir"] + "/{read_id}_{bam_step}_flagstat.txt",        
+        flagstat = config["qc_dir"] + "/{read_id}_{bam_step}_flagstat.txt",
     shell:
         """
         samtools stats {input} > {output.samstat}
@@ -895,7 +202,7 @@ rule downsample_bams:
 ## Calculate the sampling factor based on the intended number of reads:
 FACTOR=$(samtools idxstats $1 | cut -f3 | awk -v COUNT=$2 'BEGIN {total=0} {total += $1} END {print COUNT/total}')
 
-if [[ $FACTOR > 1 ]]; then 
+if [[ $FACTOR > 1 ]]; then
     echo "DS reads exceeds total for $1"
     cp $1 $3
 else
@@ -920,7 +227,7 @@ Config to run command
 
 - frag size
   #+name: fragment_size.sh
-#+begin_src bash 
+#+begin_src bash
 #########1#########2#########3#########4#########5#########6#########7#########8
 #
 source ./src/setup.sh
@@ -974,7 +281,7 @@ mkdir -p $localdata/frag_size
 for file in "${frag_filt_bam[@]}";
 do
     base=`basename $file`
-    if [ $localdata/frag_size/${base}.fragsize.tsv -ot $file ]; then    
+    if [ $localdata/frag_size/${base}.fragsize.tsv -ot $file ]; then
         mpnst_fragsize \
             $file \
             $processors \
@@ -1018,9 +325,9 @@ fi
 #
 exit
 #+end_src
-- Fragment size 
+- Fragment size
   #+name: fragment-sampling
-  #+begin_src bash 
+  #+begin_src bash
 #
 # Samples fragment size by TLEN in bam files
 #
@@ -1034,7 +341,7 @@ rm -rf $fragsampledir
 mkdir -p $fragsampledir
 #
 # Get lists of bam files to sample
-find /localdata/box/NCI FASTQ/ -name 
+find /localdata/box/NCI FASTQ/ -name
 find /duo4/.mpnst/bam-nci/ -name "*.dedup.bam" > $fragsampledir/nci-invivo-bams
 find /duo4/.mpnst/bam-nci/ -name "*.filt.sorted.bam" > $fragsampledir/nci-insilico-bams
 #TODO ADD WASHU find /duo4/mpnst/
@@ -1045,7 +352,7 @@ find /duo4/.mpnst/bam-nci/ -name "*.filt.sorted.bam" > $fragsampledir/nci-insili
 # Run Setup
 #
 # Processes
-## 
+##
 #
 mapfile -t nci_insilico_bams < $fragsampledir/nci-insilico-bams
 for file in "${nci_insilico_bams[@]}"; do
@@ -1097,19 +404,19 @@ do
                     90 \
                     150 \
                     40
-    fi    
+    fi
 done
 #+end_src
 
 - deeptools https://multiqc.info/docs/
 - using mosdepth
   #+name: mosdepth
-  #+begin_src bash 
+  #+begin_src bash
 #########1#########2#########3#########4#########5#########6#########7#########8
 #
 ### mosdepth for WGS depth calc  ###
 #
-# Setup 
+# Setup
 ##
 
 # Mosdepth per bam dir
@@ -1141,17 +448,17 @@ biotools
 ### Convert bams to wigs
 bam_to_wig() {
     printf "Variables are: 1=bam_file 2=bam_suffix 3=outdir\n"
-        base=`basename -s ${2} $1`        
+        base=`basename -s ${2} $1`
         if [ $3/${base}.wig -ot $1 ]; then
             /opt/hmmcopy_utils/bin/readCounter --window 1000000 --quality 20 \
                                                --chromosome "chr1,chr2,chr3,chr4,chr5,chr6,chr7,chr8,chr9,chr10,chr11,chr12,chr13,chr14,chr15,chr16,chr17,chr18,chr19,chr20,chr21,chr22,chrX,chrY" $1 > $3/${base}.wig
         fi
 }
 ###
-### Run ichor for low TF 
+### Run ichor for low TF
 ichor_lowfract() {
     base=`basename -s .wig $1`
-    if [ $2/$base.RData -ot $1 ]; then  
+    if [ $2/$base.RData -ot $1 ]; then
         Rscript /opt/ichorCNA/scripts/runIchorCNA.R \
                 --id $base \
                 --WIG $1 \
@@ -1197,7 +504,7 @@ for file in ${genomic[@]}; do
 done
 #
 ##
-## Send successful file list to repo 
+## Send successful file list to repo
 rm /drive3/users/jszymanski/repos/mpnst/data/wigs.tsv
 for file in $localdata/wigs/*.wig;
 do
@@ -1229,8 +536,8 @@ fi
 #
 #+end_src
   - Cant calcualte depths off [[file:~/repos/mpnst/data/bam_qc_data/mqc_mosdepth-coverage-per-contig_1.txt]] , d/n allow values under 1
-  - [ ] for coverage, should intersect down to autosomes 
-- run and extract mosdepth 
+  - [ ] for coverage, should intersect down to autosomes
+- run and extract mosdepth
   mosdepthRAW = as_tibble(read.table(file.path(repo,"data/all_dedup_coverage.tsv"), header = T, sep = '\t', fill = TRUE))
 - https://snakemake.readthedocs.io/en/stable/snakefiles/rules.html see multiext
 - ideas
@@ -1239,10 +546,10 @@ fi
       #     base=`basename -s _R1.fastq.gz ${read1}`
       #     filesize=$(wc -c <"$bamdir/${base}.bam")
       #     if [ $minimum_bam_size -ge $filesize ]; then
-      #         echo $base >> /drive3/users/jszymanski/repos/mpnst/data/small_bams        
+      #         echo $base >> /drive3/users/jszymanski/repos/mpnst/data/small_bams
       #     fi
       # done
-      # readarray -t small_bam < /drive3/users/jszymanski/repos/mpnst/data/small_bams         
+      # readarray -t small_bam < /drive3/users/jszymanski/repos/mpnst/data/small_bams
 ***** Ideas
   - filter to min file size && expected by manual spreadsheet
   - fastqs too small (< 500 Mb)
@@ -1264,7 +571,7 @@ rule rename:
         old_sample_id=lambda wcs: sampledict[wcs.f],
     output:
         read1=config["fq_symlink_dir"] + "/{f}_R1.fastq.gz",
-        read2=config["fq_symlink_dir"] + "/{f}_R2.fastq.gz",	
+        read2=config["fq_symlink_dir"] + "/{f}_R2.fastq.gz",
     shell:
         """
         if [ -f {output.read1} ]; then \\rm {output.read1}; fi
@@ -1294,7 +601,7 @@ samstats_mod =
   mutate(library_id = substr(Sample, 1, 6)) %>%
   mutate(bam_type = gsub("_.*$","", gsub("^.......","",Sample))) %>%
   pivot_wider(names_from = bam_type, values_from = -c(library_id, bam_type), everything()) %>%
-  select(library_id, everything(), -starts_with("Sample"))  
+  select(library_id, everything(), -starts_with("Sample"))
 samstats_mod
 
 #+end_src
@@ -1306,7 +613,7 @@ rule make_bwa_index_:
     input:
         fasta = config["data_dir"] + "/inputs/hg19.fa.gz",
     params:
-        out_dir = config["data_dir"] + "/ref/hg19_bwa"	
+        out_dir = config["data_dir"] + "/ref/hg19_bwa"
         prefix = config["data_dir"] + "/ref/hg19_bwa/hg19"
     output:
         config["data_dir"] + "/ref/hg19_bwa/hg19.amb"
@@ -1326,16 +633,16 @@ bwa index -p $2 -a bwtsw $3
 
 **** Downsample Bams
 #+name: downsample_bam
-#+begin_src bash 
+#+begin_src bash
 function downsample_bam {
 
 ## Calculate the sampling factor based on the intended number of reads:
 FACTOR=$(samtools idxstats $1 | cut -f3 | awk -v COUNT=$2 'BEGIN {total=0} {total += $1} END {print COUNT/total}')
 
-if [[ $FACTOR > 1 ]]; then 
+if [[ $FACTOR > 1 ]]; then
     echo "DS reads exceeds total for $1"
 else
-    sambamba view -s $FACTOR -f bam -l 5 $1    
+    sambamba view -s $FACTOR -f bam -l 5 $1
 fi
 }
 
@@ -1348,12 +655,131 @@ function downsample_bam {
 ## Calculate the sampling factor based on the intended number of reads:
 FACTOR=$(samtools idxstats $1 | cut -f3 | awk -v COUNT=$2 'BEGIN {total=0} {total += $1} END {print COUNT/total}')
 
-if [[ $FACTOR > 1 ]]; then 
+if [[ $FACTOR > 1 ]]; then
     echo "DS reads exceeds total for $1"
 else
-    sambamba view -s $FACTOR -f bam -l 5 $1    
+    sambamba view -s $FACTOR -f bam -l 5 $1
 fi
 }
 
 #+end_src
 
+** [[file:workflow/cfdna_wgs_int_test.smk][Integration testing]] :smk:
+#+begin_src snakemake :tangle ./workflow/cfdna_wgs_int_test.smk
+container: config["container"]
+
+IDS, = glob_wildcards(config["fq_dir"] + "/{id}_R1.fastq.gz")
+MILREADS = config["MILREADS"]
+
+rule all:
+    input:
+        expand(config["processed_fq_dir"] + "/{read_id}_proc_{read}.fastq.gz", read_id = IDS, read = ["R1","R2"]),
+        expand(config["unpr_fq_dir"] + "/{read_id}_unpr_R1.fastq.gz", read_id = IDS, read = ["R1","R2"]),
+        expand(config["bam_dir"] + "/{read_id}.sam", read_id = IDS),
+        expand(config["qc_dir"] + "/{read_id}_{read}_fastqc.html", read_id = IDS, read = ["R1","R2"]),
+        expand(config["qc_dir"] + "/{read_id}_proc_{read}_fastqc.html", read_id = IDS, read = ["R1","R2"]),
+        expand(config["bam_dir"] + "/{read_id}_dedup.bam", read_id = IDS),
+        expand(config["bam_dir"] + "/{read_id}_dedup.bam.bai", read_id = IDS),
+        expand(config["qc_dir"] + "/{read_id}_{bam_step}_samstats.txt", read_id = IDS, bam_step= ["dedup","raw"]),
+        expand(config["qc_dir"] + "/{read_id}_{bam_step}_flagstat.txt", read_id = IDS, bam_step =["dedup","raw"]),
+        expand(config["bam_dir"] + "/{read_id}_ds{milreads}.bam", read_id = IDS, milreads = MILREADS),
+        config["qc_dir"] + "/all_qc.html",
+
+include: "read_preprocess.smk"
+
+rule multiqc:
+    input:
+        expand(config["qc_dir"] + "/{read_id}_{read}_fastqc.html", read_id = IDS, read = ["R1","R2"]),
+        expand(config["qc_dir"] + "/{read_id}_proc_{read}_fastqc.html", read_id = IDS, read = ["R1","R2"]),
+        expand(config["qc_dir"] + "/{read_id}_{bam_step}_samstats.txt", read_id = IDS, bam_step= ["dedup","raw"]),
+        expand(config["qc_dir"] + "/{read_id}_{bam_step}_flagstat.txt", read_id = IDS, bam_step =["dedup","raw"]),
+    params:
+        out_dir = config["qc_dir"]
+    output:
+        config["qc_dir"] + "/all_qc.html"
+    shell:
+        """
+        multiqc {params.out_dir} \
+        --force \
+        --outdir {params.out_dir} \
+        --filename all_qc
+        """
+
+#+end_src
+*** Repository-local integration testing
+#+begin_src bash
+src/full_repo_int_test.sh
+#+end_src
+*** Dev Ideas
+:PROPERTIES:
+:header-args:snakemake: :tangle no
+:END:
+#+begin_src snakemake
+container: config["container"]
+
+IDS, = glob_wildcards(config["fq_dir"] + "/{id}_R1.fastq.gz")
+
+rule all:
+    input:
+        expand(config["processed_fq_dir"] + "/{read_id}_proc_{read}.fastq.gz", read_id = IDS, read = ["R1","R2"]),
+        expand(config["unpr_fq_dir"] + "/{read_id}_unpr_R1.fastq.gz", read_id = IDS, read = ["R1","R2"]),
+        expand(config["bam_dir"] + "/{read_id}_dedup.bam", read_id = IDS),
+        expand(config["bam_dir"] + "/{read_id}_ds{milreads}.bam", read_id = IDS, milreads = config["MILREADS"]),
+        expand(config["qc_dir"] + "/{read_id}_{read}_fastqc.html", read_id = IDS, read = ["R1","R2"]),
+        expand(config["qc_dir"] + "/{read_id}_proc_{read}_fastqc.html", read_id = IDS, read = ["R1","R2"]),
+        config["qc_dir"] + "/all_qc.html",
+
+rule rename:
+    params:
+        old_sample_id=lambda wcs: sampledict[wcs.f],
+    output:
+        read1=config["fq_symlink_dir"] + "/{f}_R1.fastq.gz",
+        read2=config["fq_symlink_dir"] + "/{f}_R2.fastq.gz",
+    shell:
+        """
+        if [ -f {output.read1} ]; then \\rm {output.read1}; fi
+        if [ -f {output.read2} ]; then \\rm {output.read2}; fi
+        ln -s --relative "{config[raw_fq_dir]}/{params.old_sample_id}_R1.fastq.gz" {output.read1}
+        ln -s --relative "{config[raw_fq_dir]}/{params.old_sample_id}_R2.fastq.gz" {output.read2}
+        """
+
+
+include: "read_preprocess.smk"
+#+end_src
+- Ideas
+  #+begin_src snakemake
+container: config["container"]
+import pandas as pd
+import numpy as np
+
+samples = pd.read_table(config["inputs_dir"] + "/samples.tsv")
+sampledict = dict(zip(samples['new_name'], samples['old_name']))
+
+wildcard_constraints:
+    read_id='|'.join([re.escape(x) for x in sampledict.keys()]),
+
+rule all:
+    input:
+        expand(config["processed_fq_dir"] + "/{read_id}_proc_{read}.fastq.gz", read_id = sampledict.keys(), read = ["R1","R2"]),
+        expand(config["unpr_fq_dir"] + "/{read_id}_unpr_R1.fastq.gz", read_id = sampledict.keys(), read = ["R1","R2"]),
+	expand(config["bam_dir"] + "/{read_id}_dedup.bam", read_id = sampledict.keys()),
+        config["qc_dir"] + "/all_qc.html",
+        expand(config["bam_dir"] + "/{read_id}_ds{milreads}.bam", read_id = sampledict.keys(), milreads = config["MILREADS"]),
+
+rule rename:
+    params:
+        old_sample_id=lambda wcs: sampledict[wcs.f],
+    output:
+        read1=config["fq_symlink_dir"] + "/{f}_R1.fastq.gz",
+        read2=config["fq_symlink_dir"] + "/{f}_R2.fastq.gz",
+    shell:
+        """
+        if [ -f {output.read1} ]; then \\rm {output.read1}; fi
+        if [ -f {output.read2} ]; then \\rm {output.read2}; fi
+        ln -s --relative "{config[raw_fq_dir]}/{params.old_sample_id}_R1.fastq.gz" {output.read1}
+        ln -s --relative "{config[raw_fq_dir]}/{params.old_sample_id}_R2.fastq.gz" {output.read2}
+        """
+
+
+include: "read_preprocess.smk"
+#+end_src

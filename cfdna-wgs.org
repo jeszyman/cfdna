@@ -803,6 +803,10 @@ rule rename:
 include: "read_preprocess.smk"
 #+end_src
 ** README
+:PROPERTIES:
+:export_file_name: ./README.md
+:export_options: toc:nil
+:END:
 *** Changlog
-- [2022-05-31 Tue] -
+- [2022-05-31 Tue] - Conforms to current biotools best practices.
 - [2022-04-29 Fri] - Moved multiqc to integration testing as inputs are dependent on final sample labels. Integration testing works per this commit.

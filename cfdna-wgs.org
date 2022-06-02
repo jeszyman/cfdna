@@ -810,3 +810,5 @@ include: "read_preprocess.smk"
 *** Changlog
 - [2022-05-31 Tue] - Conforms to current biotools best practices.
 - [2022-04-29 Fri] - Moved multiqc to integration testing as inputs are dependent on final sample labels. Integration testing works per this commit.
+** Reference
+- [[id:271b4d5f-727e-496e-b835-8fe9f8655655][Bioinformatics project module]]

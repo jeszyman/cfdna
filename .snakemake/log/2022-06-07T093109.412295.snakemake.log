@@ -1,0 +1,7 @@
+Building DAG of jobs...
+MissingInputException in line 12 of /home/jeszyman/repos/cfdna-wgs/workflow/int_test.smk:
+Missing input files for rule all:
+test/qc/lib004_collect_wgs_metrics
+test/qc/lib002_collect_wgs_metrics
+test/qc/lib001_collect_wgs_metrics
+test/qc/lib003_collect_wgs_metrics

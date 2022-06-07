@@ -1,0 +1,67 @@
+Building DAG of jobs...
+Using shell: /bin/bash
+Provided cores: 4
+Rules claiming more threads will be scaled down.
+Job stats:
+job                            count    min threads    max threads
+---------------------------  -------  -------------  -------------
+all                                1              1              1
+deeptools_bamprfragmentsize        1              1              1
+total                              2              1              1
+
+Resources before job selection: {'_cores': 4, '_nodes': 9223372036854775807}
+Ready jobs (1):
+	deeptools_bamprfragmentsize
+Select jobs to execute...
+Using greedy selector because only single job has to be scheduled.
+Selected jobs (1):
+	deeptools_bamprfragmentsize
+Resources after job selection: {'_cores': 3, '_nodes': 9223372036854775806}
+
+[Tue Jun  7 13:26:49 2022]
+rule deeptools_bamprfragmentsize:
+    input: test/bam/lib001_dedup.bam, test/bam/lib002_dedup.bam, test/bam/lib003_dedup.bam, test/bam/lib004_dedup.bam
+    output: test/qc/deeptools_frag_lengths.txt, test/qc/deeptools_frag_summary.txt
+    jobid: 50
+    resources: tmpdir=/tmp
+
+
+        workflow/scripts/bamPEFragmentSize_wrapper.sh         test/bam/lib001_dedup.bam test/bam/lib002_dedup.bam test/bam/lib003_dedup.bam test/bam/lib004_dedup.bam         4         test/inputs/hg38-blacklist.v2.bed         test/qc/deeptools_frag_lengths.txt         test/qc/deeptools_frag_summary.txt
+        
+ singularity  exec --home /home/jeszyman/repos/cfdna-wgs --bind /home/jeszyman:/home/jeszyman --bind /mnt:/mnt /home/jeszyman/sing_containers/biotools.sif bash -c 'set -euo pipefail;  
+        workflow/scripts/bamPEFragmentSize_wrapper.sh         test/bam/lib001_dedup.bam test/bam/lib002_dedup.bam test/bam/lib003_dedup.bam test/bam/lib004_dedup.bam         4         test/inputs/hg38-blacklist.v2.bed         test/qc/deeptools_frag_lengths.txt         test/qc/deeptools_frag_summary.txt'
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+[Tue Jun  7 13:26:52 2022]
+Error in rule deeptools_bamprfragmentsize:
+    jobid: 50
+    output: test/qc/deeptools_frag_lengths.txt, test/qc/deeptools_frag_summary.txt
+    shell:
+        
+        workflow/scripts/bamPEFragmentSize_wrapper.sh         test/bam/lib001_dedup.bam test/bam/lib002_dedup.bam test/bam/lib003_dedup.bam test/bam/lib004_dedup.bam         4         test/inputs/hg38-blacklist.v2.bed         test/qc/deeptools_frag_lengths.txt         test/qc/deeptools_frag_summary.txt
+        
+        (one of the commands exited with non-zero exit code; note that snakemake uses bash strict mode!)
+
+Full Traceback (most recent call last):
+  File "/opt/miniconda3/envs/snakemake/lib/python3.10/site-packages/snakemake/executors/__init__.py", line 593, in _callback
+    raise ex
+  File "/opt/miniconda3/envs/snakemake/lib/python3.10/concurrent/futures/thread.py", line 52, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "/opt/miniconda3/envs/snakemake/lib/python3.10/site-packages/snakemake/executors/__init__.py", line 579, in cached_or_run
+    run_func(*args)
+  File "/opt/miniconda3/envs/snakemake/lib/python3.10/site-packages/snakemake/executors/__init__.py", line 2461, in run_wrapper
+    raise ex
+  File "/opt/miniconda3/envs/snakemake/lib/python3.10/site-packages/snakemake/executors/__init__.py", line 2418, in run_wrapper
+    run(
+  File "/home/jeszyman/repos/cfdna-wgs/workflow/read_preprocess.smk", line 274, in __rule_deeptools_bamprfragmentsize
+  File "/opt/miniconda3/envs/snakemake/lib/python3.10/site-packages/snakemake/shell.py", line 266, in __new__
+    raise sp.CalledProcessError(retcode, cmd)
+subprocess.CalledProcessError: Command ' singularity  exec --home /home/jeszyman/repos/cfdna-wgs --bind /home/jeszyman:/home/jeszyman --bind /mnt:/mnt /home/jeszyman/sing_containers/biotools.sif bash -c 'set -euo pipefail;  
+        workflow/scripts/bamPEFragmentSize_wrapper.sh         test/bam/lib001_dedup.bam test/bam/lib002_dedup.bam test/bam/lib003_dedup.bam test/bam/lib004_dedup.bam         4         test/inputs/hg38-blacklist.v2.bed         test/qc/deeptools_frag_lengths.txt         test/qc/deeptools_frag_summary.txt'' returned non-zero exit status 2.
+
+Shutting down, this might take some time.
+Exiting because a job execution failed. Look above for error message
+Complete log: /home/jeszyman/repos/cfdna-wgs/.snakemake/log/2022-06-07T132649.069781.snakemake.log
+unlocking
+removing lock
+removing lock
+removed all locks

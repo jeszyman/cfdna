@@ -1,0 +1,1560 @@
+Building DAG of jobs...
+Using shell: /bin/bash
+Provided cores: 4
+Rules claiming more threads will be scaled down.
+Job stats:
+job                           count    min threads    max threads
+--------------------------  -------  -------------  -------------
+align                             4              1              1
+alignment_processing              4              1              1
+alignment_qc                      8              1              1
+all                               1              1              1
+downsample_bams                   8              1              1
+fastqc                            8              1              1
+multiqc                           1              1              1
+picard_collect_wgs_metrics        4              1              1
+symlink                           8              1              1
+trimmomatic                       4              1              1
+total                            50              1              1
+
+Resources before job selection: {'_cores': 4, '_nodes': 9223372036854775807}
+Ready jobs (8):
+	symlink
+	symlink
+	symlink
+	symlink
+	symlink
+	symlink
+	symlink
+	symlink
+Select jobs to execute...
+Selected jobs (4):
+	symlink
+	symlink
+	symlink
+	symlink
+Resources after job selection: {'_cores': 0, '_nodes': 9223372036854775803}
+
+[Tue Jun  7 10:05:55 2022]
+rule symlink:
+    input: test/inputs/lib001_R1.fastq.gz
+    output: test/fastq/raw/lib001_R1.fastq.gz
+    jobid: 1
+    wildcards: library_id=lib001, read=R1
+    resources: tmpdir=/tmp
+
+
+        ln --force --relative --symbolic test/inputs/lib001_R1.fastq.gz test/fastq/raw/lib001_R1.fastq.gz
+        
+
+ singularity  exec --home /home/jeszyman/repos/cfdna-wgs --bind /home/jeszyman:/home/jeszyman --bind /mnt:/mnt /home/jeszyman/sing_containers/biotools.sif bash -c 'set -euo pipefail;  
+        ln --force --relative --symbolic test/inputs/lib001_R1.fastq.gz test/fastq/raw/lib001_R1.fastq.gz'
+[Tue Jun  7 10:05:55 2022]
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+rule symlink:
+    input: test/inputs/lib002_R1.fastq.gz
+    output: test/fastq/raw/lib002_R1.fastq.gz
+    jobid: 3
+    wildcards: library_id=lib002, read=R1
+    resources: tmpdir=/tmp
+
+
+        ln --force --relative --symbolic test/inputs/lib002_R1.fastq.gz test/fastq/raw/lib002_R1.fastq.gz
+        
+
+ singularity  exec --home /home/jeszyman/repos/cfdna-wgs --bind /home/jeszyman:/home/jeszyman --bind /mnt:/mnt /home/jeszyman/sing_containers/biotools.sif bash -c 'set -euo pipefail;  
+        ln --force --relative --symbolic test/inputs/lib002_R1.fastq.gz test/fastq/raw/lib002_R1.fastq.gz'
+[Tue Jun  7 10:05:55 2022]
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+rule symlink:
+    input: test/inputs/lib003_R1.fastq.gz
+    output: test/fastq/raw/lib003_R1.fastq.gz
+    jobid: 5
+    wildcards: library_id=lib003, read=R1
+    resources: tmpdir=/tmp
+
+
+        ln --force --relative --symbolic test/inputs/lib003_R1.fastq.gz test/fastq/raw/lib003_R1.fastq.gz
+        
+ singularity  exec --home /home/jeszyman/repos/cfdna-wgs --bind /home/jeszyman:/home/jeszyman --bind /mnt:/mnt /home/jeszyman/sing_containers/biotools.sif bash -c 'set -euo pipefail;  
+        ln --force --relative --symbolic test/inputs/lib003_R1.fastq.gz test/fastq/raw/lib003_R1.fastq.gz'
+
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+[Tue Jun  7 10:05:55 2022]
+rule symlink:
+    input: test/inputs/lib004_R1.fastq.gz
+    output: test/fastq/raw/lib004_R1.fastq.gz
+    jobid: 7
+    wildcards: library_id=lib004, read=R1
+    resources: tmpdir=/tmp
+
+
+        ln --force --relative --symbolic test/inputs/lib004_R1.fastq.gz test/fastq/raw/lib004_R1.fastq.gz
+        
+ singularity  exec --home /home/jeszyman/repos/cfdna-wgs --bind /home/jeszyman:/home/jeszyman --bind /mnt:/mnt /home/jeszyman/sing_containers/biotools.sif bash -c 'set -euo pipefail;  
+        ln --force --relative --symbolic test/inputs/lib004_R1.fastq.gz test/fastq/raw/lib004_R1.fastq.gz'
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+[Tue Jun  7 10:05:55 2022]
+Finished job 3.
+1 of 50 steps (2%) done
+Resources before job selection: {'_cores': 1, '_nodes': 9223372036854775804}
+Ready jobs (4):
+	symlink
+	symlink
+	symlink
+	symlink
+Select jobs to execute...
+Selected jobs (1):
+	symlink
+Resources after job selection: {'_cores': 0, '_nodes': 9223372036854775803}
+
+[Tue Jun  7 10:05:55 2022]
+rule symlink:
+    input: test/inputs/lib004_R2.fastq.gz
+    output: test/fastq/raw/lib004_R2.fastq.gz
+    jobid: 8
+    wildcards: library_id=lib004, read=R2
+    resources: tmpdir=/tmp
+
+
+        ln --force --relative --symbolic test/inputs/lib004_R2.fastq.gz test/fastq/raw/lib004_R2.fastq.gz
+        
+ singularity  exec --home /home/jeszyman/repos/cfdna-wgs --bind /home/jeszyman:/home/jeszyman --bind /mnt:/mnt /home/jeszyman/sing_containers/biotools.sif bash -c 'set -euo pipefail;  
+        ln --force --relative --symbolic test/inputs/lib004_R2.fastq.gz test/fastq/raw/lib004_R2.fastq.gz'
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+[Tue Jun  7 10:05:55 2022]
+Finished job 5.
+2 of 50 steps (4%) done
+[Tue Jun  7 10:05:55 2022]
+Finished job 7.
+3 of 50 steps (6%) done
+Resources before job selection: {'_cores': 2, '_nodes': 9223372036854775805}
+Ready jobs (3):
+	symlink
+	symlink
+	symlink
+Select jobs to execute...
+Selected jobs (2):
+	symlink
+	symlink
+Resources after job selection: {'_cores': 0, '_nodes': 9223372036854775803}
+
+[Tue Jun  7 10:05:55 2022]
+rule symlink:
+    input: test/inputs/lib002_R2.fastq.gz
+    output: test/fastq/raw/lib002_R2.fastq.gz
+    jobid: 4
+    wildcards: library_id=lib002, read=R2
+    resources: tmpdir=/tmp
+
+
+        ln --force --relative --symbolic test/inputs/lib002_R2.fastq.gz test/fastq/raw/lib002_R2.fastq.gz
+        
+
+[Tue Jun  7 10:05:55 2022]
+rule symlink:
+    input: test/inputs/lib003_R2.fastq.gz
+    output: test/fastq/raw/lib003_R2.fastq.gz
+    jobid: 6
+    wildcards: library_id=lib003, read=R2
+    resources: tmpdir=/tmp
+
+
+        ln --force --relative --symbolic test/inputs/lib003_R2.fastq.gz test/fastq/raw/lib003_R2.fastq.gz
+        
+ singularity  exec --home /home/jeszyman/repos/cfdna-wgs --bind /home/jeszyman:/home/jeszyman --bind /mnt:/mnt /home/jeszyman/sing_containers/biotools.sif bash -c 'set -euo pipefail;  
+        ln --force --relative --symbolic test/inputs/lib002_R2.fastq.gz test/fastq/raw/lib002_R2.fastq.gz'
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+ singularity  exec --home /home/jeszyman/repos/cfdna-wgs --bind /home/jeszyman:/home/jeszyman --bind /mnt:/mnt /home/jeszyman/sing_containers/biotools.sif bash -c 'set -euo pipefail;  
+        ln --force --relative --symbolic test/inputs/lib003_R2.fastq.gz test/fastq/raw/lib003_R2.fastq.gz'
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+[Tue Jun  7 10:05:55 2022]
+Finished job 1.
+4 of 50 steps (8%) done
+Resources before job selection: {'_cores': 1, '_nodes': 9223372036854775804}
+Ready jobs (1):
+	symlink
+Select jobs to execute...
+Using greedy selector because only single job has to be scheduled.
+Selected jobs (1):
+	symlink
+Resources after job selection: {'_cores': 0, '_nodes': 9223372036854775803}
+
+[Tue Jun  7 10:05:55 2022]
+rule symlink:
+    input: test/inputs/lib001_R2.fastq.gz
+    output: test/fastq/raw/lib001_R2.fastq.gz
+    jobid: 2
+    wildcards: library_id=lib001, read=R2
+    resources: tmpdir=/tmp
+
+
+        ln --force --relative --symbolic test/inputs/lib001_R2.fastq.gz test/fastq/raw/lib001_R2.fastq.gz
+        
+ singularity  exec --home /home/jeszyman/repos/cfdna-wgs --bind /home/jeszyman:/home/jeszyman --bind /mnt:/mnt /home/jeszyman/sing_containers/biotools.sif bash -c 'set -euo pipefail;  
+        ln --force --relative --symbolic test/inputs/lib001_R2.fastq.gz test/fastq/raw/lib001_R2.fastq.gz'
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+[Tue Jun  7 10:05:55 2022]
+Finished job 8.
+5 of 50 steps (10%) done
+Resources before job selection: {'_cores': 1, '_nodes': 9223372036854775804}
+Ready jobs (1):
+	trimmomatic
+Select jobs to execute...
+Using greedy selector because only single job has to be scheduled.
+Selected jobs (1):
+	trimmomatic
+Resources after job selection: {'_cores': 0, '_nodes': 9223372036854775803}
+
+[Tue Jun  7 10:05:55 2022]
+rule trimmomatic:
+    input: test/fastq/raw/lib004_R1.fastq.gz, test/fastq/raw/lib004_R2.fastq.gz
+    output: test/fastq/processed/lib004_proc_R1.fastq.gz, test/fastq/unpaired/lib004_unpr_R1.fastq.gz, test/fastq/processed/lib004_proc_R2.fastq.gz, test/fastq/unpaired/lib004_unpr_R2.fastq.gz
+    log: test/logs/trimmomatic_trimlog_lib004.log, test/logs/trimmomatic_lib004.log
+    jobid: 12
+    wildcards: library_id=lib004
+    resources: tmpdir=/tmp
+
+
+        trimmomatic PE                     -threads 4                     -trimlog test/logs/trimmomatic_trimlog_lib004.log                     test/fastq/raw/lib004_R1.fastq.gz test/fastq/raw/lib004_R2.fastq.gz                     test/fastq/processed/lib004_proc_R1.fastq.gz test/fastq/unpaired/lib004_unpr_R1.fastq.gz                     test/fastq/processed/lib004_proc_R2.fastq.gz test/fastq/unpaired/lib004_unpr_R2.fastq.gz                     ILLUMINACLIP:test/inputs/TruSeq3-PE.fa:2:30:10                     LEADING:10 TRAILING:10 MAXINFO:50:0.97 MINLEN:20 &> test/logs/trimmomatic_lib004.log
+        
+ singularity  exec --home /home/jeszyman/repos/cfdna-wgs --bind /home/jeszyman:/home/jeszyman --bind /mnt:/mnt /home/jeszyman/sing_containers/biotools.sif bash -c 'set -euo pipefail;  
+        trimmomatic PE                     -threads 4                     -trimlog test/logs/trimmomatic_trimlog_lib004.log                     test/fastq/raw/lib004_R1.fastq.gz test/fastq/raw/lib004_R2.fastq.gz                     test/fastq/processed/lib004_proc_R1.fastq.gz test/fastq/unpaired/lib004_unpr_R1.fastq.gz                     test/fastq/processed/lib004_proc_R2.fastq.gz test/fastq/unpaired/lib004_unpr_R2.fastq.gz                     ILLUMINACLIP:test/inputs/TruSeq3-PE.fa:2:30:10                     LEADING:10 TRAILING:10 MAXINFO:50:0.97 MINLEN:20 &> test/logs/trimmomatic_lib004.log'
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+[Tue Jun  7 10:05:55 2022]
+Finished job 6.
+6 of 50 steps (12%) done
+Resources before job selection: {'_cores': 1, '_nodes': 9223372036854775804}
+Ready jobs (1):
+	trimmomatic
+Select jobs to execute...
+Using greedy selector because only single job has to be scheduled.
+Selected jobs (1):
+	trimmomatic
+Resources after job selection: {'_cores': 0, '_nodes': 9223372036854775803}
+
+[Tue Jun  7 10:05:55 2022]
+rule trimmomatic:
+    input: test/fastq/raw/lib003_R1.fastq.gz, test/fastq/raw/lib003_R2.fastq.gz
+    output: test/fastq/processed/lib003_proc_R1.fastq.gz, test/fastq/unpaired/lib003_unpr_R1.fastq.gz, test/fastq/processed/lib003_proc_R2.fastq.gz, test/fastq/unpaired/lib003_unpr_R2.fastq.gz
+    log: test/logs/trimmomatic_trimlog_lib003.log, test/logs/trimmomatic_lib003.log
+    jobid: 11
+    wildcards: library_id=lib003
+    resources: tmpdir=/tmp
+
+
+        trimmomatic PE                     -threads 4                     -trimlog test/logs/trimmomatic_trimlog_lib003.log                     test/fastq/raw/lib003_R1.fastq.gz test/fastq/raw/lib003_R2.fastq.gz                     test/fastq/processed/lib003_proc_R1.fastq.gz test/fastq/unpaired/lib003_unpr_R1.fastq.gz                     test/fastq/processed/lib003_proc_R2.fastq.gz test/fastq/unpaired/lib003_unpr_R2.fastq.gz                     ILLUMINACLIP:test/inputs/TruSeq3-PE.fa:2:30:10                     LEADING:10 TRAILING:10 MAXINFO:50:0.97 MINLEN:20 &> test/logs/trimmomatic_lib003.log
+        
+ singularity  exec --home /home/jeszyman/repos/cfdna-wgs --bind /home/jeszyman:/home/jeszyman --bind /mnt:/mnt /home/jeszyman/sing_containers/biotools.sif bash -c 'set -euo pipefail;  
+        trimmomatic PE                     -threads 4                     -trimlog test/logs/trimmomatic_trimlog_lib003.log                     test/fastq/raw/lib003_R1.fastq.gz test/fastq/raw/lib003_R2.fastq.gz                     test/fastq/processed/lib003_proc_R1.fastq.gz test/fastq/unpaired/lib003_unpr_R1.fastq.gz                     test/fastq/processed/lib003_proc_R2.fastq.gz test/fastq/unpaired/lib003_unpr_R2.fastq.gz                     ILLUMINACLIP:test/inputs/TruSeq3-PE.fa:2:30:10                     LEADING:10 TRAILING:10 MAXINFO:50:0.97 MINLEN:20 &> test/logs/trimmomatic_lib003.log'
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+[Tue Jun  7 10:05:55 2022]
+Finished job 4.
+7 of 50 steps (14%) done
+[Tue Jun  7 10:05:55 2022]
+Finished job 2.
+8 of 50 steps (16%) done
+Resources before job selection: {'_cores': 2, '_nodes': 9223372036854775805}
+Ready jobs (2):
+	trimmomatic
+	trimmomatic
+Select jobs to execute...
+Selected jobs (2):
+	trimmomatic
+	trimmomatic
+Resources after job selection: {'_cores': 0, '_nodes': 9223372036854775803}
+
+[Tue Jun  7 10:05:55 2022]
+rule trimmomatic:
+    input: test/fastq/raw/lib002_R1.fastq.gz, test/fastq/raw/lib002_R2.fastq.gz
+    output: test/fastq/processed/lib002_proc_R1.fastq.gz, test/fastq/unpaired/lib002_unpr_R1.fastq.gz, test/fastq/processed/lib002_proc_R2.fastq.gz, test/fastq/unpaired/lib002_unpr_R2.fastq.gz
+    log: test/logs/trimmomatic_trimlog_lib002.log, test/logs/trimmomatic_lib002.log
+    jobid: 10
+    wildcards: library_id=lib002
+    resources: tmpdir=/tmp
+
+
+        trimmomatic PE                     -threads 4                     -trimlog test/logs/trimmomatic_trimlog_lib002.log                     test/fastq/raw/lib002_R1.fastq.gz test/fastq/raw/lib002_R2.fastq.gz                     test/fastq/processed/lib002_proc_R1.fastq.gz test/fastq/unpaired/lib002_unpr_R1.fastq.gz                     test/fastq/processed/lib002_proc_R2.fastq.gz test/fastq/unpaired/lib002_unpr_R2.fastq.gz                     ILLUMINACLIP:test/inputs/TruSeq3-PE.fa:2:30:10                     LEADING:10 TRAILING:10 MAXINFO:50:0.97 MINLEN:20 &> test/logs/trimmomatic_lib002.log
+        
+
+ singularity  exec --home /home/jeszyman/repos/cfdna-wgs --bind /home/jeszyman:/home/jeszyman --bind /mnt:/mnt /home/jeszyman/sing_containers/biotools.sif bash -c 'set -euo pipefail;  
+        trimmomatic PE                     -threads 4                     -trimlog test/logs/trimmomatic_trimlog_lib002.log                     test/fastq/raw/lib002_R1.fastq.gz test/fastq/raw/lib002_R2.fastq.gz                     test/fastq/processed/lib002_proc_R1.fastq.gz test/fastq/unpaired/lib002_unpr_R1.fastq.gz                     test/fastq/processed/lib002_proc_R2.fastq.gz test/fastq/unpaired/lib002_unpr_R2.fastq.gz                     ILLUMINACLIP:test/inputs/TruSeq3-PE.fa:2:30:10                     LEADING:10 TRAILING:10 MAXINFO:50:0.97 MINLEN:20 &> test/logs/trimmomatic_lib002.log'
+[Tue Jun  7 10:05:55 2022]
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+rule trimmomatic:
+    input: test/fastq/raw/lib001_R1.fastq.gz, test/fastq/raw/lib001_R2.fastq.gz
+    output: test/fastq/processed/lib001_proc_R1.fastq.gz, test/fastq/unpaired/lib001_unpr_R1.fastq.gz, test/fastq/processed/lib001_proc_R2.fastq.gz, test/fastq/unpaired/lib001_unpr_R2.fastq.gz
+    log: test/logs/trimmomatic_trimlog_lib001.log, test/logs/trimmomatic_lib001.log
+    jobid: 9
+    wildcards: library_id=lib001
+    resources: tmpdir=/tmp
+
+
+        trimmomatic PE                     -threads 4                     -trimlog test/logs/trimmomatic_trimlog_lib001.log                     test/fastq/raw/lib001_R1.fastq.gz test/fastq/raw/lib001_R2.fastq.gz                     test/fastq/processed/lib001_proc_R1.fastq.gz test/fastq/unpaired/lib001_unpr_R1.fastq.gz                     test/fastq/processed/lib001_proc_R2.fastq.gz test/fastq/unpaired/lib001_unpr_R2.fastq.gz                     ILLUMINACLIP:test/inputs/TruSeq3-PE.fa:2:30:10                     LEADING:10 TRAILING:10 MAXINFO:50:0.97 MINLEN:20 &> test/logs/trimmomatic_lib001.log
+        
+ singularity  exec --home /home/jeszyman/repos/cfdna-wgs --bind /home/jeszyman:/home/jeszyman --bind /mnt:/mnt /home/jeszyman/sing_containers/biotools.sif bash -c 'set -euo pipefail;  
+        trimmomatic PE                     -threads 4                     -trimlog test/logs/trimmomatic_trimlog_lib001.log                     test/fastq/raw/lib001_R1.fastq.gz test/fastq/raw/lib001_R2.fastq.gz                     test/fastq/processed/lib001_proc_R1.fastq.gz test/fastq/unpaired/lib001_unpr_R1.fastq.gz                     test/fastq/processed/lib001_proc_R2.fastq.gz test/fastq/unpaired/lib001_unpr_R2.fastq.gz                     ILLUMINACLIP:test/inputs/TruSeq3-PE.fa:2:30:10                     LEADING:10 TRAILING:10 MAXINFO:50:0.97 MINLEN:20 &> test/logs/trimmomatic_lib001.log'
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+[Tue Jun  7 10:05:58 2022]
+Finished job 12.
+9 of 50 steps (18%) done
+Resources before job selection: {'_cores': 1, '_nodes': 9223372036854775804}
+Ready jobs (3):
+	align
+	fastqc
+	fastqc
+Select jobs to execute...
+Selected jobs (1):
+	fastqc
+Resources after job selection: {'_cores': 0, '_nodes': 9223372036854775803}
+
+[Tue Jun  7 10:05:58 2022]
+rule fastqc:
+    input: test/fastq/raw/lib004_R2.fastq.gz, test/fastq/processed/lib004_proc_R2.fastq.gz
+    output: test/qc/lib004_R2_fastqc.html, test/qc/lib004_proc_R2_fastqc.html
+    log: test/logs/fastqc_raw_lib004_R2.log, test/logs/fastqc_proc_lib004_R2.log
+    jobid: 24
+    wildcards: library_id=lib004, read=R2
+    resources: tmpdir=/tmp
+
+
+        fastqc --outdir test/qc         --quiet         --threads 4 test/fastq/raw/lib004_R2.fastq.gz &> test/logs/fastqc_raw_lib004_R2.log test/logs/fastqc_proc_lib004_R2.log
+        fastqc --outdir test/qc         --quiet         --threads 4 test/fastq/processed/lib004_proc_R2.fastq.gz &> test/logs/fastqc_raw_lib004_R2.log test/logs/fastqc_proc_lib004_R2.log
+        
+ singularity  exec --home /home/jeszyman/repos/cfdna-wgs --bind /home/jeszyman:/home/jeszyman --bind /mnt:/mnt /home/jeszyman/sing_containers/biotools.sif bash -c 'set -euo pipefail;  
+        fastqc --outdir test/qc         --quiet         --threads 4 test/fastq/raw/lib004_R2.fastq.gz &> test/logs/fastqc_raw_lib004_R2.log test/logs/fastqc_proc_lib004_R2.log
+        fastqc --outdir test/qc         --quiet         --threads 4 test/fastq/processed/lib004_proc_R2.fastq.gz &> test/logs/fastqc_raw_lib004_R2.log test/logs/fastqc_proc_lib004_R2.log'
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+[Tue Jun  7 10:05:58 2022]
+Finished job 11.
+10 of 50 steps (20%) done
+Resources before job selection: {'_cores': 1, '_nodes': 9223372036854775804}
+Ready jobs (5):
+	fastqc
+	align
+	fastqc
+	align
+	fastqc
+Select jobs to execute...
+Selected jobs (1):
+	fastqc
+Resources after job selection: {'_cores': 0, '_nodes': 9223372036854775803}
+
+[Tue Jun  7 10:05:58 2022]
+rule fastqc:
+    input: test/fastq/raw/lib003_R2.fastq.gz, test/fastq/processed/lib003_proc_R2.fastq.gz
+    output: test/qc/lib003_R2_fastqc.html, test/qc/lib003_proc_R2_fastqc.html
+    log: test/logs/fastqc_raw_lib003_R2.log, test/logs/fastqc_proc_lib003_R2.log
+    jobid: 22
+    wildcards: library_id=lib003, read=R2
+    resources: tmpdir=/tmp
+
+
+        fastqc --outdir test/qc         --quiet         --threads 4 test/fastq/raw/lib003_R2.fastq.gz &> test/logs/fastqc_raw_lib003_R2.log test/logs/fastqc_proc_lib003_R2.log
+        fastqc --outdir test/qc         --quiet         --threads 4 test/fastq/processed/lib003_proc_R2.fastq.gz &> test/logs/fastqc_raw_lib003_R2.log test/logs/fastqc_proc_lib003_R2.log
+        
+ singularity  exec --home /home/jeszyman/repos/cfdna-wgs --bind /home/jeszyman:/home/jeszyman --bind /mnt:/mnt /home/jeszyman/sing_containers/biotools.sif bash -c 'set -euo pipefail;  
+        fastqc --outdir test/qc         --quiet         --threads 4 test/fastq/raw/lib003_R2.fastq.gz &> test/logs/fastqc_raw_lib003_R2.log test/logs/fastqc_proc_lib003_R2.log
+        fastqc --outdir test/qc         --quiet         --threads 4 test/fastq/processed/lib003_proc_R2.fastq.gz &> test/logs/fastqc_raw_lib003_R2.log test/logs/fastqc_proc_lib003_R2.log'
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+[Tue Jun  7 10:05:59 2022]
+Finished job 10.
+11 of 50 steps (22%) done
+Resources before job selection: {'_cores': 1, '_nodes': 9223372036854775804}
+Ready jobs (7):
+	fastqc
+	fastqc
+	align
+	fastqc
+	align
+	align
+	fastqc
+Select jobs to execute...
+Selected jobs (1):
+	fastqc
+Resources after job selection: {'_cores': 0, '_nodes': 9223372036854775803}
+
+[Tue Jun  7 10:05:59 2022]
+rule fastqc:
+    input: test/fastq/raw/lib002_R2.fastq.gz, test/fastq/processed/lib002_proc_R2.fastq.gz
+    output: test/qc/lib002_R2_fastqc.html, test/qc/lib002_proc_R2_fastqc.html
+    log: test/logs/fastqc_raw_lib002_R2.log, test/logs/fastqc_proc_lib002_R2.log
+    jobid: 20
+    wildcards: library_id=lib002, read=R2
+    resources: tmpdir=/tmp
+
+
+        fastqc --outdir test/qc         --quiet         --threads 4 test/fastq/raw/lib002_R2.fastq.gz &> test/logs/fastqc_raw_lib002_R2.log test/logs/fastqc_proc_lib002_R2.log
+        fastqc --outdir test/qc         --quiet         --threads 4 test/fastq/processed/lib002_proc_R2.fastq.gz &> test/logs/fastqc_raw_lib002_R2.log test/logs/fastqc_proc_lib002_R2.log
+        
+ singularity  exec --home /home/jeszyman/repos/cfdna-wgs --bind /home/jeszyman:/home/jeszyman --bind /mnt:/mnt /home/jeszyman/sing_containers/biotools.sif bash -c 'set -euo pipefail;  
+        fastqc --outdir test/qc         --quiet         --threads 4 test/fastq/raw/lib002_R2.fastq.gz &> test/logs/fastqc_raw_lib002_R2.log test/logs/fastqc_proc_lib002_R2.log
+        fastqc --outdir test/qc         --quiet         --threads 4 test/fastq/processed/lib002_proc_R2.fastq.gz &> test/logs/fastqc_raw_lib002_R2.log test/logs/fastqc_proc_lib002_R2.log'
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+[Tue Jun  7 10:05:59 2022]
+Finished job 9.
+12 of 50 steps (24%) done
+Resources before job selection: {'_cores': 1, '_nodes': 9223372036854775804}
+Ready jobs (9):
+	align
+	fastqc
+	fastqc
+	align
+	fastqc
+	fastqc
+	align
+	align
+	fastqc
+Select jobs to execute...
+Selected jobs (1):
+	fastqc
+Resources after job selection: {'_cores': 0, '_nodes': 9223372036854775803}
+
+[Tue Jun  7 10:05:59 2022]
+rule fastqc:
+    input: test/fastq/raw/lib001_R2.fastq.gz, test/fastq/processed/lib001_proc_R2.fastq.gz
+    output: test/qc/lib001_R2_fastqc.html, test/qc/lib001_proc_R2_fastqc.html
+    log: test/logs/fastqc_raw_lib001_R2.log, test/logs/fastqc_proc_lib001_R2.log
+    jobid: 18
+    wildcards: library_id=lib001, read=R2
+    resources: tmpdir=/tmp
+
+
+        fastqc --outdir test/qc         --quiet         --threads 4 test/fastq/raw/lib001_R2.fastq.gz &> test/logs/fastqc_raw_lib001_R2.log test/logs/fastqc_proc_lib001_R2.log
+        fastqc --outdir test/qc         --quiet         --threads 4 test/fastq/processed/lib001_proc_R2.fastq.gz &> test/logs/fastqc_raw_lib001_R2.log test/logs/fastqc_proc_lib001_R2.log
+        
+ singularity  exec --home /home/jeszyman/repos/cfdna-wgs --bind /home/jeszyman:/home/jeszyman --bind /mnt:/mnt /home/jeszyman/sing_containers/biotools.sif bash -c 'set -euo pipefail;  
+        fastqc --outdir test/qc         --quiet         --threads 4 test/fastq/raw/lib001_R2.fastq.gz &> test/logs/fastqc_raw_lib001_R2.log test/logs/fastqc_proc_lib001_R2.log
+        fastqc --outdir test/qc         --quiet         --threads 4 test/fastq/processed/lib001_proc_R2.fastq.gz &> test/logs/fastqc_raw_lib001_R2.log test/logs/fastqc_proc_lib001_R2.log'
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+[Tue Jun  7 10:06:04 2022]
+Finished job 22.
+13 of 50 steps (26%) done
+Resources before job selection: {'_cores': 1, '_nodes': 9223372036854775804}
+Ready jobs (8):
+	align
+	fastqc
+	fastqc
+	align
+	fastqc
+	fastqc
+	align
+	align
+Select jobs to execute...
+Selected jobs (1):
+	align
+Resources after job selection: {'_cores': 0, '_nodes': 9223372036854775803}
+
+[Tue Jun  7 10:06:04 2022]
+rule align:
+    input: test/fastq/processed/lib002_proc_R1.fastq.gz, test/fastq/processed/lib002_proc_R2.fastq.gz
+    output: test/bam/lib002.sam
+    log: test/logs/align_lib002.log
+    jobid: 14
+    wildcards: library_id=lib002
+    resources: tmpdir=/tmp
+
+
+        bwa mem -M -t 4 test/inputs/chr8 test/fastq/processed/lib002_proc_R1.fastq.gz test/fastq/processed/lib002_proc_R2.fastq.gz > test/bam/lib002.sam
+	
+ singularity  exec --home /home/jeszyman/repos/cfdna-wgs --bind /home/jeszyman:/home/jeszyman --bind /mnt:/mnt /home/jeszyman/sing_containers/biotools.sif bash -c 'set -euo pipefail;  
+        bwa mem -M -t 4 test/inputs/chr8 test/fastq/processed/lib002_proc_R1.fastq.gz test/fastq/processed/lib002_proc_R2.fastq.gz > test/bam/lib002.sam'
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+[Tue Jun  7 10:06:05 2022]
+Finished job 14.
+14 of 50 steps (28%) done
+Resources before job selection: {'_cores': 1, '_nodes': 9223372036854775804}
+Ready jobs (8):
+	align
+	fastqc
+	fastqc
+	align
+	fastqc
+	fastqc
+	align
+	alignment_processing
+Select jobs to execute...
+Selected jobs (1):
+	alignment_processing
+Resources after job selection: {'_cores': 0, '_nodes': 9223372036854775803}
+
+[Tue Jun  7 10:06:05 2022]
+rule alignment_processing:
+    input: test/bam/lib002.sam
+    output: test/bam/lib002_raw.bam, test/bam/lib002_dedup_unsort.bam, test/bam/lib002_dedup.bam, test/bam/lib002_dedup.bam.bai
+    log: test/logs/alignment_processing_lib002.log
+    jobid: 26
+    wildcards: library_id=lib002
+    resources: tmpdir=/tmp
+
+
+        sambamba view -t 4 -S -f bam test/bam/lib002.sam > test/bam/lib002_raw.bam
+        sambamba markdup -r -t 4 test/bam/lib002_raw.bam test/bam/lib002_dedup_unsort.bam
+        sambamba sort -t 4 test/bam/lib002_dedup_unsort.bam -o test/bam/lib002_dedup.bam
+        sambamba index -t 4 test/bam/lib002_dedup.bam
+        
+ singularity  exec --home /home/jeszyman/repos/cfdna-wgs --bind /home/jeszyman:/home/jeszyman --bind /mnt:/mnt /home/jeszyman/sing_containers/biotools.sif bash -c 'set -euo pipefail;  
+        sambamba view -t 4 -S -f bam test/bam/lib002.sam > test/bam/lib002_raw.bam
+        sambamba markdup -r -t 4 test/bam/lib002_raw.bam test/bam/lib002_dedup_unsort.bam
+        sambamba sort -t 4 test/bam/lib002_dedup_unsort.bam -o test/bam/lib002_dedup.bam
+        sambamba index -t 4 test/bam/lib002_dedup.bam'
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+[Tue Jun  7 10:06:05 2022]
+Finished job 20.
+15 of 50 steps (30%) done
+Resources before job selection: {'_cores': 1, '_nodes': 9223372036854775804}
+Ready jobs (7):
+	align
+	fastqc
+	fastqc
+	align
+	fastqc
+	fastqc
+	align
+Select jobs to execute...
+Selected jobs (1):
+	align
+Resources after job selection: {'_cores': 0, '_nodes': 9223372036854775803}
+
+[Tue Jun  7 10:06:05 2022]
+rule align:
+    input: test/fastq/processed/lib004_proc_R1.fastq.gz, test/fastq/processed/lib004_proc_R2.fastq.gz
+    output: test/bam/lib004.sam
+    log: test/logs/align_lib004.log
+    jobid: 16
+    wildcards: library_id=lib004
+    resources: tmpdir=/tmp
+
+
+        bwa mem -M -t 4 test/inputs/chr8 test/fastq/processed/lib004_proc_R1.fastq.gz test/fastq/processed/lib004_proc_R2.fastq.gz > test/bam/lib004.sam
+	
+ singularity  exec --home /home/jeszyman/repos/cfdna-wgs --bind /home/jeszyman:/home/jeszyman --bind /mnt:/mnt /home/jeszyman/sing_containers/biotools.sif bash -c 'set -euo pipefail;  
+        bwa mem -M -t 4 test/inputs/chr8 test/fastq/processed/lib004_proc_R1.fastq.gz test/fastq/processed/lib004_proc_R2.fastq.gz > test/bam/lib004.sam'
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+[Tue Jun  7 10:06:06 2022]
+Finished job 18.
+16 of 50 steps (32%) done
+Resources before job selection: {'_cores': 1, '_nodes': 9223372036854775804}
+Ready jobs (6):
+	align
+	fastqc
+	fastqc
+	align
+	fastqc
+	fastqc
+Select jobs to execute...
+Selected jobs (1):
+	fastqc
+Resources after job selection: {'_cores': 0, '_nodes': 9223372036854775803}
+
+[Tue Jun  7 10:06:06 2022]
+rule fastqc:
+    input: test/fastq/raw/lib001_R1.fastq.gz, test/fastq/processed/lib001_proc_R1.fastq.gz
+    output: test/qc/lib001_R1_fastqc.html, test/qc/lib001_proc_R1_fastqc.html
+    log: test/logs/fastqc_raw_lib001_R1.log, test/logs/fastqc_proc_lib001_R1.log
+    jobid: 17
+    wildcards: library_id=lib001, read=R1
+    resources: tmpdir=/tmp
+
+
+        fastqc --outdir test/qc         --quiet         --threads 4 test/fastq/raw/lib001_R1.fastq.gz &> test/logs/fastqc_raw_lib001_R1.log test/logs/fastqc_proc_lib001_R1.log
+        fastqc --outdir test/qc         --quiet         --threads 4 test/fastq/processed/lib001_proc_R1.fastq.gz &> test/logs/fastqc_raw_lib001_R1.log test/logs/fastqc_proc_lib001_R1.log
+        
+ singularity  exec --home /home/jeszyman/repos/cfdna-wgs --bind /home/jeszyman:/home/jeszyman --bind /mnt:/mnt /home/jeszyman/sing_containers/biotools.sif bash -c 'set -euo pipefail;  
+        fastqc --outdir test/qc         --quiet         --threads 4 test/fastq/raw/lib001_R1.fastq.gz &> test/logs/fastqc_raw_lib001_R1.log test/logs/fastqc_proc_lib001_R1.log
+        fastqc --outdir test/qc         --quiet         --threads 4 test/fastq/processed/lib001_proc_R1.fastq.gz &> test/logs/fastqc_raw_lib001_R1.log test/logs/fastqc_proc_lib001_R1.log'
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+[Tue Jun  7 10:06:06 2022]
+Finished job 24.
+17 of 50 steps (34%) done
+Resources before job selection: {'_cores': 1, '_nodes': 9223372036854775804}
+Ready jobs (5):
+	align
+	fastqc
+	fastqc
+	align
+	fastqc
+Select jobs to execute...
+Selected jobs (1):
+	fastqc
+Resources after job selection: {'_cores': 0, '_nodes': 9223372036854775803}
+
+[Tue Jun  7 10:06:06 2022]
+rule fastqc:
+    input: test/fastq/raw/lib004_R1.fastq.gz, test/fastq/processed/lib004_proc_R1.fastq.gz
+    output: test/qc/lib004_R1_fastqc.html, test/qc/lib004_proc_R1_fastqc.html
+    log: test/logs/fastqc_raw_lib004_R1.log, test/logs/fastqc_proc_lib004_R1.log
+    jobid: 23
+    wildcards: library_id=lib004, read=R1
+    resources: tmpdir=/tmp
+
+
+        fastqc --outdir test/qc         --quiet         --threads 4 test/fastq/raw/lib004_R1.fastq.gz &> test/logs/fastqc_raw_lib004_R1.log test/logs/fastqc_proc_lib004_R1.log
+        fastqc --outdir test/qc         --quiet         --threads 4 test/fastq/processed/lib004_proc_R1.fastq.gz &> test/logs/fastqc_raw_lib004_R1.log test/logs/fastqc_proc_lib004_R1.log
+        
+ singularity  exec --home /home/jeszyman/repos/cfdna-wgs --bind /home/jeszyman:/home/jeszyman --bind /mnt:/mnt /home/jeszyman/sing_containers/biotools.sif bash -c 'set -euo pipefail;  
+        fastqc --outdir test/qc         --quiet         --threads 4 test/fastq/raw/lib004_R1.fastq.gz &> test/logs/fastqc_raw_lib004_R1.log test/logs/fastqc_proc_lib004_R1.log
+        fastqc --outdir test/qc         --quiet         --threads 4 test/fastq/processed/lib004_proc_R1.fastq.gz &> test/logs/fastqc_raw_lib004_R1.log test/logs/fastqc_proc_lib004_R1.log'
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+[Tue Jun  7 10:06:07 2022]
+Finished job 16.
+18 of 50 steps (36%) done
+Resources before job selection: {'_cores': 1, '_nodes': 9223372036854775804}
+Ready jobs (5):
+	align
+	fastqc
+	fastqc
+	align
+	alignment_processing
+Select jobs to execute...
+Selected jobs (1):
+	alignment_processing
+Resources after job selection: {'_cores': 0, '_nodes': 9223372036854775803}
+
+[Tue Jun  7 10:06:07 2022]
+rule alignment_processing:
+    input: test/bam/lib004.sam
+    output: test/bam/lib004_raw.bam, test/bam/lib004_dedup_unsort.bam, test/bam/lib004_dedup.bam, test/bam/lib004_dedup.bam.bai
+    log: test/logs/alignment_processing_lib004.log
+    jobid: 28
+    wildcards: library_id=lib004
+    resources: tmpdir=/tmp
+
+
+        sambamba view -t 4 -S -f bam test/bam/lib004.sam > test/bam/lib004_raw.bam
+        sambamba markdup -r -t 4 test/bam/lib004_raw.bam test/bam/lib004_dedup_unsort.bam
+        sambamba sort -t 4 test/bam/lib004_dedup_unsort.bam -o test/bam/lib004_dedup.bam
+        sambamba index -t 4 test/bam/lib004_dedup.bam
+        
+ singularity  exec --home /home/jeszyman/repos/cfdna-wgs --bind /home/jeszyman:/home/jeszyman --bind /mnt:/mnt /home/jeszyman/sing_containers/biotools.sif bash -c 'set -euo pipefail;  
+        sambamba view -t 4 -S -f bam test/bam/lib004.sam > test/bam/lib004_raw.bam
+        sambamba markdup -r -t 4 test/bam/lib004_raw.bam test/bam/lib004_dedup_unsort.bam
+        sambamba sort -t 4 test/bam/lib004_dedup_unsort.bam -o test/bam/lib004_dedup.bam
+        sambamba index -t 4 test/bam/lib004_dedup.bam'
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+Removing temporary output file test/bam/lib002_dedup_unsort.bam.
+[Tue Jun  7 10:06:07 2022]
+Finished job 26.
+19 of 50 steps (38%) done
+Resources before job selection: {'_cores': 1, '_nodes': 9223372036854775804}
+Ready jobs (9):
+	downsample_bams
+	fastqc
+	fastqc
+	align
+	align
+	alignment_qc
+	downsample_bams
+	alignment_qc
+	picard_collect_wgs_metrics
+Select jobs to execute...
+Selected jobs (1):
+	picard_collect_wgs_metrics
+Resources after job selection: {'_cores': 0, '_nodes': 9223372036854775803}
+
+[Tue Jun  7 10:06:07 2022]
+rule picard_collect_wgs_metrics:
+    input: test/bam/lib002_dedup.bam
+    output: test/qc/lib002_collect_wgs_metrics.txt
+    jobid: 30
+    wildcards: library_id=lib002
+    resources: tmpdir=/tmp
+
+
+        workflow/scripts/CollectWgsMetrics_wrapper.sh test/bam/lib002_dedup.bam test/inputs/chr8.fa test/qc/lib002_collect_wgs_metrics.txt
+        
+ singularity  exec --home /home/jeszyman/repos/cfdna-wgs --bind /home/jeszyman:/home/jeszyman --bind /mnt:/mnt /home/jeszyman/sing_containers/biotools.sif bash -c 'set -euo pipefail;  
+        workflow/scripts/CollectWgsMetrics_wrapper.sh test/bam/lib002_dedup.bam test/inputs/chr8.fa test/qc/lib002_collect_wgs_metrics.txt'
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+Removing temporary output file test/bam/lib004_dedup_unsort.bam.
+[Tue Jun  7 10:06:08 2022]
+Finished job 28.
+20 of 50 steps (40%) done
+Resources before job selection: {'_cores': 1, '_nodes': 9223372036854775804}
+Ready jobs (13):
+	downsample_bams
+	fastqc
+	fastqc
+	align
+	align
+	alignment_qc
+	alignment_qc
+	downsample_bams
+	downsample_bams
+	alignment_qc
+	picard_collect_wgs_metrics
+	alignment_qc
+	downsample_bams
+Select jobs to execute...
+Selected jobs (1):
+	alignment_qc
+Resources after job selection: {'_cores': 0, '_nodes': 9223372036854775803}
+
+[Tue Jun  7 10:06:08 2022]
+rule alignment_qc:
+    input: test/bam/lib002_raw.bam
+    output: test/qc/lib002_raw_samstats.txt, test/qc/lib002_raw_flagstat.txt
+    log: test/logs/alignment_qc_lib002_raw.err
+    jobid: 36
+    wildcards: library_id=lib002, bam_step=raw
+    resources: tmpdir=/tmp
+
+
+        samtools stats test/bam/lib002_raw.bam > test/qc/lib002_raw_samstats.txt 2>test/logs/alignment_qc_lib002_raw.err
+        samtools flagstat test/bam/lib002_raw.bam > test/qc/lib002_raw_flagstat.txt 2>>test/logs/alignment_qc_lib002_raw.err
+        
+ singularity  exec --home /home/jeszyman/repos/cfdna-wgs --bind /home/jeszyman:/home/jeszyman --bind /mnt:/mnt /home/jeszyman/sing_containers/biotools.sif bash -c 'set -euo pipefail;  
+        samtools stats test/bam/lib002_raw.bam > test/qc/lib002_raw_samstats.txt 2>test/logs/alignment_qc_lib002_raw.err
+        samtools flagstat test/bam/lib002_raw.bam > test/qc/lib002_raw_flagstat.txt 2>>test/logs/alignment_qc_lib002_raw.err'
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+[Tue Jun  7 10:06:08 2022]
+Finished job 36.
+21 of 50 steps (42%) done
+Resources before job selection: {'_cores': 1, '_nodes': 9223372036854775804}
+Ready jobs (12):
+	downsample_bams
+	fastqc
+	fastqc
+	align
+	align
+	alignment_qc
+	alignment_qc
+	downsample_bams
+	downsample_bams
+	picard_collect_wgs_metrics
+	alignment_qc
+	downsample_bams
+Select jobs to execute...
+Selected jobs (1):
+	picard_collect_wgs_metrics
+Resources after job selection: {'_cores': 0, '_nodes': 9223372036854775803}
+
+[Tue Jun  7 10:06:08 2022]
+rule picard_collect_wgs_metrics:
+    input: test/bam/lib004_dedup.bam
+    output: test/qc/lib004_collect_wgs_metrics.txt
+    jobid: 32
+    wildcards: library_id=lib004
+    resources: tmpdir=/tmp
+
+
+        workflow/scripts/CollectWgsMetrics_wrapper.sh test/bam/lib004_dedup.bam test/inputs/chr8.fa test/qc/lib004_collect_wgs_metrics.txt
+        
+ singularity  exec --home /home/jeszyman/repos/cfdna-wgs --bind /home/jeszyman:/home/jeszyman --bind /mnt:/mnt /home/jeszyman/sing_containers/biotools.sif bash -c 'set -euo pipefail;  
+        workflow/scripts/CollectWgsMetrics_wrapper.sh test/bam/lib004_dedup.bam test/inputs/chr8.fa test/qc/lib004_collect_wgs_metrics.txt'
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+[Tue Jun  7 10:06:12 2022]
+Finished job 17.
+22 of 50 steps (44%) done
+Resources before job selection: {'_cores': 1, '_nodes': 9223372036854775804}
+Ready jobs (11):
+	downsample_bams
+	fastqc
+	fastqc
+	align
+	align
+	alignment_qc
+	alignment_qc
+	downsample_bams
+	downsample_bams
+	alignment_qc
+	downsample_bams
+Select jobs to execute...
+Selected jobs (1):
+	alignment_qc
+Resources after job selection: {'_cores': 0, '_nodes': 9223372036854775803}
+
+[Tue Jun  7 10:06:12 2022]
+rule alignment_qc:
+    input: test/bam/lib004_dedup.bam
+    output: test/qc/lib004_dedup_samstats.txt, test/qc/lib004_dedup_flagstat.txt
+    log: test/logs/alignment_qc_lib004_dedup.err
+    jobid: 39
+    wildcards: library_id=lib004, bam_step=dedup
+    resources: tmpdir=/tmp
+
+
+        samtools stats test/bam/lib004_dedup.bam > test/qc/lib004_dedup_samstats.txt 2>test/logs/alignment_qc_lib004_dedup.err
+        samtools flagstat test/bam/lib004_dedup.bam > test/qc/lib004_dedup_flagstat.txt 2>>test/logs/alignment_qc_lib004_dedup.err
+        
+ singularity  exec --home /home/jeszyman/repos/cfdna-wgs --bind /home/jeszyman:/home/jeszyman --bind /mnt:/mnt /home/jeszyman/sing_containers/biotools.sif bash -c 'set -euo pipefail;  
+        samtools stats test/bam/lib004_dedup.bam > test/qc/lib004_dedup_samstats.txt 2>test/logs/alignment_qc_lib004_dedup.err
+        samtools flagstat test/bam/lib004_dedup.bam > test/qc/lib004_dedup_flagstat.txt 2>>test/logs/alignment_qc_lib004_dedup.err'
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+[Tue Jun  7 10:06:13 2022]
+Finished job 39.
+23 of 50 steps (46%) done
+Resources before job selection: {'_cores': 1, '_nodes': 9223372036854775804}
+Ready jobs (10):
+	downsample_bams
+	fastqc
+	fastqc
+	align
+	align
+	alignment_qc
+	alignment_qc
+	downsample_bams
+	downsample_bams
+	downsample_bams
+Select jobs to execute...
+Selected jobs (1):
+	downsample_bams
+Resources after job selection: {'_cores': 0, '_nodes': 9223372036854775803}
+
+[Tue Jun  7 10:06:13 2022]
+rule downsample_bams:
+    input: test/bam/lib004_dedup.bam
+    output: test/bam/lib004_ds10.bam
+    log: test/logs/downsample_bam_lib004_10.err
+    jobid: 47
+    wildcards: library_id=lib004, milreads=10
+    resources: tmpdir=/tmp
+
+
+        workflow/scripts/downsample_bam.sh test/bam/lib004_dedup.bam 10000000 test/bam/lib004_ds10.bam 2>test/logs/downsample_bam_lib004_10.err
+        
+ singularity  exec --home /home/jeszyman/repos/cfdna-wgs --bind /home/jeszyman:/home/jeszyman --bind /mnt:/mnt /home/jeszyman/sing_containers/biotools.sif bash -c 'set -euo pipefail;  
+        workflow/scripts/downsample_bam.sh test/bam/lib004_dedup.bam 10000000 test/bam/lib004_ds10.bam 2>test/logs/downsample_bam_lib004_10.err'
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+[Tue Jun  7 10:06:13 2022]
+Finished job 47.
+24 of 50 steps (48%) done
+Resources before job selection: {'_cores': 1, '_nodes': 9223372036854775804}
+Ready jobs (9):
+	downsample_bams
+	fastqc
+	fastqc
+	align
+	align
+	alignment_qc
+	alignment_qc
+	downsample_bams
+	downsample_bams
+Select jobs to execute...
+Selected jobs (1):
+	downsample_bams
+Resources after job selection: {'_cores': 0, '_nodes': 9223372036854775803}
+
+[Tue Jun  7 10:06:13 2022]
+rule downsample_bams:
+    input: test/bam/lib002_dedup.bam
+    output: test/bam/lib002_ds10.bam
+    log: test/logs/downsample_bam_lib002_10.err
+    jobid: 43
+    wildcards: library_id=lib002, milreads=10
+    resources: tmpdir=/tmp
+
+
+        workflow/scripts/downsample_bam.sh test/bam/lib002_dedup.bam 10000000 test/bam/lib002_ds10.bam 2>test/logs/downsample_bam_lib002_10.err
+        
+ singularity  exec --home /home/jeszyman/repos/cfdna-wgs --bind /home/jeszyman:/home/jeszyman --bind /mnt:/mnt /home/jeszyman/sing_containers/biotools.sif bash -c 'set -euo pipefail;  
+        workflow/scripts/downsample_bam.sh test/bam/lib002_dedup.bam 10000000 test/bam/lib002_ds10.bam 2>test/logs/downsample_bam_lib002_10.err'
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+[Tue Jun  7 10:06:13 2022]
+Finished job 43.
+25 of 50 steps (50%) done
+Resources before job selection: {'_cores': 1, '_nodes': 9223372036854775804}
+Ready jobs (8):
+	downsample_bams
+	fastqc
+	fastqc
+	align
+	align
+	alignment_qc
+	alignment_qc
+	downsample_bams
+Select jobs to execute...
+Selected jobs (1):
+	downsample_bams
+Resources after job selection: {'_cores': 0, '_nodes': 9223372036854775803}
+
+[Tue Jun  7 10:06:13 2022]
+rule downsample_bams:
+    input: test/bam/lib004_dedup.bam
+    output: test/bam/lib004_ds20.bam
+    log: test/logs/downsample_bam_lib004_20.err
+    jobid: 48
+    wildcards: library_id=lib004, milreads=20
+    resources: tmpdir=/tmp
+
+
+        workflow/scripts/downsample_bam.sh test/bam/lib004_dedup.bam 20000000 test/bam/lib004_ds20.bam 2>test/logs/downsample_bam_lib004_20.err
+        
+ singularity  exec --home /home/jeszyman/repos/cfdna-wgs --bind /home/jeszyman:/home/jeszyman --bind /mnt:/mnt /home/jeszyman/sing_containers/biotools.sif bash -c 'set -euo pipefail;  
+        workflow/scripts/downsample_bam.sh test/bam/lib004_dedup.bam 20000000 test/bam/lib004_ds20.bam 2>test/logs/downsample_bam_lib004_20.err'
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+[Tue Jun  7 10:06:13 2022]
+Finished job 23.
+26 of 50 steps (52%) done
+Resources before job selection: {'_cores': 1, '_nodes': 9223372036854775804}
+Ready jobs (7):
+	downsample_bams
+	fastqc
+	fastqc
+	align
+	align
+	alignment_qc
+	alignment_qc
+Select jobs to execute...
+Selected jobs (1):
+	alignment_qc
+Resources after job selection: {'_cores': 0, '_nodes': 9223372036854775803}
+
+[Tue Jun  7 10:06:13 2022]
+rule alignment_qc:
+    input: test/bam/lib004_raw.bam
+    output: test/qc/lib004_raw_samstats.txt, test/qc/lib004_raw_flagstat.txt
+    log: test/logs/alignment_qc_lib004_raw.err
+    jobid: 40
+    wildcards: library_id=lib004, bam_step=raw
+    resources: tmpdir=/tmp
+
+
+        samtools stats test/bam/lib004_raw.bam > test/qc/lib004_raw_samstats.txt 2>test/logs/alignment_qc_lib004_raw.err
+        samtools flagstat test/bam/lib004_raw.bam > test/qc/lib004_raw_flagstat.txt 2>>test/logs/alignment_qc_lib004_raw.err
+        
+ singularity  exec --home /home/jeszyman/repos/cfdna-wgs --bind /home/jeszyman:/home/jeszyman --bind /mnt:/mnt /home/jeszyman/sing_containers/biotools.sif bash -c 'set -euo pipefail;  
+        samtools stats test/bam/lib004_raw.bam > test/qc/lib004_raw_samstats.txt 2>test/logs/alignment_qc_lib004_raw.err
+        samtools flagstat test/bam/lib004_raw.bam > test/qc/lib004_raw_flagstat.txt 2>>test/logs/alignment_qc_lib004_raw.err'
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+[Tue Jun  7 10:06:14 2022]
+Finished job 48.
+27 of 50 steps (54%) done
+Resources before job selection: {'_cores': 1, '_nodes': 9223372036854775804}
+Ready jobs (6):
+	downsample_bams
+	fastqc
+	fastqc
+	align
+	align
+	alignment_qc
+Select jobs to execute...
+Selected jobs (1):
+	alignment_qc
+Resources after job selection: {'_cores': 0, '_nodes': 9223372036854775803}
+
+[Tue Jun  7 10:06:14 2022]
+rule alignment_qc:
+    input: test/bam/lib002_dedup.bam
+    output: test/qc/lib002_dedup_samstats.txt, test/qc/lib002_dedup_flagstat.txt
+    log: test/logs/alignment_qc_lib002_dedup.err
+    jobid: 35
+    wildcards: library_id=lib002, bam_step=dedup
+    resources: tmpdir=/tmp
+
+
+        samtools stats test/bam/lib002_dedup.bam > test/qc/lib002_dedup_samstats.txt 2>test/logs/alignment_qc_lib002_dedup.err
+        samtools flagstat test/bam/lib002_dedup.bam > test/qc/lib002_dedup_flagstat.txt 2>>test/logs/alignment_qc_lib002_dedup.err
+        
+ singularity  exec --home /home/jeszyman/repos/cfdna-wgs --bind /home/jeszyman:/home/jeszyman --bind /mnt:/mnt /home/jeszyman/sing_containers/biotools.sif bash -c 'set -euo pipefail;  
+        samtools stats test/bam/lib002_dedup.bam > test/qc/lib002_dedup_samstats.txt 2>test/logs/alignment_qc_lib002_dedup.err
+        samtools flagstat test/bam/lib002_dedup.bam > test/qc/lib002_dedup_flagstat.txt 2>>test/logs/alignment_qc_lib002_dedup.err'
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+[Tue Jun  7 10:06:14 2022]
+Finished job 40.
+28 of 50 steps (56%) done
+Resources before job selection: {'_cores': 1, '_nodes': 9223372036854775804}
+Ready jobs (5):
+	downsample_bams
+	fastqc
+	fastqc
+	align
+	align
+Select jobs to execute...
+Selected jobs (1):
+	align
+Resources after job selection: {'_cores': 0, '_nodes': 9223372036854775803}
+
+[Tue Jun  7 10:06:14 2022]
+rule align:
+    input: test/fastq/processed/lib001_proc_R1.fastq.gz, test/fastq/processed/lib001_proc_R2.fastq.gz
+    output: test/bam/lib001.sam
+    log: test/logs/align_lib001.log
+    jobid: 13
+    wildcards: library_id=lib001
+    resources: tmpdir=/tmp
+
+
+        bwa mem -M -t 4 test/inputs/chr8 test/fastq/processed/lib001_proc_R1.fastq.gz test/fastq/processed/lib001_proc_R2.fastq.gz > test/bam/lib001.sam
+	
+ singularity  exec --home /home/jeszyman/repos/cfdna-wgs --bind /home/jeszyman:/home/jeszyman --bind /mnt:/mnt /home/jeszyman/sing_containers/biotools.sif bash -c 'set -euo pipefail;  
+        bwa mem -M -t 4 test/inputs/chr8 test/fastq/processed/lib001_proc_R1.fastq.gz test/fastq/processed/lib001_proc_R2.fastq.gz > test/bam/lib001.sam'
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+[Tue Jun  7 10:06:14 2022]
+Finished job 35.
+29 of 50 steps (58%) done
+Resources before job selection: {'_cores': 1, '_nodes': 9223372036854775804}
+Ready jobs (4):
+	downsample_bams
+	fastqc
+	fastqc
+	align
+Select jobs to execute...
+Selected jobs (1):
+	align
+Resources after job selection: {'_cores': 0, '_nodes': 9223372036854775803}
+
+[Tue Jun  7 10:06:14 2022]
+rule align:
+    input: test/fastq/processed/lib003_proc_R1.fastq.gz, test/fastq/processed/lib003_proc_R2.fastq.gz
+    output: test/bam/lib003.sam
+    log: test/logs/align_lib003.log
+    jobid: 15
+    wildcards: library_id=lib003
+    resources: tmpdir=/tmp
+
+
+        bwa mem -M -t 4 test/inputs/chr8 test/fastq/processed/lib003_proc_R1.fastq.gz test/fastq/processed/lib003_proc_R2.fastq.gz > test/bam/lib003.sam
+	
+ singularity  exec --home /home/jeszyman/repos/cfdna-wgs --bind /home/jeszyman:/home/jeszyman --bind /mnt:/mnt /home/jeszyman/sing_containers/biotools.sif bash -c 'set -euo pipefail;  
+        bwa mem -M -t 4 test/inputs/chr8 test/fastq/processed/lib003_proc_R1.fastq.gz test/fastq/processed/lib003_proc_R2.fastq.gz > test/bam/lib003.sam'
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+[Tue Jun  7 10:06:15 2022]
+Finished job 13.
+30 of 50 steps (60%) done
+Resources before job selection: {'_cores': 1, '_nodes': 9223372036854775804}
+Ready jobs (4):
+	downsample_bams
+	fastqc
+	fastqc
+	alignment_processing
+Select jobs to execute...
+Selected jobs (1):
+	alignment_processing
+Resources after job selection: {'_cores': 0, '_nodes': 9223372036854775803}
+
+[Tue Jun  7 10:06:15 2022]
+rule alignment_processing:
+    input: test/bam/lib001.sam
+    output: test/bam/lib001_raw.bam, test/bam/lib001_dedup_unsort.bam, test/bam/lib001_dedup.bam, test/bam/lib001_dedup.bam.bai
+    log: test/logs/alignment_processing_lib001.log
+    jobid: 25
+    wildcards: library_id=lib001
+    resources: tmpdir=/tmp
+
+
+        sambamba view -t 4 -S -f bam test/bam/lib001.sam > test/bam/lib001_raw.bam
+        sambamba markdup -r -t 4 test/bam/lib001_raw.bam test/bam/lib001_dedup_unsort.bam
+        sambamba sort -t 4 test/bam/lib001_dedup_unsort.bam -o test/bam/lib001_dedup.bam
+        sambamba index -t 4 test/bam/lib001_dedup.bam
+        
+ singularity  exec --home /home/jeszyman/repos/cfdna-wgs --bind /home/jeszyman:/home/jeszyman --bind /mnt:/mnt /home/jeszyman/sing_containers/biotools.sif bash -c 'set -euo pipefail;  
+        sambamba view -t 4 -S -f bam test/bam/lib001.sam > test/bam/lib001_raw.bam
+        sambamba markdup -r -t 4 test/bam/lib001_raw.bam test/bam/lib001_dedup_unsort.bam
+        sambamba sort -t 4 test/bam/lib001_dedup_unsort.bam -o test/bam/lib001_dedup.bam
+        sambamba index -t 4 test/bam/lib001_dedup.bam'
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+[Tue Jun  7 10:06:16 2022]
+Finished job 15.
+31 of 50 steps (62%) done
+Resources before job selection: {'_cores': 1, '_nodes': 9223372036854775804}
+Ready jobs (4):
+	downsample_bams
+	fastqc
+	fastqc
+	alignment_processing
+Select jobs to execute...
+Selected jobs (1):
+	alignment_processing
+Resources after job selection: {'_cores': 0, '_nodes': 9223372036854775803}
+
+[Tue Jun  7 10:06:16 2022]
+rule alignment_processing:
+    input: test/bam/lib003.sam
+    output: test/bam/lib003_raw.bam, test/bam/lib003_dedup_unsort.bam, test/bam/lib003_dedup.bam, test/bam/lib003_dedup.bam.bai
+    log: test/logs/alignment_processing_lib003.log
+    jobid: 27
+    wildcards: library_id=lib003
+    resources: tmpdir=/tmp
+
+
+        sambamba view -t 4 -S -f bam test/bam/lib003.sam > test/bam/lib003_raw.bam
+        sambamba markdup -r -t 4 test/bam/lib003_raw.bam test/bam/lib003_dedup_unsort.bam
+        sambamba sort -t 4 test/bam/lib003_dedup_unsort.bam -o test/bam/lib003_dedup.bam
+        sambamba index -t 4 test/bam/lib003_dedup.bam
+        
+ singularity  exec --home /home/jeszyman/repos/cfdna-wgs --bind /home/jeszyman:/home/jeszyman --bind /mnt:/mnt /home/jeszyman/sing_containers/biotools.sif bash -c 'set -euo pipefail;  
+        sambamba view -t 4 -S -f bam test/bam/lib003.sam > test/bam/lib003_raw.bam
+        sambamba markdup -r -t 4 test/bam/lib003_raw.bam test/bam/lib003_dedup_unsort.bam
+        sambamba sort -t 4 test/bam/lib003_dedup_unsort.bam -o test/bam/lib003_dedup.bam
+        sambamba index -t 4 test/bam/lib003_dedup.bam'
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+Removing temporary output file test/bam/lib001_dedup_unsort.bam.
+[Tue Jun  7 10:06:17 2022]
+Finished job 25.
+32 of 50 steps (64%) done
+Resources before job selection: {'_cores': 1, '_nodes': 9223372036854775804}
+Ready jobs (8):
+	downsample_bams
+	fastqc
+	fastqc
+	alignment_qc
+	picard_collect_wgs_metrics
+	downsample_bams
+	alignment_qc
+	downsample_bams
+Select jobs to execute...
+Selected jobs (1):
+	downsample_bams
+Resources after job selection: {'_cores': 0, '_nodes': 9223372036854775803}
+
+[Tue Jun  7 10:06:17 2022]
+rule downsample_bams:
+    input: test/bam/lib001_dedup.bam
+    output: test/bam/lib001_ds10.bam
+    log: test/logs/downsample_bam_lib001_10.err
+    jobid: 41
+    wildcards: library_id=lib001, milreads=10
+    resources: tmpdir=/tmp
+
+
+        workflow/scripts/downsample_bam.sh test/bam/lib001_dedup.bam 10000000 test/bam/lib001_ds10.bam 2>test/logs/downsample_bam_lib001_10.err
+        
+ singularity  exec --home /home/jeszyman/repos/cfdna-wgs --bind /home/jeszyman:/home/jeszyman --bind /mnt:/mnt /home/jeszyman/sing_containers/biotools.sif bash -c 'set -euo pipefail;  
+        workflow/scripts/downsample_bam.sh test/bam/lib001_dedup.bam 10000000 test/bam/lib001_ds10.bam 2>test/logs/downsample_bam_lib001_10.err'
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+[Tue Jun  7 10:06:17 2022]
+Finished job 41.
+33 of 50 steps (66%) done
+Resources before job selection: {'_cores': 1, '_nodes': 9223372036854775804}
+Ready jobs (7):
+	downsample_bams
+	fastqc
+	fastqc
+	alignment_qc
+	picard_collect_wgs_metrics
+	downsample_bams
+	alignment_qc
+Select jobs to execute...
+Selected jobs (1):
+	alignment_qc
+Resources after job selection: {'_cores': 0, '_nodes': 9223372036854775803}
+
+[Tue Jun  7 10:06:17 2022]
+rule alignment_qc:
+    input: test/bam/lib001_raw.bam
+    output: test/qc/lib001_raw_samstats.txt, test/qc/lib001_raw_flagstat.txt
+    log: test/logs/alignment_qc_lib001_raw.err
+    jobid: 34
+    wildcards: library_id=lib001, bam_step=raw
+    resources: tmpdir=/tmp
+
+
+        samtools stats test/bam/lib001_raw.bam > test/qc/lib001_raw_samstats.txt 2>test/logs/alignment_qc_lib001_raw.err
+        samtools flagstat test/bam/lib001_raw.bam > test/qc/lib001_raw_flagstat.txt 2>>test/logs/alignment_qc_lib001_raw.err
+        
+ singularity  exec --home /home/jeszyman/repos/cfdna-wgs --bind /home/jeszyman:/home/jeszyman --bind /mnt:/mnt /home/jeszyman/sing_containers/biotools.sif bash -c 'set -euo pipefail;  
+        samtools stats test/bam/lib001_raw.bam > test/qc/lib001_raw_samstats.txt 2>test/logs/alignment_qc_lib001_raw.err
+        samtools flagstat test/bam/lib001_raw.bam > test/qc/lib001_raw_flagstat.txt 2>>test/logs/alignment_qc_lib001_raw.err'
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+Removing temporary output file test/bam/lib003_dedup_unsort.bam.
+[Tue Jun  7 10:06:17 2022]
+Finished job 27.
+34 of 50 steps (68%) done
+Resources before job selection: {'_cores': 1, '_nodes': 9223372036854775804}
+Ready jobs (11):
+	downsample_bams
+	fastqc
+	fastqc
+	alignment_qc
+	picard_collect_wgs_metrics
+	downsample_bams
+	picard_collect_wgs_metrics
+	alignment_qc
+	alignment_qc
+	downsample_bams
+	downsample_bams
+Select jobs to execute...
+Selected jobs (1):
+	downsample_bams
+Resources after job selection: {'_cores': 0, '_nodes': 9223372036854775803}
+
+[Tue Jun  7 10:06:17 2022]
+rule downsample_bams:
+    input: test/bam/lib003_dedup.bam
+    output: test/bam/lib003_ds20.bam
+    log: test/logs/downsample_bam_lib003_20.err
+    jobid: 46
+    wildcards: library_id=lib003, milreads=20
+    resources: tmpdir=/tmp
+
+
+        workflow/scripts/downsample_bam.sh test/bam/lib003_dedup.bam 20000000 test/bam/lib003_ds20.bam 2>test/logs/downsample_bam_lib003_20.err
+        
+ singularity  exec --home /home/jeszyman/repos/cfdna-wgs --bind /home/jeszyman:/home/jeszyman --bind /mnt:/mnt /home/jeszyman/sing_containers/biotools.sif bash -c 'set -euo pipefail;  
+        workflow/scripts/downsample_bam.sh test/bam/lib003_dedup.bam 20000000 test/bam/lib003_ds20.bam 2>test/logs/downsample_bam_lib003_20.err'
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+[Tue Jun  7 10:06:18 2022]
+Finished job 46.
+35 of 50 steps (70%) done
+Resources before job selection: {'_cores': 1, '_nodes': 9223372036854775804}
+Ready jobs (10):
+	downsample_bams
+	fastqc
+	fastqc
+	alignment_qc
+	picard_collect_wgs_metrics
+	downsample_bams
+	picard_collect_wgs_metrics
+	alignment_qc
+	alignment_qc
+	downsample_bams
+Select jobs to execute...
+Selected jobs (1):
+	downsample_bams
+Resources after job selection: {'_cores': 0, '_nodes': 9223372036854775803}
+
+[Tue Jun  7 10:06:18 2022]
+rule downsample_bams:
+    input: test/bam/lib003_dedup.bam
+    output: test/bam/lib003_ds10.bam
+    log: test/logs/downsample_bam_lib003_10.err
+    jobid: 45
+    wildcards: library_id=lib003, milreads=10
+    resources: tmpdir=/tmp
+
+
+        workflow/scripts/downsample_bam.sh test/bam/lib003_dedup.bam 10000000 test/bam/lib003_ds10.bam 2>test/logs/downsample_bam_lib003_10.err
+        
+ singularity  exec --home /home/jeszyman/repos/cfdna-wgs --bind /home/jeszyman:/home/jeszyman --bind /mnt:/mnt /home/jeszyman/sing_containers/biotools.sif bash -c 'set -euo pipefail;  
+        workflow/scripts/downsample_bam.sh test/bam/lib003_dedup.bam 10000000 test/bam/lib003_ds10.bam 2>test/logs/downsample_bam_lib003_10.err'
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+[Tue Jun  7 10:06:18 2022]
+Finished job 34.
+36 of 50 steps (72%) done
+Resources before job selection: {'_cores': 1, '_nodes': 9223372036854775804}
+Ready jobs (9):
+	downsample_bams
+	fastqc
+	fastqc
+	alignment_qc
+	picard_collect_wgs_metrics
+	downsample_bams
+	picard_collect_wgs_metrics
+	alignment_qc
+	alignment_qc
+Select jobs to execute...
+Selected jobs (1):
+	alignment_qc
+Resources after job selection: {'_cores': 0, '_nodes': 9223372036854775803}
+
+[Tue Jun  7 10:06:18 2022]
+rule alignment_qc:
+    input: test/bam/lib003_raw.bam
+    output: test/qc/lib003_raw_samstats.txt, test/qc/lib003_raw_flagstat.txt
+    log: test/logs/alignment_qc_lib003_raw.err
+    jobid: 38
+    wildcards: library_id=lib003, bam_step=raw
+    resources: tmpdir=/tmp
+
+
+        samtools stats test/bam/lib003_raw.bam > test/qc/lib003_raw_samstats.txt 2>test/logs/alignment_qc_lib003_raw.err
+        samtools flagstat test/bam/lib003_raw.bam > test/qc/lib003_raw_flagstat.txt 2>>test/logs/alignment_qc_lib003_raw.err
+        
+ singularity  exec --home /home/jeszyman/repos/cfdna-wgs --bind /home/jeszyman:/home/jeszyman --bind /mnt:/mnt /home/jeszyman/sing_containers/biotools.sif bash -c 'set -euo pipefail;  
+        samtools stats test/bam/lib003_raw.bam > test/qc/lib003_raw_samstats.txt 2>test/logs/alignment_qc_lib003_raw.err
+        samtools flagstat test/bam/lib003_raw.bam > test/qc/lib003_raw_flagstat.txt 2>>test/logs/alignment_qc_lib003_raw.err'
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+[Tue Jun  7 10:06:18 2022]
+Finished job 45.
+37 of 50 steps (74%) done
+Resources before job selection: {'_cores': 1, '_nodes': 9223372036854775804}
+Ready jobs (8):
+	downsample_bams
+	fastqc
+	fastqc
+	alignment_qc
+	picard_collect_wgs_metrics
+	downsample_bams
+	picard_collect_wgs_metrics
+	alignment_qc
+Select jobs to execute...
+Selected jobs (1):
+	alignment_qc
+Resources after job selection: {'_cores': 0, '_nodes': 9223372036854775803}
+
+[Tue Jun  7 10:06:18 2022]
+rule alignment_qc:
+    input: test/bam/lib003_dedup.bam
+    output: test/qc/lib003_dedup_samstats.txt, test/qc/lib003_dedup_flagstat.txt
+    log: test/logs/alignment_qc_lib003_dedup.err
+    jobid: 37
+    wildcards: library_id=lib003, bam_step=dedup
+    resources: tmpdir=/tmp
+
+
+        samtools stats test/bam/lib003_dedup.bam > test/qc/lib003_dedup_samstats.txt 2>test/logs/alignment_qc_lib003_dedup.err
+        samtools flagstat test/bam/lib003_dedup.bam > test/qc/lib003_dedup_flagstat.txt 2>>test/logs/alignment_qc_lib003_dedup.err
+        
+ singularity  exec --home /home/jeszyman/repos/cfdna-wgs --bind /home/jeszyman:/home/jeszyman --bind /mnt:/mnt /home/jeszyman/sing_containers/biotools.sif bash -c 'set -euo pipefail;  
+        samtools stats test/bam/lib003_dedup.bam > test/qc/lib003_dedup_samstats.txt 2>test/logs/alignment_qc_lib003_dedup.err
+        samtools flagstat test/bam/lib003_dedup.bam > test/qc/lib003_dedup_flagstat.txt 2>>test/logs/alignment_qc_lib003_dedup.err'
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+[Tue Jun  7 10:06:18 2022]
+Finished job 38.
+38 of 50 steps (76%) done
+Resources before job selection: {'_cores': 1, '_nodes': 9223372036854775804}
+Ready jobs (7):
+	downsample_bams
+	fastqc
+	fastqc
+	alignment_qc
+	picard_collect_wgs_metrics
+	downsample_bams
+	picard_collect_wgs_metrics
+Select jobs to execute...
+Selected jobs (1):
+	picard_collect_wgs_metrics
+Resources after job selection: {'_cores': 0, '_nodes': 9223372036854775803}
+
+[Tue Jun  7 10:06:18 2022]
+rule picard_collect_wgs_metrics:
+    input: test/bam/lib003_dedup.bam
+    output: test/qc/lib003_collect_wgs_metrics.txt
+    jobid: 31
+    wildcards: library_id=lib003
+    resources: tmpdir=/tmp
+
+
+        workflow/scripts/CollectWgsMetrics_wrapper.sh test/bam/lib003_dedup.bam test/inputs/chr8.fa test/qc/lib003_collect_wgs_metrics.txt
+        
+ singularity  exec --home /home/jeszyman/repos/cfdna-wgs --bind /home/jeszyman:/home/jeszyman --bind /mnt:/mnt /home/jeszyman/sing_containers/biotools.sif bash -c 'set -euo pipefail;  
+        workflow/scripts/CollectWgsMetrics_wrapper.sh test/bam/lib003_dedup.bam test/inputs/chr8.fa test/qc/lib003_collect_wgs_metrics.txt'
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+[Tue Jun  7 10:06:18 2022]
+Finished job 37.
+39 of 50 steps (78%) done
+Resources before job selection: {'_cores': 1, '_nodes': 9223372036854775804}
+Ready jobs (6):
+	downsample_bams
+	fastqc
+	fastqc
+	alignment_qc
+	picard_collect_wgs_metrics
+	downsample_bams
+Select jobs to execute...
+Selected jobs (1):
+	downsample_bams
+Resources after job selection: {'_cores': 0, '_nodes': 9223372036854775803}
+
+[Tue Jun  7 10:06:18 2022]
+rule downsample_bams:
+    input: test/bam/lib001_dedup.bam
+    output: test/bam/lib001_ds20.bam
+    log: test/logs/downsample_bam_lib001_20.err
+    jobid: 42
+    wildcards: library_id=lib001, milreads=20
+    resources: tmpdir=/tmp
+
+
+        workflow/scripts/downsample_bam.sh test/bam/lib001_dedup.bam 20000000 test/bam/lib001_ds20.bam 2>test/logs/downsample_bam_lib001_20.err
+        
+ singularity  exec --home /home/jeszyman/repos/cfdna-wgs --bind /home/jeszyman:/home/jeszyman --bind /mnt:/mnt /home/jeszyman/sing_containers/biotools.sif bash -c 'set -euo pipefail;  
+        workflow/scripts/downsample_bam.sh test/bam/lib001_dedup.bam 20000000 test/bam/lib001_ds20.bam 2>test/logs/downsample_bam_lib001_20.err'
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+[Tue Jun  7 10:06:19 2022]
+Finished job 42.
+40 of 50 steps (80%) done
+Resources before job selection: {'_cores': 1, '_nodes': 9223372036854775804}
+Ready jobs (5):
+	downsample_bams
+	fastqc
+	fastqc
+	alignment_qc
+	picard_collect_wgs_metrics
+Select jobs to execute...
+Selected jobs (1):
+	picard_collect_wgs_metrics
+Resources after job selection: {'_cores': 0, '_nodes': 9223372036854775803}
+
+[Tue Jun  7 10:06:19 2022]
+rule picard_collect_wgs_metrics:
+    input: test/bam/lib001_dedup.bam
+    output: test/qc/lib001_collect_wgs_metrics.txt
+    jobid: 29
+    wildcards: library_id=lib001
+    resources: tmpdir=/tmp
+
+
+        workflow/scripts/CollectWgsMetrics_wrapper.sh test/bam/lib001_dedup.bam test/inputs/chr8.fa test/qc/lib001_collect_wgs_metrics.txt
+        
+ singularity  exec --home /home/jeszyman/repos/cfdna-wgs --bind /home/jeszyman:/home/jeszyman --bind /mnt:/mnt /home/jeszyman/sing_containers/biotools.sif bash -c 'set -euo pipefail;  
+        workflow/scripts/CollectWgsMetrics_wrapper.sh test/bam/lib001_dedup.bam test/inputs/chr8.fa test/qc/lib001_collect_wgs_metrics.txt'
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+[Tue Jun  7 10:06:22 2022]
+Finished job 30.
+41 of 50 steps (82%) done
+Resources before job selection: {'_cores': 1, '_nodes': 9223372036854775804}
+Ready jobs (4):
+	downsample_bams
+	fastqc
+	fastqc
+	alignment_qc
+Select jobs to execute...
+Selected jobs (1):
+	alignment_qc
+Resources after job selection: {'_cores': 0, '_nodes': 9223372036854775803}
+
+[Tue Jun  7 10:06:22 2022]
+rule alignment_qc:
+    input: test/bam/lib001_dedup.bam
+    output: test/qc/lib001_dedup_samstats.txt, test/qc/lib001_dedup_flagstat.txt
+    log: test/logs/alignment_qc_lib001_dedup.err
+    jobid: 33
+    wildcards: library_id=lib001, bam_step=dedup
+    resources: tmpdir=/tmp
+
+
+        samtools stats test/bam/lib001_dedup.bam > test/qc/lib001_dedup_samstats.txt 2>test/logs/alignment_qc_lib001_dedup.err
+        samtools flagstat test/bam/lib001_dedup.bam > test/qc/lib001_dedup_flagstat.txt 2>>test/logs/alignment_qc_lib001_dedup.err
+        
+ singularity  exec --home /home/jeszyman/repos/cfdna-wgs --bind /home/jeszyman:/home/jeszyman --bind /mnt:/mnt /home/jeszyman/sing_containers/biotools.sif bash -c 'set -euo pipefail;  
+        samtools stats test/bam/lib001_dedup.bam > test/qc/lib001_dedup_samstats.txt 2>test/logs/alignment_qc_lib001_dedup.err
+        samtools flagstat test/bam/lib001_dedup.bam > test/qc/lib001_dedup_flagstat.txt 2>>test/logs/alignment_qc_lib001_dedup.err'
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+[Tue Jun  7 10:06:23 2022]
+Finished job 33.
+42 of 50 steps (84%) done
+Resources before job selection: {'_cores': 1, '_nodes': 9223372036854775804}
+Ready jobs (3):
+	downsample_bams
+	fastqc
+	fastqc
+Select jobs to execute...
+Selected jobs (1):
+	fastqc
+Resources after job selection: {'_cores': 0, '_nodes': 9223372036854775803}
+
+[Tue Jun  7 10:06:23 2022]
+rule fastqc:
+    input: test/fastq/raw/lib003_R1.fastq.gz, test/fastq/processed/lib003_proc_R1.fastq.gz
+    output: test/qc/lib003_R1_fastqc.html, test/qc/lib003_proc_R1_fastqc.html
+    log: test/logs/fastqc_raw_lib003_R1.log, test/logs/fastqc_proc_lib003_R1.log
+    jobid: 21
+    wildcards: library_id=lib003, read=R1
+    resources: tmpdir=/tmp
+
+
+        fastqc --outdir test/qc         --quiet         --threads 4 test/fastq/raw/lib003_R1.fastq.gz &> test/logs/fastqc_raw_lib003_R1.log test/logs/fastqc_proc_lib003_R1.log
+        fastqc --outdir test/qc         --quiet         --threads 4 test/fastq/processed/lib003_proc_R1.fastq.gz &> test/logs/fastqc_raw_lib003_R1.log test/logs/fastqc_proc_lib003_R1.log
+        
+ singularity  exec --home /home/jeszyman/repos/cfdna-wgs --bind /home/jeszyman:/home/jeszyman --bind /mnt:/mnt /home/jeszyman/sing_containers/biotools.sif bash -c 'set -euo pipefail;  
+        fastqc --outdir test/qc         --quiet         --threads 4 test/fastq/raw/lib003_R1.fastq.gz &> test/logs/fastqc_raw_lib003_R1.log test/logs/fastqc_proc_lib003_R1.log
+        fastqc --outdir test/qc         --quiet         --threads 4 test/fastq/processed/lib003_proc_R1.fastq.gz &> test/logs/fastqc_raw_lib003_R1.log test/logs/fastqc_proc_lib003_R1.log'
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+[Tue Jun  7 10:06:26 2022]
+Finished job 32.
+43 of 50 steps (86%) done
+Resources before job selection: {'_cores': 1, '_nodes': 9223372036854775804}
+Ready jobs (2):
+	fastqc
+	downsample_bams
+Select jobs to execute...
+Selected jobs (1):
+	fastqc
+Resources after job selection: {'_cores': 0, '_nodes': 9223372036854775803}
+
+[Tue Jun  7 10:06:26 2022]
+rule fastqc:
+    input: test/fastq/raw/lib002_R1.fastq.gz, test/fastq/processed/lib002_proc_R1.fastq.gz
+    output: test/qc/lib002_R1_fastqc.html, test/qc/lib002_proc_R1_fastqc.html
+    log: test/logs/fastqc_raw_lib002_R1.log, test/logs/fastqc_proc_lib002_R1.log
+    jobid: 19
+    wildcards: library_id=lib002, read=R1
+    resources: tmpdir=/tmp
+
+
+        fastqc --outdir test/qc         --quiet         --threads 4 test/fastq/raw/lib002_R1.fastq.gz &> test/logs/fastqc_raw_lib002_R1.log test/logs/fastqc_proc_lib002_R1.log
+        fastqc --outdir test/qc         --quiet         --threads 4 test/fastq/processed/lib002_proc_R1.fastq.gz &> test/logs/fastqc_raw_lib002_R1.log test/logs/fastqc_proc_lib002_R1.log
+        
+ singularity  exec --home /home/jeszyman/repos/cfdna-wgs --bind /home/jeszyman:/home/jeszyman --bind /mnt:/mnt /home/jeszyman/sing_containers/biotools.sif bash -c 'set -euo pipefail;  
+        fastqc --outdir test/qc         --quiet         --threads 4 test/fastq/raw/lib002_R1.fastq.gz &> test/logs/fastqc_raw_lib002_R1.log test/logs/fastqc_proc_lib002_R1.log
+        fastqc --outdir test/qc         --quiet         --threads 4 test/fastq/processed/lib002_proc_R1.fastq.gz &> test/logs/fastqc_raw_lib002_R1.log test/logs/fastqc_proc_lib002_R1.log'
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+[Tue Jun  7 10:06:29 2022]
+Finished job 21.
+44 of 50 steps (88%) done
+Resources before job selection: {'_cores': 1, '_nodes': 9223372036854775804}
+Ready jobs (1):
+	downsample_bams
+Select jobs to execute...
+Using greedy selector because only single job has to be scheduled.
+Selected jobs (1):
+	downsample_bams
+Resources after job selection: {'_cores': 0, '_nodes': 9223372036854775803}
+
+[Tue Jun  7 10:06:29 2022]
+rule downsample_bams:
+    input: test/bam/lib002_dedup.bam
+    output: test/bam/lib002_ds20.bam
+    log: test/logs/downsample_bam_lib002_20.err
+    jobid: 44
+    wildcards: library_id=lib002, milreads=20
+    resources: tmpdir=/tmp
+
+
+        workflow/scripts/downsample_bam.sh test/bam/lib002_dedup.bam 20000000 test/bam/lib002_ds20.bam 2>test/logs/downsample_bam_lib002_20.err
+        
+ singularity  exec --home /home/jeszyman/repos/cfdna-wgs --bind /home/jeszyman:/home/jeszyman --bind /mnt:/mnt /home/jeszyman/sing_containers/biotools.sif bash -c 'set -euo pipefail;  
+        workflow/scripts/downsample_bam.sh test/bam/lib002_dedup.bam 20000000 test/bam/lib002_ds20.bam 2>test/logs/downsample_bam_lib002_20.err'
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+[Tue Jun  7 10:06:29 2022]
+Finished job 44.
+45 of 50 steps (90%) done
+[Tue Jun  7 10:06:32 2022]
+Finished job 19.
+46 of 50 steps (92%) done
+Resources before job selection: {'_cores': 2, '_nodes': 9223372036854775805}
+Ready jobs (1):
+	multiqc
+Select jobs to execute...
+Using greedy selector because only single job has to be scheduled.
+Selected jobs (1):
+	multiqc
+Resources after job selection: {'_cores': 1, '_nodes': 9223372036854775804}
+
+[Tue Jun  7 10:06:32 2022]
+rule multiqc:
+    input: test/qc/lib001_R1_fastqc.html, test/qc/lib001_R2_fastqc.html, test/qc/lib002_R1_fastqc.html, test/qc/lib002_R2_fastqc.html, test/qc/lib003_R1_fastqc.html, test/qc/lib003_R2_fastqc.html, test/qc/lib004_R1_fastqc.html, test/qc/lib004_R2_fastqc.html, test/qc/lib001_proc_R1_fastqc.html, test/qc/lib001_proc_R2_fastqc.html, test/qc/lib002_proc_R1_fastqc.html, test/qc/lib002_proc_R2_fastqc.html, test/qc/lib003_proc_R1_fastqc.html, test/qc/lib003_proc_R2_fastqc.html, test/qc/lib004_proc_R1_fastqc.html, test/qc/lib004_proc_R2_fastqc.html, test/qc/lib001_dedup_samstats.txt, test/qc/lib001_raw_samstats.txt, test/qc/lib002_dedup_samstats.txt, test/qc/lib002_raw_samstats.txt, test/qc/lib003_dedup_samstats.txt, test/qc/lib003_raw_samstats.txt, test/qc/lib004_dedup_samstats.txt, test/qc/lib004_raw_samstats.txt, test/qc/lib001_dedup_flagstat.txt, test/qc/lib001_raw_flagstat.txt, test/qc/lib002_dedup_flagstat.txt, test/qc/lib002_raw_flagstat.txt, test/qc/lib003_dedup_flagstat.txt, test/qc/lib003_raw_flagstat.txt, test/qc/lib004_dedup_flagstat.txt, test/qc/lib004_raw_flagstat.txt
+    output: test/qc/all_qc.html
+    jobid: 49
+    resources: tmpdir=/tmp
+
+
+        multiqc test/qc         --force         --outdir test/qc         --filename all_qc
+        
+ singularity  exec --home /home/jeszyman/repos/cfdna-wgs --bind /home/jeszyman:/home/jeszyman --bind /mnt:/mnt /home/jeszyman/sing_containers/biotools.sif bash -c 'set -euo pipefail;  
+        multiqc test/qc         --force         --outdir test/qc         --filename all_qc'
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+[Tue Jun  7 10:06:34 2022]
+Finished job 29.
+47 of 50 steps (94%) done
+[Tue Jun  7 10:06:35 2022]
+Finished job 31.
+48 of 50 steps (96%) done
+[Tue Jun  7 10:06:39 2022]
+Finished job 49.
+49 of 50 steps (98%) done
+Resources before job selection: {'_cores': 4, '_nodes': 9223372036854775807}
+Ready jobs (1):
+	all
+Select jobs to execute...
+Using greedy selector because only single job has to be scheduled.
+Selected jobs (1):
+	all
+Resources after job selection: {'_cores': 3, '_nodes': 9223372036854775806}
+
+[Tue Jun  7 10:06:39 2022]
+localrule all:
+    input: test/fastq/raw/lib001_R1.fastq.gz, test/fastq/raw/lib001_R2.fastq.gz, test/fastq/raw/lib002_R1.fastq.gz, test/fastq/raw/lib002_R2.fastq.gz, test/fastq/raw/lib003_R1.fastq.gz, test/fastq/raw/lib003_R2.fastq.gz, test/fastq/raw/lib004_R1.fastq.gz, test/fastq/raw/lib004_R2.fastq.gz, test/fastq/processed/lib001_proc_R1.fastq.gz, test/fastq/processed/lib001_proc_R2.fastq.gz, test/fastq/processed/lib002_proc_R1.fastq.gz, test/fastq/processed/lib002_proc_R2.fastq.gz, test/fastq/processed/lib003_proc_R1.fastq.gz, test/fastq/processed/lib003_proc_R2.fastq.gz, test/fastq/processed/lib004_proc_R1.fastq.gz, test/fastq/processed/lib004_proc_R2.fastq.gz, test/fastq/unpaired/lib001_unpr_R1.fastq.gz, test/fastq/unpaired/lib002_unpr_R1.fastq.gz, test/fastq/unpaired/lib003_unpr_R1.fastq.gz, test/fastq/unpaired/lib004_unpr_R1.fastq.gz, test/bam/lib001.sam, test/bam/lib002.sam, test/bam/lib003.sam, test/bam/lib004.sam, test/qc/lib001_R1_fastqc.html, test/qc/lib001_R2_fastqc.html, test/qc/lib002_R1_fastqc.html, test/qc/lib002_R2_fastqc.html, test/qc/lib003_R1_fastqc.html, test/qc/lib003_R2_fastqc.html, test/qc/lib004_R1_fastqc.html, test/qc/lib004_R2_fastqc.html, test/qc/lib001_proc_R1_fastqc.html, test/qc/lib001_proc_R2_fastqc.html, test/qc/lib002_proc_R1_fastqc.html, test/qc/lib002_proc_R2_fastqc.html, test/qc/lib003_proc_R1_fastqc.html, test/qc/lib003_proc_R2_fastqc.html, test/qc/lib004_proc_R1_fastqc.html, test/qc/lib004_proc_R2_fastqc.html, test/bam/lib001_dedup.bam, test/bam/lib002_dedup.bam, test/bam/lib003_dedup.bam, test/bam/lib004_dedup.bam, test/qc/lib001_collect_wgs_metrics.txt, test/qc/lib002_collect_wgs_metrics.txt, test/qc/lib003_collect_wgs_metrics.txt, test/qc/lib004_collect_wgs_metrics.txt, test/bam/lib001_dedup.bam.bai, test/bam/lib002_dedup.bam.bai, test/bam/lib003_dedup.bam.bai, test/bam/lib004_dedup.bam.bai, test/qc/lib001_dedup_samstats.txt, test/qc/lib001_raw_samstats.txt, test/qc/lib002_dedup_samstats.txt, test/qc/lib002_raw_samstats.txt, test/qc/lib003_dedup_samstats.txt, test/qc/lib003_raw_samstats.txt, test/qc/lib004_dedup_samstats.txt, test/qc/lib004_raw_samstats.txt, test/qc/lib001_dedup_flagstat.txt, test/qc/lib001_raw_flagstat.txt, test/qc/lib002_dedup_flagstat.txt, test/qc/lib002_raw_flagstat.txt, test/qc/lib003_dedup_flagstat.txt, test/qc/lib003_raw_flagstat.txt, test/qc/lib004_dedup_flagstat.txt, test/qc/lib004_raw_flagstat.txt, test/bam/lib001_ds10.bam, test/bam/lib001_ds20.bam, test/bam/lib002_ds10.bam, test/bam/lib002_ds20.bam, test/bam/lib003_ds10.bam, test/bam/lib003_ds20.bam, test/bam/lib004_ds10.bam, test/bam/lib004_ds20.bam, test/qc/all_qc.html
+    jobid: 0
+    resources: tmpdir=/tmp
+
+[Tue Jun  7 10:06:39 2022]
+Finished job 0.
+50 of 50 steps (100%) done
+Complete log: /home/jeszyman/repos/cfdna-wgs/.snakemake/log/2022-06-07T100554.552665.snakemake.log
+unlocking
+removing lock
+removing lock
+removed all locks

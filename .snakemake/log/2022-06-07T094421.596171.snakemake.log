@@ -1,0 +1,325 @@
+Building DAG of jobs...
+Using shell: /bin/bash
+Provided cores: 4
+Rules claiming more threads will be scaled down.
+Job stats:
+job                           count    min threads    max threads
+--------------------------  -------  -------------  -------------
+alignment_qc                      3              1              1
+all                               1              1              1
+downsample_bams                   1              1              1
+fastqc                            1              1              1
+multiqc                           1              1              1
+picard_collect_wgs_metrics        4              1              1
+total                            11              1              1
+
+Resources before job selection: {'_cores': 4, '_nodes': 9223372036854775807}
+Ready jobs (9):
+	alignment_qc
+	alignment_qc
+	fastqc
+	downsample_bams
+	alignment_qc
+	picard_collect_wgs_metrics
+	picard_collect_wgs_metrics
+	picard_collect_wgs_metrics
+	picard_collect_wgs_metrics
+Select jobs to execute...
+Selected jobs (4):
+	downsample_bams
+	alignment_qc
+	fastqc
+	alignment_qc
+Resources after job selection: {'_cores': 0, '_nodes': 9223372036854775803}
+
+[Tue Jun  7 09:44:22 2022]
+rule downsample_bams:
+    input: test/bam/lib003_dedup.bam
+    output: test/bam/lib003_ds20.bam
+    log: test/logs/downsample_bam_lib003_20.err
+    jobid: 46
+    wildcards: read_id=lib003, milreads=20
+    resources: tmpdir=/tmp
+
+
+        workflow/scripts/downsample_bam.sh test/bam/lib003_dedup.bam 20000000 test/bam/lib003_ds20.bam 2>test/logs/downsample_bam_lib003_20.err
+        
+ singularity  exec --home /home/jeszyman/repos/cfdna-wgs --bind /home/jeszyman:/home/jeszyman --bind /mnt:/mnt /home/jeszyman/sing_containers/biotools.sif bash -c 'set -euo pipefail;  
+        workflow/scripts/downsample_bam.sh test/bam/lib003_dedup.bam 20000000 test/bam/lib003_ds20.bam 2>test/logs/downsample_bam_lib003_20.err'
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+
+[Tue Jun  7 09:44:22 2022]
+rule alignment_qc:
+    input: test/bam/lib001_dedup.bam
+    output: test/qc/lib001_dedup_samstats.txt, test/qc/lib001_dedup_flagstat.txt
+    log: test/logs/alignment_qc_lib001_dedup.err
+    jobid: 33
+    wildcards: read_id=lib001, bam_step=dedup
+    resources: tmpdir=/tmp
+
+
+        samtools stats test/bam/lib001_dedup.bam > test/qc/lib001_dedup_samstats.txt 2>test/logs/alignment_qc_lib001_dedup.err
+        samtools flagstat test/bam/lib001_dedup.bam > test/qc/lib001_dedup_flagstat.txt 2>>test/logs/alignment_qc_lib001_dedup.err
+        
+ singularity  exec --home /home/jeszyman/repos/cfdna-wgs --bind /home/jeszyman:/home/jeszyman --bind /mnt:/mnt /home/jeszyman/sing_containers/biotools.sif bash -c 'set -euo pipefail;  
+        samtools stats test/bam/lib001_dedup.bam > test/qc/lib001_dedup_samstats.txt 2>test/logs/alignment_qc_lib001_dedup.err
+        samtools flagstat test/bam/lib001_dedup.bam > test/qc/lib001_dedup_flagstat.txt 2>>test/logs/alignment_qc_lib001_dedup.err'
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+
+[Tue Jun  7 09:44:22 2022]
+rule fastqc:
+    input: test/fastq/raw/lib002_R1.fastq.gz, test/fastq/processed/lib002_proc_R1.fastq.gz
+    output: test/qc/lib002_R1_fastqc.html, test/qc/lib002_proc_R1_fastqc.html
+    log: test/logs/fastqc_raw_lib002_R1.log, test/logs/fastqc_proc_lib002_R1.log
+    jobid: 19
+    wildcards: read_id=lib002, read=R1
+    resources: tmpdir=/tmp
+
+
+        fastqc --outdir test/qc         --quiet         --threads 4 test/fastq/raw/lib002_R1.fastq.gz &> test/logs/fastqc_raw_lib002_R1.log test/logs/fastqc_proc_lib002_R1.log
+        fastqc --outdir test/qc         --quiet         --threads 4 test/fastq/processed/lib002_proc_R1.fastq.gz &> test/logs/fastqc_raw_lib002_R1.log test/logs/fastqc_proc_lib002_R1.log
+        
+ singularity  exec --home /home/jeszyman/repos/cfdna-wgs --bind /home/jeszyman:/home/jeszyman --bind /mnt:/mnt /home/jeszyman/sing_containers/biotools.sif bash -c 'set -euo pipefail;  
+        fastqc --outdir test/qc         --quiet         --threads 4 test/fastq/raw/lib002_R1.fastq.gz &> test/logs/fastqc_raw_lib002_R1.log test/logs/fastqc_proc_lib002_R1.log
+        fastqc --outdir test/qc         --quiet         --threads 4 test/fastq/processed/lib002_proc_R1.fastq.gz &> test/logs/fastqc_raw_lib002_R1.log test/logs/fastqc_proc_lib002_R1.log'
+
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+[Tue Jun  7 09:44:22 2022]
+rule alignment_qc:
+    input: test/bam/lib003_dedup.bam
+    output: test/qc/lib003_dedup_samstats.txt, test/qc/lib003_dedup_flagstat.txt
+    log: test/logs/alignment_qc_lib003_dedup.err
+    jobid: 37
+    wildcards: read_id=lib003, bam_step=dedup
+    resources: tmpdir=/tmp
+
+
+        samtools stats test/bam/lib003_dedup.bam > test/qc/lib003_dedup_samstats.txt 2>test/logs/alignment_qc_lib003_dedup.err
+        samtools flagstat test/bam/lib003_dedup.bam > test/qc/lib003_dedup_flagstat.txt 2>>test/logs/alignment_qc_lib003_dedup.err
+        
+ singularity  exec --home /home/jeszyman/repos/cfdna-wgs --bind /home/jeszyman:/home/jeszyman --bind /mnt:/mnt /home/jeszyman/sing_containers/biotools.sif bash -c 'set -euo pipefail;  
+        samtools stats test/bam/lib003_dedup.bam > test/qc/lib003_dedup_samstats.txt 2>test/logs/alignment_qc_lib003_dedup.err
+        samtools flagstat test/bam/lib003_dedup.bam > test/qc/lib003_dedup_flagstat.txt 2>>test/logs/alignment_qc_lib003_dedup.err'
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+[Tue Jun  7 09:44:22 2022]
+Finished job 46.
+1 of 11 steps (9%) done
+Resources before job selection: {'_cores': 1, '_nodes': 9223372036854775804}
+Ready jobs (5):
+	picard_collect_wgs_metrics
+	picard_collect_wgs_metrics
+	alignment_qc
+	picard_collect_wgs_metrics
+	picard_collect_wgs_metrics
+Select jobs to execute...
+Selected jobs (1):
+	picard_collect_wgs_metrics
+Resources after job selection: {'_cores': 0, '_nodes': 9223372036854775803}
+
+[Tue Jun  7 09:44:22 2022]
+rule picard_collect_wgs_metrics:
+    input: test/bam/lib002_dedup.bam
+    output: test/qc/lib002_collect_wgs_metrics.txt
+    jobid: 30
+    wildcards: library_id=lib002
+    resources: tmpdir=/tmp
+
+
+        workflow/scripts/CollectWgsMetrics_wrapper.sh test/bam/lib002_dedup.bam test/inputs/chr8.fa test/qc/lib002_collect_wgs_metrics.txt
+        
+ singularity  exec --home /home/jeszyman/repos/cfdna-wgs --bind /home/jeszyman:/home/jeszyman --bind /mnt:/mnt /home/jeszyman/sing_containers/biotools.sif bash -c 'set -euo pipefail;  
+        workflow/scripts/CollectWgsMetrics_wrapper.sh test/bam/lib002_dedup.bam test/inputs/chr8.fa test/qc/lib002_collect_wgs_metrics.txt'
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+[Tue Jun  7 09:44:22 2022]
+Finished job 33.
+2 of 11 steps (18%) done
+Resources before job selection: {'_cores': 1, '_nodes': 9223372036854775804}
+Ready jobs (4):
+	picard_collect_wgs_metrics
+	picard_collect_wgs_metrics
+	alignment_qc
+	picard_collect_wgs_metrics
+Select jobs to execute...
+Selected jobs (1):
+	picard_collect_wgs_metrics
+Resources after job selection: {'_cores': 0, '_nodes': 9223372036854775803}
+
+[Tue Jun  7 09:44:22 2022]
+rule picard_collect_wgs_metrics:
+    input: test/bam/lib004_dedup.bam
+    output: test/qc/lib004_collect_wgs_metrics.txt
+    jobid: 32
+    wildcards: library_id=lib004
+    resources: tmpdir=/tmp
+
+
+        workflow/scripts/CollectWgsMetrics_wrapper.sh test/bam/lib004_dedup.bam test/inputs/chr8.fa test/qc/lib004_collect_wgs_metrics.txt
+        
+ singularity  exec --home /home/jeszyman/repos/cfdna-wgs --bind /home/jeszyman:/home/jeszyman --bind /mnt:/mnt /home/jeszyman/sing_containers/biotools.sif bash -c 'set -euo pipefail;  
+        workflow/scripts/CollectWgsMetrics_wrapper.sh test/bam/lib004_dedup.bam test/inputs/chr8.fa test/qc/lib004_collect_wgs_metrics.txt'
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+[Tue Jun  7 09:44:22 2022]
+Finished job 37.
+3 of 11 steps (27%) done
+Resources before job selection: {'_cores': 1, '_nodes': 9223372036854775804}
+Ready jobs (3):
+	picard_collect_wgs_metrics
+	picard_collect_wgs_metrics
+	alignment_qc
+Select jobs to execute...
+Selected jobs (1):
+	alignment_qc
+Resources after job selection: {'_cores': 0, '_nodes': 9223372036854775803}
+
+[Tue Jun  7 09:44:22 2022]
+rule alignment_qc:
+    input: test/bam/lib003_raw.bam
+    output: test/qc/lib003_raw_samstats.txt, test/qc/lib003_raw_flagstat.txt
+    log: test/logs/alignment_qc_lib003_raw.err
+    jobid: 38
+    wildcards: read_id=lib003, bam_step=raw
+    resources: tmpdir=/tmp
+
+
+        samtools stats test/bam/lib003_raw.bam > test/qc/lib003_raw_samstats.txt 2>test/logs/alignment_qc_lib003_raw.err
+        samtools flagstat test/bam/lib003_raw.bam > test/qc/lib003_raw_flagstat.txt 2>>test/logs/alignment_qc_lib003_raw.err
+        
+ singularity  exec --home /home/jeszyman/repos/cfdna-wgs --bind /home/jeszyman:/home/jeszyman --bind /mnt:/mnt /home/jeszyman/sing_containers/biotools.sif bash -c 'set -euo pipefail;  
+        samtools stats test/bam/lib003_raw.bam > test/qc/lib003_raw_samstats.txt 2>test/logs/alignment_qc_lib003_raw.err
+        samtools flagstat test/bam/lib003_raw.bam > test/qc/lib003_raw_flagstat.txt 2>>test/logs/alignment_qc_lib003_raw.err'
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+[Tue Jun  7 09:44:22 2022]
+Finished job 38.
+4 of 11 steps (36%) done
+Resources before job selection: {'_cores': 1, '_nodes': 9223372036854775804}
+Ready jobs (2):
+	picard_collect_wgs_metrics
+	picard_collect_wgs_metrics
+Select jobs to execute...
+Selected jobs (1):
+	picard_collect_wgs_metrics
+Resources after job selection: {'_cores': 0, '_nodes': 9223372036854775803}
+
+[Tue Jun  7 09:44:22 2022]
+rule picard_collect_wgs_metrics:
+    input: test/bam/lib003_dedup.bam
+    output: test/qc/lib003_collect_wgs_metrics.txt
+    jobid: 31
+    wildcards: library_id=lib003
+    resources: tmpdir=/tmp
+
+
+        workflow/scripts/CollectWgsMetrics_wrapper.sh test/bam/lib003_dedup.bam test/inputs/chr8.fa test/qc/lib003_collect_wgs_metrics.txt
+        
+ singularity  exec --home /home/jeszyman/repos/cfdna-wgs --bind /home/jeszyman:/home/jeszyman --bind /mnt:/mnt /home/jeszyman/sing_containers/biotools.sif bash -c 'set -euo pipefail;  
+        workflow/scripts/CollectWgsMetrics_wrapper.sh test/bam/lib003_dedup.bam test/inputs/chr8.fa test/qc/lib003_collect_wgs_metrics.txt'
+Activating singularity image /home/jeszyman/sing_containers/biotools.sif
+Waiting at most 5 seconds for missing files.
+Full Traceback (most recent call last):
+  File "/opt/miniconda3/envs/snakemake/lib/python3.10/site-packages/snakemake/dag.py", line 493, in check_and_touch_output
+    wait_for_files(
+  File "/opt/miniconda3/envs/snakemake/lib/python3.10/site-packages/snakemake/io.py", line 825, in wait_for_files
+    raise IOError(
+OSError: Missing files after 5 seconds:
+test/qc/lib002_collect_wgs_metrics.txt
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/opt/miniconda3/envs/snakemake/lib/python3.10/site-packages/snakemake/scheduler.py", line 529, in _finish_jobs
+    self.get_executor(job).handle_job_success(job)
+  File "/opt/miniconda3/envs/snakemake/lib/python3.10/site-packages/snakemake/executors/__init__.py", line 608, in handle_job_success
+    super().handle_job_success(job)
+  File "/opt/miniconda3/envs/snakemake/lib/python3.10/site-packages/snakemake/executors/__init__.py", line 265, in handle_job_success
+    job.postprocess(
+  File "/opt/miniconda3/envs/snakemake/lib/python3.10/site-packages/snakemake/jobs.py", line 1011, in postprocess
+    self.dag.check_and_touch_output(
+  File "/opt/miniconda3/envs/snakemake/lib/python3.10/site-packages/snakemake/dag.py", line 500, in check_and_touch_output
+    raise MissingOutputException(
+snakemake.exceptions.MissingOutputException: Job Missing files after 5 seconds:
+test/qc/lib002_collect_wgs_metrics.txt
+This might be due to filesystem latency. If that is the case, consider to increase the wait time with --latency-wait.
+Job id: 30 completed successfully, but some output files are missing. 30
+
+MissingOutputException in line 223 of /home/jeszyman/repos/cfdna-wgs/workflow/read_preprocess.smk:
+Job Missing files after 5 seconds:
+test/qc/lib002_collect_wgs_metrics.txt
+This might be due to filesystem latency. If that is the case, consider to increase the wait time with --latency-wait.
+Job id: 30 completed successfully, but some output files are missing. 30
+Waiting at most 5 seconds for missing files.
+Full Traceback (most recent call last):
+  File "/opt/miniconda3/envs/snakemake/lib/python3.10/site-packages/snakemake/dag.py", line 493, in check_and_touch_output
+    wait_for_files(
+  File "/opt/miniconda3/envs/snakemake/lib/python3.10/site-packages/snakemake/io.py", line 825, in wait_for_files
+    raise IOError(
+OSError: Missing files after 5 seconds:
+test/qc/lib002_collect_wgs_metrics.txt
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/opt/miniconda3/envs/snakemake/lib/python3.10/site-packages/snakemake/scheduler.py", line 529, in _finish_jobs
+    self.get_executor(job).handle_job_success(job)
+  File "/opt/miniconda3/envs/snakemake/lib/python3.10/site-packages/snakemake/executors/__init__.py", line 608, in handle_job_success
+    super().handle_job_success(job)
+  File "/opt/miniconda3/envs/snakemake/lib/python3.10/site-packages/snakemake/executors/__init__.py", line 265, in handle_job_success
+    job.postprocess(
+  File "/opt/miniconda3/envs/snakemake/lib/python3.10/site-packages/snakemake/jobs.py", line 1011, in postprocess
+    self.dag.check_and_touch_output(
+  File "/opt/miniconda3/envs/snakemake/lib/python3.10/site-packages/snakemake/dag.py", line 500, in check_and_touch_output
+    raise MissingOutputException(
+snakemake.exceptions.MissingOutputException: Job Missing files after 5 seconds:
+test/qc/lib002_collect_wgs_metrics.txt
+This might be due to filesystem latency. If that is the case, consider to increase the wait time with --latency-wait.
+Job id: 30 completed successfully, but some output files are missing. 30
+
+MissingOutputException in line 223 of /home/jeszyman/repos/cfdna-wgs/workflow/read_preprocess.smk:
+Job Missing files after 5 seconds:
+test/qc/lib002_collect_wgs_metrics.txt
+This might be due to filesystem latency. If that is the case, consider to increase the wait time with --latency-wait.
+Job id: 30 completed successfully, but some output files are missing. 30
+Full Traceback (most recent call last):
+  File "/opt/miniconda3/envs/snakemake/lib/python3.10/site-packages/snakemake/dag.py", line 493, in check_and_touch_output
+    wait_for_files(
+  File "/opt/miniconda3/envs/snakemake/lib/python3.10/site-packages/snakemake/io.py", line 825, in wait_for_files
+    raise IOError(
+OSError: Missing files after 5 seconds:
+test/qc/lib002_collect_wgs_metrics.txt
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/opt/miniconda3/envs/snakemake/lib/python3.10/site-packages/snakemake/scheduler.py", line 529, in _finish_jobs
+    self.get_executor(job).handle_job_success(job)
+  File "/opt/miniconda3/envs/snakemake/lib/python3.10/site-packages/snakemake/executors/__init__.py", line 608, in handle_job_success
+    super().handle_job_success(job)
+  File "/opt/miniconda3/envs/snakemake/lib/python3.10/site-packages/snakemake/executors/__init__.py", line 265, in handle_job_success
+    job.postprocess(
+  File "/opt/miniconda3/envs/snakemake/lib/python3.10/site-packages/snakemake/jobs.py", line 1011, in postprocess
+    self.dag.check_and_touch_output(
+  File "/opt/miniconda3/envs/snakemake/lib/python3.10/site-packages/snakemake/dag.py", line 500, in check_and_touch_output
+    raise MissingOutputException(
+snakemake.exceptions.MissingOutputException: Job Missing files after 5 seconds:
+test/qc/lib002_collect_wgs_metrics.txt
+This might be due to filesystem latency. If that is the case, consider to increase the wait time with --latency-wait.
+Job id: 30 completed successfully, but some output files are missing. 30
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/opt/miniconda3/envs/snakemake/lib/python3.10/site-packages/snakemake/__init__.py", line 699, in snakemake
+    success = workflow.execute(
+  File "/opt/miniconda3/envs/snakemake/lib/python3.10/site-packages/snakemake/workflow.py", line 1069, in execute
+    success = self.scheduler.schedule()
+  File "/opt/miniconda3/envs/snakemake/lib/python3.10/site-packages/snakemake/scheduler.py", line 440, in schedule
+    self._finish_jobs()
+  File "/opt/miniconda3/envs/snakemake/lib/python3.10/site-packages/snakemake/scheduler.py", line 534, in _finish_jobs
+    self._handle_error(job)
+  File "/opt/miniconda3/envs/snakemake/lib/python3.10/site-packages/snakemake/scheduler.py", line 615, in _handle_error
+    self.running.remove(job)
+KeyError: picard_collect_wgs_metrics
+
+unlocking
+removing lock
+removing lock
+removed all locks

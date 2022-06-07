@@ -1,0 +1,3 @@
+WildcardError:
+No values given for wildcard 'read_id'.
+  File "/home/jeszyman/repos/cfdna-wgs/workflow/int_test.smk", line 26, in <module>

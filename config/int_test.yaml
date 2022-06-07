@@ -1,18 +1,19 @@
+# Integration testing is on software in the jeszyman/biotools dockerfile.
 container: "~/sing_containers/biotools.sif"
-threads: 4
 
-# Note, need full repository path when calling from another directory.
-cfdna_wgs_repo: "./"
+# Required paths
+#  (Data directory will contain all snakefile outputs in a sub-directory.)
 data_dir: "test"
+cfdna_wgs_script_dir: "workflow/scripts"
+
+# Required reference files
 adapter_fastq: "test/inputs/TruSeq3-PE.fa"
-bwa_index: "test/ref/chr8"
+genome_fasta: "test/inputs/chr8.fa"
+bwa_index: "test/inputs/chr8"
+blacklist: "test/inputs/hg38-blacklist.v2.bed"
 
-
-bam_dir: "test/bam"
-rename_dir: "test/cappseq_fastq"
-extracted_dir: "test/extracted_fastq"
-fq_symlink_dir: "test/symlink-fastq"
+# Required parameters
+threads: 4
 MILREADS:
   - "10"
   - "20"
-cfdna_wgs_script_dir: "workflow/scripts"

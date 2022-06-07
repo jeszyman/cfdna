@@ -1,32 +1,43 @@
 * Cell-free DNA Whole-Genome Sequencing                             :biopipe:
 :PROPERTIES:
-:header-args:bash: :tangle-mode (identity #o555)
+:header-args: :tangle no :tangle-mode (identity #o555)
 :logging: nil
 :END:
 ** Setup
+*** Shell
+- Some setup scripts can be found in tools directories of jeszyman/biotools
+  #+begin_src bash
+add_biorepo_dirs.sh ${HOME}/repos/cfdna-wgs
+#+end_src
 *** Snakemake configuration YAML
 #+begin_src bash :tangle ./config/int_test.yaml
+# Integration testing is on software in the jeszyman/biotools dockerfile.
 container: "~/sing_containers/biotools.sif"
-threads: 4
 
-# Note, need full repository path when calling from another directory.
-cfdna_wgs_repo: "./"
+# Required paths
+#  (Data directory will contain all snakefile outputs in a sub-directory.)
 data_dir: "test"
+cfdna_wgs_script_dir: "workflow/scripts"
+
+# Required reference files
 adapter_fastq: "test/inputs/TruSeq3-PE.fa"
-bwa_index: "test/ref/chr8"
+genome_fasta: "test/inputs/chr8.fa"
+bwa_index: "test/inputs/chr8"
+blacklist: "test/inputs/hg38-blacklist.v2.bed"
 
-
-bam_dir: "test/bam"
-rename_dir: "test/cappseq_fastq"
-extracted_dir: "test/extracted_fastq"
-fq_symlink_dir: "test/symlink-fastq"
+# Required parameters
+threads: 4
 MILREADS:
   - "10"
   - "20"
-cfdna_wgs_script_dir: "workflow/scripts"
+
 #+end_src
 *** Integration testing inputs setup
 #+begin_src bash
+wget --directory-prefix="/home/jeszyman/repos/cfdna-wgs/test/inputs" https://raw.githubusercontent.com/Boyle-Lab/Blacklist/master/lists/hg38-blacklist.v2.bed.gz
+
+gunzip -c ~/repos/cfdna-wgs/test/inputs/hg38-blacklist.v2.bed.gz > ~/repos/cfdna-wgs/test/inputs/hg38-blacklist.v2.bed
+
 ls -d1 test/* | grep -v -e inputs -e ref -e fastq
 
 ls -d ./test/
@@ -67,7 +78,7 @@ singularity shell ~/sing_containers/biotools.sif
 bwa index -p test/ref/chr8 test/inputs/chr8.fa
 exit
 #+end_src
-** [[file:workflow/read_preprocess.smk][Sequence pre-processing, alignment, and quality control]] :smk:
+** [[file:workflow/read_preprocess.smk][Sequence pre-processing, alignment, and quality control]]  :smk:
 :PROPERTIES:
 :header-args:snakemake: :tangle ./workflow/read_preprocess.smk
 :END:
@@ -77,18 +88,18 @@ exit
 # Read trimming per NCI
 rule trimmomatic:
     input:
-        read1 = config["data_dir"] + "/fastq/raw/{read_id}_R1.fastq.gz",
-        read2 = config["data_dir"] + "/fastq/raw/{read_id}_R2.fastq.gz",
+        read1 = config["data_dir"] + "/fastq/raw/{library_id}_R1.fastq.gz",
+        read2 = config["data_dir"] + "/fastq/raw/{library_id}_R2.fastq.gz",
     params:
         adapter_fasta = config["adapter_fastq"],
     output:
-        read1 = config["data_dir"] + "/fastq/processed/{read_id}_proc_R1.fastq.gz",
-        read1_unpr = config["data_dir"] + "/fastq/unpaired/{read_id}_unpr_R1.fastq.gz",
-        read2 = config["data_dir"] + "/fastq/processed/{read_id}_proc_R2.fastq.gz",
-        read2_unpr = config["data_dir"] + "/fastq/unpaired/{read_id}_unpr_R2.fastq.gz",
+        read1 = config["data_dir"] + "/fastq/processed/{library_id}_proc_R1.fastq.gz",
+        read1_unpr = config["data_dir"] + "/fastq/unpaired/{library_id}_unpr_R1.fastq.gz",
+        read2 = config["data_dir"] + "/fastq/processed/{library_id}_proc_R2.fastq.gz",
+        read2_unpr = config["data_dir"] + "/fastq/unpaired/{library_id}_unpr_R2.fastq.gz",
     log:
-        int = config["data_dir"] + "/logs/trimmomatic_trimlog_{read_id}.log",
-        main = config["data_dir"] + "/logs/trimmomatic_{read_id}.log",
+        int = config["data_dir"] + "/logs/trimmomatic_trimlog_{library_id}.log",
+        main = config["data_dir"] + "/logs/trimmomatic_{library_id}.log",
     shell:
         """
         trimmomatic PE \
@@ -104,17 +115,17 @@ rule trimmomatic:
 - Reference
   - Trimmomatic parameters based on Taylor's parameters ([[https://mail.google.com/mail/u/0/#search/sundby+fastq/FMfcgzGmvLWSbsmhDsffvSSWfjWdQhhR?projector=1&messagePartId=0.1][email]])
   - https://github.com/AAFC-BICoE/snakemake-trimmomatic/blob/master/Snakefile
-*** DONE Alignment
+*** DONE Alignment :smk_rule:
 #+begin_src snakemake
 # BWA alignment
 rule align:
     input:
-        read1 = config["data_dir"] + "/fastq/processed/{read_id}_proc_R1.fastq.gz",
-        read2 = config["data_dir"] + "/fastq/processed/{read_id}_proc_R2.fastq.gz",
+        read1 = config["data_dir"] + "/fastq/processed/{library_id}_proc_R1.fastq.gz",
+        read2 = config["data_dir"] + "/fastq/processed/{library_id}_proc_R2.fastq.gz",
     output:
-        config["data_dir"] + "/bam/{read_id}.sam",
+        config["data_dir"] + "/bam/{library_id}.sam",
     log:
-        config["data_dir"] + "/logs/align_{read_id}.log"
+        config["data_dir"] + "/logs/align_{library_id}.log"
     shell:
         """
         bwa mem -M -t 4 {config[bwa_index]} {input.read1} {input.read2} > {output}
@@ -127,16 +138,16 @@ rule align:
 # FastQC
 rule fastqc:
     input:
-        raw =  config["data_dir"] + "/fastq/raw/{read_id}_{read}.fastq.gz",
-        proc = config["data_dir"] + "/fastq/processed/{read_id}_proc_{read}.fastq.gz",
+        raw =  config["data_dir"] + "/fastq/raw/{library_id}_{read}.fastq.gz",
+        proc = config["data_dir"] + "/fastq/processed/{library_id}_proc_{read}.fastq.gz",
     params:
         out_dir = config["data_dir"] + "/qc",
     output:
-        raw_html = config["data_dir"] + "/qc/{read_id}_{read}_fastqc.html",
-        proc_html = config["data_dir"] + "/qc/{read_id}_proc_{read}_fastqc.html",
+        raw_html = config["data_dir"] + "/qc/{library_id}_{read}_fastqc.html",
+        proc_html = config["data_dir"] + "/qc/{library_id}_proc_{read}_fastqc.html",
     log:
-        raw = config["data_dir"] + "/logs/fastqc_raw_{read_id}_{read}.log",
-        proc = config["data_dir"] + "/logs/fastqc_proc_{read_id}_{read}.log",
+        raw = config["data_dir"] + "/logs/fastqc_raw_{library_id}_{read}.log",
+        proc = config["data_dir"] + "/logs/fastqc_proc_{library_id}_{read}.log",
     shell:
         """
         fastqc --outdir {params.out_dir} \
@@ -147,19 +158,19 @@ rule fastqc:
         --threads {config[threads]} {input.proc} &> {log}
         """
 #+end_src
-*** DONE Alignment processing
+*** DONE Alignment processing :smk_rule:
 #+begin_src snakemake
 # Alignment deduplication and sorting
 rule alignment_processing:
     input:
-        config["data_dir"] + "/bam/{read_id}.sam",
+        config["data_dir"] + "/bam/{library_id}.sam",
     output:
-        bam = config["data_dir"] + "/bam/{read_id}_raw.bam",
-        dedup = temp(config["data_dir"] + "/bam/{read_id}_dedup_unsort.bam"),
-        sort = config["data_dir"] + "/bam/{read_id}_dedup.bam",
-        index = config["data_dir"] + "/bam/{read_id}_dedup.bam.bai",
+        bam = config["data_dir"] + "/bam/{library_id}_raw.bam",
+        dedup = temp(config["data_dir"] + "/bam/{library_id}_dedup_unsort.bam"),
+        sort = config["data_dir"] + "/bam/{library_id}_dedup.bam",
+        index = config["data_dir"] + "/bam/{library_id}_dedup.bam.bai",
     log:
-        config["data_dir"] + "/logs/alignment_processing_{read_id}.log"
+        config["data_dir"] + "/logs/alignment_processing_{library_id}.log"
     shell:
         """
         sambamba view -t {config[threads]} -S -f bam {input} > {output.bam}
@@ -168,33 +179,33 @@ rule alignment_processing:
         sambamba index -t {config[threads]} {output.sort}
         """
 #+end_src
-*** DONE Alignment QC
+*** DONE Alignment QC :smk_rule:
 #+begin_src snakemake
 # Alignment samtools QC
 rule alignment_qc:
     input:
-        config["data_dir"] + "/bam/{read_id}_{bam_step}.bam",
+        config["data_dir"] + "/bam/{library_id}_{bam_step}.bam",
     output:
-        samstat = config["data_dir"] + "/qc/{read_id}_{bam_step}_samstats.txt",
-        flagstat = config["data_dir"] + "/qc/{read_id}_{bam_step}_flagstat.txt",
+        samstat = config["data_dir"] + "/qc/{library_id}_{bam_step}_samstats.txt",
+        flagstat = config["data_dir"] + "/qc/{library_id}_{bam_step}_flagstat.txt",
     log:
-        config["data_dir"] + "/logs/alignment_qc_{read_id}_{bam_step}.err",
+        config["data_dir"] + "/logs/alignment_qc_{library_id}_{bam_step}.err",
     shell:
         """
         samtools stats {input} > {output.samstat} 2>{log}
         samtools flagstat {input} > {output.flagstat} 2>>{log}
         """
 #+end_src
-*** DONE Downsample bams
+*** DONE Downsample bams :smk_rule:
 #+begin_src snakemake
 # Alignment downsampling
 rule downsample_bams:
     input:
-        config["data_dir"] + "/bam/{read_id}_dedup.bam",
+        config["data_dir"] + "/bam/{library_id}_dedup.bam",
     output:
-        config["data_dir"] + "/bam/{read_id}_ds{milreads}.bam",
+        config["data_dir"] + "/bam/{library_id}_ds{milreads}.bam",
     log:
-        config["data_dir"] + "/logs/downsample_bam_{read_id}_{milreads}.err"
+        config["data_dir"] + "/logs/downsample_bam_{library_id}_{milreads}.err"
     shell:
         """
         {config[cfdna_wgs_script_dir]}/downsample_bam.sh {input} {wildcards.milreads}000000 {output} 2>{log}
@@ -213,24 +224,63 @@ else
 fi
 #+end_src
 
-*** Dev
-:PROPERTIES:
-:header-args:snakemake: :tangle no
-:END:
-**** Ideas
-***** Ideas
 
-:PROPERTIES:
-:header-args:snakemake: :tangle no
-:END:
-- https://github.com/brentp/mosdepth
-- https://deeptools.readthedocs.io/en/develop/content/tools/bamCoverage.html#Output
-Mem cap
-Config to run command
+*** DONE Sequencing depth metric(s)
+#+begin_src snakemake
+# Sequencing depth via Picard
+rule picard_collect_wgs_metrics:
+    input:
+        config["data_dir"] + "/bam/{library_id}_dedup.bam",
+    output:
+        config["data_dir"] + "/qc/{library_id}_collect_wgs_metrics.txt",
+    shell:
+        """
+        {config[cfdna_wgs_script_dir]}/CollectWgsMetrics_wrapper.sh {input} {config[genome_fasta]} {output}
+        """
+#+end_src
+#+begin_src bash :tangle ./workflow/scripts/CollectWgsMetrics_wrapper.sh
+picard CollectWgsMetrics \
+       INPUT=$1 \
+       OUTPUT=$3 \
+       READ_LENGTH=150 \
+       REFERENCE_SEQUENCE=$2
 
-- frag size
-  #+name: fragment_size.sh
-#+begin_src bash
+#+end_src
+
+*** DONE Fragment sizes                                               :smk_rule:
+#+begin_src snakemake
+# Fragment sizes by deepTools
+rule deeptools_bamprfragmentsize:
+    input:
+        config["data_dir"] + "/bam/{library_id}_dedup.bam",
+    params:
+        blacklist = config["blacklist"],
+    output:
+        config["data_dir"] + "/qc/{library_id}_deeptools_frag_lengths.txt",
+    shell:
+        """
+        {config[cfdna_wgs_script_dir]}/bamPEFragmentSize_wrapper.sh \
+        {input} \
+        {config[threads]} \
+        {params[blacklist]} \
+        {output}
+        """
+#+end_src
+
+#+begin_src bash :tangle ./workflow/scripts/bamPEFragmentSize_wrapper.sh
+#!/usr/bin/env bash
+input=$1
+threads=$2
+blacklist=$3
+output=$4
+
+bamPEFragmentSize --bamfiles $input \
+                  --numberOfProcessors $threads \
+                  --blackListFileName $blacklist \
+                  --outRawFragmentLengths $output
+#+end_src
+
+  #+begin_src bash
 #########1#########2#########3#########4#########5#########6#########7#########8
 #
 source ./src/setup.sh
@@ -328,347 +378,90 @@ fi
 #
 exit
 #+end_src
-- Fragment size
-  #+name: fragment-sampling
-  #+begin_src bash
-#
-# Samples fragment size by TLEN in bam files
-#
-# Setup
-exit
-source ~/repos/mpnst/bin/local-setup.sh
-## Variables
-fragsampledir=$localdata/tmp
-## Directories
-rm -rf $fragsampledir
-mkdir -p $fragsampledir
-#
-# Get lists of bam files to sample
-find /localdata/box/NCI FASTQ/ -name
-find /duo4/.mpnst/bam-nci/ -name "*.dedup.bam" > $fragsampledir/nci-invivo-bams
-find /duo4/.mpnst/bam-nci/ -name "*.filt.sorted.bam" > $fragsampledir/nci-insilico-bams
-#TODO ADD WASHU find /duo4/mpnst/
+  - Fragment size
+    #+name: fragment-sampling
+    #+begin_src bash
+  #
+  # Samples fragment size by TLEN in bam files
+  #
+  # Setup
+  exit
+  source ~/repos/mpnst/bin/local-setup.sh
+  ## Variables
+  fragsampledir=$localdata/tmp
+  ## Directories
+  rm -rf $fragsampledir
+  mkdir -p $fragsampledir
+  #
+  # Get lists of bam files to sample
+  find /localdata/box/NCI FASTQ/ -name
+  find /duo4/.mpnst/bam-nci/ -name "*.dedup.bam" > $fragsampledir/nci-invivo-bams
+  find /duo4/.mpnst/bam-nci/ -name "*.filt.sorted.bam" > $fragsampledir/nci-insilico-bams
+  #TODO ADD WASHU find /duo4/mpnst/
 
-# TODO
-## paramaterize sampleing count
-#
-# Run Setup
-#
-# Processes
-##
-#
-mapfile -t nci_insilico_bams < $fragsampledir/nci-insilico-bams
-for file in "${nci_insilico_bams[@]}"; do
-    prebase=`basename $file`
-    base="${prebase%%.*}"
-    sambamba view -f sam -t 30 $file | shuf --head-count 10000 > $fragsampledir/${base}_nci_insilico_sample
-done
-#
-#########1#########2#########3#########4#########5#########6#########7#########8
-mapfile -t nci_invivo_bams < $fragsampledir/nci-invivo-bams
-for file in "${nci_invivo_bams[@]}"; do
-    prebase=`basename $file`
-    base="${prebase%%.*}"
-    sambamba view -f sam -t 30 $file | shuf --head-count 10000 > $fragsampledir/${base}_nci_invivo_sample
-done
+  # TODO
+  ## paramaterize sampleing count
+  #
+  # Run Setup
+  #
+  # Processes
+  ##
+  #
+  mapfile -t nci_insilico_bams < $fragsampledir/nci-insilico-bams
+  for file in "${nci_insilico_bams[@]}"; do
+      prebase=`basename $file`
+      base="${prebase%%.*}"
+      sambamba view -f sam -t 30 $file | shuf --head-count 10000 > $fragsampledir/${base}_nci_insilico_sample
+  done
+  #
+  #########1#########2#########3#########4#########5#########6#########7#########8
+  mapfile -t nci_invivo_bams < $fragsampledir/nci-invivo-bams
+  for file in "${nci_invivo_bams[@]}"; do
+      prebase=`basename $file`
+      base="${prebase%%.*}"
+      sambamba view -f sam -t 30 $file | shuf --head-count 10000 > $fragsampledir/${base}_nci_invivo_sample
+  done
 
-cd $fragsampledir
-rm frag_concat.txt
-for file in $fragsampledir/*_sample; do
-    awk '{ print sqrt($9^2) "_" FILENAME }' $file >> frag_concat.txt
-done
-sed -i '1s/^/fragsize_\n/' frag_concat.txt
->>>>>>> 2d6bf2d62424a76f5893600fce7444a867784228
+  cd $fragsampledir
+  rm frag_concat.txt
+  for file in $fragsampledir/*_sample; do
+      awk '{ print sqrt($9^2) "_" FILENAME }' $file >> frag_concat.txt
+  done
+  sed -i '1s/^/fragsize_\n/' frag_concat.txt
+  >>>>>>> 2d6bf2d62424a76f5893600fce7444a867784228
 
-sed -i -e 's/_/,/g' frag_sum_test.txt
-
-
-
-# find /duo4/.mpnst/fastq-washu/ -name "*HiSeqW31*R1_001_TAGC*.fastq.gz" | cut -d "_" -f 1-5
-#      | parallel perl ~/repos/mpnst/bin/cp-fastq-extract-auto.pl {}\_R1_001_TAGC.fastq.gz {}\_R2_001_TAGC.fastq.gz -j 24
-
-#+end_src
-
-#+begin_src bash
-source ./src/setup.sh
-docker_interactive
-jeszyman
-biotools
-source ~/repos/mpnst/src/setup.sh
-source ~/repos/mpnst/src/functions.sh
-
-for file in $dataDIR/bam/lib*_sub20m.bam;
-do
-    base=$(basename -s .bam $file)
-    if [ $file -nt $dataDIR/bam/${base}_frag90_150_sorted.bam ];
-    then
-        frag_filter $file \
-                    $dataDIR/bam \
-                    90 \
-                    150 \
-                    40
-    fi
-done
-#+end_src
-
-- deeptools https://multiqc.info/docs/
-- using mosdepth
-  #+name: mosdepth
-  #+begin_src bash
-#########1#########2#########3#########4#########5#########6#########7#########8
-#
-### mosdepth for WGS depth calc  ###
-#
-# Setup
-##
-
-# Mosdepth per bam dir
-##
-## For deduped bams
-for file in $localdata/bams/*.dedup.sorted.bam; do
-    mosdepth_mpnst $file $localdata/bam-qc/dedup 250000000
-done
-##
-#
-# get simple tsv and send to repo
-
-for file in $localdata/bam-qc/dedup/lib*.regions.bed.gz; do
-    base=`basename -s .dedup.sorted.regions.bed.gz $file`
-    zcat $file | awk -v FS='\t' -v var=$base 'NR <=24 {print var,$1,$4}' >> $localdata/bam-qc/dedup/all_dedup_coverage
-done
-
-header=library_id\\tchr\\tmean_coverage
-sed -i "1 i$header" $localdata/bam-qc/dedup/all_dedup_coverage
-
-## Local
->>>>>>> 2d6bf2d62424a76f5893600fce7444a867784228
-source ~/repos/mpnst/bin/local-setup.sh
-docker_interactive
-biotools
-##
-## Functions
-###
-### Convert bams to wigs
-bam_to_wig() {
-    printf "Variables are: 1=bam_file 2=bam_suffix 3=outdir\n"
-        base=`basename -s ${2} $1`
-        if [ $3/${base}.wig -ot $1 ]; then
-            /opt/hmmcopy_utils/bin/readCounter --window 1000000 --quality 20 \
-                                               --chromosome "chr1,chr2,chr3,chr4,chr5,chr6,chr7,chr8,chr9,chr10,chr11,chr12,chr13,chr14,chr15,chr16,chr17,chr18,chr19,chr20,chr21,chr22,chrX,chrY" $1 > $3/${base}.wig
-        fi
-}
-###
-### Run ichor for low TF
-ichor_lowfract() {
-    base=`basename -s .wig $1`
-    if [ $2/$base.RData -ot $1 ]; then
-        Rscript /opt/ichorCNA/scripts/runIchorCNA.R \
-                --id $base \
-                --WIG $1 \
-                --gcWig /opt/ichorCNA/inst/extdata/gc_hg19_1000kb.wig \
-                --normal "c(0.95, 0.99, 0.995, 0.999)" \
-                --ploidy "c(2)" \
-                --maxCN 3 \
-                --estimateScPrevalence FALSE \
-                --scStates "c()" \
-                --outDir $2
-    fi
-}
-##
-##
-mkdir -p $localdata/wigs
-mkdir -p $localdata/ichor
-#
-# Make wigs
-#
-#bam_to_wig /mnt/xt3/mpnst/frag-filt-bams/lib109.dedup.sorted.frag90_150.sorted.bam .dedup.sorted.frag90_150.sorted.bam $localdata/wigs
-##
-for file in $localdata/frag-filt-bams/lib109*.bam; do
-    bam_to_wig $file \
-               .dedup.sorted.frag.sorted.bam \
-               $localdata/wigs
-done
-
-## For fraction-filtered WGS cfDNA
-for file in $localdata/frag-filt-bams/*.bam; do
-    bam_to_wig $file \
-               .dedup.sorted.frag.sorted.bam \
-               $localdata/wigs
-done
-##
-## For tumor and leukocyte WGS libraries
-### Make array of genomic library file paths
-genomic=($(cat /drive3/users/jszymanski/repos/mpnst/data/libraries.csv | grep -e tumor -e leukocyte | grep -v "wes" | awk -F, '{print $1}' | sed 's/"//g' | sed 's/$/.dedup.sorted.bam/g' | sed 's/^/\/mnt\/xt3\/mpnst\/bams\//g'))
-###
-for file in ${genomic[@]}; do
-    bam_to_wig $file \
-               .dedup.sorted.bam \
-               $localdata/wigs
-done
-#
-##
-## Send successful file list to repo
-rm /drive3/users/jszymanski/repos/mpnst/data/wigs.tsv
-for file in $localdata/wigs/*.wig;
-do
-    base=`basename -s .wig $file`
-    echo $base >> /drive3/users/jszymanski/repos/mpnst/data/wigs.tsv
-done
-#
-##RESUME HERE
-# ichor
-##
-for file in $localdata/wigs/lib109*.wig; do
-    ichor_lowfract $file $localdata/ichor
-done
+  sed -i -e 's/_/,/g' frag_sum_test.txt
 
 
-header=library_id\\tchr\\tmean_coverage
-sed -i "1 i$header" $localdata/bam-qc/dedup/all_dedup_coverage
 
-max_file_size=5000000
-file_size=$(
-    wc -c <"$localdata/bam-qc/dedup/all_dedup_coverage"
-         )
+  # find /duo4/.mpnst/fastq-washu/ -name "*HiSeqW31*R1_001_TAGC*.fastq.gz" | cut -d "_" -f 1-5
+  #      | parallel perl ~/repos/mpnst/bin/cp-fastq-extract-auto.pl {}\_R1_001_TAGC.fastq.gz {}\_R2_001_TAGC.fastq.gz -j 24
 
-if [ $filesize -gt $max_file_size ]; then
-    touch $repo/data/qc/all_dedup_coverage_too_big
-else
-    cp $localdata/bam-qc/dedup/all_dedup_coverage $repo/qc/all_dedup_coverage.tsv
-fi
-#
-#+end_src
-  - Cant calcualte depths off [[file:~/repos/mpnst/data/bam_qc_data/mqc_mosdepth-coverage-per-contig_1.txt]] , d/n allow values under 1
-  - [ ] for coverage, should intersect down to autosomes
-- run and extract mosdepth
-  mosdepthRAW = as_tibble(read.table(file.path(repo,"data/all_dedup_coverage.tsv"), header = T, sep = '\t', fill = TRUE))
-- https://snakemake.readthedocs.io/en/stable/snakefiles/rules.html see multiext
-- ideas
-  - add # # TODO setup via fastqc metrics check
-    - # for read1 in $fastqdir/*_R1.fastq.gz; do
-      #     base=`basename -s _R1.fastq.gz ${read1}`
-      #     filesize=$(wc -c <"$bamdir/${base}.bam")
-      #     if [ $minimum_bam_size -ge $filesize ]; then
-      #         echo $base >> /drive3/users/jszymanski/repos/mpnst/data/small_bams
-      #     fi
-      # done
-      # readarray -t small_bam < /drive3/users/jszymanski/repos/mpnst/data/small_bams
-****** Ideas
-  - filter to min file size && expected by manual spreadsheet
-  - fastqs too small (< 500 Mb)
-    #+begin_src bash :results replace
-  find /mnt/ris/aadel/mpnst/inputs/cappseq-fastq -size -500M
   #+end_src
+    #+begin_src bash
+  source ./src/setup.sh
+  docker_interactive
+  jeszyman
+  biotools
+  source ~/repos/mpnst/src/setup.sh
+  source ~/repos/mpnst/src/functions.sh
 
-
-
-
-
-
-
-****** Rename                                                      :smk_rule:
-- Snakemake
-#+begin_src snakemake
-rule rename:
-    params:
-        old_sample_id=lambda wcs: sampledict[wcs.f],
-    output:
-        read1=config["fq_symlink_dir"] + "/{f}_R1.fastq.gz",
-        read2=config["fq_symlink_dir"] + "/{f}_R2.fastq.gz",
-    shell:
-        """
-        if [ -f {output.read1} ]; then \\rm {output.read1}; fi
-        if [ -f {output.read2} ]; then \\rm {output.read2}; fi
-        ln -s --relative "{config[raw_fq_dir]}/{params.old_sample_id}_R1.fastq.gz" {output.read1}
-        ln -s --relative "{config[raw_fq_dir]}/{params.old_sample_id}_R2.fastq.gz" {output.read2}
-        """
-#+end_src
-
-***** Library QC Dataframe
-#+begin_src R
-library(tidyverse)
-
-flagstat_raw = as_tibble(read.table("/home/jeszyman/repos/mpnst-preprocessing/test/qc/all_qc_data/multiqc_samtools_flagstat.txt", header = T, sep = '\t'))
-
-flagstat_mod =
-  flagstat_raw %>%
-  mutate(library_id = substr(Sample, 1, 6)) %>%
-  mutate(bam_type = gsub("_.*$","", gsub("^.......","",Sample))) %>%
-  pivot_wider(names_from = bam_type, values_from = -c(library_id, bam_type), everything()) %>%
-  select(library_id, everything(), -starts_with("Sample"))
-
-samstats_raw = as_tibble(read.table("/home/jeszyman/repos/mpnst-preprocessing/test/qc/all_qc_data/multiqc_samtools_stats.txt", header = T, sep = '\t'))
-
-samstats_mod =
-  samstats_raw %>%
-  mutate(library_id = substr(Sample, 1, 6)) %>%
-  mutate(bam_type = gsub("_.*$","", gsub("^.......","",Sample))) %>%
-  pivot_wider(names_from = bam_type, values_from = -c(library_id, bam_type), everything()) %>%
-  select(library_id, everything(), -starts_with("Sample"))
-samstats_mod
-
-#+end_src
-
-****** Make bwa index                                              :smk_rule:
-- Snakemake
-  #+begin_src snakemake
-rule make_bwa_index_:
-    input:
-        fasta = config["data_dir"] + "/inputs/hg19.fa.gz",
-    params:
-        out_dir = config["data_dir"] + "/ref/hg19_bwa"
-        prefix = config["data_dir"] + "/ref/hg19_bwa/hg19"
-    output:
-        config["data_dir"] + "/ref/hg19_bwa/hg19.amb"
-    shell:
-        """
-        scripts/make_bwa_index_.sh {params.out_dir} {params.prefix} {input.fasta}
-        """
-#+end_src
-- [[file:./workflow/scripts/make_bwa_index_.sh][Base script]]
-  #+begin_src bash :tangle ./workflow/scripts/make_bwa_index_.sh
-mkdir -p $1
-bwa index -p $2 -a bwtsw $3
-# Snakemake variables
-# Function
-# Run command
-#+end_src
-
-***** Downsample Bams
-#+name: downsample_bam
-#+begin_src bash
-function downsample_bam {
-
-## Calculate the sampling factor based on the intended number of reads:
-FACTOR=$(samtools idxstats $1 | cut -f3 | awk -v COUNT=$2 'BEGIN {total=0} {total += $1} END {print COUNT/total}')
-
-if [[ $FACTOR > 1 ]]; then
-    echo "DS reads exceeds total for $1"
-else
-    sambamba view -s $FACTOR -f bam -l 5 $1
-fi
-}
-
-#+end_src
-
-#+name: downsample_bam
-#+begin_src bash :tangle ./src/functions.sh
-function downsample_bam {
-
-## Calculate the sampling factor based on the intended number of reads:
-FACTOR=$(samtools idxstats $1 | cut -f3 | awk -v COUNT=$2 'BEGIN {total=0} {total += $1} END {print COUNT/total}')
-
-if [[ $FACTOR > 1 ]]; then
-    echo "DS reads exceeds total for $1"
-else
-    sambamba view -s $FACTOR -f bam -l 5 $1
-fi
-}
-
-#+end_src
-
-** [[file:workflow/cfdna_wgs_int_test.smk][Integration testing]] :smk:
-#+begin_src snakemake :tangle ./workflow/int_test.smk
+  for file in $dataDIR/bam/lib*_sub20m.bam;
+  do
+      base=$(basename -s .bam $file)
+      if [ $file -nt $dataDIR/bam/${base}_frag90_150_sorted.bam ];
+      then
+          frag_filter $file \
+                      $dataDIR/bam \
+                      90 \
+                      150 \
+                      40
+      fi
+  done
+  #+end_src
+** [[file:workflow/cfdna_wgs_int_test.smk][Integration testing]]                                                  :smk:
+- snakefile
+  #+begin_src snakemake :tangle ./workflow/int_test.smk
 import pandas as pd
 
 container: config["container"]
@@ -688,11 +481,13 @@ rule all:
         expand(config["data_dir"] + "/qc/{library_id}_{read}_fastqc.html", library_id = LIBRARY_IDS, read = ["R1","R2"]),
         expand(config["data_dir"] + "/qc/{library_id}_proc_{read}_fastqc.html", library_id = LIBRARY_IDS, read = ["R1","R2"]),
         expand(config["data_dir"] + "/bam/{library_id}_dedup.bam", library_id = LIBRARY_IDS),
+        expand(config["data_dir"] + "/qc/{library_id}_collect_wgs_metrics.txt", library_id = LIBRARY_IDS),
         expand(config["data_dir"] + "/bam/{library_id}_dedup.bam.bai", library_id = LIBRARY_IDS),
         expand(config["data_dir"] + "/qc/{library_id}_{bam_step}_samstats.txt", library_id = LIBRARY_IDS, bam_step= ["dedup","raw"]),
         expand(config["data_dir"] + "/qc/{library_id}_{bam_step}_flagstat.txt", library_id = LIBRARY_IDS, bam_step =["dedup","raw"]),
         expand(config["data_dir"] + "/bam/{library_id}_ds{milreads}.bam", library_id = LIBRARY_IDS, milreads = MILREADS),
         config["data_dir"] + "/qc/all_qc.html",
+        expand(config["data_dir"] + "/qc/{library_id}_deeptools_frag_lengths.txt", library_id = LIBRARY_IDS),
 
 rule symlink:
     input:
@@ -725,83 +520,32 @@ rule multiqc:
         """
 
 #+end_src
-*** Repository-local integration testing
-#+begin_src bash
-src/full_repo_int_test.sh
+- shell script
+  #+begin_src bash :tangle ./tools/shell/int_test.sh
+#!/usr/bin/env bash
+outputs_dirs=("fastq"
+              "bam"
+              "logs"
+              "qc")
+
+for dir in "${outputs_dirs[@]}"; do
+    if [ -d test/${dir} ]; then \rm -rf test/${dir}; fi
+done
+
+../basecamp/src/smk_dry_run.sh config/int_test.yaml workflow/int_test.smk &&
+../basecamp/src/smk_draw.sh config/int_test.yaml workflow/int_test.smk resources/int_test.pdf &&
+../basecamp/src/smk_forced_run.sh config/int_test.yaml workflow/int_test.smk &&
+echo "Integration testing passed, do you want to erase results files?" &&
+select yn in "Yes" "No"; do
+    case $yn in
+        Yes ) for dir in "${outputs_dirs[@]}"; do \rm -rf test/$dir; done; break;;
+        No ) exit;;
+    esac
+done
+
 #+end_src
-*** Dev Ideas
-:PROPERTIES:
-:header-args:snakemake: :tangle no
-:END:
-#+begin_src snakemake
-container: config["container"]
+- [[file:resources/int_test.pdf]]
 
-IDS, = glob_wildcards(config["fq_dir"] + "/{id}_R1.fastq.gz")
-
-rule all:
-    input:
-        expand(config["processed_fq_dir"] + "/{read_id}_proc_{read}.fastq.gz", read_id = IDS, read = ["R1","R2"]),
-        expand(config["unpr_fq_dir"] + "/{read_id}_unpr_R1.fastq.gz", read_id = IDS, read = ["R1","R2"]),
-        expand(config["bam_dir"] + "/{read_id}_dedup.bam", read_id = IDS),
-        expand(config["bam_dir"] + "/{read_id}_ds{milreads}.bam", read_id = IDS, milreads = config["MILREADS"]),
-        expand(config["qc_dir"] + "/{read_id}_{read}_fastqc.html", read_id = IDS, read = ["R1","R2"]),
-        expand(config["qc_dir"] + "/{read_id}_proc_{read}_fastqc.html", read_id = IDS, read = ["R1","R2"]),
-        config["qc_dir"] + "/all_qc.html",
-
-rule rename:
-    params:
-        old_sample_id=lambda wcs: sampledict[wcs.f],
-    output:
-        read1=config["fq_symlink_dir"] + "/{f}_R1.fastq.gz",
-        read2=config["fq_symlink_dir"] + "/{f}_R2.fastq.gz",
-    shell:
-        """
-        if [ -f {output.read1} ]; then \\rm {output.read1}; fi
-        if [ -f {output.read2} ]; then \\rm {output.read2}; fi
-        ln -s --relative "{config[raw_fq_dir]}/{params.old_sample_id}_R1.fastq.gz" {output.read1}
-        ln -s --relative "{config[raw_fq_dir]}/{params.old_sample_id}_R2.fastq.gz" {output.read2}
-        """
-
-
-include: "read_preprocess.smk"
-#+end_src
-- Ideas
-  #+begin_src snakemake
-container: config["container"]
-import pandas as pd
-import numpy as np
-
-samples = pd.read_table(config["inputs_dir"] + "/samples.tsv")
-sampledict = dict(zip(samples['new_name'], samples['old_name']))
-
-wildcard_constraints:
-    read_id='|'.join([re.escape(x) for x in sampledict.keys()]),
-
-rule all:
-    input:
-        expand(config["processed_fq_dir"] + "/{read_id}_proc_{read}.fastq.gz", read_id = sampledict.keys(), read = ["R1","R2"]),
-        expand(config["unpr_fq_dir"] + "/{read_id}_unpr_R1.fastq.gz", read_id = sampledict.keys(), read = ["R1","R2"]),
-	expand(config["bam_dir"] + "/{read_id}_dedup.bam", read_id = sampledict.keys()),
-        config["qc_dir"] + "/all_qc.html",
-        expand(config["bam_dir"] + "/{read_id}_ds{milreads}.bam", read_id = sampledict.keys(), milreads = config["MILREADS"]),
-
-rule rename:
-    params:
-        old_sample_id=lambda wcs: sampledict[wcs.f],
-    output:
-        read1=config["fq_symlink_dir"] + "/{f}_R1.fastq.gz",
-        read2=config["fq_symlink_dir"] + "/{f}_R2.fastq.gz",
-    shell:
-        """
-        if [ -f {output.read1} ]; then \\rm {output.read1}; fi
-        if [ -f {output.read2} ]; then \\rm {output.read2}; fi
-        ln -s --relative "{config[raw_fq_dir]}/{params.old_sample_id}_R1.fastq.gz" {output.read1}
-        ln -s --relative "{config[raw_fq_dir]}/{params.old_sample_id}_R2.fastq.gz" {output.read2}
-        """
-
-
-include: "read_preprocess.smk"
-#+end_src
 ** README
 :PROPERTIES:
 :export_file_name: ./README.md
@@ -810,5 +554,186 @@ include: "read_preprocess.smk"
 *** Changlog
 - [2022-05-31 Tue] - Conforms to current biotools best practices.
 - [2022-04-29 Fri] - Moved multiqc to integration testing as inputs are dependent on final sample labels. Integration testing works per this commit.
+** Dev
+:PROPERTIES:
+:header-args:snakemake: :tangle no
+:END:
+- Prioritized [2022-06-07 Tue]
+  1. input params checks
+     - add # # TODO setup via fastqc metrics check
+       - # for read1 in $fastqdir/*_R1.fastq.gz; do
+         #     base=`basename -s _R1.fastq.gz ${read1}`
+         #     filesize=$(wc -c <"$bamdir/${base}.bam")
+         #     if [ $minimum_bam_size -ge $filesize ]; then
+         #         echo $base >> /drive3/users/jszymanski/repos/mpnst/data/small_bams
+         #     fi
+         # done
+         # readarray -t small_bam < /drive3/users/jszymanski/repos/mpnst/data/small_bams
+  2. Library QC Dataframe
+     #+begin_src R
+   library(tidyverse)
+
+   flagstat_raw = as_tibble(read.table("/home/jeszyman/repos/mpnst-preprocessing/test/qc/all_qc_data/multiqc_samtools_flagstat.txt", header = T, sep = '\t'))
+
+   flagstat_mod =
+     flagstat_raw %>%
+     mutate(library_id = substr(Sample, 1, 6)) %>%
+     mutate(bam_type = gsub("_.*$","", gsub("^.......","",Sample))) %>%
+     pivot_wider(names_from = bam_type, values_from = -c(library_id, bam_type), everything()) %>%
+     select(library_id, everything(), -starts_with("Sample"))
+
+   samstats_raw = as_tibble(read.table("/home/jeszyman/repos/mpnst-preprocessing/test/qc/all_qc_data/multiqc_samtools_stats.txt", header = T, sep = '\t'))
+
+   samstats_mod =
+     samstats_raw %>%
+     mutate(library_id = substr(Sample, 1, 6)) %>%
+     mutate(bam_type = gsub("_.*$","", gsub("^.......","",Sample))) %>%
+     pivot_wider(names_from = bam_type, values_from = -c(library_id, bam_type), everything()) %>%
+     select(library_id, everything(), -starts_with("Sample"))
+   samstats_mod
+
+   #+end_src
+  3. Mem cap and performance workup
+  4. deeptools integration to multiqc https://multiqc.info/docs/
+  5. https://snakemake.readthedocs.io/en/stable/snakefiles/rules.html see multiext
+- filter to min file size && expected by manual spreadsheet
+- fastqs too small (< 500 Mb)
+  #+begin_src bash :results replace
+find /mnt/ris/aadel/mpnst/inputs/cappseq-fastq -size -500M
+#+end_src
+- expand seq depth metrics
+  - https://gatk.broadinstitute.org/hc/en-us/articles/360037226132-CollectWgsMetrics-Picard-
+  - https://github.com/brentp/mosdepth
+  - https://deeptools.readthedocs.io/en/develop/content/tools/bamCoverage.html#Output
+  - using mosdepth
+    #+name: mosdepth
+    #+begin_src bash
+  #########1#########2#########3#########4#########5#########6#########7#########8
+  #
+  ### mosdepth for WGS depth calc  ###
+  #
+  # Setup
+  ##
+
+  # Mosdepth per bam dir
+  ##
+  ## For deduped bams
+  for file in $localdata/bams/*.dedup.sorted.bam; do
+      mosdepth_mpnst $file $localdata/bam-qc/dedup 250000000
+  done
+  ##
+  #
+  # get simple tsv and send to repo
+
+  for file in $localdata/bam-qc/dedup/lib*.regions.bed.gz; do
+      base=`basename -s .dedup.sorted.regions.bed.gz $file`
+      zcat $file | awk -v FS='\t' -v var=$base 'NR <=24 {print var,$1,$4}' >> $localdata/bam-qc/dedup/all_dedup_coverage
+  done
+
+  header=library_id\\tchr\\tmean_coverage
+  sed -i "1 i$header" $localdata/bam-qc/dedup/all_dedup_coverage
+
+  ## Local
+  >>>>>>> 2d6bf2d62424a76f5893600fce7444a867784228
+  source ~/repos/mpnst/bin/local-setup.sh
+  docker_interactive
+  biotools
+  ##
+  ## Functions
+  ###
+  ### Convert bams to wigs
+  bam_to_wig() {
+      printf "Variables are: 1=bam_file 2=bam_suffix 3=outdir\n"
+          base=`basename -s ${2} $1`
+          if [ $3/${base}.wig -ot $1 ]; then
+              /opt/hmmcopy_utils/bin/readCounter --window 1000000 --quality 20 \
+                                                 --chromosome "chr1,chr2,chr3,chr4,chr5,chr6,chr7,chr8,chr9,chr10,chr11,chr12,chr13,chr14,chr15,chr16,chr17,chr18,chr19,chr20,chr21,chr22,chrX,chrY" $1 > $3/${base}.wig
+          fi
+  }
+  ###
+  ### Run ichor for low TF
+  ichor_lowfract() {
+      base=`basename -s .wig $1`
+      if [ $2/$base.RData -ot $1 ]; then
+          Rscript /opt/ichorCNA/scripts/runIchorCNA.R \
+                  --id $base \
+                  --WIG $1 \
+                  --gcWig /opt/ichorCNA/inst/extdata/gc_hg19_1000kb.wig \
+                  --normal "c(0.95, 0.99, 0.995, 0.999)" \
+                  --ploidy "c(2)" \
+                  --maxCN 3 \
+                  --estimateScPrevalence FALSE \
+                  --scStates "c()" \
+                  --outDir $2
+      fi
+  }
+  ##
+  ##
+  mkdir -p $localdata/wigs
+  mkdir -p $localdata/ichor
+  #
+  # Make wigs
+  #
+  #bam_to_wig /mnt/xt3/mpnst/frag-filt-bams/lib109.dedup.sorted.frag90_150.sorted.bam .dedup.sorted.frag90_150.sorted.bam $localdata/wigs
+  ##
+  for file in $localdata/frag-filt-bams/lib109*.bam; do
+      bam_to_wig $file \
+                 .dedup.sorted.frag.sorted.bam \
+                 $localdata/wigs
+  done
+
+  ## For fraction-filtered WGS cfDNA
+  for file in $localdata/frag-filt-bams/*.bam; do
+      bam_to_wig $file \
+                 .dedup.sorted.frag.sorted.bam \
+                 $localdata/wigs
+  done
+  ##
+  ## For tumor and leukocyte WGS libraries
+  ### Make array of genomic library file paths
+  genomic=($(cat /drive3/users/jszymanski/repos/mpnst/data/libraries.csv | grep -e tumor -e leukocyte | grep -v "wes" | awk -F, '{print $1}' | sed 's/"//g' | sed 's/$/.dedup.sorted.bam/g' | sed 's/^/\/mnt\/xt3\/mpnst\/bams\//g'))
+  ###
+  for file in ${genomic[@]}; do
+      bam_to_wig $file \
+                 .dedup.sorted.bam \
+                 $localdata/wigs
+  done
+  #
+  ##
+  ## Send successful file list to repo
+  rm /drive3/users/jszymanski/repos/mpnst/data/wigs.tsv
+  for file in $localdata/wigs/*.wig;
+  do
+      base=`basename -s .wig $file`
+      echo $base >> /drive3/users/jszymanski/repos/mpnst/data/wigs.tsv
+  done
+  #
+  ##RESUME HERE
+  # ichor
+  ##
+  for file in $localdata/wigs/lib109*.wig; do
+      ichor_lowfract $file $localdata/ichor
+  done
+
+
+  header=library_id\\tchr\\tmean_coverage
+  sed -i "1 i$header" $localdata/bam-qc/dedup/all_dedup_coverage
+
+  max_file_size=5000000
+  file_size=$(
+      wc -c <"$localdata/bam-qc/dedup/all_dedup_coverage"
+           )
+
+  if [ $filesize -gt $max_file_size ]; then
+      touch $repo/data/qc/all_dedup_coverage_too_big
+  else
+      cp $localdata/bam-qc/dedup/all_dedup_coverage $repo/qc/all_dedup_coverage.tsv
+  fi
+  #
+  #+end_src
+    - Cant calcualte depths off [[file:~/repos/mpnst/data/bam_qc_data/mqc_mosdepth-coverage-per-contig_1.txt]] , d/n allow values under 1
+    - [ ] for coverage, should intersect down to autosomes
+  - run and extract mosdepth
+    mosdepthRAW = as_tibble(read.table(file.path(repo,"data/all_dedup_coverage.tsv"), header = T, sep = '\t', fill = TRUE))
 ** Reference
 - [[id:271b4d5f-727e-496e-b835-8fe9f8655655][Bioinformatics project module]]

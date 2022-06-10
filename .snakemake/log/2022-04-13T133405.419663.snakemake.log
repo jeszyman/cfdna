@@ -1,7 +1,0 @@
-Building DAG of jobs...
-MissingInputException in line 13 of /home/jeszyman/repos/mpnst-preprocessing/workflow/read_preprocess.smk:
-Missing input files for rule all:
-test/bam/lib001_ds10.bam
-test/bam/lib003_ds10.bam
-test/bam/lib002_ds10.bam
-test/bam/lib004_ds10.bam

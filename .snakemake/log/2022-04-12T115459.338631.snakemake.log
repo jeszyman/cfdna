@@ -1,5 +1,0 @@
-Building DAG of jobs...
-WorkflowError:
-Unable to obtain modification time of file test/symlink_fastq/lib001_R1.fastq.gz although it existed before. It could be that a concurrent process has deleted it while Snakemake was running.
-  File "/opt/miniconda3/envs/snakemake/lib/python3.9/asyncio/runners.py", line 44, in run
-  File "/opt/miniconda3/envs/snakemake/lib/python3.9/asyncio/base_events.py", line 642, in run_until_complete

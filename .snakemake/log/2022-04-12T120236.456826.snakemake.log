@@ -1,3 +1,0 @@
-CreateRuleException in line 101 of /home/jeszyman/repos/mpnst-preprocessing/workflow/read_qc.smk:
-The name all is already used by another rule
-  File "/home/jeszyman/repos/mpnst-preprocessing/workflow/read_qc.smk", line 101, in <module>

@@ -1,7 +1,0 @@
-Building DAG of jobs...
-MissingInputException in line 13 of /home/jeszyman/repos/mpnst-preprocessing/workflow/read_qc.smk:
-Missing input files for rule all:
-test/bam/lib004_dedup_sort.bam
-test/bam/lib002_dedup_sort.bam
-test/bam/lib003_dedup_sort.bam
-test/bam/lib001_dedup_sort.bam

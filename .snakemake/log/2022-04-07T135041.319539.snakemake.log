@@ -1,3 +1,0 @@
-KeyError in line 29 of /home/jeszyman/repos/mpnst-preprocessing/workflow/read_qc.smk:
-'proc_fq_dir'
-  File "/home/jeszyman/repos/mpnst-preprocessing/workflow/read_qc.smk", line 29, in <module>

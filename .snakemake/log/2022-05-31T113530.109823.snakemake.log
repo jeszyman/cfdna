@@ -1,3 +1,0 @@
-KeyError in line 13 of /home/jeszyman/repos/cfdna-wgs/workflow/int_test.smk:
-'processed_fq_dir'
-  File "/home/jeszyman/repos/cfdna-wgs/workflow/int_test.smk", line 13, in <module>

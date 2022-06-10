@@ -1,3 +1,0 @@
-NameError in line 39 of /home/jeszyman/repos/cfdna-wgs/workflow/int_test.smk:
-name 'IDS' is not defined
-  File "/home/jeszyman/repos/cfdna-wgs/workflow/int_test.smk", line 39, in <module>

@@ -1,2 +1,0 @@
-SyntaxError in line 10 of /drive3/users/jszymanski/repos/mpnst-preprocessing/workflow/cappseq.smk:
-Unexpected keyword extract_cappseq_barcodes in rule definition (cappseq.smk, line 10)

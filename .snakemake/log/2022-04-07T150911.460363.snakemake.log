@@ -1,3 +1,0 @@
-KeyError in line 13 of /home/jeszyman/repos/mpnst-preprocessing/workflow/read_qc.smk:
-'bam_dir'
-  File "/home/jeszyman/repos/mpnst-preprocessing/workflow/read_qc.smk", line 13, in <module>

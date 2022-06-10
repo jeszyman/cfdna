@@ -1,4 +1,0 @@
-Building DAG of jobs...
-WildcardError in line 3 of /home/jeszyman/repos/mpnst-preprocessing/workflow/read_qc.smk:
-Wildcards in input files cannot be determined from output files:
-'fq_id'

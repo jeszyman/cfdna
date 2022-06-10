@@ -1,2 +1,0 @@
-SyntaxError in line 135 of /home/jeszyman/repos/mpnst-preprocessing/workflow/read_preprocess.smk:
-Unexpected keyword config in rule definition (read_preprocess.smk, line 135)

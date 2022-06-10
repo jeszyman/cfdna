@@ -1,3 +1,0 @@
-KeyError in line 8 of /home/jeszyman/repos/mpnst-preprocessing/workflow/read_qc.smk:
-'symlink_fq_dir'
-  File "/home/jeszyman/repos/mpnst-preprocessing/workflow/read_qc.smk", line 8, in <module>

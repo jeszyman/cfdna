@@ -1,3 +1,0 @@
-WildcardError in line 14 of /home/jeszyman/repos/mpnst-preprocessing/workflow/TMPread_qc.smk:
-No values given for wildcard 'read'.
-  File "/home/jeszyman/repos/mpnst-preprocessing/workflow/TMPread_qc.smk", line 14, in <module>

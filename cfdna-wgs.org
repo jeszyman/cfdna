@@ -4,11 +4,6 @@
 :logging: nil
 :END:
 ** Setup
-*** Shell
-- Some setup scripts can be found in tools directories of jeszyman/biotools
-  #+begin_src bash
-add_biorepo_dirs.sh ${HOME}/repos/cfdna-wgs
-#+end_src
 *** Snakemake configuration YAML
 #+begin_src bash :tangle ./config/int_test.yaml
 # Integration testing is on software in the jeszyman/biotools dockerfile.

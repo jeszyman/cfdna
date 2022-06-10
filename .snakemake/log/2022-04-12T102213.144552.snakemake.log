@@ -1,7 +1,0 @@
-Building DAG of jobs...
-MissingInputException in line 4 of /home/jeszyman/repos/mpnst-preprocessing/workflow/cappseq.smk:
-Missing input files for rule all:
-extracted_fastqcapp1_R1.fastq
-extracted_fastqcapp1_R2.fastq
-extracted_fastqcapp2_R1.fastq
-extracted_fastqcapp2_R2.fastq

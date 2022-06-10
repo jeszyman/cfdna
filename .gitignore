@@ -1,1 +1,6 @@
-./snake*
+./snake*# Taken from https://github.com/jeszyman/biotools on 2022-06-08
+# Ignore hidden directories
+**/.snakemake
+**/.cache
+**/.config
+**/.java

@@ -1,3 +1,0 @@
-WildcardError:
-No values given for wildcard 'bam_step'.
-  File "/home/jeszyman/repos/cfdna-wgs/workflow/repo_test.smk", line 16, in <module>

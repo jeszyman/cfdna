@@ -1,4 +1,0 @@
-Config file ./config/common.yaml is extended by additional config specified via the command line.
-SyntaxError:
-Not all output, log and benchmark files of rule extract_cappseq_barcodes contain the same wildcards. This is crucial though, in order to avoid that two or more jobs write to the same file.
-  File "/drive3/users/jszymanski/repos/mpnst-preprocessing/workflow/cappseq.smk", line 35, in <module>

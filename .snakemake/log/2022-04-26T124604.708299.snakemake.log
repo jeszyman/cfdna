@@ -1,4 +1,0 @@
-CreateRuleException:
-The name all is already used by another rule
-  File "/home/jeszyman/repos/cfdna-wgs/workflow/repo_test.smk", line 27, in <module>
-  File "/home/jeszyman/repos/cfdna-wgs/workflow/read_preprocess.smk", line 13, in <module>

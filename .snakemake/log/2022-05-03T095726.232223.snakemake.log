@@ -1,3 +1,0 @@
-SyntaxError in line 215 of /home/jeszyman/repos/cfdna-wgs/workflow/read_preprocess.smk:
-invalid syntax. Perhaps you forgot a comma? (read_preprocess.smk, line 215)
-  File "/home/jeszyman/repos/cfdna-wgs/workflow/int_test.smk", line 26, in <module>

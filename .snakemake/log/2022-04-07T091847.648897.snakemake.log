@@ -1,3 +1,0 @@
-IndexError in line 6 of /home/jeszyman/repos/mpnst-preprocessing/workflow/read_qc.smk:
-tuple index out of range
-  File "/home/jeszyman/repos/mpnst-preprocessing/workflow/read_qc.smk", line 6, in <module>

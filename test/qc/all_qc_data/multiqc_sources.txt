@@ -1,5 +1,11 @@
 Module	Section	Sample Name	Source
+deepTools	bamPEFragmentSizeDistribution	lib004_deeptools_frag_lengths	/home/jeszyman/repos/cfdna-wgs/test/qc/lib004_deeptools_frag_lengths.txt
+deepTools	bamPEFragmentSizeDistribution	lib003_deeptools_frag_lengths	/home/jeszyman/repos/cfdna-wgs/test/qc/lib003_deeptools_frag_lengths.txt
+deepTools	bamPEFragmentSizeDistribution	lib001_deeptools_frag_lengths	/home/jeszyman/repos/cfdna-wgs/test/qc/lib001_deeptools_frag_lengths.txt
+deepTools	bamPEFragmentSizeDistribution	lib002_deeptools_frag_lengths	/home/jeszyman/repos/cfdna-wgs/test/qc/lib002_deeptools_frag_lengths.txt
 Picard	WgsMetrics	lib002_dedup	/home/jeszyman/repos/cfdna-wgs/test/qc/lib002_collect_wgs_metrics.txt
+Picard	WgsMetrics	lib003_dedup	/home/jeszyman/repos/cfdna-wgs/test/qc/lib003_collect_wgs_metrics.txt
+Picard	WgsMetrics	lib001_dedup	/home/jeszyman/repos/cfdna-wgs/test/qc/lib001_collect_wgs_metrics.txt
 Picard	WgsMetrics	lib004_dedup	/home/jeszyman/repos/cfdna-wgs/test/qc/lib004_collect_wgs_metrics.txt
 Samtools	stats	lib002_raw_samstats	/home/jeszyman/repos/cfdna-wgs/test/qc/lib002_raw_samstats.txt
 Samtools	stats	lib004_raw_samstats	/home/jeszyman/repos/cfdna-wgs/test/qc/lib004_raw_samstats.txt
@@ -17,8 +23,6 @@ Samtools	flagstat	lib003_raw_flagstat	/home/jeszyman/repos/cfdna-wgs/test/qc/lib
 Samtools	flagstat	lib002_raw_flagstat	/home/jeszyman/repos/cfdna-wgs/test/qc/lib002_raw_flagstat.txt
 Samtools	flagstat	lib001_dedup_flagstat	/home/jeszyman/repos/cfdna-wgs/test/qc/lib001_dedup_flagstat.txt
 Samtools	flagstat	lib003_dedup_flagstat	/home/jeszyman/repos/cfdna-wgs/test/qc/lib003_dedup_flagstat.txt
-Snippy	snippy	multiqc_general_stats	/home/jeszyman/repos/cfdna-wgs/test/qc/all_qc_data/multiqc_general_stats.txt
-Snippy	snippy	multiqc	/home/jeszyman/repos/cfdna-wgs/test/qc/all_qc_data/multiqc.log
 FastQC	all_sections	lib004_proc_R2	/home/jeszyman/repos/cfdna-wgs/test/qc/lib004_proc_R2_fastqc.zip
 FastQC	all_sections	lib002_R1	/home/jeszyman/repos/cfdna-wgs/test/qc/lib002_R1_fastqc.zip
 FastQC	all_sections	lib001_proc_R2	/home/jeszyman/repos/cfdna-wgs/test/qc/lib001_proc_R2_fastqc.zip

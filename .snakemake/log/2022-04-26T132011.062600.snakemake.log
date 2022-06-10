@@ -1,4 +1,0 @@
-Building DAG of jobs...
-WildcardError in line 185 of /home/jeszyman/repos/cfdna-wgs/workflow/read_preprocess.smk:
-Wildcards in input files cannot be determined from output files:
-'read_id'

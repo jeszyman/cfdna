@@ -1,3 +1,0 @@
-WorkflowError:
-Config file is not valid JSON or YAML. In case of YAML, make sure to not mix whitespace and tab indentation.
-  File "/drive3/users/jszymanski/repos/mpnst-preprocessing/workflows/cappseq.smk", line 1, in <module>

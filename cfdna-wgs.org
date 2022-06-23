@@ -1,3 +1,7 @@
+- ...rebuild local sing and add checker
+- [ ] sing builds to box
+- qc summary and checkpoint
+
 * Cell-free DNA Whole-Genome Sequencing                             :biopipe:
 :PROPERTIES:
 :header-args: :tangle no :tangle-mode (identity #o555)
@@ -7,7 +11,8 @@
 *** Snakemake configuration YAML
 #+begin_src bash :tangle ./config/int_test.yaml
 # Integration testing is on software in the jeszyman/biotools dockerfile.
-container: "~/sing_containers/biotools.sif"
+#container: "~/sing_containers/biotools.sif"
+container: "~/sing_containers/mpnst.sif"
 
 # Required paths
 #  (Data directory will contain all snakefile outputs in a sub-directory.)
@@ -42,7 +47,7 @@ results_dirs=
 if [ -d test/bam]
 basecamp/src/smk_forced_run.sh config/int_repo_test.yaml workflow/int_test.smk
 #+end_src
-#+begin_src bash :tangle ./src/seq_preprocess_integration_setup.sh
+#+begin_src bash
 #!/bin/echo Run:.
 
 # For documentation, not intended to be executable
@@ -191,35 +196,6 @@ rule alignment_qc:
         samtools flagstat {input} > {output.flagstat} 2>>{log}
         """
 #+end_src
-*** DONE Downsample bams :smk_rule:
-#+begin_src snakemake
-# Alignment downsampling
-rule downsample_bams:
-    input:
-        config["data_dir"] + "/bam/{library_id}_dedup.bam",
-    output:
-        config["data_dir"] + "/bam/{library_id}_ds{milreads}.bam",
-    log:
-        config["data_dir"] + "/logs/downsample_bam_{library_id}_{milreads}.err"
-    shell:
-        """
-        {config[cfdna_wgs_script_dir]}/downsample_bam.sh {input} {wildcards.milreads}000000 {output} 2>{log}
-        """
-#+end_src
-
-#+begin_src bash :tangle ./workflow/scripts/downsample_bam.sh
-## Calculate the sampling factor based on the intended number of reads:
-FACTOR=$(samtools idxstats $1 | cut -f3 | awk -v COUNT=$2 'BEGIN {total=0} {total += $1} END {print COUNT/total}')
-
-if [[ $FACTOR > 1 ]]; then
-    echo "DS reads exceeds total for $1"
-    cp $1 $3
-else
-    sambamba view -s $FACTOR -f bam -l 5 $1 > $3
-fi
-#+end_src
-
-
 *** DONE Sequencing depth metric(s)
 #+begin_src snakemake
 # Sequencing depth via Picard
@@ -454,6 +430,80 @@ exit
       fi
   done
   #+end_src
+*** DONE Make QC table                                                :smk_rule:
+#+begin_src snakemake
+checkpoint make_qc_tbl:
+    input:
+        config["data_dir"] + "/qc/all_qc_data/multiqc_samtools_stats.txt",
+    params:
+        script = config["cfdna_wgs_script_dir"] + "/make_qc_tbl.R"
+    output:
+        config["data_dir"] + "/qc/read_qc.tsv",
+    log:
+        config["data_dir"] + "/logs/read_qc.log"
+    shell:
+        """
+        Rscript {params.script} \
+        {input} \
+        {output} \
+        >& {log}
+        """
+#+end_src
+#+begin_src R :tangle ./workflow/scripts/make_qc_tbl.R
+args = commandArgs(trailingOnly = TRUE)
+samstats = args[1]
+read_qc_tbl = args[2]
+
+library(dplyr)
+
+read_qc = as_tibble(read.table(samstats, header = TRUE, sep = '\t')) %>%
+  filter(grepl("dedup", Sample)) %>%
+  mutate(library_id = substr(Sample,1,6)) %>%
+  mutate(dedup_reads_properly_paired = reads_properly_paired) %>%
+  select(library_id, dedup_reads_properly_paired)
+
+write.table(read_qc, file = read_qc_tbl, row.names=F, sep = '\t', quote = F)
+#+end_src
+*** TODO Use QC table as checkpoint
+#+begin_src snakemake
+
+def get_results(wildcards):
+    read_qc = pd.read_table("test/qc/read_qc.tsv")
+    test=read_qc.library_id[read_qc.dedup_reads_properly_paired > 2000].tolist()
+    return expand(
+	config["data_dir"] + "/bam/{library_id}_ds{milreads}.bam",
+        library_id=test)
+
+#+end_src
+*** TODO Downsample bams                                           :smk_rule:
+#+begin_src snakemake
+# Alignment downsampling
+rule downsample_bams:
+    input:
+        config["data_dir"] + "/bam/{library_id}_dedup.bam",
+    output:
+        config["data_dir"] + "/bam/{library_id}_ds{milreads}.bam",
+    log:
+        config["data_dir"] + "/logs/downsample_bam_{library_id}_{milreads}.err"
+    shell:
+        """
+        {config[cfdna_wgs_script_dir]}/downsample_bam.sh {input} {wildcards.milreads}000000 {output} 2>{log}
+        """
+#+end_src
+
+#+begin_src bash :tangle ./workflow/scripts/downsample_bam.sh
+## Calculate the sampling factor based on the intended number of reads:
+FACTOR=$(samtools idxstats $1 | cut -f3 | awk -v COUNT=$2 'BEGIN {total=0} {total += $1} END {print COUNT/total}')
+
+if [[ $FACTOR > 1 ]]; then
+    echo "DS reads exceeds total for $1"
+    cp $1 $3
+else
+    sambamba view -s $FACTOR -f bam -l 5 $1 > $3
+fi
+#+end_src
+
+
 ** [[file:workflow/cfdna_wgs_int_test.smk][Integration testing]]                                                  :smk:
 - snakefile
   #+begin_src snakemake :tangle ./workflow/int_test.smk
@@ -467,31 +517,43 @@ LIBRARY_IDS = list(libraries.library.unique())
 
 MILREADS = config["MILREADS"]
 
+def get_results(wildcards):
+    read_qc = pd.read_table(checkpoints.make_qc_tbl.get().output[0])
+    test=read_qc.library_id[read_qc.dedup_reads_properly_paired > 2000].tolist()
+    return expand(
+	config["data_dir"] + "/bam/{library_id}_ds{milreads}.bam",
+        library_id=test, milreads = MILREADS)
+
+
 rule all:
     input:
         expand(config["data_dir"] + "/fastq/raw/{library_id}_{read}.fastq.gz", library_id = LIBRARY_IDS, read = ["R1", "R2"]),
-        expand(config["data_dir"] + "/fastq/processed/{library_id}_proc_{read}.fastq.gz", library_id = LIBRARY_IDS, read = ["R1","R2"]),
-        expand(config["data_dir"] + "/fastq/unpaired/{library_id}_unpr_R1.fastq.gz", library_id = LIBRARY_IDS, read = ["R1","R2"]),
-        expand(config["data_dir"] + "/bam/{library_id}.sam", library_id = LIBRARY_IDS),
-        expand(config["data_dir"] + "/qc/{library_id}_{read}_fastqc.html", library_id = LIBRARY_IDS, read = ["R1","R2"]),
-        expand(config["data_dir"] + "/qc/{library_id}_proc_{read}_fastqc.html", library_id = LIBRARY_IDS, read = ["R1","R2"]),
-        expand(config["data_dir"] + "/bam/{library_id}_dedup.bam", library_id = LIBRARY_IDS),
-        expand(config["data_dir"] + "/qc/{library_id}_collect_wgs_metrics.txt", library_id = LIBRARY_IDS),
-        expand(config["data_dir"] + "/bam/{library_id}_dedup.bam.bai", library_id = LIBRARY_IDS),
-        expand(config["data_dir"] + "/qc/{library_id}_{bam_step}_samstats.txt", library_id = LIBRARY_IDS, bam_step= ["dedup","raw"]),
-        expand(config["data_dir"] + "/qc/{library_id}_{bam_step}_flagstat.txt", library_id = LIBRARY_IDS, bam_step =["dedup","raw"]),
-        expand(config["data_dir"] + "/bam/{library_id}_ds{milreads}.bam", library_id = LIBRARY_IDS, milreads = MILREADS),
-        config["data_dir"] + "/qc/all_qc.html",
-        expand(config["data_dir"] + "/qc/{library_id}_deeptools_frag_lengths.txt", library_id = LIBRARY_IDS),
+        #expand(config["data_dir"] + "/fastq/processed/{library_id}_proc_{read}.fastq.gz", library_id = LIBRARY_IDS, read = ["R1","R2"]),
+        #expand(config["data_dir"] + "/fastq/unpaired/{library_id}_unpr_R1.fastq.gz", library_id = LIBRARY_IDS, read = ["R1","R2"]),
+        #expand(config["data_dir"] + "/bam/{library_id}.sam", library_id = LIBRARY_IDS),
+        #expand(config["data_dir"] + "/qc/{library_id}_{read}_fastqc.html", library_id = LIBRARY_IDS, read = ["R1","R2"]),
+        #expand(config["data_dir"] + "/qc/{library_id}_proc_{read}_fastqc.html", library_id = LIBRARY_IDS, read = ["R1","R2"]),
+        #expand(config["data_dir"] + "/bam/{library_id}_dedup.bam", library_id = LIBRARY_IDS),
+        #expand(config["data_dir"] + "/qc/{library_id}_collect_wgs_metrics.txt", library_id = LIBRARY_IDS),
+        #expand(config["data_dir"] + "/bam/{library_id}_dedup.bam.bai", library_id = LIBRARY_IDS),
+        #expand(config["data_dir"] + "/qc/{library_id}_{bam_step}_samstats.txt", library_id = LIBRARY_IDS, bam_step= ["dedup","raw"]),
+        #expand(config["data_dir"] + "/qc/{library_id}_{bam_step}_flagstat.txt", library_id = LIBRARY_IDS, bam_step =["dedup","raw"]),
+        #config["data_dir"] + "/qc/read_qc.tsv",
+        #expand(config["data_dir"] + "/bam/{library_id}_ds{milreads}.bam", library_id = LIBRARY_IDS, milreads = MILREADS),
+        #config["data_dir"] + "/qc/all_qc.html",
+        #expand(config["data_dir"] + "/qc/{library_id}_deeptools_frag_lengths.txt", library_id = LIBRARY_IDS),
+        #get_results,
 
 rule symlink:
     input:
         config["data_dir"] + "/inputs/{library_id}_{read}.fastq.gz",
     output:
         config["data_dir"] + "/fastq/raw/{library_id}_{read}.fastq.gz",
+    log:
+        config["data_dir"] + "/logs/{library_id}_{read}_symlink.log"
     shell:
         """
-        ln --force --relative --symbolic {input} {output}
+        ln --force --relative --symbolic {input} {output} 2>{log}
         """
 
 include: "read_preprocess.smk"
@@ -515,7 +577,21 @@ rule multiqc:
         """
 
 #+end_src
-- shell script
+- shell scripts
+  #+begin_src bash :tangle ./tools/shell/rm_outputs.sh
+#!/usr/bin/env bash
+
+# Remove output directories
+outputs_dirs=("fastq"
+              "bam"
+              "logs"
+              "qc")
+
+for dir in "${outputs_dirs[@]}"; do
+    if [ -d test/${dir} ]; then \rm -rf test/${dir}; fi
+done
+
+#+end_src
   #+begin_src bash :tangle ./tools/shell/int_test.sh
 #!/usr/bin/env bash
 outputs_dirs=("fastq"
@@ -540,6 +616,10 @@ done
 
 #+end_src
 - [[file:resources/int_test.pdf]]
+
+#+transclude: [[id:f9f7130c-4fb4-4e08-99fc-3cf242587134][test]] :only-contents
+
+
 
 ** README
 :PROPERTIES:
@@ -732,3 +812,4 @@ find /mnt/ris/aadel/mpnst/inputs/cappseq-fastq -size -500M
     mosdepthRAW = as_tibble(read.table(file.path(repo,"data/all_dedup_coverage.tsv"), header = T, sep = '\t', fill = TRUE))
 ** Reference
 - [[id:271b4d5f-727e-496e-b835-8fe9f8655655][Bioinformatics project module]]
+*** [[id:13120759-71db-497c-8ed3-1c58e47a7840][Biotools headline]]

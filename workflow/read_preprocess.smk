@@ -96,19 +96,6 @@ rule alignment_qc:
         samtools flagstat {input} > {output.flagstat} 2>>{log}
         """
 
-# Alignment downsampling
-rule downsample_bams:
-    input:
-        config["data_dir"] + "/bam/{library_id}_dedup.bam",
-    output:
-        config["data_dir"] + "/bam/{library_id}_ds{milreads}.bam",
-    log:
-        config["data_dir"] + "/logs/downsample_bam_{library_id}_{milreads}.err"
-    shell:
-        """
-        {config[cfdna_wgs_script_dir]}/downsample_bam.sh {input} {wildcards.milreads}000000 {output} 2>{log}
-        """
-
 # Sequencing depth via Picard
 rule picard_collect_wgs_metrics:
     input:
@@ -135,4 +122,41 @@ rule deeptools_bamprfragmentsize:
         {config[threads]} \
         {params[blacklist]} \
         {output}
+        """
+
+checkpoint make_qc_tbl:
+    input:
+        config["data_dir"] + "/qc/all_qc_data/multiqc_samtools_stats.txt",
+    params:
+        script = config["cfdna_wgs_script_dir"] + "/make_qc_tbl.R"
+    output:
+        config["data_dir"] + "/qc/read_qc.tsv",
+    log:
+        config["data_dir"] + "/logs/read_qc.log"
+    shell:
+        """
+        Rscript {params.script} \
+        {input} \
+        {output} \
+        >& {log}
+        """
+
+def get_results(wildcards):
+    read_qc = pd.read_table("test/qc/read_qc.tsv")
+    test=read_qc.library_id[read_qc.dedup_reads_properly_paired > 2000].tolist()
+    return expand(
+	config["data_dir"] + "/bam/{library_id}_ds{milreads}.bam",
+        library_id=test)
+
+# Alignment downsampling
+rule downsample_bams:
+    input:
+        config["data_dir"] + "/bam/{library_id}_dedup.bam",
+    output:
+        config["data_dir"] + "/bam/{library_id}_ds{milreads}.bam",
+    log:
+        config["data_dir"] + "/logs/downsample_bam_{library_id}_{milreads}.err"
+    shell:
+        """
+        {config[cfdna_wgs_script_dir]}/downsample_bam.sh {input} {wildcards.milreads}000000 {output} 2>{log}
         """

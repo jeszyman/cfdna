@@ -1,5 +1,6 @@
 # Integration testing is on software in the jeszyman/biotools dockerfile.
-container: "~/sing_containers/biotools.sif"
+#container: "~/sing_containers/biotools.sif"
+container: "~/sing_containers/mpnst.sif"
 
 # Required paths
 #  (Data directory will contain all snakefile outputs in a sub-directory.)

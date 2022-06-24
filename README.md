@@ -4,7 +4,7 @@ This repository has a snakemake workflow for basic processing of whole-genome se
 
 Master branch of the repository contains most recent developments. Stable versions are saved as terminal branches (*e.g.* stable1.0.0).
 
-Files labeled int<sub>test</sub> will run integration testing of all rules on a small dataset in test/inputs. See config/int<sub>test.yaml</sub> for necessary run conditions.
+Files labeled int\_test will run integration testing of all rules on a small dataset in test/inputs. See config/int\_test.yaml for necessary run conditions.
 
 
 # Changlog

@@ -1,3 +1,7 @@
+This repository has a snakemake workflow for basic processing of whole-genome sequencing reads from cell-free DNA.
+
+<resources/int_test.pdf>
+
 
 # Changlog
 

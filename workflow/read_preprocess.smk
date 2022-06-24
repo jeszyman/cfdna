@@ -15,14 +15,17 @@ rule trimmomatic:
         main = config["data_dir"] + "/logs/trimmomatic_{library_id}.log",
     shell:
         """
-        trimmomatic PE \
-                    -threads {config[threads]} \
-                    -trimlog {log.int} \
-                    {input.read1} {input.read2} \
-                    {output.read1} {output.read1_unpr} \
-                    {output.read2} {output.read2_unpr} \
-                    ILLUMINACLIP:{params.adapter_fasta}:2:30:10 \
-                    LEADING:10 TRAILING:10 MAXINFO:50:0.97 MINLEN:20 &> {log.main}
+        {config[cfdna_wgs_script_dir]}/trimmomatic_wrapper.sh \
+        {input.read1} \
+        {input.read2} \
+        {params.adapter_fasta} \
+        {config[threads]} \
+        {output.read1} \
+        {output.read1_unpr} \
+        {output.read2} \
+        {output.read2_unpr} \
+        {log.int} \
+        &> {log.main}
         """
 
 # BWA alignment
@@ -75,10 +78,14 @@ rule alignment_processing:
         config["data_dir"] + "/logs/alignment_processing_{library_id}.log"
     shell:
         """
-        sambamba view -t {config[threads]} -S -f bam {input} > {output.bam}
-        sambamba markdup -r -t {config[threads]} {output.bam} {output.dedup}
-        sambamba sort -t {config[threads]} {output.dedup} -o {output.sort}
-        sambamba index -t {config[threads]} {output.sort}
+        {config[cfdna_wgs_script_dir]}/alignment_processing.sh \
+        {input} \
+        {config[threads]} \
+        {output.bam} \
+        {output.dedup} \
+        {output.sort} \
+        {output.index} \
+        &> {log}
         """
 
 # Alignment samtools QC
@@ -93,7 +100,7 @@ rule alignment_qc:
     shell:
         """
         samtools stats {input} > {output.samstat} 2>{log}
-        samtools flagstat {input} > {output.flagstat} 2>>{log}
+        samtools flagstat {input} > {output.flagstat} 2>{log}
         """
 
 # Sequencing depth via Picard
@@ -104,7 +111,11 @@ rule picard_collect_wgs_metrics:
         config["data_dir"] + "/qc/{library_id}_collect_wgs_metrics.txt",
     shell:
         """
-        {config[cfdna_wgs_script_dir]}/CollectWgsMetrics_wrapper.sh {input} {config[genome_fasta]} {output}
+        {config[cfdna_wgs_script_dir]}/CollectWgsMetrics_wrapper.sh \
+        {input} \
+        {config[picard_jar]} \
+        {config[genome_fasta]} \
+        {output}
         """
 
 # Fragment sizes by deepTools
@@ -124,6 +135,10 @@ rule deeptools_bamprfragmentsize:
         {output}
         """
 
+#  Note: This makes a basic table of read numbers. The subsequent downsampling
+#  step only runs if read numbers are above a certain threshold. See also
+#  the int_test.smk for function using this output table.
+
 checkpoint make_qc_tbl:
     input:
         config["data_dir"] + "/qc/all_qc_data/multiqc_samtools_stats.txt",
@@ -140,13 +155,6 @@ checkpoint make_qc_tbl:
         {output} \
         >& {log}
         """
-
-def get_results(wildcards):
-    read_qc = pd.read_table("test/qc/read_qc.tsv")
-    test=read_qc.library_id[read_qc.dedup_reads_properly_paired > 2000].tolist()
-    return expand(
-	config["data_dir"] + "/bam/{library_id}_ds{milreads}.bam",
-        library_id=test)
 
 # Alignment downsampling
 rule downsample_bams:

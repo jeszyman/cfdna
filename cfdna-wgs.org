@@ -1,36 +1,50 @@
-- ...rebuild local sing and add checker
-- [ ] sing builds to box
-- qc summary and checkpoint
-
 * Cell-free DNA Whole-Genome Sequencing                             :biopipe:
 :PROPERTIES:
 :header-args: :tangle no :tangle-mode (identity #o555)
+:header-args+: :noweb yes
 :logging: nil
 :END:
 ** Setup
-*** Snakemake configuration YAML
-#+begin_src bash :tangle ./config/int_test.yaml
-# Integration testing is on software in the jeszyman/biotools dockerfile.
-#container: "~/sing_containers/biotools.sif"
-container: "~/sing_containers/mpnst.sif"
+*** Bash preamble
+#+name: bash_preamble
+#+begin_src bash
 
-# Required paths
-#  (Data directory will contain all snakefile outputs in a sub-directory.)
-data_dir: "test"
+#  Note: This script is tangled from code blocks in the Emacs Org-mode file at
+#  https://github.com/jeszyman/cfdna-wgs/blob/master/cfdna-wgs.org. Changes
+#  made directly to this file will be overwritten upon tangle from Org-mode.
+
+#+end_src
+*** [[file:config/int_test.yaml][Snakemake configuration YAML]]
+:PROPERTIES:
+:header-args:bash: :tangle ./config/int_test.yaml
+:END:
+#+begin_src bash
+<#bash_preamble#>
+#+end_src
+
+#+transclude: [[id:01e0536d-4981-4e08-9ac6-9aee3e879def]] :only-contents
+
+#+begin_src bash
+
+##########################################################
+###   Repository-local Integration Testing Variables   ###
+##########################################################
+
 cfdna_wgs_script_dir: "workflow/scripts"
+picard_jar: "/opt/picard/picard.jar"
+container: "~/sing_containers/biotools.sif"
 
 # Required reference files
+
 adapter_fastq: "test/inputs/TruSeq3-PE.fa"
 genome_fasta: "test/inputs/chr8.fa"
 bwa_index: "test/inputs/chr8"
 blacklist: "test/inputs/hg38-blacklist.v2.bed"
 
 # Required parameters
-threads: 4
 MILREADS:
   - "10"
   - "20"
-
 #+end_src
 *** Integration testing inputs setup
 #+begin_src bash
@@ -102,20 +116,47 @@ rule trimmomatic:
         main = config["data_dir"] + "/logs/trimmomatic_{library_id}.log",
     shell:
         """
-        trimmomatic PE \
-                    -threads {config[threads]} \
-                    -trimlog {log.int} \
-                    {input.read1} {input.read2} \
-                    {output.read1} {output.read1_unpr} \
-                    {output.read2} {output.read2_unpr} \
-                    ILLUMINACLIP:{params.adapter_fasta}:2:30:10 \
-                    LEADING:10 TRAILING:10 MAXINFO:50:0.97 MINLEN:20 &> {log.main}
+        {config[cfdna_wgs_script_dir]}/trimmomatic_wrapper.sh \
+        {input.read1} \
+        {input.read2} \
+        {params.adapter_fasta} \
+        {config[threads]} \
+        {output.read1} \
+        {output.read1_unpr} \
+        {output.read2} \
+        {output.read2_unpr} \
+        {log.int} \
+        &> {log.main}
         """
+#+end_src
+- [[file:workflow/scripts/trimmomatic_wrapper.sh][Script]]
+  #+begin_src bash :tangle ./workflow/scripts/trimmomatic_wrapper.sh
+#!/usr/bin/env bash
+<#bash_preamble#>
+
+input_read1=$1
+input_read2=$2
+params_adapter_fasta=$3
+threads=$4
+output_read1=$5
+output_read1_unpr=$6
+output_read2=$7
+output_read2_unpr=$8
+log_int=$9
+
+trimmomatic PE \
+            -threads $threads \
+            -trimlog $log_int \
+            $input_read1 $input_read2 \
+            $output_read1 $output_read1_unpr \
+            $output_read2 $output_read2_unpr \
+            ILLUMINACLIP:$params_adapter_fasta:2:30:10 \
+            LEADING:10 TRAILING:10 MAXINFO:50:0.97 MINLEN:20
 #+end_src
 - Reference
   - Trimmomatic parameters based on Taylor's parameters ([[https://mail.google.com/mail/u/0/#search/sundby+fastq/FMfcgzGmvLWSbsmhDsffvSSWfjWdQhhR?projector=1&messagePartId=0.1][email]])
   - https://github.com/AAFC-BICoE/snakemake-trimmomatic/blob/master/Snakefile
-*** DONE Alignment :smk_rule:
+*** DONE Alignment                                                    :smk_rule:
 #+begin_src snakemake
 # BWA alignment
 rule align:
@@ -173,13 +214,36 @@ rule alignment_processing:
         config["data_dir"] + "/logs/alignment_processing_{library_id}.log"
     shell:
         """
-        sambamba view -t {config[threads]} -S -f bam {input} > {output.bam}
-        sambamba markdup -r -t {config[threads]} {output.bam} {output.dedup}
-        sambamba sort -t {config[threads]} {output.dedup} -o {output.sort}
-        sambamba index -t {config[threads]} {output.sort}
+        {config[cfdna_wgs_script_dir]}/alignment_processing.sh \
+        {input} \
+        {config[threads]} \
+        {output.bam} \
+        {output.dedup} \
+        {output.sort} \
+        {output.index} \
+        &> {log}
         """
 #+end_src
-*** DONE Alignment QC :smk_rule:
+- [[file:workflow/scripts/alignment_processing.sh][Script]]
+  #+begin_src bash :tangle ./workflow/scripts/alignment_processing.sh
+#!/usr/bin/env bash
+
+<#bash_preamble#>
+
+input=$1
+threads=$2
+output_bam=$3
+output_dedup=$4
+output_sort=$5
+output_index=$6
+
+sambamba view -t $threads -S -f bam $input > $output_bam
+sambamba markdup -r -t $threads $output_bam $output_dedup
+sambamba sort -t $threads $output_dedup -o $output_sort
+sambamba index -t $threads $output_sort
+
+#+end_src
+*** DONE Alignment QC                                                 :smk_rule:
 #+begin_src snakemake
 # Alignment samtools QC
 rule alignment_qc:
@@ -193,11 +257,12 @@ rule alignment_qc:
     shell:
         """
         samtools stats {input} > {output.samstat} 2>{log}
-        samtools flagstat {input} > {output.flagstat} 2>>{log}
+        samtools flagstat {input} > {output.flagstat} 2>{log}
         """
 #+end_src
 *** DONE Sequencing depth metric(s)
-#+begin_src snakemake
+- Snakemake
+  #+begin_src snakemake
 # Sequencing depth via Picard
 rule picard_collect_wgs_metrics:
     input:
@@ -206,20 +271,31 @@ rule picard_collect_wgs_metrics:
         config["data_dir"] + "/qc/{library_id}_collect_wgs_metrics.txt",
     shell:
         """
-        {config[cfdna_wgs_script_dir]}/CollectWgsMetrics_wrapper.sh {input} {config[genome_fasta]} {output}
+        {config[cfdna_wgs_script_dir]}/CollectWgsMetrics_wrapper.sh \
+        {input} \
+        {config[picard_jar]} \
+        {config[genome_fasta]} \
+        {output}
         """
 #+end_src
-#+begin_src bash :tangle ./workflow/scripts/CollectWgsMetrics_wrapper.sh
-picard CollectWgsMetrics \
-       INPUT=$1 \
-       OUTPUT=$3 \
-       READ_LENGTH=150 \
-       REFERENCE_SEQUENCE=$2
+- Script
+  #+begin_src bash :tangle ./workflow/scripts/CollectWgsMetrics_wrapper.sh
 
+input=$1
+picard_jar=$2
+genome_fasta=$3
+output=$4
+
+java -jar $picard_jar CollectWgsMetrics \
+       INPUT=input \
+       OUTPUT=output \
+       READ_LENGTH=150 \
+       REFERENCE_SEQUENCE=genome_fasta
 #+end_src
 
 *** DONE Fragment sizes                                               :smk_rule:
-#+begin_src snakemake
+- Snakemake
+  #+begin_src snakemake
 # Fragment sizes by deepTools
 rule deeptools_bamprfragmentsize:
     input:
@@ -237,8 +313,8 @@ rule deeptools_bamprfragmentsize:
         {output}
         """
 #+end_src
-
-#+begin_src bash :tangle ./workflow/scripts/bamPEFragmentSize_wrapper.sh
+- Script
+  #+begin_src bash :tangle ./workflow/scripts/bamPEFragmentSize_wrapper.sh
 #!/usr/bin/env bash
 input=$1
 threads=$2
@@ -431,7 +507,12 @@ exit
   done
   #+end_src
 *** DONE Make QC table                                                :smk_rule:
-#+begin_src snakemake
+- Snakemake
+  #+begin_src snakemake
+#  Note: This makes a basic table of read numbers. The subsequent downsampling
+#  step only runs if read numbers are above a certain threshold. See also
+#  the int_test.smk for function using this output table.
+
 checkpoint make_qc_tbl:
     input:
         config["data_dir"] + "/qc/all_qc_data/multiqc_samtools_stats.txt",
@@ -449,7 +530,8 @@ checkpoint make_qc_tbl:
         >& {log}
         """
 #+end_src
-#+begin_src R :tangle ./workflow/scripts/make_qc_tbl.R
+- Rscript
+  #+begin_src R :tangle ./workflow/scripts/make_qc_tbl.R
 args = commandArgs(trailingOnly = TRUE)
 samstats = args[1]
 read_qc_tbl = args[2]
@@ -464,19 +546,10 @@ read_qc = as_tibble(read.table(samstats, header = TRUE, sep = '\t')) %>%
 
 write.table(read_qc, file = read_qc_tbl, row.names=F, sep = '\t', quote = F)
 #+end_src
-*** TODO Use QC table as checkpoint
-#+begin_src snakemake
 
-def get_results(wildcards):
-    read_qc = pd.read_table("test/qc/read_qc.tsv")
-    test=read_qc.library_id[read_qc.dedup_reads_properly_paired > 2000].tolist()
-    return expand(
-	config["data_dir"] + "/bam/{library_id}_ds{milreads}.bam",
-        library_id=test)
-
-#+end_src
-*** TODO Downsample bams                                           :smk_rule:
-#+begin_src snakemake
+*** DONE Downsample bams                                              :smk_rule:
+- Snakemake
+  #+begin_src snakemake
 # Alignment downsampling
 rule downsample_bams:
     input:
@@ -490,8 +563,8 @@ rule downsample_bams:
         {config[cfdna_wgs_script_dir]}/downsample_bam.sh {input} {wildcards.milreads}000000 {output} 2>{log}
         """
 #+end_src
-
-#+begin_src bash :tangle ./workflow/scripts/downsample_bam.sh
+- Shell script
+  #+begin_src bash :tangle ./workflow/scripts/downsample_bam.sh
 ## Calculate the sampling factor based on the intended number of reads:
 FACTOR=$(samtools idxstats $1 | cut -f3 | awk -v COUNT=$2 'BEGIN {total=0} {total += $1} END {print COUNT/total}')
 
@@ -502,11 +575,12 @@ else
     sambamba view -s $FACTOR -f bam -l 5 $1 > $3
 fi
 #+end_src
-
-
 ** [[file:workflow/cfdna_wgs_int_test.smk][Integration testing]]                                                  :smk:
-- snakefile
-  #+begin_src snakemake :tangle ./workflow/int_test.smk
+*** snakefile
+:PROPERTIES:
+:header-args:snakemake: :tangle ./workflow/int_test.smk
+:END:
+#+begin_src snakemake
 import pandas as pd
 
 container: config["container"]
@@ -524,25 +598,23 @@ def get_results(wildcards):
 	config["data_dir"] + "/bam/{library_id}_ds{milreads}.bam",
         library_id=test, milreads = MILREADS)
 
-
 rule all:
     input:
-        expand(config["data_dir"] + "/fastq/raw/{library_id}_{read}.fastq.gz", library_id = LIBRARY_IDS, read = ["R1", "R2"]),
-        #expand(config["data_dir"] + "/fastq/processed/{library_id}_proc_{read}.fastq.gz", library_id = LIBRARY_IDS, read = ["R1","R2"]),
-        #expand(config["data_dir"] + "/fastq/unpaired/{library_id}_unpr_R1.fastq.gz", library_id = LIBRARY_IDS, read = ["R1","R2"]),
-        #expand(config["data_dir"] + "/bam/{library_id}.sam", library_id = LIBRARY_IDS),
-        #expand(config["data_dir"] + "/qc/{library_id}_{read}_fastqc.html", library_id = LIBRARY_IDS, read = ["R1","R2"]),
-        #expand(config["data_dir"] + "/qc/{library_id}_proc_{read}_fastqc.html", library_id = LIBRARY_IDS, read = ["R1","R2"]),
-        #expand(config["data_dir"] + "/bam/{library_id}_dedup.bam", library_id = LIBRARY_IDS),
-        #expand(config["data_dir"] + "/qc/{library_id}_collect_wgs_metrics.txt", library_id = LIBRARY_IDS),
-        #expand(config["data_dir"] + "/bam/{library_id}_dedup.bam.bai", library_id = LIBRARY_IDS),
-        #expand(config["data_dir"] + "/qc/{library_id}_{bam_step}_samstats.txt", library_id = LIBRARY_IDS, bam_step= ["dedup","raw"]),
-        #expand(config["data_dir"] + "/qc/{library_id}_{bam_step}_flagstat.txt", library_id = LIBRARY_IDS, bam_step =["dedup","raw"]),
-        #config["data_dir"] + "/qc/read_qc.tsv",
-        #expand(config["data_dir"] + "/bam/{library_id}_ds{milreads}.bam", library_id = LIBRARY_IDS, milreads = MILREADS),
-        #config["data_dir"] + "/qc/all_qc.html",
-        #expand(config["data_dir"] + "/qc/{library_id}_deeptools_frag_lengths.txt", library_id = LIBRARY_IDS),
-        #get_results,
+        # expand(config["data_dir"] + "/fastq/raw/{library_id}_{read}.fastq.gz", library_id = LIBRARY_IDS, read = ["R1", "R2"]),
+        # expand(config["data_dir"] + "/fastq/processed/{library_id}_proc_{read}.fastq.gz", library_id = LIBRARY_IDS, read = ["R1","R2"]),
+        # expand(config["data_dir"] + "/fastq/unpaired/{library_id}_unpr_R1.fastq.gz", library_id = LIBRARY_IDS, read = ["R1","R2"]),
+        # expand(config["data_dir"] + "/bam/{library_id}.sam", library_id = LIBRARY_IDS),
+        # expand(config["data_dir"] + "/qc/{library_id}_{read}_fastqc.html", library_id = LIBRARY_IDS, read = ["R1","R2"]),
+        # expand(config["data_dir"] + "/qc/{library_id}_proc_{read}_fastqc.html", library_id = LIBRARY_IDS, read = ["R1","R2"]),
+        # expand(config["data_dir"] + "/bam/{library_id}_dedup.bam", library_id = LIBRARY_IDS),
+        # expand(config["data_dir"] + "/qc/{library_id}_collect_wgs_metrics.txt", library_id = LIBRARY_IDS),
+        # expand(config["data_dir"] + "/bam/{library_id}_dedup.bam.bai", library_id = LIBRARY_IDS),
+        # expand(config["data_dir"] + "/qc/{library_id}_{bam_step}_samstats.txt", library_id = LIBRARY_IDS, bam_step= ["dedup","raw"]),
+        # expand(config["data_dir"] + "/qc/{library_id}_{bam_step}_flagstat.txt", library_id = LIBRARY_IDS, bam_step =["dedup","raw"]),
+        # config["data_dir"] + "/qc/read_qc.tsv",
+        # config["data_dir"] + "/qc/all_qc.html",
+        # expand(config["data_dir"] + "/qc/{library_id}_deeptools_frag_lengths.txt", library_id = LIBRARY_IDS),
+        get_results,
 
 rule symlink:
     input:
@@ -567,7 +639,8 @@ rule multiqc:
     params:
         out_dir = config["data_dir"] + "/qc"
     output:
-        config["data_dir"] + "/qc/all_qc.html"
+        config["data_dir"] + "/qc/all_qc.html",
+        config["data_dir"] + "/qc/all_qc_data/multiqc_samtools_stats.txt",
     shell:
         """
         multiqc {params.out_dir} \
@@ -577,7 +650,7 @@ rule multiqc:
         """
 
 #+end_src
-- shell scripts
+*** shell scripts
   #+begin_src bash :tangle ./tools/shell/rm_outputs.sh
 #!/usr/bin/env bash
 
@@ -592,7 +665,7 @@ for dir in "${outputs_dirs[@]}"; do
 done
 
 #+end_src
-  #+begin_src bash :tangle ./tools/shell/int_test.sh
+  #+begin_src bash :tangle ./tools/shell/int_test.sh :session int_test
 #!/usr/bin/env bash
 outputs_dirs=("fastq"
               "bam"
@@ -615,17 +688,19 @@ select yn in "Yes" "No"; do
 done
 
 #+end_src
-- [[file:resources/int_test.pdf]]
+*** [[file:resources/int_test.pdf]]
 
-#+transclude: [[id:f9f7130c-4fb4-4e08-99fc-3cf242587134][test]] :only-contents
-
-
-
-** README
+** [[file:README.md][README]]
 :PROPERTIES:
 :export_file_name: ./README.md
 :export_options: toc:nil
 :END:
+This repository has a snakemake workflow for basic processing of whole-genome sequencing reads from cell-free DNA.
+
+[[file:resources/int_test.pdf]]
+
+
+
 *** Changlog
 - [2022-05-31 Tue] - Conforms to current biotools best practices.
 - [2022-04-29 Fri] - Moved multiqc to integration testing as inputs are dependent on final sample labels. Integration testing works per this commit.

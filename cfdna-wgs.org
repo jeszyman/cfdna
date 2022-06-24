@@ -697,7 +697,7 @@ done
 :END:
 This repository has a snakemake workflow for basic processing of whole-genome sequencing reads from cell-free DNA.
 
-[[file:resources/int_test.pdf]]
+[[file:resources/int_test.png]]
 
 
 
@@ -886,5 +886,6 @@ find /mnt/ris/aadel/mpnst/inputs/cappseq-fastq -size -500M
   - run and extract mosdepth
     mosdepthRAW = as_tibble(read.table(file.path(repo,"data/all_dedup_coverage.tsv"), header = T, sep = '\t', fill = TRUE))
 ** Reference
+- https://github.com/jeszyman/cfdna-wgs
 - [[id:271b4d5f-727e-496e-b835-8fe9f8655655][Bioinformatics project module]]
 *** [[id:13120759-71db-497c-8ed3-1c58e47a7840][Biotools headline]]

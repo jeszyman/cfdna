@@ -31,7 +31,6 @@ container: "~/sing_containers/biotools.sif"
 
 adapter_fastq: "test/inputs/TruSeq3-PE.fa"
 genome_fasta: "test/inputs/chr8.fa"
-bwa_index: "test/inputs/chr8"
 blacklist: "test/inputs/hg38-blacklist.v2.bed"
 
 # Required parameters

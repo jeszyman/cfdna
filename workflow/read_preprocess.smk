@@ -28,9 +28,22 @@ rule trimmomatic:
         &> {log.main}
         """
 
+rule index:
+    input:
+        config["genome_fasta"],
+    params:
+        out_prefix = genome_ref
+    output:
+        done = touch(genome_ref)
+    shell:
+        """
+        bwa index -p {params.out_prefix} {input}
+        """
+
 # BWA alignment
 rule align:
     input:
+        bwa_index_done = genome_ref,
         read1 = config["data_dir"] + "/fastq/processed/{library_id}_proc_R1.fastq.gz",
         read2 = config["data_dir"] + "/fastq/processed/{library_id}_proc_R2.fastq.gz",
     output:
@@ -39,7 +52,7 @@ rule align:
         config["data_dir"] + "/logs/align_{library_id}.log"
     shell:
         """
-        bwa mem -M -t 4 {config[bwa_index]} {input.read1} {input.read2} > {output}
+        bwa mem -M -t 4 {input.bwa_index_done} {input.read1} {input.read2} > {output}
 	"""
 
 # FastQC
@@ -135,13 +148,36 @@ rule deeptools_bamprfragmentsize:
         {output}
         """
 
-#  Note: This makes a basic table of read numbers. The subsequent downsampling
+rule multiqc:
+    input:
+        expand(config["data_dir"] + "/qc/{library_id}_{read}_fastqc.html", library_id = LIBRARY_IDS, read = ["R1","R2"]),
+        expand(config["data_dir"] + "/qc/{library_id}_proc_{read}_fastqc.html", library_id = LIBRARY_IDS, read = ["R1","R2"]),
+        expand(config["data_dir"] + "/qc/{library_id}_{bam_step}_samstats.txt", library_id = LIBRARY_IDS, bam_step= ["dedup","raw"]),
+        expand(config["data_dir"] + "/qc/{library_id}_{bam_step}_flagstat.txt", library_id = LIBRARY_IDS, bam_step =["dedup","raw"]),
+    params:
+        out_dir = config["data_dir"] + "/qc"
+    output:
+        config["data_dir"] + "/qc/all_qc.html",
+        config["data_dir"] + "/qc/all_qc_data/multiqc_samtools_stats.txt",
+    shell:
+        """
+        multiqc {params.out_dir} \
+        --force \
+        --outdir {params.out_dir} \
+        --filename all_qc
+        """
+
+#  Notes:
+#  This makes an aggregate table of QC values. The subsequent downsampling
 #  step only runs if read numbers are above a certain threshold. See also
 #  the int_test.smk for function using this output table.
+#
 
 checkpoint make_qc_tbl:
     input:
-        config["data_dir"] + "/qc/all_qc_data/multiqc_samtools_stats.txt",
+        fq = config["data_dir"] + "/qc/all_qc_data/multiqc_fastqc.txt",
+        sam = config["data_dir"] + "/qc/all_qc_data/multiqc_samtools_stats.txt",
+        flag = config["data_dir"] + "/qc/all_qc_data/multiqc_samtools_flagstat.txt",
     params:
         script = config["cfdna_wgs_script_dir"] + "/make_qc_tbl.R"
     output:
@@ -151,7 +187,9 @@ checkpoint make_qc_tbl:
     shell:
         """
         Rscript {params.script} \
-        {input} \
+        {input.fq} \
+        {input.sam} \
+        {input.flag} \
         {output} \
         >& {log}
         """

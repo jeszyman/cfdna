@@ -4,7 +4,7 @@ genome_fasta=$3
 output=$4
 
 java -jar $picard_jar CollectWgsMetrics \
-       INPUT=input \
-       OUTPUT=output \
+       INPUT=$input \
+       OUTPUT=$output \
        READ_LENGTH=150 \
-       REFERENCE_SEQUENCE=genome_fasta
+       REFERENCE_SEQUENCE=$genome_fasta

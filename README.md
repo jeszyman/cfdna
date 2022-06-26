@@ -1,3 +1,6 @@
+
+# Introduction
+
 This repository has a snakemake workflow for basic processing of whole-genome sequencing reads from cell-free DNA.
 
 ![img](resources/int_test.png)
@@ -9,6 +12,7 @@ Files labeled int\_test will run integration testing of all rules on a small dat
 
 # Changlog
 
+-   <span class="timestamp-wrapper"><span class="timestamp">[2022-06-24 Fri] </span></span> - Validate version 3.1 which includes genome index build as a snakefile rule.
 -   <span class="timestamp-wrapper"><span class="timestamp">[2022-06-24 Fri] </span></span> - Validated version 3 with read number checkpoint for down-sampling.
 -   <span class="timestamp-wrapper"><span class="timestamp">[2022-05-31 Tue] </span></span> - Conforms to current biotools best practices.
 -   <span class="timestamp-wrapper"><span class="timestamp">[2022-04-29 Fri] </span></span> - Moved multiqc to integration testing as inputs are dependent on final sample labels. Integration testing works per this commit.

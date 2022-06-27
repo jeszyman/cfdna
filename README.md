@@ -12,6 +12,8 @@ Files labeled int\_test will run integration testing of all rules on a small dat
 
 # Changlog
 
+-   <span class="timestamp-wrapper"><span class="timestamp">[2022-06-27 Mon] </span></span> - Version 4 validated. Further expanded read\_qc.tsv table. Removed bam post-processing step and added a more expansive bam filtering step. Updated downsampling to work off filtered alignments.
+-   <span class="timestamp-wrapper"><span class="timestamp">[2022-06-26 Sun] </span></span> - Version 3.2 validated. Expanded the qc aggregate table and added some comments.
 -   <span class="timestamp-wrapper"><span class="timestamp">[2022-06-24 Fri] </span></span> - Validate version 3.1 which includes genome index build as a snakefile rule.
 -   <span class="timestamp-wrapper"><span class="timestamp">[2022-06-24 Fri] </span></span> - Validated version 3 with read number checkpoint for down-sampling.
 -   <span class="timestamp-wrapper"><span class="timestamp">[2022-05-31 Tue] </span></span> - Conforms to current biotools best practices.

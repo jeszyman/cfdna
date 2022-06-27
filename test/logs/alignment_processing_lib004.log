@@ -1,8 +1,0 @@
-finding positions of the duplicate reads in the file...
-  sorted 1678 end pairs
-     and 776 single ends (among them 0 unmatched pairs)
-  collecting indices of duplicate reads...   done in 1 ms
-  found 576 duplicates
-collected list of positions in 0 min 0 sec
-removing duplicates...
-total time elapsed: 0 min 1 sec

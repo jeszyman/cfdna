@@ -7,4 +7,5 @@ output=$4
 bamPEFragmentSize --bamfiles $input \
                   --numberOfProcessors $threads \
                   --blackListFileName $blacklist \
+                  --maxFragmentLength 500 \
                   --outRawFragmentLengths $output

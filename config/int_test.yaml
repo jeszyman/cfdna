@@ -35,5 +35,6 @@ blacklist: "test/inputs/hg38-blacklist.v2.bed"
 
 # Required parameters
 MILREADS:
-  - "10"
-  - "20"
+  - "1"
+
+qscore: "20"

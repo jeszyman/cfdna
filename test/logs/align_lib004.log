@@ -1,0 +1,29 @@
+[M::bwa_idx_load_from_disk] read 0 ALT contigs
+samblaster: Version 0.1.26
+samblaster: Inputting from stdin
+samblaster: Outputting to stdout
+[M::process] read 49848 sequences (4605479 bp)...
+[M::mem_pestat] # candidate unique pairs for (FF, FR, RF, RR): (8, 60, 5, 8)
+[M::mem_pestat] skip orientation FF as there are not enough pairs
+[M::mem_pestat] analyzing insert size distribution for orientation FR...
+[M::mem_pestat] (25, 50, 75) percentile: (58, 124, 161)
+[M::mem_pestat] low and high boundaries for computing mean and std.dev: (1, 367)
+[M::mem_pestat] mean and std.dev: (110.30, 53.63)
+[M::mem_pestat] low and high boundaries for proper pairs: (1, 470)
+[M::mem_pestat] skip orientation RF as there are not enough pairs
+[M::mem_pestat] skip orientation RR as there are not enough pairs
+[M::mem_process_seqs] Processed 49848 reads in 2.503 CPU sec, 0.652 real sec
+samblaster: Loaded 1 header sequence entries.
+[main] Version: 0.7.17-r1188
+[main] CMD: bwa mem -M -t 4 test/ref/chr8 test/fastq/processed/lib004_proc_R1.fastq.gz test/fastq/processed/lib004_proc_R2.fastq.gz
+[main] Real time: 0.897 sec; CPU: 2.621 sec
+samblaster:
+samblaster: Pair Type        Type_ID_Count   %Type/All_IDs Dup_ID_Count  %Dups/Type_ID_Count  %Dups/All_Dups  %Dups/All_IDs
+samblaster: ---------------------------------------------------------------------------------------------------------------
+samblaster: Both Unmapped           22470        90.154              0           0.000             0.000          0.000
+samblaster: Orphan/Singleton          776         3.113            155          19.974            52.013          0.622
+samblaster: Both Mapped              1678         6.732            143           8.522            47.987          0.574
+samblaster: Total                   24924       100.000            298           1.196           100.000          1.196
+samblaster:
+samblaster: Marked         298 of      24924 (1.196%) total read ids as duplicates using 3160k memory in 0.031S CPU seconds and 1S wall time.
+[bam_sort_core] merging from 0 files and 4 in-memory blocks...

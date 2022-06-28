@@ -792,8 +792,8 @@ fi
 :PROPERTIES:
 :header-args:snakemake: :tangle no
 :END:
-** [[file:workflow/cfdna_wgs_int_test.smk][Integration testing]]                                                  :smk:
-*** snakefile
+** Integration testing                                                  :smk:
+*** [[file:workflow/int_test.smk][Snakefile]]
 :PROPERTIES:
 :header-args:snakemake: :tangle ./workflow/int_test.smk
 :END:
@@ -878,7 +878,7 @@ rule symlink:
 include: "read_preprocess.smk"
 
 #+end_src
-*** shell scripts
+*** Shell scripts
 #+begin_src bash :tangle ./tools/shell/rm_outputs.sh
 #!/usr/bin/env bash
 
@@ -939,6 +939,7 @@ Files labeled int_test will run integration testing of all rules on a small data
 :PROPERTIES:
 :header-args:snakemake: :tangle no
 :END:
+- add symlink from dict
 - Prioritized [2022-06-07 Tue]
   1. Library QC Dataframe
   2. Mem cap and performance workup

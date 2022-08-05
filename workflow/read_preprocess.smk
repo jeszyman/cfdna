@@ -45,7 +45,7 @@ rule fastqc:
         proc_html = cfdna_wgs_qc_dir + "/{library_id}_proc_{read}_fastqc.html",
     log:
         raw = cfdna_wgs_log_dir + "/fastqc_raw_{library_id}_{read}.log",
-        proc = cfdna_wgs_log_dir + "fastqc_proc_{library_id}_{read}.log",
+        proc = cfdna_wgs_log_dir + "/fastqc_proc_{library_id}_{read}.log",
     shell:
         """
         fastqc --outdir {params.out_dir} \

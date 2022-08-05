@@ -174,7 +174,7 @@ rule fastqc:
         proc_html = cfdna_wgs_qc_dir + "/{library_id}_proc_{read}_fastqc.html",
     log:
         raw = cfdna_wgs_log_dir + "/fastqc_raw_{library_id}_{read}.log",
-        proc = cfdna_wgs_log_dir + "fastqc_proc_{library_id}_{read}.log",
+        proc = cfdna_wgs_log_dir + "/fastqc_proc_{library_id}_{read}.log",
     shell:
         """
         fastqc --outdir {params.out_dir} \
@@ -916,8 +916,8 @@ Master branch of the repository contains most recent developments. Stable versio
 
 Files labeled int_test will run integration testing of all rules on a small dataset in test/inputs. See config/int_test.yaml for necessary run conditions.
 
-
 *** Changlog
+- [2022-08-05 Fri] - Version 5.0.0 validated: Added a symlink rule based on python dictionary. Added repo-specific output naming, added checks for sequence type and file readability to input tsv.
 - [2022-06-27 Mon] - Version 4 validated. Further expanded read_qc.tsv table. Removed bam post-processing step and added a more expansive bam filtering step. Updated downsampling to work off filtered alignments.
 - [2022-06-26 Sun] - Version 3.2 validated. Expanded the qc aggregate table and added some comments.
 - [2022-06-24 Fri] - Validate version 3.1 which includes genome index build as a snakefile rule.
@@ -932,7 +932,7 @@ Files labeled int_test will run integration testing of all rules on a small data
 - [X] add symlink from dict
 - [X] add repo specific output naming
 - [X] add sample sheet sequencing type selector
-- [ ] add unreadable input checker
+- [X] add unreadable input checker
 
 *** Ideas
 - Prioritized [2022-06-07 Tue]

@@ -1,0 +1,168 @@
+[2022-08-05 10:53:20,902] multiqc                                            [DEBUG  ]  This is MultiQC v1.12
+[2022-08-05 10:53:20,903] multiqc                                            [DEBUG  ]  No MultiQC config found: /opt/miniconda/lib/python3.6/site-packages/multiqc_config.yaml
+[2022-08-05 10:53:20,903] multiqc                                            [DEBUG  ]  No MultiQC config found: /home/jeszyman/repos/cfdna-wgs/.multiqc_config.yaml
+[2022-08-05 10:53:20,903] multiqc                                            [DEBUG  ]  No MultiQC config found: multiqc_config.yaml
+[2022-08-05 10:53:20,903] multiqc                                            [DEBUG  ]  Command used: /opt/miniconda/bin/multiqc test/qc/cfdna_wgs --force --outdir test/qc/cfdna_wgs --filename all_qc
+[2022-08-05 10:53:21,872] multiqc                                            [DEBUG  ]  Latest MultiQC version is v1.12
+[2022-08-05 10:53:21,872] multiqc                                            [DEBUG  ]  Command     : /opt/miniconda/bin/multiqc test/qc/cfdna_wgs --force --outdir test/qc/cfdna_wgs --filename all_qc
+[2022-08-05 10:53:21,872] multiqc                                            [DEBUG  ]  Working dir : /home/jeszyman/repos/cfdna-wgs
+[2022-08-05 10:53:21,873] multiqc                                            [DEBUG  ]  Template    : default
+[2022-08-05 10:53:21,873] multiqc                                            [DEBUG  ]  Running Python 3.6.6 |Anaconda, Inc.| (default, Oct  9 2018, 12:34:16)  [GCC 7.3.0]
+[2022-08-05 10:53:21,874] multiqc                                            [DEBUG  ]  Analysing modules: custom_content, ccs, ngsderive, purple, conpair, lima, peddy, somalier, methylQA, mosdepth, phantompeakqualtools, qualimap, preseq, quast, qorts, rna_seqc, rockhopper, rsem, rseqc, busco, bustools, goleft_indexcov, gffcompare, disambiguate, supernova, deeptools, sargasso, verifybamid, mirtrace, happy, mirtop, sambamba, homer, hops, macs2, theta2, snpeff, gatk, htseq, bcftools, featureCounts, fgbio, dragen, dedup, pbmarkdup, damageprofiler, biobambam2, jcvi, mtnucratio, picard, vep, sentieon, prokka, qc3C, nanostat, samblaster, samtools, sexdeterrmine, eigenstratdatabasetools, bamtools, jellyfish, vcftools, longranger, stacks, varscan2, snippy, bbmap, bismark, biscuit, hicexplorer, hicup, hicpro, salmon, kallisto, slamdunk, star, hisat2, tophat, bowtie2, bowtie1, snpsplit, odgi, pangolin, kat, leehom, adapterRemoval, clipandmerge, cutadapt, flexbar, kaiju, kraken, malt, trimmomatic, sickle, skewer, sortmerna, biobloomtools, fastq_screen, afterqc, fastp, fastqc, pychopper, pycoqc, minionqc, multivcfanalyzer, clusterflow, checkqc, bcl2fastq, bclconvert, interop, ivar, flash, seqyclean, optitype, whatshap
+[2022-08-05 10:53:21,875] multiqc                                            [DEBUG  ]  Using temporary directory for creating report: /tmp/tmpjhnvdi3k
+[2022-08-05 10:53:22,407] multiqc                                            [INFO   ]  Search path : /home/jeszyman/repos/cfdna-wgs/test/qc/cfdna_wgs
+[2022-08-05 10:53:22,573] multiqc                                            [DEBUG  ]  File ignored by ccs/v4 because it exceeded search pattern filesize limit: lib004_R1_fastqc.html
+[2022-08-05 10:53:22,577] multiqc                                            [DEBUG  ]  File ignored by hicexplorer because it exceeded search pattern filesize limit: lib004_R1_fastqc.html
+[2022-08-05 10:53:22,577] multiqc                                            [DEBUG  ]  File ignored by lima/summary because it exceeded search pattern filesize limit: lib004_R1_fastqc.html
+[2022-08-05 10:53:22,584] multiqc                                            [DEBUG  ]  File ignored by vep/vep_txt because it exceeded search pattern filesize limit: lib004_R1_fastqc.html
+[2022-08-05 10:53:22,584] multiqc                                            [DEBUG  ]  File ignored by longranger/invocation because it exceeded search pattern filesize limit: lib004_R1_fastqc.html
+[2022-08-05 10:53:22,694] multiqc                                            [DEBUG  ]  File ignored by nanostat because it exceeded search pattern filesize limit: lib004_R1_fastqc.html
+[2022-08-05 10:53:22,709] multiqc                                            [DEBUG  ]  File ignored by ccs/v4 because it exceeded search pattern filesize limit: lib004_deeptools_frag_lengths.txt
+[2022-08-05 10:53:22,721] multiqc                                            [DEBUG  ]  File ignored by ccs/v4 because it exceeded search pattern filesize limit: lib001_R1_fastqc.html
+[2022-08-05 10:53:22,724] multiqc                                            [DEBUG  ]  File ignored by hicexplorer because it exceeded search pattern filesize limit: lib001_R1_fastqc.html
+[2022-08-05 10:53:22,725] multiqc                                            [DEBUG  ]  File ignored by lima/summary because it exceeded search pattern filesize limit: lib001_R1_fastqc.html
+[2022-08-05 10:53:22,731] multiqc                                            [DEBUG  ]  File ignored by vep/vep_txt because it exceeded search pattern filesize limit: lib001_R1_fastqc.html
+[2022-08-05 10:53:22,732] multiqc                                            [DEBUG  ]  File ignored by longranger/invocation because it exceeded search pattern filesize limit: lib001_R1_fastqc.html
+[2022-08-05 10:53:22,860] multiqc                                            [DEBUG  ]  File ignored by nanostat because it exceeded search pattern filesize limit: lib001_R1_fastqc.html
+[2022-08-05 10:53:22,884] multiqc                                            [DEBUG  ]  File ignored by ccs/v4 because it exceeded search pattern filesize limit: lib003_deeptools_frag_lengths.txt
+[2022-08-05 10:53:22,923] multiqc                                            [DEBUG  ]  File ignored by ccs/v4 because it exceeded search pattern filesize limit: lib002_collect_wgs_metrics.txt
+[2022-08-05 10:53:22,926] multiqc                                            [DEBUG  ]  File ignored by lima/summary because it exceeded search pattern filesize limit: lib002_collect_wgs_metrics.txt
+[2022-08-05 10:53:22,932] multiqc                                            [DEBUG  ]  File ignored by longranger/invocation because it exceeded search pattern filesize limit: lib002_collect_wgs_metrics.txt
+[2022-08-05 10:53:22,967] multiqc                                            [DEBUG  ]  File ignored by ccs/v4 because it exceeded search pattern filesize limit: lib003_samstats.txt
+[2022-08-05 10:53:22,970] multiqc                                            [DEBUG  ]  File ignored by hicexplorer because it exceeded search pattern filesize limit: lib003_samstats.txt
+[2022-08-05 10:53:22,971] multiqc                                            [DEBUG  ]  File ignored by lima/summary because it exceeded search pattern filesize limit: lib003_samstats.txt
+[2022-08-05 10:53:22,985] multiqc                                            [DEBUG  ]  File ignored by vep/vep_txt because it exceeded search pattern filesize limit: lib003_samstats.txt
+[2022-08-05 10:53:22,985] multiqc                                            [DEBUG  ]  File ignored by longranger/invocation because it exceeded search pattern filesize limit: lib003_samstats.txt
+[2022-08-05 10:53:23,658] multiqc                                            [DEBUG  ]  File ignored by nanostat because it exceeded search pattern filesize limit: lib003_samstats.txt
+[2022-08-05 10:53:23,737] multiqc                                            [DEBUG  ]  File ignored by ccs/v4 because it exceeded search pattern filesize limit: lib001_samstats.txt
+[2022-08-05 10:53:23,740] multiqc                                            [DEBUG  ]  File ignored by hicexplorer because it exceeded search pattern filesize limit: lib001_samstats.txt
+[2022-08-05 10:53:23,741] multiqc                                            [DEBUG  ]  File ignored by lima/summary because it exceeded search pattern filesize limit: lib001_samstats.txt
+[2022-08-05 10:53:23,746] multiqc                                            [DEBUG  ]  File ignored by vep/vep_txt because it exceeded search pattern filesize limit: lib001_samstats.txt
+[2022-08-05 10:53:23,747] multiqc                                            [DEBUG  ]  File ignored by longranger/invocation because it exceeded search pattern filesize limit: lib001_samstats.txt
+[2022-08-05 10:53:24,446] multiqc                                            [DEBUG  ]  File ignored by nanostat because it exceeded search pattern filesize limit: lib001_samstats.txt
+[2022-08-05 10:53:24,527] multiqc                                            [DEBUG  ]  File ignored by ccs/v4 because it exceeded search pattern filesize limit: lib002_proc_R2_fastqc.html
+[2022-08-05 10:53:24,530] multiqc                                            [DEBUG  ]  File ignored by hicexplorer because it exceeded search pattern filesize limit: lib002_proc_R2_fastqc.html
+[2022-08-05 10:53:24,531] multiqc                                            [DEBUG  ]  File ignored by lima/summary because it exceeded search pattern filesize limit: lib002_proc_R2_fastqc.html
+[2022-08-05 10:53:24,537] multiqc                                            [DEBUG  ]  File ignored by vep/vep_txt because it exceeded search pattern filesize limit: lib002_proc_R2_fastqc.html
+[2022-08-05 10:53:24,538] multiqc                                            [DEBUG  ]  File ignored by longranger/invocation because it exceeded search pattern filesize limit: lib002_proc_R2_fastqc.html
+[2022-08-05 10:53:24,655] multiqc                                            [DEBUG  ]  File ignored by nanostat because it exceeded search pattern filesize limit: lib002_proc_R2_fastqc.html
+[2022-08-05 10:53:24,697] multiqc                                            [DEBUG  ]  File ignored by ccs/v4 because it exceeded search pattern filesize limit: lib004_proc_R2_fastqc.html
+[2022-08-05 10:53:24,700] multiqc                                            [DEBUG  ]  File ignored by hicexplorer because it exceeded search pattern filesize limit: lib004_proc_R2_fastqc.html
+[2022-08-05 10:53:24,701] multiqc                                            [DEBUG  ]  File ignored by lima/summary because it exceeded search pattern filesize limit: lib004_proc_R2_fastqc.html
+[2022-08-05 10:53:24,708] multiqc                                            [DEBUG  ]  File ignored by vep/vep_txt because it exceeded search pattern filesize limit: lib004_proc_R2_fastqc.html
+[2022-08-05 10:53:24,708] multiqc                                            [DEBUG  ]  File ignored by longranger/invocation because it exceeded search pattern filesize limit: lib004_proc_R2_fastqc.html
+[2022-08-05 10:53:24,816] multiqc                                            [DEBUG  ]  File ignored by nanostat because it exceeded search pattern filesize limit: lib004_proc_R2_fastqc.html
+[2022-08-05 10:53:24,841] multiqc                                            [DEBUG  ]  File ignored by ccs/v4 because it exceeded search pattern filesize limit: lib003_R2_fastqc.html
+[2022-08-05 10:53:24,845] multiqc                                            [DEBUG  ]  File ignored by hicexplorer because it exceeded search pattern filesize limit: lib003_R2_fastqc.html
+[2022-08-05 10:53:24,845] multiqc                                            [DEBUG  ]  File ignored by lima/summary because it exceeded search pattern filesize limit: lib003_R2_fastqc.html
+[2022-08-05 10:53:24,852] multiqc                                            [DEBUG  ]  File ignored by vep/vep_txt because it exceeded search pattern filesize limit: lib003_R2_fastqc.html
+[2022-08-05 10:53:24,852] multiqc                                            [DEBUG  ]  File ignored by longranger/invocation because it exceeded search pattern filesize limit: lib003_R2_fastqc.html
+[2022-08-05 10:53:24,974] multiqc                                            [DEBUG  ]  File ignored by nanostat because it exceeded search pattern filesize limit: lib003_R2_fastqc.html
+[2022-08-05 10:53:24,992] multiqc                                            [DEBUG  ]  File ignored by ccs/v4 because it exceeded search pattern filesize limit: lib002_R1_fastqc.html
+[2022-08-05 10:53:24,996] multiqc                                            [DEBUG  ]  File ignored by hicexplorer because it exceeded search pattern filesize limit: lib002_R1_fastqc.html
+[2022-08-05 10:53:24,996] multiqc                                            [DEBUG  ]  File ignored by lima/summary because it exceeded search pattern filesize limit: lib002_R1_fastqc.html
+[2022-08-05 10:53:25,003] multiqc                                            [DEBUG  ]  File ignored by vep/vep_txt because it exceeded search pattern filesize limit: lib002_R1_fastqc.html
+[2022-08-05 10:53:25,003] multiqc                                            [DEBUG  ]  File ignored by longranger/invocation because it exceeded search pattern filesize limit: lib002_R1_fastqc.html
+[2022-08-05 10:53:25,136] multiqc                                            [DEBUG  ]  File ignored by nanostat because it exceeded search pattern filesize limit: lib002_R1_fastqc.html
+[2022-08-05 10:53:25,188] multiqc                                            [DEBUG  ]  File ignored by ccs/v4 because it exceeded search pattern filesize limit: lib003_proc_R2_fastqc.html
+[2022-08-05 10:53:25,192] multiqc                                            [DEBUG  ]  File ignored by hicexplorer because it exceeded search pattern filesize limit: lib003_proc_R2_fastqc.html
+[2022-08-05 10:53:25,192] multiqc                                            [DEBUG  ]  File ignored by lima/summary because it exceeded search pattern filesize limit: lib003_proc_R2_fastqc.html
+[2022-08-05 10:53:25,199] multiqc                                            [DEBUG  ]  File ignored by vep/vep_txt because it exceeded search pattern filesize limit: lib003_proc_R2_fastqc.html
+[2022-08-05 10:53:25,199] multiqc                                            [DEBUG  ]  File ignored by longranger/invocation because it exceeded search pattern filesize limit: lib003_proc_R2_fastqc.html
+[2022-08-05 10:53:25,308] multiqc                                            [DEBUG  ]  File ignored by nanostat because it exceeded search pattern filesize limit: lib003_proc_R2_fastqc.html
+[2022-08-05 10:53:25,322] multiqc                                            [DEBUG  ]  File ignored by ccs/v4 because it exceeded search pattern filesize limit: all_frag.tsv
+[2022-08-05 10:53:25,325] multiqc                                            [DEBUG  ]  File ignored by hicexplorer because it exceeded search pattern filesize limit: all_frag.tsv
+[2022-08-05 10:53:25,326] multiqc                                            [DEBUG  ]  File ignored by lima/summary because it exceeded search pattern filesize limit: all_frag.tsv
+[2022-08-05 10:53:25,331] multiqc                                            [DEBUG  ]  File ignored by longranger/invocation because it exceeded search pattern filesize limit: all_frag.tsv
+[2022-08-05 10:53:25,427] multiqc                                            [DEBUG  ]  File ignored by nanostat because it exceeded search pattern filesize limit: all_frag.tsv
+[2022-08-05 10:53:25,441] multiqc                                            [DEBUG  ]  File ignored by ccs/v4 because it exceeded search pattern filesize limit: lib004_samstats.txt
+[2022-08-05 10:53:25,444] multiqc                                            [DEBUG  ]  File ignored by hicexplorer because it exceeded search pattern filesize limit: lib004_samstats.txt
+[2022-08-05 10:53:25,444] multiqc                                            [DEBUG  ]  File ignored by lima/summary because it exceeded search pattern filesize limit: lib004_samstats.txt
+[2022-08-05 10:53:25,450] multiqc                                            [DEBUG  ]  File ignored by vep/vep_txt because it exceeded search pattern filesize limit: lib004_samstats.txt
+[2022-08-05 10:53:25,450] multiqc                                            [DEBUG  ]  File ignored by longranger/invocation because it exceeded search pattern filesize limit: lib004_samstats.txt
+[2022-08-05 10:53:26,115] multiqc                                            [DEBUG  ]  File ignored by nanostat because it exceeded search pattern filesize limit: lib004_samstats.txt
+[2022-08-05 10:53:26,167] multiqc                                            [DEBUG  ]  File ignored by ccs/v4 because it exceeded search pattern filesize limit: lib001_deeptools_frag_lengths.txt
+[2022-08-05 10:53:26,203] multiqc                                            [DEBUG  ]  File ignored by ccs/v4 because it exceeded search pattern filesize limit: lib002_proc_R1_fastqc.html
+[2022-08-05 10:53:26,207] multiqc                                            [DEBUG  ]  File ignored by hicexplorer because it exceeded search pattern filesize limit: lib002_proc_R1_fastqc.html
+[2022-08-05 10:53:26,207] multiqc                                            [DEBUG  ]  File ignored by lima/summary because it exceeded search pattern filesize limit: lib002_proc_R1_fastqc.html
+[2022-08-05 10:53:26,214] multiqc                                            [DEBUG  ]  File ignored by vep/vep_txt because it exceeded search pattern filesize limit: lib002_proc_R1_fastqc.html
+[2022-08-05 10:53:26,214] multiqc                                            [DEBUG  ]  File ignored by longranger/invocation because it exceeded search pattern filesize limit: lib002_proc_R1_fastqc.html
+[2022-08-05 10:53:26,333] multiqc                                            [DEBUG  ]  File ignored by nanostat because it exceeded search pattern filesize limit: lib002_proc_R1_fastqc.html
+[2022-08-05 10:53:26,348] multiqc                                            [DEBUG  ]  File ignored by ccs/v4 because it exceeded search pattern filesize limit: lib003_collect_wgs_metrics.txt
+[2022-08-05 10:53:26,352] multiqc                                            [DEBUG  ]  File ignored by lima/summary because it exceeded search pattern filesize limit: lib003_collect_wgs_metrics.txt
+[2022-08-05 10:53:26,357] multiqc                                            [DEBUG  ]  File ignored by longranger/invocation because it exceeded search pattern filesize limit: lib003_collect_wgs_metrics.txt
+[2022-08-05 10:53:26,403] multiqc                                            [DEBUG  ]  File ignored by ccs/v4 because it exceeded search pattern filesize limit: lib004_proc_R1_fastqc.html
+[2022-08-05 10:53:26,407] multiqc                                            [DEBUG  ]  File ignored by hicexplorer because it exceeded search pattern filesize limit: lib004_proc_R1_fastqc.html
+[2022-08-05 10:53:26,407] multiqc                                            [DEBUG  ]  File ignored by lima/summary because it exceeded search pattern filesize limit: lib004_proc_R1_fastqc.html
+[2022-08-05 10:53:26,414] multiqc                                            [DEBUG  ]  File ignored by vep/vep_txt because it exceeded search pattern filesize limit: lib004_proc_R1_fastqc.html
+[2022-08-05 10:53:26,414] multiqc                                            [DEBUG  ]  File ignored by longranger/invocation because it exceeded search pattern filesize limit: lib004_proc_R1_fastqc.html
+[2022-08-05 10:53:26,533] multiqc                                            [DEBUG  ]  File ignored by nanostat because it exceeded search pattern filesize limit: lib004_proc_R1_fastqc.html
+[2022-08-05 10:53:26,552] multiqc                                            [DEBUG  ]  File ignored by ccs/v4 because it exceeded search pattern filesize limit: lib003_R1_fastqc.html
+[2022-08-05 10:53:26,555] multiqc                                            [DEBUG  ]  File ignored by hicexplorer because it exceeded search pattern filesize limit: lib003_R1_fastqc.html
+[2022-08-05 10:53:26,556] multiqc                                            [DEBUG  ]  File ignored by lima/summary because it exceeded search pattern filesize limit: lib003_R1_fastqc.html
+[2022-08-05 10:53:26,562] multiqc                                            [DEBUG  ]  File ignored by vep/vep_txt because it exceeded search pattern filesize limit: lib003_R1_fastqc.html
+[2022-08-05 10:53:26,563] multiqc                                            [DEBUG  ]  File ignored by longranger/invocation because it exceeded search pattern filesize limit: lib003_R1_fastqc.html
+[2022-08-05 10:53:26,685] multiqc                                            [DEBUG  ]  File ignored by nanostat because it exceeded search pattern filesize limit: lib003_R1_fastqc.html
+[2022-08-05 10:53:26,709] multiqc                                            [DEBUG  ]  File ignored by ccs/v4 because it exceeded search pattern filesize limit: lib002_samstats.txt
+[2022-08-05 10:53:26,712] multiqc                                            [DEBUG  ]  File ignored by hicexplorer because it exceeded search pattern filesize limit: lib002_samstats.txt
+[2022-08-05 10:53:26,713] multiqc                                            [DEBUG  ]  File ignored by lima/summary because it exceeded search pattern filesize limit: lib002_samstats.txt
+[2022-08-05 10:53:26,718] multiqc                                            [DEBUG  ]  File ignored by vep/vep_txt because it exceeded search pattern filesize limit: lib002_samstats.txt
+[2022-08-05 10:53:26,719] multiqc                                            [DEBUG  ]  File ignored by longranger/invocation because it exceeded search pattern filesize limit: lib002_samstats.txt
+[2022-08-05 10:53:27,394] multiqc                                            [DEBUG  ]  File ignored by nanostat because it exceeded search pattern filesize limit: lib002_samstats.txt
+[2022-08-05 10:53:27,444] multiqc                                            [DEBUG  ]  File ignored by ccs/v4 because it exceeded search pattern filesize limit: lib001_collect_wgs_metrics.txt
+[2022-08-05 10:53:27,448] multiqc                                            [DEBUG  ]  File ignored by lima/summary because it exceeded search pattern filesize limit: lib001_collect_wgs_metrics.txt
+[2022-08-05 10:53:27,453] multiqc                                            [DEBUG  ]  File ignored by longranger/invocation because it exceeded search pattern filesize limit: lib001_collect_wgs_metrics.txt
+[2022-08-05 10:53:27,491] multiqc                                            [DEBUG  ]  File ignored by ccs/v4 because it exceeded search pattern filesize limit: lib004_R2_fastqc.html
+[2022-08-05 10:53:27,494] multiqc                                            [DEBUG  ]  File ignored by hicexplorer because it exceeded search pattern filesize limit: lib004_R2_fastqc.html
+[2022-08-05 10:53:27,495] multiqc                                            [DEBUG  ]  File ignored by lima/summary because it exceeded search pattern filesize limit: lib004_R2_fastqc.html
+[2022-08-05 10:53:27,510] multiqc                                            [DEBUG  ]  File ignored by vep/vep_txt because it exceeded search pattern filesize limit: lib004_R2_fastqc.html
+[2022-08-05 10:53:27,510] multiqc                                            [DEBUG  ]  File ignored by longranger/invocation because it exceeded search pattern filesize limit: lib004_R2_fastqc.html
+[2022-08-05 10:53:27,627] multiqc                                            [DEBUG  ]  File ignored by nanostat because it exceeded search pattern filesize limit: lib004_R2_fastqc.html
+[2022-08-05 10:53:27,649] multiqc                                            [DEBUG  ]  File ignored by ccs/v4 because it exceeded search pattern filesize limit: lib001_R2_fastqc.html
+[2022-08-05 10:53:27,652] multiqc                                            [DEBUG  ]  File ignored by hicexplorer because it exceeded search pattern filesize limit: lib001_R2_fastqc.html
+[2022-08-05 10:53:27,653] multiqc                                            [DEBUG  ]  File ignored by lima/summary because it exceeded search pattern filesize limit: lib001_R2_fastqc.html
+[2022-08-05 10:53:27,659] multiqc                                            [DEBUG  ]  File ignored by vep/vep_txt because it exceeded search pattern filesize limit: lib001_R2_fastqc.html
+[2022-08-05 10:53:27,660] multiqc                                            [DEBUG  ]  File ignored by longranger/invocation because it exceeded search pattern filesize limit: lib001_R2_fastqc.html
+[2022-08-05 10:53:27,789] multiqc                                            [DEBUG  ]  File ignored by nanostat because it exceeded search pattern filesize limit: lib001_R2_fastqc.html
+[2022-08-05 10:53:27,805] multiqc                                            [DEBUG  ]  File ignored by ccs/v4 because it exceeded search pattern filesize limit: lib004_collect_wgs_metrics.txt
+[2022-08-05 10:53:27,809] multiqc                                            [DEBUG  ]  File ignored by lima/summary because it exceeded search pattern filesize limit: lib004_collect_wgs_metrics.txt
+[2022-08-05 10:53:27,814] multiqc                                            [DEBUG  ]  File ignored by longranger/invocation because it exceeded search pattern filesize limit: lib004_collect_wgs_metrics.txt
+[2022-08-05 10:53:27,862] multiqc                                            [DEBUG  ]  File ignored by ccs/v4 because it exceeded search pattern filesize limit: lib003_proc_R1_fastqc.html
+[2022-08-05 10:53:27,865] multiqc                                            [DEBUG  ]  File ignored by hicexplorer because it exceeded search pattern filesize limit: lib003_proc_R1_fastqc.html
+[2022-08-05 10:53:27,866] multiqc                                            [DEBUG  ]  File ignored by lima/summary because it exceeded search pattern filesize limit: lib003_proc_R1_fastqc.html
+[2022-08-05 10:53:27,873] multiqc                                            [DEBUG  ]  File ignored by vep/vep_txt because it exceeded search pattern filesize limit: lib003_proc_R1_fastqc.html
+[2022-08-05 10:53:27,873] multiqc                                            [DEBUG  ]  File ignored by longranger/invocation because it exceeded search pattern filesize limit: lib003_proc_R1_fastqc.html
+[2022-08-05 10:53:27,989] multiqc                                            [DEBUG  ]  File ignored by nanostat because it exceeded search pattern filesize limit: lib003_proc_R1_fastqc.html
+[2022-08-05 10:53:28,030] multiqc                                            [DEBUG  ]  File ignored by ccs/v4 because it exceeded search pattern filesize limit: lib002_deeptools_frag_lengths.txt
+[2022-08-05 10:53:28,050] multiqc                                            [DEBUG  ]  File ignored by ccs/v4 because it exceeded search pattern filesize limit: lib001_proc_R2_fastqc.html
+[2022-08-05 10:53:28,054] multiqc                                            [DEBUG  ]  File ignored by hicexplorer because it exceeded search pattern filesize limit: lib001_proc_R2_fastqc.html
+[2022-08-05 10:53:28,054] multiqc                                            [DEBUG  ]  File ignored by lima/summary because it exceeded search pattern filesize limit: lib001_proc_R2_fastqc.html
+[2022-08-05 10:53:28,061] multiqc                                            [DEBUG  ]  File ignored by vep/vep_txt because it exceeded search pattern filesize limit: lib001_proc_R2_fastqc.html
+[2022-08-05 10:53:28,061] multiqc                                            [DEBUG  ]  File ignored by longranger/invocation because it exceeded search pattern filesize limit: lib001_proc_R2_fastqc.html
+[2022-08-05 10:53:28,180] multiqc                                            [DEBUG  ]  File ignored by nanostat because it exceeded search pattern filesize limit: lib001_proc_R2_fastqc.html
+[2022-08-05 10:53:28,197] multiqc                                            [DEBUG  ]  File ignored by ccs/v4 because it exceeded search pattern filesize limit: lib001_proc_R1_fastqc.html
+[2022-08-05 10:53:28,201] multiqc                                            [DEBUG  ]  File ignored by hicexplorer because it exceeded search pattern filesize limit: lib001_proc_R1_fastqc.html
+[2022-08-05 10:53:28,201] multiqc                                            [DEBUG  ]  File ignored by lima/summary because it exceeded search pattern filesize limit: lib001_proc_R1_fastqc.html
+[2022-08-05 10:53:28,208] multiqc                                            [DEBUG  ]  File ignored by vep/vep_txt because it exceeded search pattern filesize limit: lib001_proc_R1_fastqc.html
+[2022-08-05 10:53:28,208] multiqc                                            [DEBUG  ]  File ignored by longranger/invocation because it exceeded search pattern filesize limit: lib001_proc_R1_fastqc.html
+[2022-08-05 10:53:28,328] multiqc                                            [DEBUG  ]  File ignored by nanostat because it exceeded search pattern filesize limit: lib001_proc_R1_fastqc.html
+[2022-08-05 10:53:28,349] multiqc                                            [DEBUG  ]  File ignored by ccs/v4 because it exceeded search pattern filesize limit: lib002_R2_fastqc.html
+[2022-08-05 10:53:28,353] multiqc                                            [DEBUG  ]  File ignored by hicexplorer because it exceeded search pattern filesize limit: lib002_R2_fastqc.html
+[2022-08-05 10:53:28,353] multiqc                                            [DEBUG  ]  File ignored by lima/summary because it exceeded search pattern filesize limit: lib002_R2_fastqc.html
+[2022-08-05 10:53:28,360] multiqc                                            [DEBUG  ]  File ignored by vep/vep_txt because it exceeded search pattern filesize limit: lib002_R2_fastqc.html
+[2022-08-05 10:53:28,360] multiqc                                            [DEBUG  ]  File ignored by longranger/invocation because it exceeded search pattern filesize limit: lib002_R2_fastqc.html
+[2022-08-05 10:53:28,498] multiqc                                            [DEBUG  ]  File ignored by nanostat because it exceeded search pattern filesize limit: lib002_R2_fastqc.html
+[2022-08-05 10:53:31,718] multiqc.plots.linegraph                            [DEBUG  ]  Using matplotlib version 3.3.4
+[2022-08-05 10:53:32,130] multiqc.modules.deeptools.deeptools                [DEBUG  ]  Found 4 deepTools 'bamPEFragmentSize --outRawFragmentLengths' samples
+[2022-08-05 10:53:32,130] multiqc.modules.deeptools.deeptools                [INFO   ]  Found 4 total deepTools samples
+[2022-08-05 10:53:32,176] multiqc.plots.bargraph                             [DEBUG  ]  Using matplotlib version 3.3.4
+[2022-08-05 10:53:32,338] multiqc.modules.picard.picard                      [INFO   ]  Found 4 WgsMetrics reports
+[2022-08-05 10:53:32,412] multiqc.modules.samtools.samtools                  [INFO   ]  Found 4 stats reports
+[2022-08-05 10:53:32,433] multiqc.modules.samtools.samtools                  [INFO   ]  Found 4 flagstat reports
+[2022-08-05 10:53:32,586] multiqc.modules.fastqc.fastqc                      [INFO   ]  Found 16 reports
+[2022-08-05 10:53:33,660] multiqc                                            [INFO   ]  Compressing plot data
+[2022-08-05 10:53:34,390] multiqc                                            [WARNING]  Deleting    : test/qc/cfdna_wgs/all_qc_data   (-f was specified)
+[2022-08-05 10:53:34,391] multiqc                                            [INFO   ]  Report      : test/qc/cfdna_wgs/all_qc.html
+[2022-08-05 10:53:34,391] multiqc                                            [INFO   ]  Data        : test/qc/cfdna_wgs/all_qc_data
+[2022-08-05 10:53:34,391] multiqc                                            [DEBUG  ]  Moving data file from '/tmp/tmpjhnvdi3k/multiqc_data' to 'test/qc/cfdna_wgs/all_qc_data'
+[2022-08-05 10:53:34,793] multiqc                                            [INFO   ]  MultiQC complete

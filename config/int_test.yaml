@@ -2,30 +2,12 @@
 #  https://github.com/jeszyman/cfdna-wgs/blob/master/cfdna-wgs.org. Changes
 #  made directly to this file will be overwritten upon tangle from Org-mode.
 
-#########1#########2#########3#########4#########5#########6#########7#########8
-
-###################################################
-###   Standard Integration Testing Parameters   ###
-###################################################
-
-#  Note: This code block transcluded from code blocks in the Emacs Org-mode
-#  file at https://github.com/jeszyman/biotools/blob/master/biotools.org.
-#  Changes made directly to this region will be overwritten by transclusion from
-#  the source blocks in that file.
 
 threads: 4
-
 data_dir: "test"
-# Data directory will contain all snakefile outputs in a sub-directory.
-#########1#########2#########3#########4#########5#########6#########7#########8
-
-##########################################################
-###   Repository-local Integration Testing Variables   ###
-##########################################################
-
 cfdna_wgs_script_dir: "workflow/scripts"
+container: "${HOME}/sing_containers/biotools.1.0.2.sif"
 picard_jar: "/opt/picard/picard.jar"
-container: "~/sing_containers/biotools.sif"
 
 # Required reference files
 

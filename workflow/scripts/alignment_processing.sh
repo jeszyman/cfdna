@@ -1,10 +1,6 @@
 #!/usr/bin/env bash
 
-
-#  Note: This script is tangled from code blocks in the Emacs Org-mode file at
-#  https://github.com/jeszyman/cfdna-wgs/blob/master/cfdna-wgs.org. Changes
-#  made directly to this file will be overwritten upon tangle from Org-mode.
-
+<#bash_preamble#>
 
 input=$1
 threads=$2

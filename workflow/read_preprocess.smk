@@ -1,19 +1,23 @@
+##############################
+###   cfDNA WGS Pipeline   ###
+##############################
+
 # Read trimming per NCI
 rule trimmomatic:
     input:
-        read1 = config["data_dir"] + "/fastq/raw/{library_id}_R1.fastq.gz",
-        read2 = config["data_dir"] + "/fastq/raw/{library_id}_R2.fastq.gz",
+        read1 = cfdna_wgs_fastq_dir + "/raw/{library_id}_R1.fastq.gz",
+        read2 =  cfdna_wgs_fastq_dir + "/raw/{library_id}_R2.fastq.gz",
     params:
         adapter_fasta = config["adapter_fastq"],
 	script = config["cfdna_wgs_script_dir"] + "/trimmomatic_wrapper.sh",
     output:
-        read1 = config["data_dir"] + "/fastq/processed/{library_id}_proc_R1.fastq.gz",
-        read1_unpr = config["data_dir"] + "/fastq/unpaired/{library_id}_unpr_R1.fastq.gz",
-        read2 = config["data_dir"] + "/fastq/processed/{library_id}_proc_R2.fastq.gz",
-        read2_unpr = config["data_dir"] + "/fastq/unpaired/{library_id}_unpr_R2.fastq.gz",
+        read1 = cfdna_wgs_fastq_dir + "/processed/{library_id}_proc_R1.fastq.gz",
+        read1_unpr = cfdna_wgs_fastq_dir + "/unpaired/{library_id}_unpr_R1.fastq.gz",
+        read2 = cfdna_wgs_fastq_dir + "/processed/{library_id}_proc_R2.fastq.gz",
+        read2_unpr = cfdna_wgs_fastq_dir + "/unpaired/{library_id}_unpr_R2.fastq.gz",
     log:
-        int = config["data_dir"] + "/logs/trimmomatic_trimlog_{library_id}.log",
-        main = config["data_dir"] + "/logs/trimmomatic_{library_id}.log",
+        int = cfdna_wgs_log_dir + "/trimmomatic_trimlog_cfdna_wgs_{library_id}.log",
+        main = cfdna_wgs_log_dir + "/trimmomatic_cfdna_wgs_{library_id}.log",
     shell:
         """
         {params.script} \
@@ -32,16 +36,16 @@ rule trimmomatic:
 # FastQC
 rule fastqc:
     input:
-        raw =  config["data_dir"] + "/fastq/raw/{library_id}_{read}.fastq.gz",
-        proc = config["data_dir"] + "/fastq/processed/{library_id}_proc_{read}.fastq.gz",
+        raw =  cfdna_wgs_fastq_dir + "/raw/{library_id}_{read}.fastq.gz",
+        proc = cfdna_wgs_fastq_dir + "/processed/{library_id}_proc_{read}.fastq.gz",
     params:
-        out_dir = config["data_dir"] + "/qc",
+        out_dir = cfdna_wgs_qc_dir
     output:
-        raw_html = config["data_dir"] + "/qc/{library_id}_{read}_fastqc.html",
-        proc_html = config["data_dir"] + "/qc/{library_id}_proc_{read}_fastqc.html",
+        raw_html = cfdna_wgs_qc_dir + "/{library_id}_{read}_fastqc.html",
+        proc_html = cfdna_wgs_qc_dir + "/{library_id}_proc_{read}_fastqc.html",
     log:
-        raw = config["data_dir"] + "/logs/fastqc_raw_{library_id}_{read}.log",
-        proc = config["data_dir"] + "/logs/fastqc_proc_{library_id}_{read}.log",
+        raw = cfdna_wgs_log_dir + "/fastqc_raw_{library_id}_{read}.log",
+        proc = cfdna_wgs_log_dir + "fastqc_proc_{library_id}_{read}.log",
     shell:
         """
         fastqc --outdir {params.out_dir} \
@@ -70,15 +74,15 @@ rule index:
 rule align:
     input:
         ref = genome_ref,
-        r1 = config["data_dir"] + "/fastq/processed/{library_id}_proc_R1.fastq.gz",
-        r2 = config["data_dir"] + "/fastq/processed/{library_id}_proc_R2.fastq.gz",
+        r1 = cfdna_wgs_fastq_dir + "/processed/{library_id}_proc_R1.fastq.gz",
+        r2 = cfdna_wgs_fastq_dir + "/processed/{library_id}_proc_R2.fastq.gz",
     params:
         script = config["cfdna_wgs_script_dir"] + "/align.sh"
     output:
-        sort = config["data_dir"] + "/bam/raw/{library_id}.bam",
-        index = config["data_dir"] + "/bam/raw/{library_id}.bam.bai",
+        sort = cfdna_wgs_bam_dir + "/raw/{library_id}.bam",
+        index = cfdna_wgs_bam_dir + "/raw/{library_id}.bam.bai",
     log:
-        config["data_dir"] + "/logs/align_{library_id}.log"
+        cfdna_wgs_log_dir + "/align_{library_id}.log"
     shell:
         """
         {params.script} \
@@ -92,14 +96,14 @@ rule align:
 # Alignment samtools QC
 rule alignment_qc:
     input:
-        config["data_dir"] + "/bam/raw/{library_id}.bam",
+        cfdna_wgs_bam_dir + "/raw/{library_id}.bam",
     params:
         threads = config["threads"],
     output:
-        samstat = config["data_dir"] + "/qc/{library_id}_samstats.txt",
-        flagstat = config["data_dir"] + "/qc/{library_id}_flagstat.txt",
+        samstat = cfdna_wgs_qc_dir + "/{library_id}_samstats.txt",
+        flagstat = cfdna_wgs_qc_dir + "/{library_id}_flagstat.txt",
     log:
-        config["data_dir"] + "/logs/alignment_qc_{library_id}.log",
+        cfdna_wgs_qc_dir + "/alignment_qc_{library_id}.log",
     shell:
         """
         samtools stats -@ {params.threads} {input} > {output.samstat} 2>{log}
@@ -109,16 +113,16 @@ rule alignment_qc:
 # Removes unmapped, not primary, and duplicate reads. Additionally, quality filters by config variable.
 rule alignment_filtering:
     input:
-        config["data_dir"] + "/bam/raw/{library_id}.bam",
+        cfdna_wgs_bam_dir + "/raw/{library_id}.bam",
     params:
         script = config["cfdna_wgs_script_dir"] + "/alignment_filtering.sh",
         quality = config["qscore"],
         threads = config["threads"],
     output:
-        bam = config["data_dir"] + "/bam/filt/{library_id}_filt.bam",
-        bai = config["data_dir"] + "/bam/filt/{library_id}_filt.bam.bai",
+        bam = cfdna_wgs_bam_dir + "/filt/{library_id}_filt.bam",
+        bai = cfdna_wgs_bam_dir + "/filt/{library_id}_filt.bam.bai",
     log:
-        config["data_dir"] + "/logs/{library_id}_alignment_filtering.log",
+        cfdna_wgs_log_dir + "/{library_id}_alignment_filtering.log",
     shell:
         """
         {params.script} \
@@ -131,13 +135,13 @@ rule alignment_filtering:
 # Sequencing depth via Picard
 rule picard_collect_wgs_metrics:
     input:
-        config["data_dir"] + "/bam/filt/{library_id}_filt.bam",
+        cfdna_wgs_bam_dir + "/filt/{library_id}_filt.bam",
     params:
         script = config["cfdna_wgs_script_dir"] + "/CollectWgsMetrics_wrapper.sh",
     output:
-        config["data_dir"] + "/qc/{library_id}_collect_wgs_metrics.txt",
+        cfdna_wgs_qc_dir + "/{library_id}_collect_wgs_metrics.txt",
     log:
-        config["data_dir"] + "/logs/{library_id}_picard_wgs.log",
+        cfdna_wgs_log_dir + "/{library_id}_picard_wgs.log",
     shell:
         """
         {config[cfdna_wgs_script_dir]}/CollectWgsMetrics_wrapper.sh \
@@ -150,12 +154,12 @@ rule picard_collect_wgs_metrics:
 # Fragment sizes by deepTools
 rule deeptools_bamprfragmentsize:
     input:
-        config["data_dir"] + "/bam/filt/{library_id}_filt.bam",
+        cfdna_wgs_bam_dir + "/filt/{library_id}_filt.bam",
     params:
         blacklist = config["blacklist"],
         script = config["cfdna_wgs_script_dir"] + "/bamPEFragmentSize_wrapper.sh",
     output:
-        config["data_dir"] + "/qc/{library_id}_deeptools_frag_lengths.txt",
+        cfdna_wgs_qc_dir + "/{library_id}_deeptools_frag_lengths.txt",
     shell:
         """
         {params.script} \
@@ -167,20 +171,20 @@ rule deeptools_bamprfragmentsize:
 
 rule multiqc:
     input:
-        expand(config["data_dir"] + "/qc/{library_id}_{read}_fastqc.html", library_id = LIBRARY_IDS, read = ["R1","R2"]),
-        expand(config["data_dir"] + "/qc/{library_id}_proc_{read}_fastqc.html", library_id = LIBRARY_IDS, read = ["R1","R2"]),
-        expand(config["data_dir"] + "/qc/{library_id}_samstats.txt", library_id = LIBRARY_IDS),
-        expand(config["data_dir"] + "/qc/{library_id}_flagstat.txt", library_id = LIBRARY_IDS),
-        expand(config["data_dir"] + "/qc/{library_id}_deeptools_frag_lengths.txt", library_id = LIBRARY_IDS),
-        expand(config["data_dir"] + "/qc/{library_id}_deeptools_frag_lengths.txt", library_id = LIBRARY_IDS),
-        expand(config["data_dir"] + "/qc/{library_id}_collect_wgs_metrics.txt", library_id = LIBRARY_IDS),
+        expand(cfdna_wgs_qc_dir + "/{library_id}_{read}_fastqc.html", library_id = LIBRARIES, read = ["R1","R2"]),
+        expand(cfdna_wgs_qc_dir + "/{library_id}_proc_{read}_fastqc.html", library_id = LIBRARIES, read = ["R1","R2"]),
+        expand(cfdna_wgs_qc_dir + "/{library_id}_samstats.txt", library_id = LIBRARIES),
+        expand(cfdna_wgs_qc_dir + "/{library_id}_flagstat.txt", library_id = LIBRARIES),
+        expand(cfdna_wgs_qc_dir + "/{library_id}_deeptools_frag_lengths.txt", library_id = LIBRARIES),
+        expand(cfdna_wgs_qc_dir + "/{library_id}_deeptools_frag_lengths.txt", library_id = LIBRARIES),
+        expand(cfdna_wgs_qc_dir + "/{library_id}_collect_wgs_metrics.txt", library_id = LIBRARIES),
     params:
-        out_dir = config["data_dir"] + "/qc"
+        out_dir = cfdna_wgs_qc_dir
     output:
-        config["data_dir"] + "/qc/all_qc_data/multiqc_fastqc.txt",
-        config["data_dir"] + "/qc/all_qc_data/multiqc_samtools_stats.txt",
-        config["data_dir"] + "/qc/all_qc_data/multiqc_samtools_flagstat.txt",
-	config["data_dir"] + "/qc/all_qc_data/multiqc_picard_wgsmetrics.txt",
+        cfdna_wgs_qc_dir + "/all_qc_data/multiqc_fastqc.txt",
+        cfdna_wgs_qc_dir + "/all_qc_data/multiqc_samtools_stats.txt",
+        cfdna_wgs_qc_dir + "/all_qc_data/multiqc_samtools_flagstat.txt",
+	cfdna_wgs_qc_dir + "/all_qc_data/multiqc_picard_wgsmetrics.txt",
     shell:
         """
         multiqc {params.out_dir} \
@@ -191,13 +195,13 @@ rule multiqc:
 
 rule aggregate_frag:
     input:
-        expand(config["data_dir"] + "/qc/{library_id}_deeptools_frag_lengths.txt", library_id = LIBRARY_IDS),
+        expand(cfdna_wgs_qc_dir + "/{library_id}_deeptools_frag_lengths.txt", library_id = LIBRARIES),
     params:
         script = config["cfdna_wgs_script_dir"] + "/aggregate_frag.sh",
     output:
-        config["data_dir"] + "/qc/all_frag.tsv",
+        cfdna_wgs_qc_dir + "/all_frag.tsv",
     log:
-        config["data_dir"] + "/logs/aggregate_frag.err",
+        cfdna_wgs_log_dir + "/aggregate_frag.err",
     shell:
         """
         awk 'FNR>2' {input} > {output} 2> {log}
@@ -211,17 +215,17 @@ rule aggregate_frag:
 
 checkpoint make_qc_tbl:
     input:
-        fq = config["data_dir"] + "/qc/all_qc_data/multiqc_fastqc.txt",
-        sam = config["data_dir"] + "/qc/all_qc_data/multiqc_samtools_stats.txt",
-        flag = config["data_dir"] + "/qc/all_qc_data/multiqc_samtools_flagstat.txt",
-	picard = config["data_dir"] + "/qc/all_qc_data/multiqc_picard_wgsmetrics.txt",
-        deeptools = config["data_dir"] + "/qc/all_frag.tsv",
+        fq = cfdna_wgs_qc_dir + "/all_qc_data/multiqc_fastqc.txt",
+        sam = cfdna_wgs_qc_dir + "/all_qc_data/multiqc_samtools_stats.txt",
+        flag = cfdna_wgs_qc_dir + "/all_qc_data/multiqc_samtools_flagstat.txt",
+	picard = cfdna_wgs_qc_dir + "/all_qc_data/multiqc_picard_wgsmetrics.txt",
+        deeptools = cfdna_wgs_qc_dir + "/all_frag.tsv",
     params:
         script = config["cfdna_wgs_script_dir"] + "/make_qc_tbl.R"
     output:
-        config["data_dir"] + "/qc/read_qc.tsv",
+        cfdna_wgs_qc_dir + "/read_qc.tsv",
     log:
-        config["data_dir"] + "/logs/read_qc.log"
+        cfdna_wgs_log_dir + "/read_qc.log"
     shell:
         """
         Rscript {params.script} \
@@ -240,11 +244,11 @@ checkpoint make_qc_tbl:
 
 rule downsample_bams:
     input:
-        config["data_dir"] + "/bam/filt/{library_id}_filt.bam",
+        cfdna_wgs_bam_dir + "/filt/{library_id}_filt.bam",
     output:
-        config["data_dir"] + "/bam/ds/{library_id}_ds{milreads}.bam",
+        cfdna_wgs_bam_dir + "/ds/{library_id}_ds{milreads}.bam",
     log:
-        config["data_dir"] + "/logs/downsample_bam_{library_id}_{milreads}.err"
+        cfdna_wgs_log_dir + "/downsample_bam_{library_id}_{milreads}.err"
     shell:
         """
         {config[cfdna_wgs_script_dir]}/downsample_bam.sh {input} {wildcards.milreads} {output} 2>{log}

@@ -18,6 +18,8 @@ rule trimmomatic:
     log:
         int = cfdna_wgs_log_dir + "/trimmomatic_trimlog_cfdna_wgs_{library_id}.log",
         main = cfdna_wgs_log_dir + "/trimmomatic_cfdna_wgs_{library_id}.log",
+    container:
+        config["cfdna_wgs_container"]
     shell:
         """
         {params.script} \
@@ -46,6 +48,8 @@ rule fastqc:
     log:
         raw = cfdna_wgs_log_dir + "/fastqc_raw_{library_id}_{read}.log",
         proc = cfdna_wgs_log_dir + "/fastqc_proc_{library_id}_{read}.log",
+    container:
+        config["cfdna_wgs_container"]
     shell:
         """
         fastqc --outdir {params.out_dir} \
@@ -63,6 +67,8 @@ rule index:
         out_prefix = genome_ref
     output:
         done = touch(genome_ref)
+    container:
+        config["cfdna_wgs_container"]
     shell:
         """
         bwa index -p {params.out_prefix} {input}
@@ -83,6 +89,8 @@ rule align:
         index = cfdna_wgs_bam_dir + "/raw/{library_id}.bam.bai",
     log:
         cfdna_wgs_log_dir + "/align_{library_id}.log"
+    container:
+        config["cfdna_wgs_container"]
     shell:
         """
         {params.script} \
@@ -104,6 +112,8 @@ rule alignment_qc:
         flagstat = cfdna_wgs_qc_dir + "/{library_id}_flagstat.txt",
     log:
         cfdna_wgs_qc_dir + "/alignment_qc_{library_id}.log",
+    container:
+        config["cfdna_wgs_container"]
     shell:
         """
         samtools stats -@ {params.threads} {input} > {output.samstat} 2>{log}
@@ -123,6 +133,8 @@ rule alignment_filtering:
         bai = cfdna_wgs_bam_dir + "/filt/{library_id}_filt.bam.bai",
     log:
         cfdna_wgs_log_dir + "/{library_id}_alignment_filtering.log",
+    container:
+        config["cfdna_wgs_container"]
     shell:
         """
         {params.script} \
@@ -142,6 +154,8 @@ rule picard_collect_wgs_metrics:
         cfdna_wgs_qc_dir + "/{library_id}_collect_wgs_metrics.txt",
     log:
         cfdna_wgs_log_dir + "/{library_id}_picard_wgs.log",
+    container:
+        config["cfdna_wgs_container"]
     shell:
         """
         {config[cfdna_wgs_script_dir]}/CollectWgsMetrics_wrapper.sh \
@@ -160,6 +174,8 @@ rule deeptools_bamprfragmentsize:
         script = config["cfdna_wgs_script_dir"] + "/bamPEFragmentSize_wrapper.sh",
     output:
         cfdna_wgs_qc_dir + "/{library_id}_deeptools_frag_lengths.txt",
+    container:
+        config["cfdna_wgs_container"]
     shell:
         """
         {params.script} \
@@ -169,7 +185,7 @@ rule deeptools_bamprfragmentsize:
         {output}
         """
 
-rule multiqc:
+rule cfdna_wgs_multiqc:
     input:
         expand(cfdna_wgs_qc_dir + "/{library_id}_{read}_fastqc.html", library_id = LIBRARIES, read = ["R1","R2"]),
         expand(cfdna_wgs_qc_dir + "/{library_id}_proc_{read}_fastqc.html", library_id = LIBRARIES, read = ["R1","R2"]),
@@ -185,6 +201,8 @@ rule multiqc:
         cfdna_wgs_qc_dir + "/all_qc_data/multiqc_samtools_stats.txt",
         cfdna_wgs_qc_dir + "/all_qc_data/multiqc_samtools_flagstat.txt",
 	cfdna_wgs_qc_dir + "/all_qc_data/multiqc_picard_wgsmetrics.txt",
+    container:
+        config["cfdna_wgs_container"]
     shell:
         """
         multiqc {params.out_dir} \
@@ -202,6 +220,8 @@ rule aggregate_frag:
         cfdna_wgs_qc_dir + "/all_frag.tsv",
     log:
         cfdna_wgs_log_dir + "/aggregate_frag.err",
+    container:
+        config["cfdna_wgs_container"]
     shell:
         """
         awk 'FNR>2' {input} > {output} 2> {log}
@@ -226,6 +246,8 @@ checkpoint make_qc_tbl:
         cfdna_wgs_qc_dir + "/read_qc.tsv",
     log:
         cfdna_wgs_log_dir + "/read_qc.log"
+    container:
+        config["cfdna_wgs_container"]
     shell:
         """
         Rscript {params.script} \
@@ -249,6 +271,8 @@ rule downsample_bams:
         cfdna_wgs_bam_dir + "/ds/{library_id}_ds{milreads}.bam",
     log:
         cfdna_wgs_log_dir + "/downsample_bam_{library_id}_{milreads}.err"
+    container:
+        config["cfdna_wgs_container"]
     shell:
         """
         {config[cfdna_wgs_script_dir]}/downsample_bam.sh {input} {wildcards.milreads} {output} 2>{log}

@@ -7,6 +7,7 @@ threads: 4
 data_dir: "test"
 cfdna_wgs_script_dir: "workflow/scripts"
 container: "${HOME}/sing_containers/biotools.1.0.2.sif"
+cfdna_wgs_container: "${HOME}/sing_containers/biotools.1.0.2.sif"
 picard_jar: "/opt/picard/picard.jar"
 
 # Required reference files

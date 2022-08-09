@@ -12,11 +12,11 @@ samblaster: Outputting to stdout
 [M::mem_pestat] low and high boundaries for proper pairs: (1, 470)
 [M::mem_pestat] skip orientation RF as there are not enough pairs
 [M::mem_pestat] skip orientation RR as there are not enough pairs
-[M::mem_process_seqs] Processed 49848 reads in 8.588 CPU sec, 2.786 real sec
+[M::mem_process_seqs] Processed 49848 reads in 2.402 CPU sec, 0.617 real sec
 samblaster: Loaded 1 header sequence entries.
 [main] Version: 0.7.17-r1188
 [main] CMD: bwa mem -M -t 4 test/ref/chr8 test/fastq/cfdna_wgs/processed/lib004_proc_R1.fastq.gz test/fastq/cfdna_wgs/processed/lib004_proc_R2.fastq.gz
-[main] Real time: 3.680 sec; CPU: 8.963 sec
+[main] Real time: 0.827 sec; CPU: 2.524 sec
 samblaster:
 samblaster: Pair Type        Type_ID_Count   %Type/All_IDs Dup_ID_Count  %Dups/Type_ID_Count  %Dups/All_Dups  %Dups/All_IDs
 samblaster: ---------------------------------------------------------------------------------------------------------------
@@ -25,5 +25,5 @@ samblaster: Orphan/Singleton          776         3.113            155          
 samblaster: Both Mapped              1678         6.732            143           8.522            47.987          0.574
 samblaster: Total                   24924       100.000            298           1.196           100.000          1.196
 samblaster:
-samblaster: Marked         298 of      24924 (1.196%) total read ids as duplicates using 3120k memory in 0.091S CPU seconds and 4S wall time.
+samblaster: Marked         298 of      24924 (1.196%) total read ids as duplicates using 3120k memory in 0.032S CPU seconds and 1S wall time.
 [bam_sort_core] merging from 0 files and 4 in-memory blocks...

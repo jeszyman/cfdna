@@ -15,6 +15,9 @@ Samtools	flagstat	lib001_flagstat	/home/jeszyman/repos/cfdna-wgs/test/qc/cfdna_w
 Samtools	flagstat	lib004_flagstat	/home/jeszyman/repos/cfdna-wgs/test/qc/cfdna_wgs/lib004_flagstat.txt
 Samtools	flagstat	lib003_flagstat	/home/jeszyman/repos/cfdna-wgs/test/qc/cfdna_wgs/lib003_flagstat.txt
 Samtools	flagstat	lib002_flagstat	/home/jeszyman/repos/cfdna-wgs/test/qc/cfdna_wgs/lib002_flagstat.txt
+Snippy	snippy	multiqc_sources	/home/jeszyman/repos/cfdna-wgs/test/qc/cfdna_wgs/all_qc_data/multiqc_sources.txt
+Snippy	snippy	multiqc_general_stats	/home/jeszyman/repos/cfdna-wgs/test/qc/cfdna_wgs/all_qc_data/multiqc_general_stats.txt
+Snippy	snippy	multiqc	/home/jeszyman/repos/cfdna-wgs/test/qc/cfdna_wgs/all_qc_data/multiqc.log
 FastQC	all_sections	lib004_proc_R2	/home/jeszyman/repos/cfdna-wgs/test/qc/cfdna_wgs/lib004_proc_R2_fastqc.zip
 FastQC	all_sections	lib002_R1	/home/jeszyman/repos/cfdna-wgs/test/qc/cfdna_wgs/lib002_R1_fastqc.zip
 FastQC	all_sections	lib001_proc_R2	/home/jeszyman/repos/cfdna-wgs/test/qc/cfdna_wgs/lib001_proc_R2_fastqc.zip

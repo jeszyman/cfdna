@@ -86,6 +86,8 @@ rule symlink_inputs:
     output:
         r1 = cfdna_wgs_fastq_dir + "/raw/{library}_R1.fastq.gz",
         r2 = cfdna_wgs_fastq_dir + "/raw/{library}_R2.fastq.gz",
+    container:
+        config["cfdna_wgs_container"]
     shell:
         """
         r2=$(echo {input} | sed "s/_R1/_R2/g")

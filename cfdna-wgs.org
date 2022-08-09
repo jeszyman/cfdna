@@ -844,7 +844,7 @@ def get_ds_candidates(wildcards):
         library_id=test, milreads = MILREADS)
 
 #+end_src
-**** All rule and other out-of-workflow rules
+**** All rule
 #+begin_src snakemake
 
 #########1#########2#########3#########4#########5#########6#########7#########8

@@ -1106,6 +1106,7 @@ Files labeled int_test will run integration testing of all rules on a small data
     - [ ] for coverage, should intersect down to autosomes
   - run and extract mosdepth
     mosdepthRAW = as_tibble(read.table(file.path(repo,"data/all_dedup_coverage.tsv"), header = T, sep = '\t', fill = TRUE))
+*** collectseq metrics only results at >1x, need a lower coverage option
 ** Reference
 :PROPERTIES:
 :header-args: :tangle no

@@ -16,18 +16,18 @@ samblaster: Outputting to stdout
 [M::mem_pestat] low and high boundaries for proper pairs: (1, 495)
 [M::mem_pestat] skip orientation RF as there are not enough pairs
 [M::mem_pestat] skip orientation RR as there are not enough pairs
-[M::mem_process_seqs] Processed 49800 reads in 6.559 CPU sec, 1.746 real sec
+[M::mem_process_seqs] Processed 49800 reads in 7.056 CPU sec, 1.868 real sec
 samblaster: Loaded 1 header sequence entries.
-samblaster:
 [main] Version: 0.7.17-r1188
+[main] CMD: bwa mem -M -t 4 test/ref/chr8 test/fastq/cfdna_wgs/processed/lib003_proc_R1.fastq.gz test/fastq/cfdna_wgs/processed/lib003_proc_R2.fastq.gz
+[main] Real time: 2.153 sec; CPU: 7.182 sec
+samblaster:
 samblaster: Pair Type        Type_ID_Count   %Type/All_IDs Dup_ID_Count  %Dups/Type_ID_Count  %Dups/All_Dups  %Dups/All_IDs
-[main] CMD:samblaster: ---------------------------------------------------------------------------------------------------------------
- bwa mem -M -t 4samblaster: Both Unmapped           22177        89.064              0           0.000             0.000          0.000
- test/ref/chr8 test/fastq/cfdna_wgs/processed/lib003_proc_R1.fastq.gzsamblaster: Orphan/Singleton          771         3.096            172          22.309            50.588          0.691
- test/fastq/cfdna_wgs/processed/lib003_proc_R2.fastq.gzsamblaster: Both Mapped              1952         7.839            168           8.607            49.412          0.675
-
-[main] Real time: 2.024 sec; CPU: 6.662 sec
+samblaster: ---------------------------------------------------------------------------------------------------------------
+samblaster: Both Unmapped           22177        89.064              0           0.000             0.000          0.000
+samblaster: Orphan/Singleton          771         3.096            172          22.309            50.588          0.691
+samblaster: Both Mapped              1952         7.839            168           8.607            49.412          0.675
 samblaster: Total                   24900       100.000            340           1.365           100.000          1.365
 samblaster:
-samblaster: Marked         340 of      24900 (1.365%) total read ids as duplicates using 3260k memory in 0.023S CPU seconds and 2S wall time.
+samblaster: Marked         340 of      24900 (1.365%) total read ids as duplicates using 3188k memory in 0.018S CPU seconds and 2S wall time.
 [bam_sort_core] merging from 0 files and 4 in-memory blocks...

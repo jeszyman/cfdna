@@ -3,11 +3,13 @@
 #  made directly to this file will be overwritten upon tangle from Org-mode.
 
 
-threads: 4
+threads:
+  default: 4
+  bwa: 4
 data_dir: "test"
 cfdna_wgs_script_dir: "workflow/scripts"
-container: "${HOME}/sing_containers/biotools.1.0.2.sif"
-cfdna_wgs_container: "${HOME}/sing_containers/biotools.1.0.2.sif"
+container: "${HOME}/sing_containers/biotools.sif"
+cfdna_wgs_container: "${HOME}/sing_containers/biotools.sif"
 picard_jar: "/opt/picard/picard.jar"
 
 # Required reference files

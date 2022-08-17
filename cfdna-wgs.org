@@ -21,11 +21,13 @@
 #+begin_src bash
 <#bash_preamble#>
 
-threads: 4
+threads:
+  default: 4
+  bwa: 4
 data_dir: "test"
 cfdna_wgs_script_dir: "workflow/scripts"
-container: "${HOME}/sing_containers/biotools.1.0.2.sif"
-cfdna_wgs_container: "${HOME}/sing_containers/biotools.1.0.2.sif"
+container: "${HOME}/sing_containers/biotools.sif"
+cfdna_wgs_container: "${HOME}/sing_containers/biotools.sif"
 picard_jar: "/opt/picard/picard.jar"
 
 # Required reference files
@@ -126,7 +128,7 @@ rule trimmomatic:
         {input.read1} \
         {input.read2} \
         {params.adapter_fasta} \
-        {config[threads]} \
+        {config[threads][default]} \
         {output.read1} \
         {output.read1_unpr} \
         {output.read2} \
@@ -184,10 +186,10 @@ rule fastqc:
         """
         fastqc --outdir {params.out_dir} \
         --quiet \
-        --threads {config[threads]} {input.raw} &> {log}
+        --threads {config[threads][default]} {input.raw} &> {log}
         fastqc --outdir {params.out_dir} \
         --quiet \
-        --threads {config[threads]} {input.proc} &> {log}
+        --threads {config[threads][default]} {input.proc} &> {log}
         """
 #+end_src
 *** DONE Make alignment index                                         :smk_rule:
@@ -219,7 +221,8 @@ rule align:
         r1 = cfdna_wgs_fastq_dir + "/processed/{library_id}_proc_R1.fastq.gz",
         r2 = cfdna_wgs_fastq_dir + "/processed/{library_id}_proc_R2.fastq.gz",
     params:
-        script = config["cfdna_wgs_script_dir"] + "/align.sh"
+        script = config["cfdna_wgs_script_dir"] + "/align.sh",
+        threads = config["threads"]["bwa"]
     output:
         sort = cfdna_wgs_bam_dir + "/raw/{library_id}.bam",
         index = cfdna_wgs_bam_dir + "/raw/{library_id}.bam.bai",
@@ -233,7 +236,7 @@ rule align:
         {input.ref} \
         {input.r1} \
         {input.r2} \
-        {config[threads]} \
+        {params.threads} \
         {output.sort} &> {log}
 	"""
 #+end_src
@@ -256,27 +259,6 @@ bwa mem -M -t $threads \
     samtools sort -@ $threads - -o $output_sort
 samtools index -@ threads $output_sort
 #+end_src
-*** DONE Alignment QC                                                 :smk_rule:
-#+begin_src snakemake
-# Alignment samtools QC
-rule alignment_qc:
-    input:
-        cfdna_wgs_bam_dir + "/raw/{library_id}.bam",
-    params:
-        threads = config["threads"],
-    output:
-        samstat = cfdna_wgs_qc_dir + "/{library_id}_samstats.txt",
-        flagstat = cfdna_wgs_qc_dir + "/{library_id}_flagstat.txt",
-    log:
-        cfdna_wgs_qc_dir + "/alignment_qc_{library_id}.log",
-    container:
-        config["cfdna_wgs_container"]
-    shell:
-        """
-        samtools stats -@ {params.threads} {input} > {output.samstat} 2>{log}
-        samtools flagstat -@ {params.threads} {input} > {output.flagstat} 2>{log}
-        """
-#+end_src
 *** DONE Alignment filtering                                          :smk_rule:
 - Snakemake
   #+begin_src snakemake
@@ -287,7 +269,7 @@ rule alignment_filtering:
     params:
         script = config["cfdna_wgs_script_dir"] + "/alignment_filtering.sh",
         quality = config["qscore"],
-        threads = config["threads"],
+        threads = config["threads"]["default"],
     output:
         bam = cfdna_wgs_bam_dir + "/filt/{library_id}_filt.bam",
         bai = cfdna_wgs_bam_dir + "/filt/{library_id}_filt.bam.bai",
@@ -322,6 +304,27 @@ samtools idxstats ${input} | \
 samtools index ${output}
 
 #+end_src
+*** DONE Alignment QC                                                 :smk_rule:
+#+begin_src snakemake
+# Alignment samtools QC
+rule alignment_qc:
+    input:
+        cfdna_wgs_bam_dir + "/raw/{library_id}.bam",
+    params:
+        threads = config["threads"]["default"],
+    output:
+        samstat = cfdna_wgs_qc_dir + "/{library_id}_samstats.txt",
+        flagstat = cfdna_wgs_qc_dir + "/{library_id}_flagstat.txt",
+    log:
+        cfdna_wgs_qc_dir + "/alignment_qc_{library_id}.log",
+    container:
+        config["cfdna_wgs_container"]
+    shell:
+        """
+        samtools stats -@ {params.threads} {input} > {output.samstat} 2>{log}
+        samtools flagstat -@ {params.threads} {input} > {output.flagstat} 2>{log}
+        """
+#+end_src
 *** DONE Sequencing depth metric(s)                                   :smk_rule:
 - Snakemake
   #+begin_src snakemake
@@ -339,7 +342,7 @@ rule picard_collect_wgs_metrics:
         config["cfdna_wgs_container"]
     shell:
         """
-        {config[cfdna_wgs_script_dir]}/CollectWgsMetrics_wrapper.sh \
+        {params.script} \
         {input} \
         {config[picard_jar]} \
         {config[genome_fasta]} \
@@ -379,7 +382,7 @@ rule deeptools_bamprfragmentsize:
         """
         {params.script} \
         {input} \
-        {config[threads]} \
+        {config[threads][default]} \
         {params[blacklist]} \
         {output}
         """
@@ -758,7 +761,7 @@ else
     sambamba view -s $FACTOR -f bam -l 5 $1 > $3
 fi
 #+end_src
-#+begin_src bash
+  #+begin_src bash
 # Collect only deduped, mapped, paired reads of >q20
 samtools idxstats test/bam/lib001.bam | cut -f 1 | grep -vE 'chrM|_random|chrU|chrEBV|\*' | \
 xargs samtools view -f 1 -F 1284 -q 20 -o /tmp/test.bam test/bam/lib001.bam

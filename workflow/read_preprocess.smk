@@ -26,7 +26,7 @@ rule trimmomatic:
         {input.read1} \
         {input.read2} \
         {params.adapter_fasta} \
-        {config[threads]} \
+        {config[threads][default]} \
         {output.read1} \
         {output.read1_unpr} \
         {output.read2} \
@@ -54,10 +54,10 @@ rule fastqc:
         """
         fastqc --outdir {params.out_dir} \
         --quiet \
-        --threads {config[threads]} {input.raw} &> {log}
+        --threads {config[threads][default]} {input.raw} &> {log}
         fastqc --outdir {params.out_dir} \
         --quiet \
-        --threads {config[threads]} {input.proc} &> {log}
+        --threads {config[threads][default]} {input.proc} &> {log}
         """
 
 rule index:
@@ -83,7 +83,8 @@ rule align:
         r1 = cfdna_wgs_fastq_dir + "/processed/{library_id}_proc_R1.fastq.gz",
         r2 = cfdna_wgs_fastq_dir + "/processed/{library_id}_proc_R2.fastq.gz",
     params:
-        script = config["cfdna_wgs_script_dir"] + "/align.sh"
+        script = config["cfdna_wgs_script_dir"] + "/align.sh",
+        threads = config["threads"]["bwa"]
     output:
         sort = cfdna_wgs_bam_dir + "/raw/{library_id}.bam",
         index = cfdna_wgs_bam_dir + "/raw/{library_id}.bam.bai",
@@ -97,28 +98,9 @@ rule align:
         {input.ref} \
         {input.r1} \
         {input.r2} \
-        {config[threads]} \
+        {params.threads} \
         {output.sort} &> {log}
 	"""
-
-# Alignment samtools QC
-rule alignment_qc:
-    input:
-        cfdna_wgs_bam_dir + "/raw/{library_id}.bam",
-    params:
-        threads = config["threads"],
-    output:
-        samstat = cfdna_wgs_qc_dir + "/{library_id}_samstats.txt",
-        flagstat = cfdna_wgs_qc_dir + "/{library_id}_flagstat.txt",
-    log:
-        cfdna_wgs_qc_dir + "/alignment_qc_{library_id}.log",
-    container:
-        config["cfdna_wgs_container"]
-    shell:
-        """
-        samtools stats -@ {params.threads} {input} > {output.samstat} 2>{log}
-        samtools flagstat -@ {params.threads} {input} > {output.flagstat} 2>{log}
-        """
 
 # Removes unmapped, not primary, and duplicate reads. Additionally, quality filters by config variable.
 rule alignment_filtering:
@@ -127,7 +109,7 @@ rule alignment_filtering:
     params:
         script = config["cfdna_wgs_script_dir"] + "/alignment_filtering.sh",
         quality = config["qscore"],
-        threads = config["threads"],
+        threads = config["threads"]["default"],
     output:
         bam = cfdna_wgs_bam_dir + "/filt/{library_id}_filt.bam",
         bai = cfdna_wgs_bam_dir + "/filt/{library_id}_filt.bam.bai",
@@ -144,6 +126,25 @@ rule alignment_filtering:
         {output.bam} &> {log}
         """
 
+# Alignment samtools QC
+rule alignment_qc:
+    input:
+        cfdna_wgs_bam_dir + "/raw/{library_id}.bam",
+    params:
+        threads = config["threads"]["default"],
+    output:
+        samstat = cfdna_wgs_qc_dir + "/{library_id}_samstats.txt",
+        flagstat = cfdna_wgs_qc_dir + "/{library_id}_flagstat.txt",
+    log:
+        cfdna_wgs_qc_dir + "/alignment_qc_{library_id}.log",
+    container:
+        config["cfdna_wgs_container"]
+    shell:
+        """
+        samtools stats -@ {params.threads} {input} > {output.samstat} 2>{log}
+        samtools flagstat -@ {params.threads} {input} > {output.flagstat} 2>{log}
+        """
+
 # Sequencing depth via Picard
 rule picard_collect_wgs_metrics:
     input:
@@ -158,7 +159,7 @@ rule picard_collect_wgs_metrics:
         config["cfdna_wgs_container"]
     shell:
         """
-        {config[cfdna_wgs_script_dir]}/CollectWgsMetrics_wrapper.sh \
+        {params.script} \
         {input} \
         {config[picard_jar]} \
         {config[genome_fasta]} \
@@ -180,7 +181,7 @@ rule deeptools_bamprfragmentsize:
         """
         {params.script} \
         {input} \
-        {config[threads]} \
+        {config[threads][default]} \
         {params[blacklist]} \
         {output}
         """

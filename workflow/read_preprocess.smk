@@ -89,7 +89,9 @@ rule align:
         sort = cfdna_wgs_bam_dir + "/raw/{library_id}.bam",
         index = cfdna_wgs_bam_dir + "/raw/{library_id}.bam.bai",
     log:
-        cfdna_wgs_log_dir + "/align_{library_id}.log"
+        cfdna_wgs_log_dir + "/align_{library_id}.log",
+    benchmark:
+        cfdna_wgs_log_dir + "/align_{library_id}.benchmark.txt",
     container:
         config["cfdna_wgs_container"]
     shell:
@@ -186,6 +188,55 @@ rule deeptools_bamprfragmentsize:
         {output}
         """
 
+# Make deeptools bamCoverage bedfile
+rule bamcoverage:
+    input:
+        cfdna_wgs_bam_dir + "/filt/{library}_filt.bam",
+    params:
+        bin = "10000",
+        blacklist = config["blacklist"],
+        script = config["cfdna_wgs_script_dir"] + "/bamcoverage.sh",
+    output:
+        cfdna_wgs_qc_dir + "/{library}_bamcoverage.bg",
+    log:
+        cfdna_wgs_log_dir + "/{library}_bamcoverage.log",
+    container:
+        config["cfdna_wgs_container"],
+    shell:
+        """
+        {params.script} \
+        {input} \
+        {params.bin} \
+        {params.blacklist} \
+        {config[threads][default]} \
+        {output} &> {log}
+        """
+
+# deeptools plotCoverage on all filtered bams
+rule plot_coverage:
+    input:
+        expand(cfdna_wgs_bam_dir + "/filt/{library}_filt.bam", library = LIBRARIES),
+    params:
+        blacklist = config["blacklist"],
+        script = config["cfdna_wgs_script_dir"] + "/plot_coverage.sh",
+    output:
+        raw = cfdna_wgs_qc_dir + "/coverage.tsv",
+        plot = cfdna_wgs_qc_dir + "/coverage.pdf",
+    log:
+        cfdna_wgs_log_dir + "/plot_coverage.log",
+    container:
+        config["cfdna_wgs_container"],
+    shell:
+        """
+        bam_string="{input}"
+        {params.script} \
+        "${{bam_string}}" \
+        {params.blacklist} \
+        {config[threads][default]} \
+        {output.raw} \
+        {output.plot} &> {log}
+        """
+
 rule cfdna_wgs_multiqc:
     input:
         expand(cfdna_wgs_qc_dir + "/{library_id}_{read}_fastqc.html", library_id = LIBRARIES, read = ["R1","R2"]),
@@ -193,8 +244,8 @@ rule cfdna_wgs_multiqc:
         expand(cfdna_wgs_qc_dir + "/{library_id}_samstats.txt", library_id = LIBRARIES),
         expand(cfdna_wgs_qc_dir + "/{library_id}_flagstat.txt", library_id = LIBRARIES),
         expand(cfdna_wgs_qc_dir + "/{library_id}_deeptools_frag_lengths.txt", library_id = LIBRARIES),
-        expand(cfdna_wgs_qc_dir + "/{library_id}_deeptools_frag_lengths.txt", library_id = LIBRARIES),
         expand(cfdna_wgs_qc_dir + "/{library_id}_collect_wgs_metrics.txt", library_id = LIBRARIES),
+        cfdna_wgs_qc_dir + "/coverage.tsv",
     params:
         out_dir = cfdna_wgs_qc_dir
     output:

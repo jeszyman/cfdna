@@ -1,32 +1,29 @@
-Sample	FastQC_mqc-generalstats-fastqc-percent_duplicates	FastQC_mqc-generalstats-fastqc-percent_gc	FastQC_mqc-generalstats-fastqc-avg_sequence_length	FastQC_mqc-generalstats-fastqc-percent_fails	FastQC_mqc-generalstats-fastqc-total_sequences	Picard_mqc-generalstats-picard-MEDIAN_COVERAGE	Picard_mqc-generalstats-picard-MEAN_COVERAGE	Picard_mqc-generalstats-picard-SD_COVERAGE	Picard_mqc-generalstats-picard-PCT_30X	Samtools_mqc-generalstats-samtools-flagstat_total	Samtools_mqc-generalstats-samtools-mapped_passed	Samtools_mqc-generalstats-samtools-error_rate	Samtools_mqc-generalstats-samtools-non_primary_alignments	Samtools_mqc-generalstats-samtools-reads_mapped	Samtools_mqc-generalstats-samtools-reads_mapped_percent	Samtools_mqc-generalstats-samtools-reads_properly_paired_percent	Samtools_mqc-generalstats-samtools-reads_MQ0_percent	Samtools_mqc-generalstats-samtools-raw_total_sequences	Snippy_mqc-generalstats-snippy-VariantTotal
-lib001_R1	7.147999999999996	45.0	151.0	8.333333333333332	25000.0														
-lib001_R2	6.652000000000001	45.0	151.0	8.333333333333332	25000.0														
-lib001_filt						0.0	1.673463	9.468032	0.013925										
-lib001_flagstat										46098	5054								
-lib001_proc_R1	5.986956521739131	44.0	127.17608695652174	0.0	23000.0														
-lib001_proc_R2	4.934782608695656	44.0	114.02082608695652	8.333333333333332	23000.0														
-lib001_samstats												0.08195338	98.0	4956.0	10.773913043478261	8.460869565217392	1.1217391304347826	46000.0	
-lib002_R1	6.792000000000002	39.0	151.0	8.333333333333332	25000.0														
-lib002_R2	6.439999999999998	39.0	151.0	8.333333333333332	25000.0														
-lib002_filt						0.0	0.837125	4.682411	0.007213										
-lib002_flagstat										40322	2652								
-lib002_proc_R1	4.030776867709108	38.0	106.98098783817325	0.0	20145.0														
-lib002_proc_R2	5.063291139240505	38.0	115.70220898485977	0.0	20145.0														
-lib002_samstats												0.0781859	32.0	2620.0	6.502854306279474	5.172499379498635	0.7123355671382477	40290.0	
-lib003_R1	11.188000000000002	41.0	101.0	0.0	25000.0														
-lib003_R2	11.0	41.0	101.0	0.0	25000.0														
-lib003_filt						0.0	1.381763	7.907231	0.011562										
-lib003_flagstat										49830	4705								
-lib003_proc_R1	8.369477911646584	41.0	93.67562248995984	0.0	24900.0														
-lib003_proc_R2	7.152610441767067	41.0	90.15024096385542	0.0	24900.0														
-lib003_samstats												0.07889154	30.0	4675.0	9.387550200803213	7.208835341365462	1.176706827309237	49800.0	
-lib004_R1	11.86399999999999	41.0	101.0	0.0	25000.0														
-lib004_R2	11.719999999999999	41.0	101.0	0.0	25000.0														
-lib004_filt						0.0	1.31325	7.476692	0.0118										
-lib004_flagstat										49879	4163								
-lib004_proc_R1	9.123736157920078	41.0	93.84143797143315	0.0	24924.0														
-lib004_proc_R2	7.972235596212485	41.0	90.93945594607607	0.0	24924.0														
-lib004_samstats												0.07802279	31.0	4132.0	8.289199165463007	5.974161450810464	0.8285186968383886	49848.0	
-multiqc																			0
-multiqc_general_stats																			0
-multiqc_sources																			0
+Sample	FastQC_mqc-generalstats-fastqc-percent_duplicates	FastQC_mqc-generalstats-fastqc-percent_gc	FastQC_mqc-generalstats-fastqc-avg_sequence_length	FastQC_mqc-generalstats-fastqc-percent_fails	FastQC_mqc-generalstats-fastqc-total_sequences	Picard_mqc-generalstats-picard-MEDIAN_COVERAGE	Picard_mqc-generalstats-picard-MEAN_COVERAGE	Picard_mqc-generalstats-picard-SD_COVERAGE	Picard_mqc-generalstats-picard-PCT_30X	Samtools_mqc-generalstats-samtools-flagstat_total	Samtools_mqc-generalstats-samtools-mapped_passed	Samtools_mqc-generalstats-samtools-error_rate	Samtools_mqc-generalstats-samtools-non_primary_alignments	Samtools_mqc-generalstats-samtools-reads_mapped	Samtools_mqc-generalstats-samtools-reads_mapped_percent	Samtools_mqc-generalstats-samtools-reads_properly_paired_percent	Samtools_mqc-generalstats-samtools-reads_MQ0_percent	Samtools_mqc-generalstats-samtools-raw_total_sequences
+lib001_R1	7.147999999999996	45.0	151.0	8.333333333333332	25000.0													
+lib001_R2	6.652000000000001	45.0	151.0	8.333333333333332	25000.0													
+lib001_filt						0.0	1.673463	9.468032	0.013925									
+lib001_flagstat										46098	5054							
+lib001_proc_R1	5.986956521739131	44.0	127.17608695652174	0.0	23000.0													
+lib001_proc_R2	4.934782608695656	44.0	114.02082608695652	8.333333333333332	23000.0													
+lib001_samstats												0.08195338	98.0	4956.0	10.773913043478261	8.460869565217392	1.1217391304347826	46000.0
+lib002_R1	6.792000000000002	39.0	151.0	8.333333333333332	25000.0													
+lib002_R2	6.439999999999998	39.0	151.0	8.333333333333332	25000.0													
+lib002_filt						0.0	0.837125	4.682411	0.007213									
+lib002_flagstat										40322	2652							
+lib002_proc_R1	4.030776867709108	38.0	106.98098783817325	0.0	20145.0													
+lib002_proc_R2	5.063291139240505	38.0	115.70220898485977	0.0	20145.0													
+lib002_samstats												0.0781859	32.0	2620.0	6.502854306279474	5.172499379498635	0.7123355671382477	40290.0
+lib003_R1	11.188000000000002	41.0	101.0	0.0	25000.0													
+lib003_R2	11.0	41.0	101.0	0.0	25000.0													
+lib003_filt						0.0	1.381763	7.907231	0.011562									
+lib003_flagstat										49830	4705							
+lib003_proc_R1	8.369477911646584	41.0	93.67562248995984	0.0	24900.0													
+lib003_proc_R2	7.152610441767067	41.0	90.15024096385542	0.0	24900.0													
+lib003_samstats												0.07889154	30.0	4675.0	9.387550200803213	7.208835341365462	1.176706827309237	49800.0
+lib004_R1	11.86399999999999	41.0	101.0	0.0	25000.0													
+lib004_R2	11.719999999999999	41.0	101.0	0.0	25000.0													
+lib004_filt						0.0	1.31325	7.476692	0.0118									
+lib004_flagstat										49879	4163							
+lib004_proc_R1	9.123736157920078	41.0	93.84143797143315	0.0	24924.0													
+lib004_proc_R2	7.972235596212485	41.0	90.93945594607607	0.0	24924.0													
+lib004_samstats												0.07802279	31.0	4132.0	8.289199165463007	5.974161450810464	0.8285186968383886	49848.0

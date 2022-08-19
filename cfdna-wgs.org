@@ -227,7 +227,9 @@ rule align:
         sort = cfdna_wgs_bam_dir + "/raw/{library_id}.bam",
         index = cfdna_wgs_bam_dir + "/raw/{library_id}.bam.bai",
     log:
-        cfdna_wgs_log_dir + "/align_{library_id}.log"
+        cfdna_wgs_log_dir + "/align_{library_id}.log",
+    benchmark:
+        cfdna_wgs_log_dir + "/align_{library_id}.benchmark.txt",
     container:
         config["cfdna_wgs_container"]
     shell:
@@ -325,7 +327,7 @@ rule alignment_qc:
         samtools flagstat -@ {params.threads} {input} > {output.flagstat} 2>{log}
         """
 #+end_src
-*** DONE Sequencing depth metric(s)                                   :smk_rule:
+*** DONE Sequencing depth metrics                                     :smk_rule:
 - Snakemake
   #+begin_src snakemake
 # Sequencing depth via Picard
@@ -581,7 +583,108 @@ exit
       fi
   done
   #+end_src
-*** DONE Multiqc                                                      :smk_rule:
+*** DONE deeptools bamCoverage                                        :smk_rule:
+- Snakemake
+  #+begin_src snakemake
+# Make deeptools bamCoverage bedfile
+rule bamcoverage:
+    input:
+        cfdna_wgs_bam_dir + "/filt/{library}_filt.bam",
+    params:
+        bin = "10000",
+        blacklist = config["blacklist"],
+        script = config["cfdna_wgs_script_dir"] + "/bamcoverage.sh",
+    output:
+        cfdna_wgs_qc_dir + "/{library}_bamcoverage.bg",
+    log:
+        cfdna_wgs_log_dir + "/{library}_bamcoverage.log",
+    container:
+        config["cfdna_wgs_container"],
+    shell:
+        """
+        {params.script} \
+        {input} \
+        {params.bin} \
+        {params.blacklist} \
+        {config[threads][default]} \
+        {output} &> {log}
+        """
+#+end_src
+- [[file:./workflow/scripts/bamcoverage.sh][Shell script]]
+  #+begin_src bash :tangle ./workflow/scripts/bamcoverage.sh
+#!/usr/bin/env bash
+
+in_bam=$1
+bin=$2
+blacklist=$3
+threads=$4
+out_bg=$5
+
+bamCoverage \
+    --bam $in_bam \
+    --binSize $bin \
+    --blackListFileName $blacklist \
+    --effectiveGenomeSize 2913022398 \
+    --extendReads \
+    --ignoreDuplicates \
+    --ignoreForNormalization chrX \
+    --normalizeUsing RPGC \
+    --numberOfProcessors $threads \
+    --outFileFormat bedgraph \
+    --outFileName $out_bg
+#+end_src
+- Reference
+  - https://deeptools.readthedocs.io/en/develop/content/tools/bamCoverage.html#Output
+*** DONE deeptools plotCoverage                                       :smk_rule:
+- Snakemake
+  #+begin_src snakemake
+# deeptools plotCoverage on all filtered bams
+rule plot_coverage:
+    input:
+        expand(cfdna_wgs_bam_dir + "/filt/{library}_filt.bam", library = LIBRARIES),
+    params:
+        blacklist = config["blacklist"],
+        script = config["cfdna_wgs_script_dir"] + "/plot_coverage.sh",
+    output:
+        raw = cfdna_wgs_qc_dir + "/coverage.tsv",
+        plot = cfdna_wgs_qc_dir + "/coverage.pdf",
+    log:
+        cfdna_wgs_log_dir + "/plot_coverage.log",
+    container:
+        config["cfdna_wgs_container"],
+    shell:
+        """
+        bam_string="{input}"
+        {params.script} \
+        "${{bam_string}}" \
+        {params.blacklist} \
+        {config[threads][default]} \
+        {output.raw} \
+        {output.plot} &> {log}
+        """
+#+end_src
+- [[file:./workflow/scripts/plot_coverage.sh][Shell script]]
+  #+begin_src bash :tangle ./workflow/scripts/plot_coverage.sh
+#!/usr/bin/env bash
+in_bam_string=$1
+blacklist=$2
+threads=$3
+out_raw=$4
+out_plot=$5
+
+plotCoverage \
+    --bamfiles $in_bam_string \
+    --blackListFileName $blacklist \
+    --extendReads \
+    --numberOfProcessors $threads \
+    --outRawCounts $out_raw \
+    --plotFile $out_plot \
+    --plotFileFormat pdf \
+    --skipZeros
+
+#+end_src
+
+*** INPROCESS Multiqc                                              :smk_rule:
 - Snakemake
   #+begin_src snakemake
 rule cfdna_wgs_multiqc:
@@ -591,8 +694,8 @@ rule cfdna_wgs_multiqc:
         expand(cfdna_wgs_qc_dir + "/{library_id}_samstats.txt", library_id = LIBRARIES),
         expand(cfdna_wgs_qc_dir + "/{library_id}_flagstat.txt", library_id = LIBRARIES),
         expand(cfdna_wgs_qc_dir + "/{library_id}_deeptools_frag_lengths.txt", library_id = LIBRARIES),
-        expand(cfdna_wgs_qc_dir + "/{library_id}_deeptools_frag_lengths.txt", library_id = LIBRARIES),
         expand(cfdna_wgs_qc_dir + "/{library_id}_collect_wgs_metrics.txt", library_id = LIBRARIES),
+        cfdna_wgs_qc_dir + "/coverage.tsv",
     params:
         out_dir = cfdna_wgs_qc_dir
     output:
@@ -869,6 +972,9 @@ rule all:
         #expand(cfdna_wgs_qc_dir + "/{library_id}_flagstat.txt", library_id = LIBRARIES),
         #expand(cfdna_wgs_qc_dir + "/{library_id}_collect_wgs_metrics.txt", library_id = LIBRARIES),
         #expand(cfdna_wgs_qc_dir + "/{library_id}_deeptools_frag_lengths.txt", library_id = LIBRARIES),
+        #expand(cfdna_wgs_qc_dir + "/{library}_bamcoverage.bg", library = LIBRARIES),
+        #cfdna_wgs_qc_dir + "/coverage.tsv",
+        #cfdna_wgs_qc_dir + "/coverage.pdf",
         #cfdna_wgs_qc_dir + "/all_frag.tsv",
         #
         # Final rules:
@@ -947,6 +1053,7 @@ Master branch of the repository contains most recent developments. Stable versio
 Files labeled int_test will run integration testing of all rules on a small dataset in test/inputs. See config/int_test.yaml for necessary run conditions.
 
 *** Changlog
+- [2022-08-19 Fri] - Version 5.2.0 validated: Adds bamCoverage and plotCoverage from deeptools. Benchmarks BWA.
 - [2022-08-09 Tue] - Version 5.1.0 validated: Added cfdna wgs-specific container for each rule, referenced to config
 - [2022-08-05 Fri] - Version 5.0.0 validated: Added a symlink rule based on python dictionary. Added repo-specific output naming, added checks for sequence type and file readability to input tsv.
 - [2022-06-27 Mon] - Version 4 validated. Further expanded read_qc.tsv table. Removed bam post-processing step and added a more expansive bam filtering step. Updated downsampling to work off filtered alignments.
@@ -955,30 +1062,15 @@ Files labeled int_test will run integration testing of all rules on a small data
 - [2022-06-24 Fri] - Validated version 3 with read number checkpoint for down-sampling.
 - [2022-05-31 Tue] - Conforms to current biotools best practices.
 - [2022-04-29 Fri] - Moved multiqc to integration testing as inputs are dependent on final sample labels. Integration testing works per this commit.
-** Dev
+** :dev:
 :PROPERTIES:
 :header-args: :tangle no
 :END:
-*** TODO v5
-- [X] add symlink from dict
-- [X] add repo specific output naming
-- [X] add sample sheet sequencing type selector
-- [X] add unreadable input checker
-
 *** Ideas
 - Prioritized [2022-06-07 Tue]
-  1. Library QC Dataframe
-  2. Mem cap and performance workup
-  3. deeptools integration to multiqc https://multiqc.info/docs/
-  4. fastqs too small (< 500 Mb)
-     #+begin_src bash :results replace
-   find /mnt/ris/aadel/mpnst/inputs/cappseq-fastq -size -500M
-   #+end_src
-  5. https://snakemake.readthedocs.io/en/stable/snakefiles/rules.html see multiext
+
+- update aggregate qc table
 - expand seq depth metrics
-  - https://gatk.broadinstitute.org/hc/en-us/articles/360037226132-CollectWgsMetrics-Picard-
-  - https://github.com/brentp/mosdepth
-  - https://deeptools.readthedocs.io/en/develop/content/tools/bamCoverage.html#Output
   - using mosdepth
     #+name: mosdepth
     #+begin_src bash
@@ -1107,10 +1199,11 @@ Files labeled int_test will run integration testing of all rules on a small data
   #+end_src
     - Cant calcualte depths off [[file:~/repos/mpnst/data/bam_qc_data/mqc_mosdepth-coverage-per-contig_1.txt]] , d/n allow values under 1
     - [ ] for coverage, should intersect down to autosomes
-  - run and extract mosdepth
-    mosdepthRAW = as_tibble(read.table(file.path(repo,"data/all_dedup_coverage.tsv"), header = T, sep = '\t', fill = TRUE))
-*** collectseq metrics only results at >1x, need a lower coverage option
-** Reference
+    - https://github.com/brentp/mosdepth
+    - run and extract mosdepth
+      mosdepthRAW = as_tibble(read.table(file.path(repo,"data/all_dedup_coverage.tsv"), header = T, sep = '\t', fill = TRUE))
+
+** :ref:
 :PROPERTIES:
 :header-args: :tangle no
 :END:

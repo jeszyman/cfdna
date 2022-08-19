@@ -74,6 +74,9 @@ rule all:
         #expand(cfdna_wgs_qc_dir + "/{library_id}_flagstat.txt", library_id = LIBRARIES),
         #expand(cfdna_wgs_qc_dir + "/{library_id}_collect_wgs_metrics.txt", library_id = LIBRARIES),
         #expand(cfdna_wgs_qc_dir + "/{library_id}_deeptools_frag_lengths.txt", library_id = LIBRARIES),
+        expand(cfdna_wgs_qc_dir + "/{library}_bamcoverage.bg", library = LIBRARIES),
+        cfdna_wgs_qc_dir + "/coverage.tsv",
+        cfdna_wgs_qc_dir + "/coverage.pdf",
         #cfdna_wgs_qc_dir + "/all_frag.tsv",
         #
         # Final rules:

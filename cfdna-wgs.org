@@ -887,7 +887,7 @@ fi
 ** Integration testing                                                  :smk:
 *** [[file:workflow/int_test.smk][Snakefile]]
 :PROPERTIES:
-:header-args:snakemake: :tangle ./workflow/int_test.smk
+:header-args:snakemake: :tangle ./workflow/int_test.smk :tangle-mode (identity #o555)
 :END:
 **** Preamble, variable naming and functions
 #+begin_src snakemake

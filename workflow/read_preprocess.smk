@@ -16,8 +16,8 @@ rule trimmomatic:
         read2 = cfdna_wgs_fastq_dir + "/processed/{library_id}_proc_R2.fastq.gz",
         read2_unpr = cfdna_wgs_fastq_dir + "/unpaired/{library_id}_unpr_R2.fastq.gz",
     log:
-        int = cfdna_wgs_log_dir + "/trimmomatic_trimlog_cfdna_wgs_{library_id}.log",
-        main = cfdna_wgs_log_dir + "/trimmomatic_cfdna_wgs_{library_id}.log",
+        int = config["logdir"] + "/trimmomatic_trimlog_cfdna_wgs_{library_id}.log",
+        main = config["logdir"] + "/trimmomatic_cfdna_wgs_{library_id}.log",
     container:
         config["cfdna_wgs_container"]
     shell:
@@ -46,8 +46,8 @@ rule fastqc:
         raw_html = cfdna_wgs_qc_dir + "/{library_id}_{read}_fastqc.html",
         proc_html = cfdna_wgs_qc_dir + "/{library_id}_proc_{read}_fastqc.html",
     log:
-        raw = cfdna_wgs_log_dir + "/fastqc_raw_{library_id}_{read}.log",
-        proc = cfdna_wgs_log_dir + "/fastqc_proc_{library_id}_{read}.log",
+        raw = config["logdir"] + "/fastqc_raw_{library_id}_{read}.log",
+        proc = config["logdir"] + "/fastqc_proc_{library_id}_{read}.log",
     container:
         config["cfdna_wgs_container"]
     shell:
@@ -89,9 +89,9 @@ rule align:
         sort = cfdna_wgs_bam_dir + "/raw/{library_id}.bam",
         index = cfdna_wgs_bam_dir + "/raw/{library_id}.bam.bai",
     log:
-        cfdna_wgs_log_dir + "/align_{library_id}.log",
+        config["logdir"] + "/align_{library_id}.log",
     benchmark:
-        cfdna_wgs_log_dir + "/align_{library_id}.benchmark.txt",
+        config["logdir"] + "/align_{library_id}.benchmark.txt",
     container:
         config["cfdna_wgs_container"]
     shell:
@@ -116,7 +116,7 @@ rule alignment_filtering:
         bam = cfdna_wgs_bam_dir + "/filt/{library_id}_filt.bam",
         bai = cfdna_wgs_bam_dir + "/filt/{library_id}_filt.bam.bai",
     log:
-        cfdna_wgs_log_dir + "/{library_id}_alignment_filtering.log",
+        config["logdir"] + "/{library_id}_alignment_filtering.log",
     container:
         config["cfdna_wgs_container"]
     shell:
@@ -156,7 +156,7 @@ rule picard_collect_wgs_metrics:
     output:
         cfdna_wgs_qc_dir + "/{library_id}_collect_wgs_metrics.txt",
     log:
-        cfdna_wgs_log_dir + "/{library_id}_picard_wgs.log",
+        config["logdir"] + "/{library_id}_picard_wgs.log",
     container:
         config["cfdna_wgs_container"]
     shell:
@@ -199,7 +199,7 @@ rule bamcoverage:
     output:
         cfdna_wgs_qc_dir + "/{library}_bamcoverage.bg",
     log:
-        cfdna_wgs_log_dir + "/{library}_bamcoverage.log",
+        config["logdir"] + "/{library}_bamcoverage.log",
     container:
         config["cfdna_wgs_container"],
     shell:
@@ -223,7 +223,7 @@ rule plot_coverage:
         raw = cfdna_wgs_qc_dir + "/coverage.tsv",
         plot = cfdna_wgs_qc_dir + "/coverage.pdf",
     log:
-        cfdna_wgs_log_dir + "/plot_coverage.log",
+        config["logdir"] + "/plot_coverage.log",
     container:
         config["cfdna_wgs_container"],
     shell:
@@ -271,7 +271,7 @@ rule aggregate_frag:
     output:
         cfdna_wgs_qc_dir + "/all_frag.tsv",
     log:
-        cfdna_wgs_log_dir + "/aggregate_frag.err",
+        config["logdir"] + "/aggregate_frag.err",
     container:
         config["cfdna_wgs_container"]
     shell:
@@ -297,7 +297,7 @@ checkpoint make_qc_tbl:
     output:
         cfdna_wgs_qc_dir + "/read_qc.tsv",
     log:
-        cfdna_wgs_log_dir + "/read_qc.log"
+        config["logdir"] + "/read_qc.log"
     container:
         config["cfdna_wgs_container"]
     shell:
@@ -322,7 +322,7 @@ rule downsample_bams:
     output:
         cfdna_wgs_bam_dir + "/ds/{library_id}_ds{milreads}.bam",
     log:
-        cfdna_wgs_log_dir + "/downsample_bam_{library_id}_{milreads}.err"
+        config["logdir"] + "/downsample_bam_{library_id}_{milreads}.err"
     container:
         config["cfdna_wgs_container"]
     shell:

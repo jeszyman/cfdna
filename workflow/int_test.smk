@@ -9,7 +9,7 @@ container: config["container"]
 
 # Setup sample name index as a python dictionary
 
-libraries = pd.read_table(config["data_dir"] + "/inputs/libraries.tsv")
+libraries = pd.read_table(config["datadir"] + "/inputs/libraries.tsv")
 
 readable = []
 for x in libraries.file:
@@ -37,11 +37,11 @@ genome_ref = config["genome_fasta"]
 genome_ref = re.sub("inputs", lambda x: 'ref', genome_ref)
 genome_ref = re.sub("\..*$", lambda x: '', genome_ref)
 
-# Directory structure under data_dir:
-cfdna_wgs_fastq_dir = config["data_dir"] + "/fastq/cfdna_wgs"
-cfdna_wgs_bam_dir = config["data_dir"] + "/bam/cfdna_wgs"
-cfdna_wgs_qc_dir = config["data_dir"] + "/qc/cfdna_wgs"
-cfdna_wgs_log_dir = config["data_dir"] + "/logs/cfdna_wgs"
+# Directory structure under datadir:
+cfdna_wgs_fastq_dir = config["datadir"] + "/fastq/cfdna_wgs"
+cfdna_wgs_bam_dir = config["datadir"] + "/bam/cfdna_wgs"
+cfdna_wgs_qc_dir = config["datadir"] + "/qc/cfdna_wgs"
+
 
 # Function acts on read_qc, generated in the workflow, to select libraries for
 # downsampling. Notice library 2 does not downsample because it already has
@@ -74,9 +74,9 @@ rule all:
         #expand(cfdna_wgs_qc_dir + "/{library_id}_flagstat.txt", library_id = LIBRARIES),
         #expand(cfdna_wgs_qc_dir + "/{library_id}_collect_wgs_metrics.txt", library_id = LIBRARIES),
         #expand(cfdna_wgs_qc_dir + "/{library_id}_deeptools_frag_lengths.txt", library_id = LIBRARIES),
-        expand(cfdna_wgs_qc_dir + "/{library}_bamcoverage.bg", library = LIBRARIES),
-        cfdna_wgs_qc_dir + "/coverage.tsv",
-        cfdna_wgs_qc_dir + "/coverage.pdf",
+        #expand(cfdna_wgs_qc_dir + "/{library}_bamcoverage.bg", library = LIBRARIES),
+        #cfdna_wgs_qc_dir + "/coverage.tsv",
+        #cfdna_wgs_qc_dir + "/coverage.pdf",
         #cfdna_wgs_qc_dir + "/all_frag.tsv",
         #
         # Final rules:

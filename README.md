@@ -12,7 +12,7 @@ Files labeled int\_test will run integration testing of all rules on a small dat
 
 # Changlog
 
--   <span class="timestamp-wrapper"><span class="timestamp">[2022-09-08 Thu] </span></span> - Version 5.2.1: some minor name changes
+-   <span class="timestamp-wrapper"><span class="timestamp">[2022-09-08 Thu] </span></span> - Version 5.3.0: some minor name changes
 -   <span class="timestamp-wrapper"><span class="timestamp">[2022-08-19 Fri] </span></span> - Version 5.2.0 validated: Adds bamCoverage and plotCoverage from deeptools. Benchmarks BWA.
 -   <span class="timestamp-wrapper"><span class="timestamp">[2022-08-09 Tue] </span></span> - Version 5.1.0 validated: Added cfdna wgs-specific container for each rule, referenced to config
 -   <span class="timestamp-wrapper"><span class="timestamp">[2022-08-05 Fri] </span></span> - Version 5.0.0 validated: Added a symlink rule based on python dictionary. Added repo-specific output naming, added checks for sequence type and file readability to input tsv.

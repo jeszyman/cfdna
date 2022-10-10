@@ -275,5 +275,5 @@ rule downsample_bams:
         config["cfdna_wgs_container"]
     shell:
         """
-        {config[cfdna_wgs_script_dir]}/downsample_bam.sh {input} {wildcards.milreads} {output} 2>{log}
+        {config[cfdna_wgs_script_dir]}/downsample_bam.sh {input} {wildcards.milreads} {output} {config[threads]} 2>{log}
         """

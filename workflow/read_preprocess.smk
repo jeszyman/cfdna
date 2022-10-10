@@ -2,22 +2,22 @@
 ###   cfDNA WGS Pipeline   ###
 ##############################
 
-# Read trimming per NCI
-rule trimmomatic:
+# Read trimming with fastp
+rule fastp:
     input:
         read1 = cfdna_wgs_fastq_dir + "/raw/{library_id}_R1.fastq.gz",
         read2 =  cfdna_wgs_fastq_dir + "/raw/{library_id}_R2.fastq.gz",
     params:
         adapter_fasta = config["adapter_fastq"],
-	    script = config["cfdna_wgs_script_dir"] + "/trimmomatic_wrapper.sh",
+	    script = config["cfdna_wgs_script_dir"] + "/fastp.sh",
     output:
         read1 = cfdna_wgs_fastq_dir + "/processed/{library_id}_proc_R1.fastq.gz",
         read1_unpr = cfdna_wgs_fastq_dir + "/unpaired/{library_id}_unpr_R1.fastq.gz",
         read2 = cfdna_wgs_fastq_dir + "/processed/{library_id}_proc_R2.fastq.gz",
         read2_unpr = cfdna_wgs_fastq_dir + "/unpaired/{library_id}_unpr_R2.fastq.gz",
     log:
-        int = cfdna_wgs_log_dir + "/trimmomatic_trimlog_cfdna_wgs_{library_id}.log",
-        main = cfdna_wgs_log_dir + "/trimmomatic_cfdna_wgs_{library_id}.log",
+        report_name = cfdna_wgs_qc_dir + "/fastp_report_{library_id}",
+        main = cfdna_wgs_log_dir + "/fastp_{library_id}.log",
     container:
         config["cfdna_wgs_container"]
     shell:
@@ -31,7 +31,7 @@ rule trimmomatic:
         {output.read1_unpr} \
         {output.read2} \
         {output.read2_unpr} \
-        {log.int} \
+        {log.report_name} \
         &> {log.main}
         """
 

@@ -9,7 +9,7 @@ rule trimmomatic:
         read2 =  cfdna_wgs_fastq_dir + "/raw/{library_id}_R2.fastq.gz",
     params:
         adapter_fasta = config["adapter_fastq"],
-	script = config["cfdna_wgs_script_dir"] + "/trimmomatic_wrapper.sh",
+	    script = config["cfdna_wgs_script_dir"] + "/trimmomatic_wrapper.sh",
     output:
         read1 = cfdna_wgs_fastq_dir + "/processed/{library_id}_proc_R1.fastq.gz",
         read1_unpr = cfdna_wgs_fastq_dir + "/unpaired/{library_id}_unpr_R1.fastq.gz",
@@ -54,10 +54,10 @@ rule fastqc:
         """
         fastqc --outdir {params.out_dir} \
         --quiet \
-        --threads {config[threads]} {input.raw} &> {log}
+        --threads {config[threads]} {input.raw} &> {log.raw}
         fastqc --outdir {params.out_dir} \
         --quiet \
-        --threads {config[threads]} {input.proc} &> {log}
+        --threads {config[threads]} {input.proc} &> {log.proc}
         """
 
 rule index:
@@ -200,7 +200,7 @@ rule cfdna_wgs_multiqc:
         cfdna_wgs_qc_dir + "/all_qc_data/multiqc_fastqc.txt",
         cfdna_wgs_qc_dir + "/all_qc_data/multiqc_samtools_stats.txt",
         cfdna_wgs_qc_dir + "/all_qc_data/multiqc_samtools_flagstat.txt",
-	cfdna_wgs_qc_dir + "/all_qc_data/multiqc_picard_wgsmetrics.txt",
+	    cfdna_wgs_qc_dir + "/all_qc_data/multiqc_picard_wgsmetrics.txt",
     container:
         config["cfdna_wgs_container"]
     shell:
@@ -238,7 +238,7 @@ checkpoint make_qc_tbl:
         fq = cfdna_wgs_qc_dir + "/all_qc_data/multiqc_fastqc.txt",
         sam = cfdna_wgs_qc_dir + "/all_qc_data/multiqc_samtools_stats.txt",
         flag = cfdna_wgs_qc_dir + "/all_qc_data/multiqc_samtools_flagstat.txt",
-	picard = cfdna_wgs_qc_dir + "/all_qc_data/multiqc_picard_wgsmetrics.txt",
+	    picard = cfdna_wgs_qc_dir + "/all_qc_data/multiqc_picard_wgsmetrics.txt",
         deeptools = cfdna_wgs_qc_dir + "/all_frag.tsv",
     params:
         script = config["cfdna_wgs_script_dir"] + "/make_qc_tbl.R"

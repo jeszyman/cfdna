@@ -3,24 +3,30 @@
 #  made directly to this file will be overwritten upon tangle from Org-mode.
 
 
+blacklist: "test/inputs/hg38-blacklist.v2.bed"
+
+container:
+  default: "/home/jeszyman//sing_containers/biotools.1.0.2.sif"
+  cfdna_wgs: "/home/jeszyman/sing_containers/cfdna_wgs.1.0.0.sif"
+
+datadir: "test"
+
+genome_fasta: "test/inputs/chr8.fa"
+
+keepbed: "test/inputs/keep.bed"
+
+logdir: "test/logs"
+
+picard_jar: "/opt/picard/picard.jar"
+
+qcdir: "test/qc"
+
+repo:
+  cfdna_wgs: "/home/jeszyman/repos/cfdna-wgs"
+
+scriptdir:
+  cfdna_wgs: "/home/jeszyman/repos/cfdna-wgs/workflow/scripts"
+
 threads:
   default: 4
   bwa: 4
-datadir: "test"
-logdir: "test/logs"
-cfdna_wgs_script_dir: "workflow/scripts"
-container: "${HOME}/sing_containers/biotools.sif"
-cfdna_wgs_container: "${HOME}/sing_containers/biotools.sif"
-picard_jar: "/opt/picard/picard.jar"
-
-# Required reference files
-
-adapter_fastq: "test/inputs/TruSeq3-PE.fa"
-genome_fasta: "test/inputs/chr8.fa"
-blacklist: "test/inputs/hg38-blacklist.v2.bed"
-
-# Required parameters
-MILREADS:
-  - "1"
-
-qscore: "20"

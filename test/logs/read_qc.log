@@ -6,3 +6,19 @@
 ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
 ✖ dplyr::filter() masks stats::filter()
 ✖ dplyr::lag()    masks stats::lag()
+Rows: 756 Columns: 3
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: "\t"
+chr (3): frag_len, frag_count, file
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+Rows: 140000 Columns: 7
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: "\t"
+chr (1): #'chr'
+dbl (6): 'start', 'end', 'lib001_filt.bam', 'lib002_filt.bam', 'lib003_filt....
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+Joining, by = "frag_len"

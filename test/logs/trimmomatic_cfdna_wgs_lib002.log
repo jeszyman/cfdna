@@ -1,7 +1,0 @@
-TrimmomaticPE: Started with arguments:
- -threads 4 -trimlog test/logs/trimmomatic_trimlog_cfdna_wgs_lib002.log test/fastq/cfdna_wgs/raw/lib002_R1.fastq.gz test/fastq/cfdna_wgs/raw/lib002_R2.fastq.gz test/fastq/cfdna_wgs/processed/lib002_proc_R1.fastq.gz test/fastq/cfdna_wgs/unpaired/lib002_unpr_R1.fastq.gz test/fastq/cfdna_wgs/processed/lib002_proc_R2.fastq.gz test/fastq/cfdna_wgs/unpaired/lib002_unpr_R2.fastq.gz ILLUMINACLIP:test/inputs/TruSeq3-PE.fa:2:30:10 LEADING:10 TRAILING:10 MAXINFO:50:0.97 MINLEN:20
-Using PrefixPair: 'TACACTCTTTCCCTACACGACGCTCTTCCGATCT' and 'GTGACTGGAGTTCAGACGTGTGCTCTTCCGATCT'
-ILLUMINACLIP: Using 1 prefix pairs, 0 forward/reverse sequences, 0 forward only sequences, 0 reverse only sequences
-Quality encoding detected as phred33
-Input Read Pairs: 25000 Both Surviving: 20145 (80.58%) Forward Only Surviving: 4855 (19.42%) Reverse Only Surviving: 0 (0.00%) Dropped: 0 (0.00%)
-TrimmomaticPE: Completed successfully

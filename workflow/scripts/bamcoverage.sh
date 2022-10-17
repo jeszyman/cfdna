@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 
 in_bam=$1
-bin=$2
-blacklist=$3
-threads=$4
-out_bg=$5
+bin=$3
+blacklist=$4
+threads=$5
+out_bg=$2
 
 bamCoverage \
     --bam $in_bam \

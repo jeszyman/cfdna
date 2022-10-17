@@ -1,0 +1,74 @@
+
+  /// MultiQC 🔍 | v1.12
+
+|           multiqc | MultiQC Version v1.13 now available!
+|           multiqc | Search path : /home/jeszyman/repos/cfdna-wgs/test/logs/lib001_fastp.json
+|           multiqc | Search path : /home/jeszyman/repos/cfdna-wgs/test/logs/lib002_fastp.json
+|           multiqc | Search path : /home/jeszyman/repos/cfdna-wgs/test/logs/lib003_fastp.json
+|           multiqc | Search path : /home/jeszyman/repos/cfdna-wgs/test/logs/lib004_fastp.json
+|           multiqc | Search path : /home/jeszyman/repos/cfdna-wgs/test/qc/lib001_raw_R1_fastqc.zip
+|           multiqc | Search path : /home/jeszyman/repos/cfdna-wgs/test/qc/lib001_raw_R2_fastqc.zip
+|           multiqc | Search path : /home/jeszyman/repos/cfdna-wgs/test/qc/lib001_processed_R1_fastqc.zip
+|           multiqc | Search path : /home/jeszyman/repos/cfdna-wgs/test/qc/lib001_processed_R2_fastqc.zip
+|           multiqc | Search path : /home/jeszyman/repos/cfdna-wgs/test/qc/lib001_unpaired_R1_fastqc.zip
+|           multiqc | Search path : /home/jeszyman/repos/cfdna-wgs/test/qc/lib001_unpaired_R2_fastqc.zip
+|           multiqc | Search path : /home/jeszyman/repos/cfdna-wgs/test/qc/lib002_raw_R1_fastqc.zip
+|           multiqc | Search path : /home/jeszyman/repos/cfdna-wgs/test/qc/lib002_raw_R2_fastqc.zip
+|           multiqc | Search path : /home/jeszyman/repos/cfdna-wgs/test/qc/lib002_processed_R1_fastqc.zip
+|           multiqc | Search path : /home/jeszyman/repos/cfdna-wgs/test/qc/lib002_processed_R2_fastqc.zip
+|           multiqc | Search path : /home/jeszyman/repos/cfdna-wgs/test/qc/lib002_unpaired_R1_fastqc.zip
+|           multiqc | Search path : /home/jeszyman/repos/cfdna-wgs/test/qc/lib002_unpaired_R2_fastqc.zip
+|           multiqc | Search path : /home/jeszyman/repos/cfdna-wgs/test/qc/lib003_raw_R1_fastqc.zip
+|           multiqc | Search path : /home/jeszyman/repos/cfdna-wgs/test/qc/lib003_raw_R2_fastqc.zip
+|           multiqc | Search path : /home/jeszyman/repos/cfdna-wgs/test/qc/lib003_processed_R1_fastqc.zip
+|           multiqc | Search path : /home/jeszyman/repos/cfdna-wgs/test/qc/lib003_processed_R2_fastqc.zip
+|           multiqc | Search path : /home/jeszyman/repos/cfdna-wgs/test/qc/lib003_unpaired_R1_fastqc.zip
+|           multiqc | Search path : /home/jeszyman/repos/cfdna-wgs/test/qc/lib003_unpaired_R2_fastqc.zip
+|           multiqc | Search path : /home/jeszyman/repos/cfdna-wgs/test/qc/lib004_raw_R1_fastqc.zip
+|           multiqc | Search path : /home/jeszyman/repos/cfdna-wgs/test/qc/lib004_raw_R2_fastqc.zip
+|           multiqc | Search path : /home/jeszyman/repos/cfdna-wgs/test/qc/lib004_processed_R1_fastqc.zip
+|           multiqc | Search path : /home/jeszyman/repos/cfdna-wgs/test/qc/lib004_processed_R2_fastqc.zip
+|           multiqc | Search path : /home/jeszyman/repos/cfdna-wgs/test/qc/lib004_unpaired_R1_fastqc.zip
+|           multiqc | Search path : /home/jeszyman/repos/cfdna-wgs/test/qc/lib004_unpaired_R2_fastqc.zip
+|           multiqc | Search path : /home/jeszyman/repos/cfdna-wgs/test/qc/lib001_raw_flagstat.txt
+|           multiqc | Search path : /home/jeszyman/repos/cfdna-wgs/test/qc/lib001_dedup_flagstat.txt
+|           multiqc | Search path : /home/jeszyman/repos/cfdna-wgs/test/qc/lib001_filt_flagstat.txt
+|           multiqc | Search path : /home/jeszyman/repos/cfdna-wgs/test/qc/lib002_raw_flagstat.txt
+|           multiqc | Search path : /home/jeszyman/repos/cfdna-wgs/test/qc/lib002_dedup_flagstat.txt
+|           multiqc | Search path : /home/jeszyman/repos/cfdna-wgs/test/qc/lib002_filt_flagstat.txt
+|           multiqc | Search path : /home/jeszyman/repos/cfdna-wgs/test/qc/lib003_raw_flagstat.txt
+|           multiqc | Search path : /home/jeszyman/repos/cfdna-wgs/test/qc/lib003_dedup_flagstat.txt
+|           multiqc | Search path : /home/jeszyman/repos/cfdna-wgs/test/qc/lib003_filt_flagstat.txt
+|           multiqc | Search path : /home/jeszyman/repos/cfdna-wgs/test/qc/lib004_raw_flagstat.txt
+|           multiqc | Search path : /home/jeszyman/repos/cfdna-wgs/test/qc/lib004_dedup_flagstat.txt
+|           multiqc | Search path : /home/jeszyman/repos/cfdna-wgs/test/qc/lib004_filt_flagstat.txt
+|           multiqc | Search path : /home/jeszyman/repos/cfdna-wgs/test/qc/lib001_raw_samstats.txt
+|           multiqc | Search path : /home/jeszyman/repos/cfdna-wgs/test/qc/lib001_dedup_samstats.txt
+|           multiqc | Search path : /home/jeszyman/repos/cfdna-wgs/test/qc/lib001_filt_samstats.txt
+|           multiqc | Search path : /home/jeszyman/repos/cfdna-wgs/test/qc/lib002_raw_samstats.txt
+|           multiqc | Search path : /home/jeszyman/repos/cfdna-wgs/test/qc/lib002_dedup_samstats.txt
+|           multiqc | Search path : /home/jeszyman/repos/cfdna-wgs/test/qc/lib002_filt_samstats.txt
+|           multiqc | Search path : /home/jeszyman/repos/cfdna-wgs/test/qc/lib003_raw_samstats.txt
+|           multiqc | Search path : /home/jeszyman/repos/cfdna-wgs/test/qc/lib003_dedup_samstats.txt
+|           multiqc | Search path : /home/jeszyman/repos/cfdna-wgs/test/qc/lib003_filt_samstats.txt
+|           multiqc | Search path : /home/jeszyman/repos/cfdna-wgs/test/qc/lib004_raw_samstats.txt
+|           multiqc | Search path : /home/jeszyman/repos/cfdna-wgs/test/qc/lib004_dedup_samstats.txt
+|           multiqc | Search path : /home/jeszyman/repos/cfdna-wgs/test/qc/lib004_filt_samstats.txt
+|           multiqc | Search path : /home/jeszyman/repos/cfdna-wgs/test/qc/lib001_picard_wgs.txt
+|           multiqc | Search path : /home/jeszyman/repos/cfdna-wgs/test/qc/lib002_picard_wgs.txt
+|           multiqc | Search path : /home/jeszyman/repos/cfdna-wgs/test/qc/lib003_picard_wgs.txt
+|           multiqc | Search path : /home/jeszyman/repos/cfdna-wgs/test/qc/lib004_picard_wgs.txt
+|           multiqc | Search path : /home/jeszyman/repos/cfdna-wgs/test/qc/deeptools_frag_lengths.txt
+|           multiqc | Search path : /home/jeszyman/repos/cfdna-wgs/test/qc/coverage.tsv
+|         searching | ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 58/58  
+|         deeptools | Found 8 total deepTools samples
+|            picard | Found 4 WgsMetrics reports
+|          samtools | Found 12 stats reports
+|          samtools | Found 12 flagstat reports
+|             fastp | Found 4 reports
+|            fastqc | Found 24 reports
+|           multiqc | Compressing plot data
+|           multiqc | Deleting    : test/qc/all_cfdna_wgs_data   (-f was specified)
+|           multiqc | Report      : test/qc/all_cfdna_wgs.html
+|           multiqc | Data        : test/qc/all_cfdna_wgs_data
+|           multiqc | MultiQC complete

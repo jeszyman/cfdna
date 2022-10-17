@@ -12,6 +12,7 @@ Files labeled int\_test will run integration testing of all rules on a small dat
 
 # Changlog
 
+-   <span class="timestamp-wrapper"><span class="timestamp">[2022-10-17 Mon] </span></span> - Version 6.0.0: Using fastp for read trimming (replaces trimmomatic). Simplified naming schema. Removed downsampling (will reinstate in later version).
 -   <span class="timestamp-wrapper"><span class="timestamp">[2022-09-08 Thu] </span></span> - Version 5.3.0: some minor name changes
 -   <span class="timestamp-wrapper"><span class="timestamp">[2022-08-19 Fri] </span></span> - Version 5.2.0 validated: Adds bamCoverage and plotCoverage from deeptools. Benchmarks BWA.
 -   <span class="timestamp-wrapper"><span class="timestamp">[2022-08-09 Tue] </span></span> - Version 5.1.0 validated: Added cfdna wgs-specific container for each rule, referenced to config

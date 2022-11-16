@@ -1,0 +1,9 @@
+Sample	total_passed	total_failed	secondary_passed	secondary_failed	supplementary_passed	supplementary_failed	duplicates_passed	duplicates_failed	mapped_passed	mapped_failed	mapped_passed_pct	mapped_failed_pct	paired in sequencing_passed	paired in sequencing_failed	read1_passed	read1_failed	read2_passed	read2_failed	properly paired_passed	properly paired_failed	properly paired_passed_pct	properly paired_failed_pct	with itself and mate mapped_passed	with itself and mate mapped_failed	singletons_passed	singletons_failed	singletons_passed_pct	singletons_failed_pct	with mate mapped to a different chr_passed	with mate mapped to a different chr_failed	with mate mapped to a different chr (mapQ >= 5)_passed	with mate mapped to a different chr (mapQ >= 5)_failed	flagstat_total
+lib001_filt_flagstat	4137	0	0	0	0	0	0	0	4137	0	100.0	nan	4137	0	2070	0	2067	0	4137	0	100.0	nan	4137	0	0	0	0.0	nan	0	0	0	0	4137
+lib001_raw_flagstat	48857	0	207	0	0	0	0	0	6756	0	13.83	nan	48650	0	24325	0	24325	0	5878	0	12.08	nan	6202	0	347	0	0.71	nan	0	0	0	0	48857
+lib002_filt_flagstat	2987	0	0	0	0	0	0	0	2987	0	100.0	nan	2987	0	1489	0	1498	0	2987	0	100.0	nan	2987	0	0	0	0.0	nan	0	0	0	0	2987
+lib002_raw_flagstat	48868	0	98	0	0	0	0	0	4631	0	9.48	nan	48770	0	24385	0	24385	0	4338	0	8.89	nan	4444	0	89	0	0.18	nan	0	0	0	0	48868
+lib003_filt_flagstat	2379	0	0	0	0	0	0	0	2379	0	100.0	nan	2379	0	1185	0	1194	0	2379	0	100.0	nan	2379	0	0	0	0.0	nan	0	0	0	0	2379
+lib003_raw_flagstat	49764	0	44	0	0	0	0	0	4923	0	9.89	nan	49720	0	24860	0	24860	0	3752	0	7.55	nan	4180	0	699	0	1.41	nan	0	0	0	0	49764
+lib004_filt_flagstat	1610	0	0	0	0	0	0	0	1610	0	100.0	nan	1610	0	807	0	803	0	1610	0	100.0	nan	1610	0	0	0	0.0	nan	0	0	0	0	1610
+lib004_raw_flagstat	49858	0	40	0	0	0	0	0	4781	0	9.59	nan	49818	0	24909	0	24909	0	3936	0	7.9	nan	4158	0	583	0	1.17	nan	0	0	0	0	49858

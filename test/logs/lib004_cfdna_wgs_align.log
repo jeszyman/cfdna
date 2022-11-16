@@ -1,0 +1,20 @@
+[M::bwa_idx_load_from_disk] read 0 ALT contigs
+[M::process] read 49818 sequences (5023280 bp)...
+[M::mem_pestat] # candidate unique pairs for (FF, FR, RF, RR): (8, 103, 6, 14)
+[M::mem_pestat] skip orientation FF as there are not enough pairs
+[M::mem_pestat] analyzing insert size distribution for orientation FR...
+[M::mem_pestat] (25, 50, 75) percentile: (50, 104, 147)
+[M::mem_pestat] low and high boundaries for computing mean and std.dev: (1, 341)
+[M::mem_pestat] mean and std.dev: (96.98, 51.18)
+[M::mem_pestat] low and high boundaries for proper pairs: (1, 438)
+[M::mem_pestat] skip orientation RF as there are not enough pairs
+[M::mem_pestat] analyzing insert size distribution for orientation RR...
+[M::mem_pestat] (25, 50, 75) percentile: (3052, 6314, 8331)
+[M::mem_pestat] low and high boundaries for computing mean and std.dev: (1, 18889)
+[M::mem_pestat] mean and std.dev: (5844.57, 2402.69)
+[M::mem_pestat] low and high boundaries for proper pairs: (1, 24168)
+[M::mem_process_seqs] Processed 49818 reads in 8.285 CPU sec, 2.125 real sec
+[main] Version: 0.7.17-r1188
+[main] CMD: bwa mem -M -t 4 test/ref/chr8 test/analysis/cfdna_wgs_fastqs/lib004_processed_R1.fastq.gz test/analysis/cfdna_wgs_fastqs/lib004_processed_R2.fastq.gz
+[main] Real time: 2.392 sec; CPU: 8.394 sec
+[bam_sort_core] merging from 0 files and 4 in-memory blocks...

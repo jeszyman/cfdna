@@ -1,0 +1,63 @@
+── Attaching packages ─────────────────────────────────────── tidyverse 1.3.1 ──
+✔ ggplot2 3.3.6     ✔ purrr   0.3.4
+✔ tibble  3.1.7     ✔ dplyr   1.0.9
+✔ tidyr   1.2.0     ✔ stringr 1.4.0
+✔ readr   2.1.2     ✔ forcats 0.5.1
+── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+✖ dplyr::filter() masks stats::filter()
+✖ dplyr::lag()    masks stats::lag()
+# A tibble: 4 × 64
+  library Filename_processed Filename_raw Filename_unpaired File.type_processed
+  <chr>   <list>             <list>       <list>            <list>             
+1 lib001  <chr [2]>          <chr [2]>    <chr [2]>         <chr [2]>          
+2 lib002  <chr [2]>          <chr [2]>    <chr [2]>         <chr [2]>          
+3 lib003  <chr [2]>          <chr [2]>    <chr [2]>         <chr [2]>          
+4 lib004  <chr [2]>          <chr [2]>    <chr [2]>         <chr [2]>          
+# … with 59 more variables: File.type_raw <list>, File.type_unpaired <list>,
+#   Encoding_processed <list>, Encoding_raw <list>, Encoding_unpaired <list>,
+#   Total.Sequences_processed <list>, Total.Sequences_raw <list>,
+#   Total.Sequences_unpaired <list>,
+#   Sequences.flagged.as.poor.quality_processed <list>,
+#   Sequences.flagged.as.poor.quality_raw <list>,
+#   Sequences.flagged.as.poor.quality_unpaired <list>, …
+Warning message:
+Values from `adapter_content`, `avg_sequence_length`, `basic_statistics`, `Encoding`, `File.type`, `Filename`, `kmer_content`, `overrepresented_sequences`, `per_base_n_content`, `per_base_sequence_content`, `per_base_sequence_quality`, `per_sequence_gc_content`, `per_sequence_quality_scores`, `per_tile_sequence_quality`, `sequence_duplication_levels`, `sequence_length_distribution`, `Sequence.length`, `Sequences.flagged.as.poor.quality`, `total_deduplicated_percentage`, `Total.Sequences` and `X.GC` are not uniquely identified; output will contain list-cols.
+* Use `values_fn = list` to suppress this warning.
+* Use `values_fn = {summary_fun}` to summarise duplicates.
+* Use the following dplyr code to identify duplicates.
+  {data} %>%
+    dplyr::group_by(library, bam_processing) %>%
+    dplyr::summarise(n = dplyr::n(), .groups = "drop") %>%
+    dplyr::filter(n > 1L) 
+Rows: 8 Columns: 40
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: "\t"
+chr  (1): Sample
+dbl (39): raw_total_sequences, filtered_sequences, sequences, is_sorted, 1st...
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+Rows: 8 Columns: 34
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: "\t"
+chr  (1): Sample
+dbl (33): total_passed, total_failed, secondary_passed, secondary_failed, su...
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+Rows: 756 Columns: 3
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: "\t"
+chr (3): frag_len, frag_count, file
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+Rows: 140000 Columns: 7
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: "\t"
+chr (1): #'chr'
+dbl (6): 'start', 'end', 'lib001_filt.bam', 'lib002_filt.bam', 'lib003_filt....
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+Joining, by = "frag_len"

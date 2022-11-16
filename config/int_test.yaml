@@ -1,19 +1,21 @@
-#  Note: This script is tangled from code blocks in the Emacs Org-mode file at
-#  https://github.com/jeszyman/cfdna-wgs/blob/master/cfdna-wgs.org. Changes
-#  made directly to this file will be overwritten upon tangle from Org-mode.
-
-
 blacklist: "test/inputs/hg38-blacklist.v2.bed"
 
-container:
-  default: "/home/jeszyman//sing_containers/biotools.1.0.2.sif"
-  cfdna_wgs: "/home/jeszyman/sing_containers/cfdna_wgs.1.0.0.sif"
+chrom_sizes: "test/inputs/hg38.chrom.sizes"
 
 datadir: "test"
 
+default_container: "/home/jeszyman/sing_containers/biotools.1.0.2.sif"
+
+frag_distro: "90_150"
+
 genome_fasta: "test/inputs/chr8.fa"
 
-keepbed: "test/inputs/keep.bed"
+milreads: .002
+
+cfdna_wgs_container: "/home/jeszyman/sing_containers/cfdna_wgs.1.0.0.sif"
+cfdna_wgs_repo: "/home/jeszyman/repos/cfdna-wgs"
+
+
 
 logdir: "test/logs"
 
@@ -24,9 +26,6 @@ qcdir: "test/qc"
 repo:
   cfdna_wgs: "/home/jeszyman/repos/cfdna-wgs"
 
-scriptdir:
-  cfdna_wgs: "/home/jeszyman/repos/cfdna-wgs/workflow/scripts"
+cfdna_wgs_scriptdir: "/home/jeszyman/repos/cfdna-wgs/scripts"
 
-threads:
-  default: 4
-  bwa: 4
+threads: 4

@@ -1,0 +1,47 @@
+Detecting adapter sequence for read1...
+No adapter detected for read1
+
+Detecting adapter sequence for read2...
+No adapter detected for read2
+
+Read1 before filtering:
+total reads: 25000
+total bases: 2525000
+Q20 bases: 2506054(99.2497%)
+Q30 bases: 2459097(97.39%)
+
+Read2 before filtering:
+total reads: 25000
+total bases: 2525000
+Q20 bases: 2498188(98.9381%)
+Q30 bases: 2437566(96.5373%)
+
+Read1 after filtering:
+total reads: 24909
+total bases: 2511617
+Q20 bases: 2494313(99.311%)
+Q30 bases: 2448027(97.4682%)
+
+Read2 after filtering:
+total reads: 24909
+total bases: 2511663
+Q20 bases: 2489118(99.1024%)
+Q30 bases: 2429755(96.7389%)
+
+Filtering result:
+reads passed filter: 49818
+reads failed due to low quality: 174
+reads failed due to too many N: 0
+reads failed due to too short: 8
+reads with adapter trimmed: 414
+bases trimmed due to adapters: 8018
+
+Duplication rate: 10.6058%
+
+Insert size peak (evaluated by paired-end reads): 165
+
+JSON report: test/logs/lib004_cfdna_wgs_fastp.json
+HTML report: test/logs/lib004_cfdna_wgs_fastp.html
+
+fastp --detect_adapter_for_pe --failed_out test/analysis/cfdna_wgs_fastqs/lib004_failed_fastp.fastq.gz --in1 test/analysis/cfdna_wgs_fastqs/lib004_raw_R1.fastq.gz --in2 test/analysis/cfdna_wgs_fastqs/lib004_raw_R2.fastq.gz --html test/logs/lib004_cfdna_wgs_fastp.html --json test/logs/lib004_cfdna_wgs_fastp.json --out1 test/analysis/cfdna_wgs_fastqs/lib004_processed_R1.fastq.gz --out2 test/analysis/cfdna_wgs_fastqs/lib004_processed_R2.fastq.gz --unpaired1 test/analysis/cfdna_wgs_fastqs/lib004_unpaired_R1.fastq.gz --unpaired2 test/analysis/cfdna_wgs_fastqs/lib004_unpaired_R2.fastq.gz --thread 4 
+fastp v0.22.0, time used: 2 seconds

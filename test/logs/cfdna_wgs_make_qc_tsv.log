@@ -6,13 +6,15 @@
 ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
 ✖ dplyr::filter() masks stats::filter()
 ✖ dplyr::lag()    masks stats::lag()
-# A tibble: 4 × 64
+# A tibble: 6 × 64
   library Filename_processed Filename_raw Filename_unpaired File.type_processed
   <chr>   <list>             <list>       <list>            <list>             
 1 lib001  <chr [2]>          <chr [2]>    <chr [2]>         <chr [2]>          
 2 lib002  <chr [2]>          <chr [2]>    <chr [2]>         <chr [2]>          
 3 lib003  <chr [2]>          <chr [2]>    <chr [2]>         <chr [2]>          
 4 lib004  <chr [2]>          <chr [2]>    <chr [2]>         <chr [2]>          
+5 lib008  <chr [2]>          <chr [2]>    <chr [2]>         <chr [2]>          
+6 lib009  <chr [2]>          <chr [2]>    <chr [2]>         <chr [2]>          
 # … with 59 more variables: File.type_raw <list>, File.type_unpaired <list>,
 #   Encoding_processed <list>, Encoding_raw <list>, Encoding_unpaired <list>,
 #   Total.Sequences_processed <list>, Total.Sequences_raw <list>,
@@ -29,7 +31,7 @@ Values from `adapter_content`, `avg_sequence_length`, `basic_statistics`, `Encod
     dplyr::group_by(library, bam_processing) %>%
     dplyr::summarise(n = dplyr::n(), .groups = "drop") %>%
     dplyr::filter(n > 1L) 
-Rows: 8 Columns: 40
+Rows: 12 Columns: 40
 ── Column specification ────────────────────────────────────────────────────────
 Delimiter: "\t"
 chr  (1): Sample
@@ -37,7 +39,7 @@ dbl (39): raw_total_sequences, filtered_sequences, sequences, is_sorted, 1st...
 
 ℹ Use `spec()` to retrieve the full column specification for this data.
 ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-Rows: 8 Columns: 34
+Rows: 12 Columns: 34
 ── Column specification ────────────────────────────────────────────────────────
 Delimiter: "\t"
 chr  (1): Sample
@@ -45,18 +47,18 @@ dbl (33): total_passed, total_failed, secondary_passed, secondary_failed, su...
 
 ℹ Use `spec()` to retrieve the full column specification for this data.
 ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-Rows: 756 Columns: 3
+Rows: 1126 Columns: 3
 ── Column specification ────────────────────────────────────────────────────────
 Delimiter: "\t"
 chr (3): frag_len, frag_count, file
 
 ℹ Use `spec()` to retrieve the full column specification for this data.
 ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-Rows: 140000 Columns: 7
+Rows: 140000 Columns: 9
 ── Column specification ────────────────────────────────────────────────────────
 Delimiter: "\t"
 chr (1): #'chr'
-dbl (6): 'start', 'end', 'lib001_filt.bam', 'lib002_filt.bam', 'lib003_filt....
+dbl (8): 'start', 'end', 'lib001_filt.bam', 'lib002_filt.bam', 'lib003_filt....
 
 ℹ Use `spec()` to retrieve the full column specification for this data.
 ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.

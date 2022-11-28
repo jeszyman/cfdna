@@ -1,0 +1,5 @@
+library	bam_file	cohort
+lib001	test/inputs/lib003_hg38.bam	mpnst
+lib002	test/inputs/lib004_hg38.bam	mpnst
+lib003	test/inputs/lib005.bam	healthy
+lib004	test/inputs/lib006.bam	healthy

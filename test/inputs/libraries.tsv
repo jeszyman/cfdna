@@ -1,8 +1,10 @@
 library	cohort	file	library_type	isolation_type	specimen
-lib001	plex	test/inputs/file1_R1.fastq.gz	wgs	cfdna	spec001
+lib001	plex	test/inputs/plex1_R1.fastq.gz	wgs	cfdna	spec001
 lib002	plex	test/inputs/plex2_R1.fastq.gz	wgs	cfdna	spec002
 lib003	mpnst	test/inputs/mpnst1_R1.fastq.gz	wgs	cfdna	spec003
-lib004	mpnst	test/inputs/new_MPNST_R1.fastq.gz	wgs	cfdna	spec003
+lib004	mpnst	test/inputs/mpnst2_R1.fastq.gz	wgs	cfdna	spec003
 lib005	mpnst	test/inputs/willfilt_R1.fastq.gz	meth_wgs	cfdna	spec003
 lib006	plex	test/inputs/willfilt2_R1.fastq.gz	wgs	tissue	spec004
 lib007	plex	unreadable/file	wgs	cfdna	spec010
+lib008	healthy	test/inputs/healthy1_R1.fastq.gz	wgs	cfdna	spec012
+lib009	healthy	test/inputs/healthy2_R1.fastq.gz	wgs	cfdna	spec013

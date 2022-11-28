@@ -15,3 +15,7 @@ input_read2=$(echo $input_read1 | sed "s/_R1/_R2/g")
 
 ln -sf --relative $input_read1 $output_read1
 ln -sf --relative $input_read2 $output_read2
+
+#!/usr/bin/env bash
+input=$1
+output=$2

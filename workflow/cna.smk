@@ -2,14 +2,14 @@
 
 # Filter fragments by length
 rule cfdna_wgs_frag_filt:
-    benchmark: logdir + "/{library}_{milreads}_{frag_distro}_cfdna_wgs_frag_filt.benchmark.txt",
+    benchmark: logdir + "/{library}_{frag_distro}_cfdna_wgs_frag_filt.benchmark.txt",
     container: cfdna_wgs_container,
-    input: analysis + "/cfdna_wgs_bams/{library}_ds{milreads}.bam",
-    log: logdir + "/{library}_{milreads}_{frag_distro}_cfdna_wgs_frag_filt.log",
+    input: cfdna_wgs_cna_in_bams + "/{library}.bam",
+    log: logdir + "/{library}_{frag_distro}_cfdna_wgs_frag_filt.log",
     output:
-        nohead = temp(analysis + "/cfdna_wgs_frag/{library}_ds{milreads}_frag{frag_distro}.nohead"),
-        onlyhead = temp(analysis + "/cfdna_wgs_frag/{library}_ds{milreads}_frag{frag_distro}.only"),
-        final = analysis + "/cfdna_wgs_frag/{library}_ds{milreads}_frag{frag_distro}.bam",
+        nohead = temp(cfdna_wgs_cna_frag_bams + "/{library}_frag{frag_distro}.nohead"),
+        onlyhead = temp(cfdna_wgs_cna_frag_bams + "/{library}_frag{frag_distro}.only"),
+        final = cfdna_wgs_cna_frag_bams + "/{library}_frag{frag_distro}.bam",
     params:
         script = cfdna_wgs_scriptdir + "/frag_filt.sh",
         threads = cfdna_wgs_threads,
@@ -29,18 +29,47 @@ rule cfdna_wgs_frag_filt:
 
 # Use readCounter to create windowed wig from bam file
 rule cfdna_wgs_bam_to_wig:
-    benchmark: logdir + "/{library}_{milreads}_{frag_distro}_cfdna_wgs_bam_to_wig.benchmark.txt",
+    benchmark: logdir + "/{library}_{frag_distro}_cfdna_wgs_bam_to_wig.benchmark.txt",
     container: cfdna_wgs_container,
-    input: analysis + "/cfdna_wgs_frag/{library}_ds{milreads}_frag{frag_distro}.bam",
-    log: logdir + "/{library}_{milreads}_{frag_distro}_cfdna_wgs_bam_to_wig.log",
-    output: analysis + "/cfdna_wgs_frag/{library}_ds{milreads}_frag{frag_distro}.wig",
+    input: cfdna_wgs_cna_frag_bams + "/{library}_frag{frag_distro}.bam",
+    log: logdir + "/{library}_{frag_distro}_cfdna_wgs_bam_to_wig.log",
+    output: cfdna_wgs_cna_wigs + "/{library}_frag{frag_distro}.wig",
     params:
         chrs = chrs,
         script = cfdna_wgs_scriptdir + "/bam_to_wig.sh",
         threads = cfdna_wgs_threads,
     shell:
         """
-        /opt/hmmcopy_utils/bin/readCounter --window 1000000 --quality 20 \
-        --chromosome {params.chrs} \
-        {input} > {output} &> {log}
+        /opt/hmmcopy_utils/bin/readCounter \
+        --chromosome "{params.chrs}" \
+        --quality 20 \
+        --window 1000000 \
+        {input} > {output}
+        """
+
+# Run ichorCNA without a panel of normals
+rule cfdna_wgs_ichor_nopon:
+    input:
+        wig = cfdna_wgs_cna_wigs + "/{library}_frag{frag_distro}.wig",
+    output:
+        cfdna_wgs_cna_ichor_nopon + "/{library}_frag{frag_distro}.cna.seg",
+    params:
+        script = cfdna_wgs_scriptdir + "/MOD_runIchorCNA.R",
+        out_dir = cfdna_wgs_cna_ichor_nopon,
+    container:
+        cfdna_wgs_container,
+    shell:
+        """
+        Rscript {params.script} \
+         --id {wildcards.library}_frag{wildcards.frag_distro} \
+         --WIG {input.wig} \
+         --gcWig /opt/ichorCNA/inst/extdata/gc_hg38_1000kb.wig \
+         --mapWig /opt/ichorCNA/inst/extdata/map_hg38_1000kb.wig \
+         --centromere /opt/ichorCNA/inst/extdata/GRCh38.GCA_000001405.2_centromere_acen.txt \
+         --normal "c(0.95, 0.99, 0.995, 0.999)" \
+         --ploidy "c(2)" \
+         --maxCN 3 \
+         --estimateScPrevalence FALSE \
+         --scStates "c()" \
+         --outDir {params.out_dir}
         """

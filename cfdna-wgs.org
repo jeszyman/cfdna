@@ -2539,6 +2539,7 @@ Files labeled int_test will run integration testing of all rules on a small data
 :PROPERTIES:
 :header-args: :tangle no
 :END:
+- specify file is R1 path in int test
 - filter CNA abberant regions
   - cite:dehner2021
 *** 6.1.0
@@ -2741,6 +2742,7 @@ rule aggregate_frag:
 :PROPERTIES:
 :header-args: :tangle no
 :END:
+- https://github.com/jeszyman/cfdna-wgs
 *** [[id:271b4d5f-727e-496e-b835-8fe9f8655655][Bioinformatics project module]]
 *** [[https://github.com/jeszyman/cfdna-wgs][Github link]]
 *** [[id:13120759-71db-497c-8ed3-1c58e47a7840][Biotools headline]]

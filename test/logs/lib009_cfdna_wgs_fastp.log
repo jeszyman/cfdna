@@ -36,9 +36,9 @@ reads failed due to too short: 38
 reads with adapter trimmed: 212
 bases trimmed due to adapters: 5452
 
-Duplication rate: 8.64728%
+Duplication rate: 8.63133%
 
-Insert size peak (evaluated by paired-end reads): 169
+Insert size peak (evaluated by paired-end reads): 168
 
 JSON report: test/logs/lib009_cfdna_wgs_fastp.json
 HTML report: test/logs/lib009_cfdna_wgs_fastp.html

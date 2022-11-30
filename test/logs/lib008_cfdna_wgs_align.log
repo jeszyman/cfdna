@@ -9,8 +9,8 @@
 [M::mem_pestat] low and high boundaries for proper pairs: (1, 435)
 [M::mem_pestat] skip orientation RF as there are not enough pairs
 [M::mem_pestat] skip orientation RR as there are not enough pairs
-[M::mem_process_seqs] Processed 49608 reads in 2.714 CPU sec, 0.697 real sec
+[M::mem_process_seqs] Processed 49608 reads in 2.743 CPU sec, 0.712 real sec
 [main] Version: 0.7.17-r1188
 [main] CMD: bwa mem -M -t 4 test/ref/chr8.fa test/analysis/cfdna_wgs/fastqs/lib008_processed_R1.fastq.gz test/analysis/cfdna_wgs/fastqs/lib008_processed_R2.fastq.gz
-[main] Real time: 0.941 sec; CPU: 2.837 sec
+[main] Real time: 0.967 sec; CPU: 2.853 sec
 [bam_sort_core] merging from 0 files and 4 in-memory blocks...

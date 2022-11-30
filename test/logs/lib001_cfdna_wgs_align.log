@@ -14,8 +14,8 @@
 [M::mem_pestat] mean and std.dev: (4674.64, 2015.26)
 [M::mem_pestat] low and high boundaries for proper pairs: (1, 14453)
 [M::mem_pestat] skip orientation RR
-[M::mem_process_seqs] Processed 48650 reads in 3.946 CPU sec, 1.043 real sec
+[M::mem_process_seqs] Processed 48650 reads in 3.839 CPU sec, 0.978 real sec
 [main] Version: 0.7.17-r1188
 [main] CMD: bwa mem -M -t 4 test/ref/chr8.fa test/analysis/cfdna_wgs/fastqs/lib001_processed_R1.fastq.gz test/analysis/cfdna_wgs/fastqs/lib001_processed_R2.fastq.gz
-[main] Real time: 1.415 sec; CPU: 4.100 sec
+[main] Real time: 1.298 sec; CPU: 4.007 sec
 [bam_sort_core] merging from 0 files and 4 in-memory blocks...

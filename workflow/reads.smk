@@ -345,22 +345,3 @@ checkpoint cfdna_wgs_make_qc_tsv:
         {output.readqc} \
         {output.fraglen} >& {log}
         """
-
-# Downsample bam file to a set number of reads
-rule cfdna_wgs_downsample:
-    benchmark: logdir + "/{library}_{milreads}_cfdna_wgs_downsample.benchmark.txt",
-    container: cfdna_wgs_container,
-    input: cfdna_wgs_bams + "/{library}_filt.bam",
-    log: logdir + "/{library}_{milreads}_cfdna_wgs_downsample.log",
-    output: cfdna_wgs_bams + "/{library}_ds{milreads}.bam",
-    params:
-        milreads = MILREADS,
-        script = cfdna_wgs_scriptdir + "/downsample.sh",
-        threads = cfdna_wgs_threads,
-    shell:
-        """
-        {params.script} \
-        {input} \
-        {wildcards.milreads} \
-        {output} &> {log}
-        """

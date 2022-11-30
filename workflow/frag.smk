@@ -11,7 +11,6 @@ rule cfdna_wgs_filt_bam_to_frag_bed:
         fasta = genome_fasta,
         script = cfdna_wgs_scriptdir + "/filt_bam_to_frag_bed.sh",
         threads = cfdna_wgs_threads,
-    resources: mem_mb=5000
     shell:
         """
         {params.script} \

@@ -1,4 +1,3 @@
-[W::hts_idx_load2] The index file is older than the data file: test/analysis/cfdna_wgs/bams/lib004_dedup.bam.bai
 [W::hts_itr_regions] Region 'chrM' specifies an unknown reference name. Continue anyway
 [W::hts_itr_regions] Region 'chr21' specifies an unknown reference name. Continue anyway
 [W::hts_itr_regions] Region 'chr1' specifies an unknown reference name. Continue anyway

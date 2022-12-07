@@ -2113,8 +2113,8 @@ mkdir -p $outdir
 
 input_read2="$(echo $input_read1 | sed "s/_R1/_R2/g")"
 
-ln -sf --relative "${input_read1}" "${output_read1}"
-ln -sf --relative "${input_read2} "${output_read2}"
+ln -sf --relative ${input_read1} ${output_read1}
+ln -sf --relative ${input_read2} ${output_read2}
 #+end_src
 **** Includes statements
 #+begin_src snakemake
@@ -2177,7 +2177,7 @@ genome_ref = config["genome_ref"]
 
 
 FRAG_DISTROS = config["frag_distro"]
-MILREADS = config["milreads"]
+
 cfdna_wgs_threads = config["threads"]
 cfdna_wgs_scriptdir = config["cfdna_wgs_scriptdir"]
 analysis = config["datadir"] + "/analysis"
@@ -2458,6 +2458,7 @@ Master branch of the repository contains most recent developments. Stable versio
 Files labeled int_test will run integration testing of all rules on a small dataset in test/inputs. See config/int_test.yaml for necessary run conditions.
 *** Prerequisites for local integration testing
 *** Changelog
+- [2022-12-07 Wed] - Version 7.0.0: Added copy number alteration and DELFI fragmentomics.
 - [2022-10-17 Mon] - Version 6.0.0: Using fastp for read trimming (replaces trimmomatic). Simplified naming schema. Removed downsampling (will reinstate in later version).
 - [2022-09-08 Thu] - Version 5.3.0: some minor name changes
 - [2022-08-19 Fri] - Version 5.2.0 validated: Adds bamCoverage and plotCoverage from deeptools. Benchmarks BWA.

@@ -1,9 +1,9 @@
 [bwa_index] Pack FASTA... 0.00 sec
 [bwa_index] Construct BWT for the packed sequence...
-[bwa_index] 0.02 seconds elapse.
+[bwa_index] 0.03 seconds elapse.
 [bwa_index] Update BWT... 0.00 sec
 [bwa_index] Pack forward-only FASTA... 0.00 sec
 [bwa_index] Construct SA from BWT and Occ... 0.01 sec
 [main] Version: 0.7.17-r1188
 [main] CMD: bwa index -p test/ref/chr8.fa test/inputs/chr8.fa
-[main] Real time: 0.098 sec; CPU: 0.056 sec
+[main] Real time: 0.116 sec; CPU: 0.062 sec

@@ -45,7 +45,7 @@ genome_ref = config["genome_ref"]
 
 
 FRAG_DISTROS = config["frag_distro"]
-MILREADS = config["milreads"]
+
 cfdna_wgs_threads = config["threads"]
 cfdna_wgs_scriptdir = config["cfdna_wgs_scriptdir"]
 analysis = config["datadir"] + "/analysis"

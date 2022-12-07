@@ -36,7 +36,7 @@ reads failed due to too short: 38
 reads with adapter trimmed: 212
 bases trimmed due to adapters: 5452
 
-Duplication rate: 8.63133%
+Duplication rate: 8.63341%
 
 Insert size peak (evaluated by paired-end reads): 168
 

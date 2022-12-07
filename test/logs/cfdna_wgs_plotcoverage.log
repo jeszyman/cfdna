@@ -1,7 +1,34 @@
+[W::hts_idx_load2] The index file is older than the data file: test/analysis/cfdna_wgs/bams/lib002_filt.bam.bai
+[W::hts_idx_load2] The index file is older than the data file: test/analysis/cfdna_wgs/bams/lib002_filt.bam.bai
+[W::hts_idx_load2] The index file is older than the data file: test/analysis/cfdna_wgs/bams/lib002_filt.bam.bai
+[W::hts_idx_load2] [W::hts_idx_load2] The index file is older than the data file: test/analysis/cfdna_wgs/bams/lib002_filt.bam.baiThe index file is older than the data file: test/analysis/cfdna_wgs/bams/lib002_filt.bam.bai
+
+[W::hts_idx_load2] The index file is older than the data file: test/analysis/cfdna_wgs/bams/lib002_filt.bam.bai
+[W::hts_idx_load2] The index file is older than the data file: test/analysis/cfdna_wgs/bams/lib002_filt.bam.bai
+[W::hts_idx_load2] The index file is older than the data file: test/analysis/cfdna_wgs/bams/lib002_filt.bam.bai
+[W::hts_idx_load2] The index file is older than the data file: test/analysis/cfdna_wgs/bams/lib002_filt.bam.bai
+[W::hts_idx_load2] The index file is older than the data file: test/analysis/cfdna_wgs/bams/lib002_filt.bam.bai
+[W::hts_idx_load2] The index file is older than the data file: test/analysis/cfdna_wgs/bams/lib002_filt.bam.bai
+[W::hts_idx_load2] The index file is older than the data file: test/analysis/cfdna_wgs/bams/lib002_filt.bam.bai
+[W::hts_idx_load2] The index file is older than the data file: test/analysis/cfdna_wgs/bams/lib002_filt.bam.bai
+[W::hts_idx_load2] The index file is older than the data file: test/analysis/cfdna_wgs/bams/lib002_filt.bam.bai
+[W::hts_idx_load2] The index file is older than the data file: test/analysis/cfdna_wgs/bams/lib002_filt.bam.bai
+[W::hts_idx_load2] The index file is older than the data file: test/analysis/cfdna_wgs/bams/lib002_filt.bam.bai
+[W::hts_idx_load2] The index file is older than the data file: test/analysis/cfdna_wgs/bams/lib002_filt.bam.bai
+[W::hts_idx_load2] The index file is older than the data file: test/analysis/cfdna_wgs/bams/lib002_filt.bam.bai
+[W::hts_idx_load2] The index file is older than the data file: test/analysis/cfdna_wgs/bams/lib002_filt.bam.bai
+[W::hts_idx_load2] The index file is older than the data file: test/analysis/cfdna_wgs/bams/lib002_filt.bam.bai
+[W::hts_idx_load2] The index file is older than the data file: test/analysis/cfdna_wgs/bams/lib002_filt.bam.bai
+[W::hts_idx_load2] The index file is older than the data file: test/analysis/cfdna_wgs/bams/lib002_filt.bam.bai
+[W::hts_idx_load2] The index file is older than the data file: test/analysis/cfdna_wgs/bams/lib002_filt.bam.bai
+[W::hts_idx_load2] The index file is older than the data file: test/analysis/cfdna_wgs/bams/lib002_filt.bam.bai
+[W::hts_idx_load2] The index file is older than the data file: test/analysis/cfdna_wgs/bams/lib002_filt.bam.bai
+[W::hts_idx_load2] The index file is older than the data file: test/analysis/cfdna_wgs/bams/lib002_filt.bam.bai
+[W::hts_idx_load2] The index file is older than the data file: test/analysis/cfdna_wgs/bams/lib002_filt.bam.bai
 sample	mean	std	min	25%	50%	75%	max
-lib001_filt.bam	20.29	52.63	0	0.0	2.0	12.0	410	
-lib002_filt.bam	12.64	30.53	0	0.0	2.0	9.0	228	
+lib001_filt.bam	20.28	52.62	0	0.0	2.0	12.0	410	
+lib002_filt.bam	12.65	30.59	0	0.0	2.0	9.0	230	
 lib003_filt.bam	13.91	35.74	0	0.0	2.0	8.0	260	
-lib004_filt.bam	9.15	23.82	0	0.0	0.0	6.0	182	
-lib008_filt.bam	15.09	38.29	0	0.0	1.0	10.0	276	
-lib009_filt.bam	8.54	23.18	0	0.0	0.0	4.0	170	
+lib004_filt.bam	9.15	23.80	0	0.0	0.0	6.0	182	
+lib008_filt.bam	15.08	38.27	0	0.0	1.0	10.0	276	
+lib009_filt.bam	8.54	23.19	0	0.0	0.0	4.0	170	

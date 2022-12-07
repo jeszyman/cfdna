@@ -120,6 +120,8 @@ rule cfdna_wgs_fastp:
     params:
         script = cfdna_wgs_scriptdir + "/fastp.sh",
         threads = cfdna_wgs_threads,
+    resources:
+        mem_mb = 500,
     shell:
         """
         {params.script} \
@@ -203,9 +205,9 @@ rule cfdna_wgs_align:
         index = cfdna_wgs_bams + "/{library}_raw.bam.bai",
     params:
         script = cfdna_wgs_scriptdir + "/align.sh",
-        threads = cfdna_wgs_threads,
+        threads = 4,
     resources:
-        mem_mb = 2900,
+        mem_mb = 500,
     shell:
         """
         {params.script} \
@@ -2109,10 +2111,10 @@ outdir="${4}"
 
 mkdir -p $outdir
 
-input_read2=$(echo $input_read1 | sed "s/_R1/_R2/g")
+input_read2="$(echo $input_read1 | sed "s/_R1/_R2/g")"
 
-ln -sf --relative $input_read1 $output_read1
-ln -sf --relative $input_read2 $output_read2
+ln -sf --relative "${input_read1}" "${output_read1}"
+ln -sf --relative "${input_read2} "${output_read2}"
 #+end_src
 **** Includes statements
 #+begin_src snakemake

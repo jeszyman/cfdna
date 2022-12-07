@@ -69,6 +69,8 @@ rule cfdna_wgs_fastp:
     params:
         script = cfdna_wgs_scriptdir + "/fastp.sh",
         threads = cfdna_wgs_threads,
+    resources:
+        mem_mb = 500,
     shell:
         """
         {params.script} \
@@ -98,9 +100,9 @@ rule cfdna_wgs_align:
         index = cfdna_wgs_bams + "/{library}_raw.bam.bai",
     params:
         script = cfdna_wgs_scriptdir + "/align.sh",
-        threads = cfdna_wgs_threads,
+        threads = 4,
     resources:
-        mem_mb = 2900,
+        mem_mb = 500,
     shell:
         """
         {params.script} \

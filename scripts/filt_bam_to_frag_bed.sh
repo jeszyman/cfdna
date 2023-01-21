@@ -10,6 +10,7 @@ output_frag_bed="$4"
 bam_to_frag(){
     # Ensure name-sorted bam file
     samtools sort -@ $threads -n -o - $1 |
+    samtools fixmate -@ $threads -m -r - - |
     # Make bedpe
     bedtools bamtobed -bedpe -i - |
     # Filter any potential non-standard alignments

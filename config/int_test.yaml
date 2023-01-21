@@ -1,24 +1,17 @@
-# common parameters (to be shared across other workflows)
+benchdir: "test/benchmark"
+blklist: "test/inputs/hg38-blacklist.v2.bed"
+cfdna_wgs_container: "/home/jeszyman/sing_containers/cfdna_wgs.1.0.0.sif"
+cfdna_wgs_repo: "/home/jeszyman/repos/cfdna-wgs"
+cfdna_wgs_scriptdir: "/home/jeszyman/repos/cfdna-wgs/scripts"
+chrom_sizes: "test/inputs/hg38.chrom.sizes"
 datadir: "test"
 default_container: "/home/jeszyman/sing_containers/biotools.1.0.2.sif"
+frag_distro:
+  - "90_150"
+  - "80_450"
+gc5mb: "test/inputs/gc5mb.bed"
 genome_fasta: "test/inputs/chr8.fa"
 genome_ref: "test/ref/chr8.fa"
 logdir: "test/logs"
 picard_jar: "/opt/picard/picard.jar"
 threads: 4
-
-# cfdna-wgs-specific parameters
-blacklist: "test/inputs/hg38-blacklist.v2.bed"
-cfdna_wgs_container: "/home/jeszyman/sing_containers/cfdna_wgs.1.0.0.sif"
-cfdna_wgs_repo: "/home/jeszyman/repos/cfdna-wgs"
-chrom_sizes: "test/inputs/hg38.chrom.sizes"
-frag_distro:
-  - "90_150"
-  - "80_450"
-
-
-#########1#########2#########3#########4#########5#########6#########7#########8
-repo:
-  cfdna_wgs: "/home/jeszyman/repos/cfdna-wgs"
-
-cfdna_wgs_scriptdir: "/home/jeszyman/repos/cfdna-wgs/scripts"

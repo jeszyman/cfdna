@@ -1,12 +1,28 @@
-#!/usr/bin/env bash
-output=$1
-declare -a array2=$2
+# For unit testing
+#counts_dir="/home/jeszyman/mpnst/analysis/cfdna-wgs/frag/counts"
+#out_tsv="/home/jeszyman/mpnst/analysis/cfdna-wgs/frag/frag_counts.tsv"
 
-if [ -f $output ]; then \rm $output; fi
+# Define variables
+counts_dir="${1}"
+out_tsv="${2}"
 
-for file in ${array2[@]}; do
+# Remove the existing aggregate file if present
+if [ -f $out_tsv ]; then rm $out_tsv; fi
+#touch $out_tsv
+
+# Make aggregate file
+for file in ${counts_dir}/*;
+do
+    # Add file name to each line
     awk '{{print FILENAME (NF?"\t":"") $0}}' $file |
+        # Modify file name to library id
         sed 's/^.*lib/lib/g' |
         sed 's/_.*_/\t/g' |
-        sed 's/\.bed//g' >> $output
+        # Cleanup "tmp"
+        sed 's/.tmp//g' |
+        # Send to output
+        sed 's/\.bed//g' >> $out_tsv
 done
+
+# Add a header
+sed -i  '1 i\library	len_class	chr	start	end	gc	count' $out_tsv

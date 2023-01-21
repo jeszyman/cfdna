@@ -1,14 +1,20 @@
-# Cell-free DNA whole genome sequencing analysis of copy number alteration
+#########1#########2#########3#########4#########5#########6#########7#########8
+#                                                                              #
+#                    Copy-number Alteration Analysis of                        #
+#                  Cell-free DNA Whole Genome Sequencing                       #
+#                                                                              #
+#                                                                              #
+#########1#########2#########3#########4#########5#########6#########7#########8
 
 # Filter fragments by length
-rule cfdna_wgs_frag_filt:
-    benchmark: logdir + "/{library}_{frag_distro}_cfdna_wgs_frag_filt.benchmark.txt",
+rule cna_frag_filt:
+    benchmark: benchdir + "/{library}_{frag_distro}_cfdna_wgs_frag_filt.benchmark.txt",
     container: cfdna_wgs_container,
     input: cfdna_wgs_cna_in_bams + "/{library}.bam",
     log: logdir + "/{library}_{frag_distro}_cfdna_wgs_frag_filt.log",
     output:
-        nohead = temp(cfdna_wgs_cna_frag_bams + "/{library}_frag{frag_distro}.nohead"),
-        onlyhead = temp(cfdna_wgs_cna_frag_bams + "/{library}_frag{frag_distro}.only"),
+        nohead = temp(cfdna_wgs_cna_frag_bams) + "/{library}_frag{frag_distro}.nohead",
+        onlyhead = temp(cfdna_wgs_cna_frag_bams) + "/{library}_frag{frag_distro}.only",
         final = cfdna_wgs_cna_frag_bams + "/{library}_frag{frag_distro}.bam",
     params:
         script = cfdna_wgs_scriptdir + "/frag_filt.sh",
@@ -28,8 +34,8 @@ rule cfdna_wgs_frag_filt:
         """
 
 # Use readCounter to create windowed wig from bam file
-rule cfdna_wgs_bam_to_wig:
-    benchmark: logdir + "/{library}_{frag_distro}_cfdna_wgs_bam_to_wig.benchmark.txt",
+rule bam_to_wig:
+    benchmark: benchdir + "/{library}_{frag_distro}_cfdna_wgs_bam_to_wig.benchmark.txt",
     container: cfdna_wgs_container,
     input: cfdna_wgs_cna_frag_bams + "/{library}_frag{frag_distro}.bam",
     log: logdir + "/{library}_{frag_distro}_cfdna_wgs_bam_to_wig.log",
@@ -48,7 +54,7 @@ rule cfdna_wgs_bam_to_wig:
         """
 
 # Run ichorCNA without a panel of normals
-rule cfdna_wgs_ichor_nopon:
+rule ichor_nopon:
     input:
         wig = cfdna_wgs_cna_wigs + "/{library}_frag{frag_distro}.wig",
     output:

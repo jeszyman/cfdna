@@ -6,7 +6,7 @@
 49450 + 0 paired in sequencing
 24725 + 0 read1
 24725 + 0 read2
-5160 + 0 properly paired (10.43% : N/A)
+5164 + 0 properly paired (10.44% : N/A)
 5330 + 0 with itself and mate mapped
 743 + 0 singletons (1.50% : N/A)
 0 + 0 with mate mapped to a different chr

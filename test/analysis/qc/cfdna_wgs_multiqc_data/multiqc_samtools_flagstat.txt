@@ -1,13 +1,13 @@
 Sample	total_passed	total_failed	secondary_passed	secondary_failed	supplementary_passed	supplementary_failed	duplicates_passed	duplicates_failed	mapped_passed	mapped_failed	mapped_passed_pct	mapped_failed_pct	paired in sequencing_passed	paired in sequencing_failed	read1_passed	read1_failed	read2_passed	read2_failed	properly paired_passed	properly paired_failed	properly paired_passed_pct	properly paired_failed_pct	with itself and mate mapped_passed	with itself and mate mapped_failed	singletons_passed	singletons_failed	singletons_passed_pct	singletons_failed_pct	with mate mapped to a different chr_passed	with mate mapped to a different chr_failed	with mate mapped to a different chr (mapQ >= 5)_passed	with mate mapped to a different chr (mapQ >= 5)_failed	flagstat_total
-lib001_filt_flagstat	4135	0	0	0	0	0	0	0	4135	0	100.0	nan	4135	0	2069	0	2066	0	4135	0	100.0	nan	4135	0	0	0	0.0	nan	0	0	0	0	4135
-lib001_raw_flagstat	48857	0	207	0	0	0	0	0	6756	0	13.83	nan	48650	0	24325	0	24325	0	5874	0	12.07	nan	6202	0	347	0	0.71	nan	0	0	0	0	48857
-lib002_filt_flagstat	2984	0	0	0	0	0	0	0	2984	0	100.0	nan	2984	0	1487	0	1497	0	2984	0	100.0	nan	2984	0	0	0	0.0	nan	0	0	0	0	2984
-lib002_raw_flagstat	48870	0	100	0	0	0	0	0	4633	0	9.48	nan	48770	0	24385	0	24385	0	4334	0	8.89	nan	4444	0	89	0	0.18	nan	0	0	0	0	48870
-lib003_filt_flagstat	2376	0	0	0	0	0	0	0	2376	0	100.0	nan	2376	0	1184	0	1192	0	2376	0	100.0	nan	2376	0	0	0	0.0	nan	0	0	0	0	2376
-lib003_raw_flagstat	49764	0	44	0	0	0	0	0	4923	0	9.89	nan	49720	0	24860	0	24860	0	3752	0	7.55	nan	4180	0	699	0	1.41	nan	0	0	0	0	49764
-lib004_filt_flagstat	1611	0	0	0	0	0	0	0	1611	0	100.0	nan	1611	0	807	0	804	0	1611	0	100.0	nan	1611	0	0	0	0.0	nan	0	0	0	0	1611
-lib004_raw_flagstat	49857	0	39	0	0	0	0	0	4780	0	9.59	nan	49818	0	24909	0	24909	0	3936	0	7.9	nan	4158	0	583	0	1.17	nan	0	0	0	0	49857
-lib008_filt_flagstat	2648	0	0	0	0	0	0	0	2648	0	100.0	nan	2648	0	1322	0	1326	0	2648	0	100.0	nan	2648	0	0	0	0.0	nan	0	0	0	0	2648
-lib008_raw_flagstat	49643	0	35	0	0	0	0	0	5339	0	10.75	nan	49608	0	24804	0	24804	0	4154	0	8.37	nan	4560	0	744	0	1.5	nan	0	0	0	0	49643
-lib009_filt_flagstat	1417	0	0	0	0	0	0	0	1417	0	100.0	nan	1417	0	716	0	701	0	1417	0	100.0	nan	1417	0	0	0	0.0	nan	0	0	0	0	1417
-lib009_raw_flagstat	49485	0	35	0	0	0	0	0	6108	0	12.34	nan	49450	0	24725	0	24725	0	5160	0	10.43	nan	5330	0	743	0	1.5	nan	0	0	0	0	49485
+lib001_filt_flagstat	4130	0	0	0	0	0	0	0	4130	0	100.0	nan	4130	0	2066	0	2064	0	4130	0	100.0	nan	4130	0	0	0	0.0	nan	0	0	0	0	4130
+lib001_raw_flagstat	48856	0	206	0	0	0	0	0	6755	0	13.83	nan	48650	0	24325	0	24325	0	5872	0	12.07	nan	6202	0	347	0	0.71	nan	0	0	0	0	48856
+lib002_filt_flagstat	2986	0	0	0	0	0	0	0	2986	0	100.0	nan	2986	0	1489	0	1497	0	2986	0	100.0	nan	2986	0	0	0	0.0	nan	0	0	0	0	2986
+lib002_raw_flagstat	48869	0	99	0	0	0	0	0	4632	0	9.48	nan	48770	0	24385	0	24385	0	4336	0	8.89	nan	4444	0	89	0	0.18	nan	0	0	0	0	48869
+lib003_filt_flagstat	2374	0	0	0	0	0	0	0	2374	0	100.0	nan	2374	0	1183	0	1191	0	2374	0	100.0	nan	2374	0	0	0	0.0	nan	0	0	0	0	2374
+lib003_raw_flagstat	49765	0	45	0	0	0	0	0	4924	0	9.89	nan	49720	0	24860	0	24860	0	3750	0	7.54	nan	4180	0	699	0	1.41	nan	0	0	0	0	49765
+lib004_filt_flagstat	1612	0	0	0	0	0	0	0	1612	0	100.0	nan	1612	0	808	0	804	0	1612	0	100.0	nan	1612	0	0	0	0.0	nan	0	0	0	0	1612
+lib004_raw_flagstat	49858	0	40	0	0	0	0	0	4781	0	9.59	nan	49818	0	24909	0	24909	0	3936	0	7.9	nan	4158	0	583	0	1.17	nan	0	0	0	0	49858
+lib008_filt_flagstat	2648	0	0	0	0	0	0	0	2648	0	100.0	nan	2648	0	1321	0	1327	0	2648	0	100.0	nan	2648	0	0	0	0.0	nan	0	0	0	0	2648
+lib008_raw_flagstat	49643	0	35	0	0	0	0	0	5339	0	10.75	nan	49608	0	24804	0	24804	0	4152	0	8.37	nan	4560	0	744	0	1.5	nan	0	0	0	0	49643
+lib009_filt_flagstat	1416	0	0	0	0	0	0	0	1416	0	100.0	nan	1416	0	715	0	701	0	1416	0	100.0	nan	1416	0	0	0	0.0	nan	0	0	0	0	1416
+lib009_raw_flagstat	49485	0	35	0	0	0	0	0	6108	0	12.34	nan	49450	0	24725	0	24725	0	5164	0	10.44	nan	5330	0	743	0	1.5	nan	0	0	0	0	49485

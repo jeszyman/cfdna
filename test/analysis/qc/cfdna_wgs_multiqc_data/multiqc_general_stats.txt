@@ -1,73 +1,73 @@
 Sample	fastp_mqc-generalstats-fastp-pct_duplication	fastp_mqc-generalstats-fastp-after_filtering_q30_rate	fastp_mqc-generalstats-fastp-after_filtering_q30_bases	fastp_mqc-generalstats-fastp-after_filtering_gc_content	fastp_mqc-generalstats-fastp-pct_surviving	fastp_mqc-generalstats-fastp-pct_adapter	Picard_mqc-generalstats-picard-MEDIAN_COVERAGE	Picard_mqc-generalstats-picard-MEAN_COVERAGE	Picard_mqc-generalstats-picard-SD_COVERAGE	Picard_mqc-generalstats-picard-PCT_30X	Samtools_mqc-generalstats-samtools-flagstat_total	Samtools_mqc-generalstats-samtools-mapped_passed	Samtools_mqc-generalstats-samtools-error_rate	Samtools_mqc-generalstats-samtools-non_primary_alignments	Samtools_mqc-generalstats-samtools-reads_mapped	Samtools_mqc-generalstats-samtools-reads_mapped_percent	Samtools_mqc-generalstats-samtools-reads_properly_paired_percent	Samtools_mqc-generalstats-samtools-reads_MQ0_percent	Samtools_mqc-generalstats-samtools-raw_total_sequences	FastQC_mqc-generalstats-fastqc-percent_duplicates	FastQC_mqc-generalstats-fastqc-percent_gc	FastQC_mqc-generalstats-fastqc-avg_sequence_length	FastQC_mqc-generalstats-fastqc-percent_fails	FastQC_mqc-generalstats-fastqc-total_sequences
-lib001_cfdna_wgs_fastp	4.7289200000000005	0.936795	6791429.0	0.450894	97.3	13.420000000000002																		
-lib001_filt							0.0	2.333162	13.381875	0.021663														
-lib001_filt_flagstat											4135	4135												
-lib001_filt_samstats													0.08852235	0.0	4135.0	100.0	100.0	0.0	4135.0					
+lib001_cfdna_wgs_fastp	4.731380000000001	0.936795	6791429.0	0.450894	97.3	13.420000000000002																		
+lib001_filt							0.0	2.3309	13.362987	0.021513														
+lib001_filt_flagstat											4130	4130												
+lib001_filt_samstats													0.08854767	0.0	4130.0	100.0	100.0	0.0	4130.0					
 lib001_processed_R1																				6.7749229188078175	45.0	149.00982528263103	8.333333333333332	24325.0
 lib001_processed_R2																				6.4460431654676285	45.0	149.01977389516958	8.333333333333332	24325.0
 lib001_raw_R1																				7.147999999999996	45.0	151.0	8.333333333333332	25000.0
 lib001_raw_R2																				6.652000000000001	45.0	151.0	8.333333333333332	25000.0
-lib001_raw_flagstat											48857	6756												
-lib001_raw_samstats													0.08764579	207.0	6549.0	13.461459403905446	12.07399794450154	1.2600205549845838	48650.0					
+lib001_raw_flagstat											48856	6755												
+lib001_raw_samstats													0.08767166	206.0	6549.0	13.461459403905446	12.06988694758479	1.2559095580678314	48650.0					
 lib001_unpaired_R1																				2.19560878243513	45.0	149.3453093812375	8.333333333333332	501.0
 lib001_unpaired_R2																				1.3157894736842195	45.0	150.26315789473685	33.33333333333333	76.0
-lib002_cfdna_wgs_fastp	4.43091	0.92485	6516464.0	0.39479	97.54	26.336																		
-lib002_filt							0.0	1.479088	7.948264	0.0141														
-lib002_filt_flagstat											2984	2984												
-lib002_filt_samstats													0.08598813	0.0	2984.0	100.0	100.0	0.0	2984.0					
+lib002_cfdna_wgs_fastp	4.43919	0.92485	6516464.0	0.39479	97.54	26.336																		
+lib002_filt							0.0	1.479675	7.948969	0.0141														
+lib002_filt_flagstat											2986	2986												
+lib002_filt_samstats													0.08596966	0.0	2986.0	100.0	100.0	0.0	2986.0					
 lib002_processed_R1																				6.614722165265533	39.0	144.46143120770967	0.0	24385.0
 lib002_processed_R2																				6.339963092064792	39.0	144.46545007176542	0.0	24385.0
 lib002_raw_R1																				6.792000000000002	39.0	151.0	8.333333333333332	25000.0
 lib002_raw_R2																				6.439999999999998	39.0	151.0	8.333333333333332	25000.0
-lib002_raw_flagstat											48870	4633												
-lib002_raw_samstats													0.08460903	100.0	4533.0	9.29464834939512	8.886610621283577	0.8550338322739388	48770.0					
+lib002_raw_flagstat											48869	4632												
+lib002_raw_samstats													0.08464751	99.0	4533.0	9.29464834939512	8.89071150297314	0.8591347139635022	48770.0					
 lib002_unpaired_R1																				3.25	38.0	147.205	16.666666666666664	400.0
 lib002_unpaired_R2																				2.857142857142861	40.0	146.77142857142857	25.0	140.0
-lib003_cfdna_wgs_fastp	9.72495	0.968923	4857315.0	0.415697	99.44	0.828																		
-lib003_filt							0.0	1.524275	8.856507	0.013662														
-lib003_filt_flagstat											2376	2376												
-lib003_filt_samstats													0.08240654	0.0	2376.0	100.0	100.0	0.0	2376.0					
+lib003_cfdna_wgs_fastp	9.692919999999999	0.968923	4857315.0	0.415697	99.44	0.828																		
+lib003_filt							0.0	1.523	8.844757	0.013662														
+lib003_filt_flagstat											2374	2374												
+lib003_filt_samstats													0.08244192	0.0	2374.0	100.0	100.0	0.0	2374.0					
 lib003_processed_R1																				11.170555108608198	41.0	99.83226065969428	0.0	24860.0
 lib003_processed_R2																				11.025744167337095	41.0	99.83065164923572	0.0	24860.0
 lib003_raw_R1																				11.188000000000002	41.0	101.0	0.0	25000.0
 lib003_raw_R2																				11.0	41.0	101.0	0.0	25000.0
-lib003_raw_flagstat											49764	4923												
-lib003_raw_samstats													0.08091028	44.0	4879.0	9.812952534191473	7.546259050683829	0.8930008045052293	49720.0					
+lib003_raw_flagstat											49765	4924												
+lib003_raw_samstats													0.08085473	45.0	4879.0	9.812952534191473	7.54223652453741	0.8869670152855993	49720.0					
 lib003_unpaired_R1																				6.837606837606842	46.0	96.41025641025641	16.666666666666664	117.0
 lib003_unpaired_R2																				0.0	52.0	101.0	25.0	23.0
-lib004_cfdna_wgs_fastp	10.604700000000001	0.971035	4877782.0	0.412003	99.636	0.828																		
-lib004_filt							0.0	1.013075	5.916362	0.009763														
-lib004_filt_flagstat											1611	1611												
-lib004_filt_samstats													0.07927923	0.0	1611.0	100.0	100.0	0.0	1611.0					
+lib004_cfdna_wgs_fastp	10.592799999999999	0.971035	4877782.0	0.412003	99.636	0.828																		
+lib004_filt							0.0	1.0156	5.936813	0.009787														
+lib004_filt_flagstat											1612	1612												
+lib004_filt_samstats													0.0793327	0.0	1612.0	100.0	100.0	0.0	1612.0					
 lib004_processed_R1																				11.875225821992046	41.0	99.83628407402946	0.0	24909.0
 lib004_processed_R2																				11.754787426231488	41.0	99.83821108836163	0.0	24909.0
 lib004_raw_R1																				11.86399999999999	41.0	101.0	0.0	25000.0
 lib004_raw_R2																				11.719999999999999	41.0	101.0	0.0	25000.0
-lib004_raw_flagstat											49857	4780												
-lib004_raw_samstats													0.0797407	39.0	4741.0	9.516640571680918	7.900758761893291	1.26058854229395	49818.0					
+lib004_raw_flagstat											49858	4781												
+lib004_raw_samstats													0.07956151	40.0	4741.0	9.516640571680918	7.900758761893291	1.264603155485969	49818.0					
 lib004_unpaired_R1																				7.142857142857139	46.0	98.5	33.33333333333333	70.0
 lib004_unpaired_R2																				0.0	48.0	101.0	25.0	21.0
-lib008_cfdna_wgs_fastp	8.32799	0.967817	4843605.0	0.420134	99.21600000000001	0.42																		
-lib008_filt							0.0	1.650462	9.459391	0.0156														
+lib008_cfdna_wgs_fastp	8.31598	0.967817	4843605.0	0.420134	99.21600000000001	0.42																		
+lib008_filt							0.0	1.651012	9.467993	0.01555														
 lib008_filt_flagstat											2648	2648												
-lib008_filt_samstats													0.08187395	0.0	2648.0	100.0	100.0	0.0	2648.0					
+lib008_filt_samstats													0.08187728	0.0	2648.0	100.0	100.0	0.0	2648.0					
 lib008_processed_R1																				9.687953555878082	42.0	99.88687308498629	0.0	24804.0
 lib008_processed_R2																				9.655700693436543	41.0	99.88655055636188	0.0	24804.0
 lib008_raw_R1																				9.707999999999998	42.0	101.0	0.0	25000.0
 lib008_raw_R2																				9.676000000000002	42.0	101.0	0.0	25000.0
 lib008_raw_flagstat											49643	5339												
-lib008_raw_samstats													0.07941099	35.0	5304.0	10.69182389937107	8.37364941138526	1.0119335591033705	49608.0					
+lib008_raw_samstats													0.07943485	35.0	5304.0	10.69182389937107	8.369617803580068	1.0119335591033705	49608.0					
 lib008_unpaired_R1																				6.060606060606062	46.0	96.67878787878787	16.666666666666664	165.0
 lib008_unpaired_R2																				3.448275862068968	51.0	97.10344827586206	25.0	29.0
-lib009_cfdna_wgs_fastp	8.63341	0.969197	4834760.0	0.444227	98.9	0.424																		
-lib009_filt							0.0	0.9779	5.928451	0.010512														
-lib009_filt_flagstat											1417	1417												
-lib009_filt_samstats													0.08295314	0.0	1417.0	100.0	100.0	0.0	1417.0					
+lib009_cfdna_wgs_fastp	8.62387	0.969197	4834760.0	0.444227	98.9	0.424																		
+lib009_filt							0.0	0.978038	5.939886	0.010512														
+lib009_filt_flagstat											1416	1416												
+lib009_filt_samstats													0.08295482	0.0	1416.0	100.0	100.0	0.0	1416.0					
 lib009_processed_R1																				10.062689585439841	44.0	99.88586450960567	8.333333333333332	24725.0
 lib009_processed_R2																				9.961577350859457	44.0	99.87518705763398	8.333333333333332	24725.0
 lib009_raw_R1																				10.272000000000006	44.0	101.0	8.333333333333332	25000.0
 lib009_raw_R2																				9.956000000000003	44.0	101.0	8.333333333333332	25000.0
 lib009_raw_flagstat											49485	6108												
-lib009_raw_samstats													0.08127347	35.0	6073.0	12.281092012133469	10.434782608695652	1.904954499494439	49450.0					
+lib009_raw_samstats													0.08128919	35.0	6073.0	12.281092012133469	10.442871587462083	1.9089989888776544	49450.0					
 lib009_unpaired_R1																				26.556016597510364	48.0	90.78008298755186	25.0	241.0
 lib009_unpaired_R2																				0.0	51.0	101.0	25.0	31.0

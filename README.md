@@ -1,17 +1,24 @@
+-   documentation
+    -   getting started
+        -   software in sing container, bild from docker- see
+    -   limitations - no check on bwa memory fails
+
 
 # Introduction
 
 This repository has a snakemake workflow for basic processing of whole-genome sequencing reads from cell-free DNA.
 
-![img](resources/int_test.png)
+![img](resources/cna_frag_int.test.png)
 
 Master branch of the repository contains most recent developments. Stable versions are saved as terminal branches (*e.g.* stable1.0.0).
 
-Files labeled int\_test will run integration testing of all rules on a small dataset in test/inputs. See config/int\_test.yaml for necessary run conditions.
+Directory workflow contains process-focused snakefiles (reads.smk, cna.smk, frag.smk) suitable for integration into another snakemake pipeline using the :include command. The \_int\_test snakefiles are examples of such integration. See config/int\_test.yaml for necessary run conditions.
 
 
-# Changlog
+# Changelog
 
+-   <span class="timestamp-wrapper"><span class="timestamp">[2023-01-21 Sat] </span></span> - Version 8.0.0: Corrected rule filt\_bam\_to\_frag\_bed to fix mates of inputs, which seems to prevent errors in the bamtobed call. Frag\_window\_count now uses windows of consistent 5 Mb size, which are generated from rule make\_gc\_map\_bind. Added a merged fragment counts file and zero-centered unit SD counts.
+-   <span class="timestamp-wrapper"><span class="timestamp">[2022-12-07 Wed] </span></span> - Version 7.0.0: Added copy number alteration and DELFI fragmentomics.
 -   <span class="timestamp-wrapper"><span class="timestamp">[2022-10-17 Mon] </span></span> - Version 6.0.0: Using fastp for read trimming (replaces trimmomatic). Simplified naming schema. Removed downsampling (will reinstate in later version).
 -   <span class="timestamp-wrapper"><span class="timestamp">[2022-09-08 Thu] </span></span> - Version 5.3.0: some minor name changes
 -   <span class="timestamp-wrapper"><span class="timestamp">[2022-08-19 Fri] </span></span> - Version 5.2.0 validated: Adds bamCoverage and plotCoverage from deeptools. Benchmarks BWA.

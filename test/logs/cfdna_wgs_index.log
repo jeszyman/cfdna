@@ -6,4 +6,4 @@
 [bwa_index] Construct SA from BWT and Occ... 0.01 sec
 [main] Version: 0.7.17-r1188
 [main] CMD: bwa index -p test/ref/chr8.fa test/inputs/chr8.fa
-[main] Real time: 0.116 sec; CPU: 0.062 sec
+[main] Real time: 0.107 sec; CPU: 0.065 sec

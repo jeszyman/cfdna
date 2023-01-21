@@ -6,7 +6,7 @@ Size	Occurrences	Sample
 20	23	test/analysis/cfdna_wgs/bams/lib001_filt.bam
 21	14	test/analysis/cfdna_wgs/bams/lib001_filt.bam
 22	11	test/analysis/cfdna_wgs/bams/lib001_filt.bam
-23	7	test/analysis/cfdna_wgs/bams/lib001_filt.bam
+23	6	test/analysis/cfdna_wgs/bams/lib001_filt.bam
 24	8	test/analysis/cfdna_wgs/bams/lib001_filt.bam
 25	2	test/analysis/cfdna_wgs/bams/lib001_filt.bam
 26	8	test/analysis/cfdna_wgs/bams/lib001_filt.bam
@@ -36,7 +36,7 @@ Size	Occurrences	Sample
 50	5	test/analysis/cfdna_wgs/bams/lib001_filt.bam
 51	5	test/analysis/cfdna_wgs/bams/lib001_filt.bam
 52	11	test/analysis/cfdna_wgs/bams/lib001_filt.bam
-53	11	test/analysis/cfdna_wgs/bams/lib001_filt.bam
+53	10	test/analysis/cfdna_wgs/bams/lib001_filt.bam
 54	6	test/analysis/cfdna_wgs/bams/lib001_filt.bam
 55	5	test/analysis/cfdna_wgs/bams/lib001_filt.bam
 56	11	test/analysis/cfdna_wgs/bams/lib001_filt.bam
@@ -81,7 +81,7 @@ Size	Occurrences	Sample
 95	3	test/analysis/cfdna_wgs/bams/lib001_filt.bam
 96	7	test/analysis/cfdna_wgs/bams/lib001_filt.bam
 97	14	test/analysis/cfdna_wgs/bams/lib001_filt.bam
-98	13	test/analysis/cfdna_wgs/bams/lib001_filt.bam
+98	12	test/analysis/cfdna_wgs/bams/lib001_filt.bam
 99	8	test/analysis/cfdna_wgs/bams/lib001_filt.bam
 100	7	test/analysis/cfdna_wgs/bams/lib001_filt.bam
 101	11	test/analysis/cfdna_wgs/bams/lib001_filt.bam
@@ -215,7 +215,7 @@ Size	Occurrences	Sample
 22	6	test/analysis/cfdna_wgs/bams/lib002_filt.bam
 23	6	test/analysis/cfdna_wgs/bams/lib002_filt.bam
 24	13	test/analysis/cfdna_wgs/bams/lib002_filt.bam
-25	7	test/analysis/cfdna_wgs/bams/lib002_filt.bam
+25	8	test/analysis/cfdna_wgs/bams/lib002_filt.bam
 26	14	test/analysis/cfdna_wgs/bams/lib002_filt.bam
 27	12	test/analysis/cfdna_wgs/bams/lib002_filt.bam
 28	5	test/analysis/cfdna_wgs/bams/lib002_filt.bam
@@ -227,8 +227,8 @@ Size	Occurrences	Sample
 34	10	test/analysis/cfdna_wgs/bams/lib002_filt.bam
 35	10	test/analysis/cfdna_wgs/bams/lib002_filt.bam
 36	13	test/analysis/cfdna_wgs/bams/lib002_filt.bam
-37	5	test/analysis/cfdna_wgs/bams/lib002_filt.bam
-38	11	test/analysis/cfdna_wgs/bams/lib002_filt.bam
+37	4	test/analysis/cfdna_wgs/bams/lib002_filt.bam
+38	12	test/analysis/cfdna_wgs/bams/lib002_filt.bam
 39	11	test/analysis/cfdna_wgs/bams/lib002_filt.bam
 40	8	test/analysis/cfdna_wgs/bams/lib002_filt.bam
 41	9	test/analysis/cfdna_wgs/bams/lib002_filt.bam
@@ -499,7 +499,7 @@ Size	Occurrences	Sample
 133	9	test/analysis/cfdna_wgs/bams/lib003_filt.bam
 134	6	test/analysis/cfdna_wgs/bams/lib003_filt.bam
 135	10	test/analysis/cfdna_wgs/bams/lib003_filt.bam
-136	12	test/analysis/cfdna_wgs/bams/lib003_filt.bam
+136	11	test/analysis/cfdna_wgs/bams/lib003_filt.bam
 137	9	test/analysis/cfdna_wgs/bams/lib003_filt.bam
 138	10	test/analysis/cfdna_wgs/bams/lib003_filt.bam
 139	8	test/analysis/cfdna_wgs/bams/lib003_filt.bam
@@ -584,7 +584,7 @@ Size	Occurrences	Sample
 21	9	test/analysis/cfdna_wgs/bams/lib004_filt.bam
 22	8	test/analysis/cfdna_wgs/bams/lib004_filt.bam
 23	2	test/analysis/cfdna_wgs/bams/lib004_filt.bam
-24	3	test/analysis/cfdna_wgs/bams/lib004_filt.bam
+24	4	test/analysis/cfdna_wgs/bams/lib004_filt.bam
 25	4	test/analysis/cfdna_wgs/bams/lib004_filt.bam
 26	5	test/analysis/cfdna_wgs/bams/lib004_filt.bam
 28	1	test/analysis/cfdna_wgs/bams/lib004_filt.bam
@@ -786,7 +786,7 @@ Size	Occurrences	Sample
 44	1	test/analysis/cfdna_wgs/bams/lib008_filt.bam
 45	5	test/analysis/cfdna_wgs/bams/lib008_filt.bam
 46	4	test/analysis/cfdna_wgs/bams/lib008_filt.bam
-47	2	test/analysis/cfdna_wgs/bams/lib008_filt.bam
+47	3	test/analysis/cfdna_wgs/bams/lib008_filt.bam
 48	3	test/analysis/cfdna_wgs/bams/lib008_filt.bam
 49	3	test/analysis/cfdna_wgs/bams/lib008_filt.bam
 50	4	test/analysis/cfdna_wgs/bams/lib008_filt.bam
@@ -794,7 +794,7 @@ Size	Occurrences	Sample
 52	4	test/analysis/cfdna_wgs/bams/lib008_filt.bam
 53	2	test/analysis/cfdna_wgs/bams/lib008_filt.bam
 54	1	test/analysis/cfdna_wgs/bams/lib008_filt.bam
-55	2	test/analysis/cfdna_wgs/bams/lib008_filt.bam
+55	1	test/analysis/cfdna_wgs/bams/lib008_filt.bam
 56	3	test/analysis/cfdna_wgs/bams/lib008_filt.bam
 57	3	test/analysis/cfdna_wgs/bams/lib008_filt.bam
 58	1	test/analysis/cfdna_wgs/bams/lib008_filt.bam
@@ -838,7 +838,7 @@ Size	Occurrences	Sample
 96	5	test/analysis/cfdna_wgs/bams/lib008_filt.bam
 97	6	test/analysis/cfdna_wgs/bams/lib008_filt.bam
 98	10	test/analysis/cfdna_wgs/bams/lib008_filt.bam
-99	6	test/analysis/cfdna_wgs/bams/lib008_filt.bam
+99	5	test/analysis/cfdna_wgs/bams/lib008_filt.bam
 100	4	test/analysis/cfdna_wgs/bams/lib008_filt.bam
 101	13	test/analysis/cfdna_wgs/bams/lib008_filt.bam
 102	6	test/analysis/cfdna_wgs/bams/lib008_filt.bam
@@ -857,7 +857,7 @@ Size	Occurrences	Sample
 115	8	test/analysis/cfdna_wgs/bams/lib008_filt.bam
 116	12	test/analysis/cfdna_wgs/bams/lib008_filt.bam
 117	13	test/analysis/cfdna_wgs/bams/lib008_filt.bam
-118	13	test/analysis/cfdna_wgs/bams/lib008_filt.bam
+118	14	test/analysis/cfdna_wgs/bams/lib008_filt.bam
 119	15	test/analysis/cfdna_wgs/bams/lib008_filt.bam
 120	9	test/analysis/cfdna_wgs/bams/lib008_filt.bam
 121	10	test/analysis/cfdna_wgs/bams/lib008_filt.bam
@@ -910,10 +910,10 @@ Size	Occurrences	Sample
 168	6	test/analysis/cfdna_wgs/bams/lib008_filt.bam
 169	8	test/analysis/cfdna_wgs/bams/lib008_filt.bam
 170	6	test/analysis/cfdna_wgs/bams/lib008_filt.bam
-171	7	test/analysis/cfdna_wgs/bams/lib008_filt.bam
+171	8	test/analysis/cfdna_wgs/bams/lib008_filt.bam
 172	4	test/analysis/cfdna_wgs/bams/lib008_filt.bam
 173	2	test/analysis/cfdna_wgs/bams/lib008_filt.bam
-174	10	test/analysis/cfdna_wgs/bams/lib008_filt.bam
+174	9	test/analysis/cfdna_wgs/bams/lib008_filt.bam
 176	2	test/analysis/cfdna_wgs/bams/lib008_filt.bam
 177	3	test/analysis/cfdna_wgs/bams/lib008_filt.bam
 178	1	test/analysis/cfdna_wgs/bams/lib008_filt.bam
@@ -965,7 +965,6 @@ Size	Occurrences	Sample
 33	3	test/analysis/cfdna_wgs/bams/lib009_filt.bam
 34	4	test/analysis/cfdna_wgs/bams/lib009_filt.bam
 35	2	test/analysis/cfdna_wgs/bams/lib009_filt.bam
-36	1	test/analysis/cfdna_wgs/bams/lib009_filt.bam
 37	4	test/analysis/cfdna_wgs/bams/lib009_filt.bam
 38	4	test/analysis/cfdna_wgs/bams/lib009_filt.bam
 39	4	test/analysis/cfdna_wgs/bams/lib009_filt.bam
@@ -983,7 +982,7 @@ Size	Occurrences	Sample
 52	1	test/analysis/cfdna_wgs/bams/lib009_filt.bam
 53	3	test/analysis/cfdna_wgs/bams/lib009_filt.bam
 54	5	test/analysis/cfdna_wgs/bams/lib009_filt.bam
-55	3	test/analysis/cfdna_wgs/bams/lib009_filt.bam
+55	2	test/analysis/cfdna_wgs/bams/lib009_filt.bam
 56	4	test/analysis/cfdna_wgs/bams/lib009_filt.bam
 57	1	test/analysis/cfdna_wgs/bams/lib009_filt.bam
 58	5	test/analysis/cfdna_wgs/bams/lib009_filt.bam
@@ -1072,7 +1071,7 @@ Size	Occurrences	Sample
 145	6	test/analysis/cfdna_wgs/bams/lib009_filt.bam
 146	7	test/analysis/cfdna_wgs/bams/lib009_filt.bam
 147	7	test/analysis/cfdna_wgs/bams/lib009_filt.bam
-148	5	test/analysis/cfdna_wgs/bams/lib009_filt.bam
+148	7	test/analysis/cfdna_wgs/bams/lib009_filt.bam
 149	6	test/analysis/cfdna_wgs/bams/lib009_filt.bam
 150	6	test/analysis/cfdna_wgs/bams/lib009_filt.bam
 151	8	test/analysis/cfdna_wgs/bams/lib009_filt.bam

@@ -3,20 +3,20 @@
 
 This repository hosts a snakemake workflow for basic processing of whole-genome sequencing reads from cell-free DNA.
 
-![img](resources/int.test.png)
+![img](resources/int_test.png)
 
 
 # Organization
 
 Master branch of the repository contains most recent developments while stable versions are saved as terminal branches (*e.g.* stable.1.0.0).
 
-Directory \`workflow\` contains two types of workflows- process-focused snakefiles (reads.smk, cna.smk, frag.smk) suitable for integration into another snakemake pipeline using the :include command, and the \_int\_test snakefile with examples of such integration using the repository test data.
+Directory `workflow` contains two types of workflows- process-focused snakefiles (reads.smk, cna.smk, frag.smk) suitable for integration into another snakemake pipeline using the :include command, and the \_int\_test snakefile with examples of such integration using the repository test data.
 
 
 # Use
 
--   All software needed for the pipeline is present within the associated docker container (see \`docker\` and <https://hub.docker.com/repository/docker/jeszyman/cfdna_wgs/general>).
--   See the example configuration yaml \`config/int\_test.yaml\` and wrapper workflow \`workflow/int\_test\` for necessary run conditions.
+-   All software needed for the pipeline is present within the associated docker container (see `docker` and <https://hub.docker.com/repository/docker/jeszyman/cfdna_wgs/general>).
+-   See the example configuration yaml `config/int_test.yaml` and wrapper workflow `workflow/int_test` for necessary run conditions.
 
 
 # Changelog

@@ -365,7 +365,7 @@ checkpoint ds_cond_target_list:
     output: logdir + "/ds_final_targets",
     params:
         outdir = cfdna_wgs_bams,
-        frag_distro = "90_150",
+        frag_distro=config["frag_distro"]
     shell:
         """
         if [ -f {output} ]; then rm {output}; fi

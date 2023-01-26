@@ -58,9 +58,9 @@ FRAG_DISTROS = config["frag_distro"]
 cfdna_wgs_threads = config["threads"]
 cfdna_wgs_scriptdir = config["cfdna_wgs_scriptdir"]
 
-default_container = config["default_container"]
-cfdna_wgs_container = config["cfdna_wgs_container"]
 
+cfdna_wgs_container = config["cfdna_wgs_container"]
+default_container = config["default_container"]
 
 autosome_bed = refdir + "/hg38_autosomes.bed",
 cfdna_wgs_fastqs = cfdna_wgs + "/fastqs"

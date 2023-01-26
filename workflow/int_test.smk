@@ -6,12 +6,14 @@ import pandas as pd
 import re
 import numpy as np
 
+cfdna_wgs_scriptdir = config["cfdna_wgs_repo"] +  "/scripts"
 CFDNA_WGS_HEALTHY_LIBRARIES = ["lib003", "lib004"]
+
 # Values directly from configuration YAML
 benchdir = config["benchdir"]
 DOWNSAMPLE = config["downsample"]
 datadir = config["datadir"]
-
+qcdir = config["qcdir"]
 
 # Suggested directory structure:
 analysis      = config["datadir"] + "/analysis"
@@ -46,12 +48,11 @@ cfdna_wgs_wigs = cfdna_wgs + "/wigs"
 
 cfdna_wgs_ichor_nopon = cfdna_wgs + "/ichor_nopon"
 refdir = config["datadir"] + "/ref"
-chrom_sizes = config["chrom_sizes"]
-#chrs = "chr1,chr2,chr3,chr4,chr5,chr6,chr7,chr8,chr9,chr10,chr11,chr12,chr13,chr14,chr15,chr16,chr17,chr18,chr19,chr20,chr21,chr22,chrX,chrY",
+
 chrs = "chr8"
 FRAG_DISTROS = config["frag_distro"]
 cfdna_wgs_threads = config["threads"]
-cfdna_wgs_scriptdir = config["cfdna_wgs_scriptdir"]
+
 default_container = config["default_container"]
 cfdna_wgs_container = config["cfdna_wgs_container"]
 
@@ -116,12 +117,12 @@ rule all:
     input:
         logdir + "/aggregate_output",
         cfdna_wgs_frag + "/ratios.tsv",
-        qc + "/cfdna_wgs_read_qc.tsv",
-        qc + "/cfdna_wgs_frag_len.tsv",
+        qcdir + "/cfdna_wgs_read_qc.tsv",
+        qcdir + "/cfdna_wgs_frag_len.tsv",
 
 onsuccess:
     shell("""
-        bash {config[cfdna_wgs_scriptdir]}/agg_bench.sh {benchdir} {qc}/agg_bench.tsv
+        bash {cfdna_wgs_scriptdir}/agg_bench.sh {benchdir} {qc}/agg_bench.tsv
         """)
 
 rule symlink_inputs:

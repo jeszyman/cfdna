@@ -3,8 +3,7 @@
 :header-args: :tangle no :mkdirp yes :tangle-mode (identity #o755)
 :header-args+: :noweb yes
 :END:
-** Repository setup and administration
-*** Setup inputs for testing
+** Setup inputs for testing
 - [[file:test/inputs/libraries.tsv]]
 - [[file:test/inputs/cna_libraries.tsv]]
 - Get my fastq inputs for read process & testing
@@ -50,12 +49,12 @@ sambamba view -s 0.01 -f bam -t 4 /mnt/ris/aadel/Active/mpnst/bam/cfdna_wgs/ds/l
 
 for file in test/inputs/*.bam; do samtools index $file; done
 #+end_src
-*** Dockerfile
+** Dockerfile
 :PROPERTIES:
 :header-args:bash: :tangle ./docker/cfdna_wgs_Dockerfile
 :ID:       b10eb670-a855-4591-a74c-b458cb5f0581
 :END:
-**** Preamble
+*** Preamble
 #+begin_src bash
 FROM jeszyman/biotools:1.0.2
 
@@ -68,7 +67,7 @@ FROM jeszyman/biotools:1.0.2
 # (https://hub.docker.com/repository/docker/jeszyman/cfdna_wgs)
 
 #+end_src
-**** IchorCNA
+*** IchorCNA
 #+begin_src bash
 
 #
@@ -102,32 +101,38 @@ RUN cd /opt \
 ##
 
 #+end_src
-** CLOSEOUT [[file:config/int_test.yaml][Snakemake configuration YAML]]
-CLOSED: [2023-01-26 Thu 12:10]
+** [[file:config/int_test.yaml][Snakemake configuration YAML]]
 :PROPERTIES:
 :header-args:bash: :tangle ./config/int_test.yaml
 :END:
 #+begin_src bash
-downsample:
-  - "0.001"
-  - "0.004"
+###   Parameters intended to be common across workflows   ###
 benchdir: "test/benchmark"
 blklist: "test/inputs/hg38-blacklist.v2.bed"
-cfdna_wgs_container: "/home/jeszyman/sing_containers/cfdna_wgs.1.0.0.sif"
-cfdna_wgs_repo: "/home/jeszyman/repos/cfdna-wgs"
-cfdna_wgs_scriptdir: "/home/jeszyman/repos/cfdna-wgs/scripts"
-chrom_sizes: "test/inputs/hg38.chrom.sizes"
 datadir: "test"
 default_container: "/home/jeszyman/sing_containers/biotools.1.0.2.sif"
-frag_distro:
-  - "90_150"
-  - "80_450"
-gc5mb: "test/inputs/gc5mb.bed"
 genome_fasta: "test/inputs/chr8.fa"
 genome_ref: "test/ref/chr8.fa"
 logdir: "test/logs"
-picard_jar: "/opt/picard/picard.jar"
+qcdir: "test/analysis/qc"
 threads: 4
+
+###   Unique properties from this repo   ###
+
+cfdna_wgs_container: "/home/jeszyman/sing_containers/cfdna_wgs.1.0.0.sif"
+# Path to your downloaded singularity file
+cfdna_wgs_repo: "/home/jeszyman/repos/cfdna-wgs"
+
+downsample:
+  - "0.001"
+  - "0.004"
+
+frag_distro: "90_150"
+
+gc5mb: "test/inputs/gc5mb.bed"
+
+picard_jar: "/opt/picard/picard.jar"
+
 #+end_src
 ** INPROCESS [[file:workflow/reads_int_test.smk][Integration testing snakefile wrapper]]          :smk:
 :PROPERTIES:
@@ -148,12 +153,14 @@ import numpy as np
 #+end_src
 *** Variable naming
 #+begin_src snakemake
+cfdna_wgs_scriptdir = config["cfdna_wgs_repo"] +  "/scripts"
 CFDNA_WGS_HEALTHY_LIBRARIES = ["lib003", "lib004"]
+
 # Values directly from configuration YAML
 benchdir = config["benchdir"]
 DOWNSAMPLE = config["downsample"]
 datadir = config["datadir"]
-
+qcdir = config["qcdir"]
 
 # Suggested directory structure:
 analysis      = config["datadir"] + "/analysis"
@@ -188,12 +195,11 @@ cfdna_wgs_wigs = cfdna_wgs + "/wigs"
 
 cfdna_wgs_ichor_nopon = cfdna_wgs + "/ichor_nopon"
 refdir = config["datadir"] + "/ref"
-chrom_sizes = config["chrom_sizes"]
-#chrs = "chr1,chr2,chr3,chr4,chr5,chr6,chr7,chr8,chr9,chr10,chr11,chr12,chr13,chr14,chr15,chr16,chr17,chr18,chr19,chr20,chr21,chr22,chrX,chrY",
+
 chrs = "chr8"
 FRAG_DISTROS = config["frag_distro"]
 cfdna_wgs_threads = config["threads"]
-cfdna_wgs_scriptdir = config["cfdna_wgs_scriptdir"]
+
 default_container = config["default_container"]
 cfdna_wgs_container = config["cfdna_wgs_container"]
 
@@ -267,8 +273,8 @@ rule all:
     input:
         logdir + "/aggregate_output",
         cfdna_wgs_frag + "/ratios.tsv",
-        qc + "/cfdna_wgs_read_qc.tsv",
-        qc + "/cfdna_wgs_frag_len.tsv",
+        qcdir + "/cfdna_wgs_read_qc.tsv",
+        qcdir + "/cfdna_wgs_frag_len.tsv",
 
 #+end_src
 *** Benchmark aggregation
@@ -276,7 +282,7 @@ rule all:
 
 onsuccess:
     shell("""
-        bash {config[cfdna_wgs_scriptdir]}/agg_bench.sh {benchdir} {qc}/agg_bench.tsv
+        bash {cfdna_wgs_scriptdir}/agg_bench.sh {benchdir} {qc}/agg_bench.tsv
         """)
 #+end_src
 #+begin_src bash :tangle ./scripts/agg_bench.sh
@@ -1200,7 +1206,7 @@ checkpoint ds_cond_target_list:
     output: logdir + "/ds_final_targets",
     params:
         outdir = cfdna_wgs_bams,
-        frag_distro = "90_150",
+        frag_distro=config["frag_distro"]
     shell:
         """
         if [ -f {output} ]; then rm {output}; fi
@@ -1821,9 +1827,9 @@ FRAG_DISTROS = config["frag_distro"]
 cfdna_wgs_threads = config["threads"]
 cfdna_wgs_scriptdir = config["cfdna_wgs_scriptdir"]
 
-default_container = config["default_container"]
-cfdna_wgs_container = config["cfdna_wgs_container"]
 
+cfdna_wgs_container = config["cfdna_wgs_container"]
+default_container = config["default_container"]
 
 autosome_bed = refdir + "/hg38_autosomes.bed",
 cfdna_wgs_fastqs = cfdna_wgs + "/fastqs"
@@ -2538,6 +2544,8 @@ rule cna_frag_filt_tmp:
 ***** [[46270062-e3f4-46c9-9d71-5868376e495b][smk yas]]
 ***** [[file:./workflow/cna.smk][Link to Snakefile]]
 ** Ideas
+*** Multiple frag distros
+note- this would require re-write of ds_cond_target_list
 *** Testing inputs update
 - Make a smaller fasta for indexing
   #+begin_src bash

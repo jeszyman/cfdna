@@ -1,20 +1,26 @@
-downsample:
-  - "0.001"
-  - "0.004"
+###   Parameters intended to be common across workflows   ###
 benchdir: "test/benchmark"
 blklist: "test/inputs/hg38-blacklist.v2.bed"
-cfdna_wgs_container: "/home/jeszyman/sing_containers/cfdna_wgs.1.0.0.sif"
-cfdna_wgs_repo: "/home/jeszyman/repos/cfdna-wgs"
-cfdna_wgs_scriptdir: "/home/jeszyman/repos/cfdna-wgs/scripts"
-chrom_sizes: "test/inputs/hg38.chrom.sizes"
 datadir: "test"
 default_container: "/home/jeszyman/sing_containers/biotools.1.0.2.sif"
-frag_distro:
-  - "90_150"
-  - "80_450"
-gc5mb: "test/inputs/gc5mb.bed"
 genome_fasta: "test/inputs/chr8.fa"
 genome_ref: "test/ref/chr8.fa"
 logdir: "test/logs"
-picard_jar: "/opt/picard/picard.jar"
+qcdir: "test/analysis/qc"
 threads: 4
+
+###   Unique properties from this repo   ###
+
+cfdna_wgs_container: "/home/jeszyman/sing_containers/cfdna_wgs.1.0.0.sif"
+# Path to your downloaded singularity file
+cfdna_wgs_repo: "/home/jeszyman/repos/cfdna-wgs"
+
+downsample:
+  - "0.001"
+  - "0.004"
+
+frag_distro: "90_150"
+
+gc5mb: "test/inputs/gc5mb.bed"
+
+picard_jar: "/opt/picard/picard.jar"

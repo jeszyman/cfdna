@@ -32,7 +32,7 @@ cfdna_wgs_cna_ichor_nopon  = cfdna_wgs_cna + "/ichor_nopon"
 
 cfdna_wgs_frag_input_bams  = cfdna_wgs_cna + "/input_bams"
 cfdna_wgs_frag_beds       = cfdna_wgs_frag + "/beds"
-cfdna_wgs_frag_gc_distros = cfdna_wgs_frag + "/distros"
+
 cfdna_wgs_frag_counts     = cfdna_wgs_frag + "/counts"
 
 refdir                 = config["datadir"] + "/ref"
@@ -41,7 +41,7 @@ refdir                 = config["datadir"] + "/ref"
 chrom_sizes = config["chrom_sizes"]
 genome_fasta = "/mnt/ris/aadel/Active/mpnst/inputs/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna"
 
-CFDNA_WGS_HEALTHY_LIBRARIES = ["lib003", "lib004"]
+
 #TMP_FRAG_LIBS = ["lib001_filt","lib002_filt"]
 
 #chrs = "chr8"

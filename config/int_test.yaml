@@ -1,3 +1,6 @@
+downsample:
+  - "0.001"
+  - "0.004"
 benchdir: "test/benchmark"
 blklist: "test/inputs/hg38-blacklist.v2.bed"
 cfdna_wgs_container: "/home/jeszyman/sing_containers/cfdna_wgs.1.0.0.sif"

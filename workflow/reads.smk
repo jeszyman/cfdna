@@ -7,7 +7,7 @@
 
 # Make alignment index
 #  Note: Upon first run, this rule will touch an empty file with the same path
-#        as the input fasta. Thereafter, you can avoid repeat indexing when the
+#        as the index prefix. Thereafter, you can avoid repeat indexing when the
 #        rule "sees" this empty file. For repo intergration testing with an
 #        external reference, indexing can likewise be avoided with this empty
 #        file at the external index location.
@@ -25,28 +25,6 @@ rule cfdna_wgs_index:
     shell:
         """
         bwa index -p {params.out_prefix} {input} &> {log}
-        """
-
-# Make a file of blacklist-filtered autosomal regions
-rule cfdna_wgs_make_keep_bed:
-    benchmark: benchdir + "/cfdna_wgs_make_keep_bed.benchmark.txt",
-    container: cfdna_wgs_container,
-    input:
-        blacklist = blklist,
-        chrom_sizes = chrom_sizes,
-    log: logdir + "/cfdna_wgs_make_keep_bed.log",
-    output:
-        autosome_bed = autosome_bed,
-        keep_bed = keep_bed,
-    params:
-        script = cfdna_wgs_scriptdir + "/make_keep_bed.sh",
-    shell:
-        """
-        {params.script} \
-        {input.blacklist} \
-        {input.chrom_sizes} \
-        {output.autosome_bed} \
-        {output.keep_bed} &> {log}
         """
 
 # Adapter-trim and QC reads with fastp
@@ -137,9 +115,7 @@ rule cfdna_wgs_dedup:
 checkpoint cfdna_wgs_filter_alignment:
     benchmark: benchdir + "/{library}_cfdna_wgs_filter_alignment.benchmark.txt",
     container: cfdna_wgs_container,
-    input:
-        bam = cfdna_wgs_bams + "/{library}_dedup.bam",
-        keep_bed = keep_bed,
+    input: cfdna_wgs_bams + "/{library}_dedup.bam",
     log: logdir + "/{library}_cfdna_wgs_filter_alignment.log",
     output: cfdna_wgs_bams + "/{library}_filt.bam",
     params:
@@ -148,8 +124,7 @@ checkpoint cfdna_wgs_filter_alignment:
     shell:
         """
         {params.script} \
-        {input.bam} \
-        {input.keep_bed} \
+        {input} \
         {params.threads} \
         {output} &> {log}
         """
@@ -347,4 +322,95 @@ checkpoint cfdna_wgs_make_qc_tsv:
         {input.deeptools_cov} \
         {output.readqc} \
         {output.fraglen} >& {log}
+        """
+
+rule downsample_bams:
+    container: cfdna_wgs_container,
+    input: cfdna_wgs_bams + "/{library}_filt.bam",
+    output: touch(logdir + "/{library}_{downsample}_downsample.done"),
+    params:
+        out_dir = cfdna_wgs_bams,
+        script = cfdna_wgs_scriptdir + "/downsample_bams.sh",
+        suffix = "_filt.bam",
+        threads = cfdna_wgs_threads,
+    shell:
+        """
+        {params.script} \
+        {input} \
+        {wildcards.downsample} \
+        {params.out_dir} \
+        {params.suffix} \
+        {params.threads}
+        """
+
+# If downsample occured, then write filename into this per-library log, else leave the log file blank
+rule log_dowsample:
+    input: logdir + "/{library}_{downsample}_downsample.done",
+    output: logdir + "/{library}_{downsample}_made",
+    params:
+        bamdir = cfdna_wgs_bams,
+    shell:
+        """
+        dspath={params.bamdir}/{wildcards.library}_ds{wildcards.downsample}.bam
+        if [ -f $dspath ]; then echo "$dspath"  > {output}; else touch {output}; fi
+        """
+
+# Use the downsampled bam logs to make a single text file of conditionally executed final targets.
+# Specifically in this example, log text lines are in the form
+# cfdna_wgs_bams + "/{library}_ds{downsample}_frag90_150.bam" to setup conditional execution of fragment filtering ONLY on downsampled bams
+# Note alternative delimiter "~" to sed allows cfdna_wgs_wigs as param
+
+checkpoint ds_cond_target_list:
+    input: expand(logdir + "/{library}_{downsample}_made", library = CFDNA_WGS_LIBRARIES, downsample = DOWNSAMPLE),
+    output: logdir + "/ds_final_targets",
+    params:
+        outdir = cfdna_wgs_bams,
+        frag_distro = "90_150",
+    shell:
+        """
+        if [ -f {output} ]; then rm {output}; fi
+        cat {input} > {output}
+        sed -i 's~^.*lib~{params.outdir}/lib~g' {output}
+        sed -i 's/.bam$/_frag{params.frag_distro}.bam/g' {output}
+        """
+
+# Function jsut pulls the final target names out of ds_final_targets
+def get_ds_targets(wildcards):
+    with open(checkpoints.ds_cond_target_list.get(**wildcards).output[0], "r") as f:
+      non_empty_files = [l.strip() for l in f.readlines()]
+    return non_empty_files
+
+# This rule allows execution of rules which will generate the conditional targets in ds_cond_target_list
+rule make_ds_targets:
+    input:
+        get_ds_targets
+    output: logdir + "/aggregate_output"
+    run:
+        with open(output[0], "w") as f:
+            f.write("\n".join(input))
+
+rule frag_filt:
+    container: cfdna_wgs_container,
+    input:
+        main = cfdna_wgs_bams + "/{library}_ds{downsample}.bam",
+        check = logdir + "/{library}_{downsample}_made",
+    output:
+        nohead = temp(cfdna_wgs_bams + "/{library}_ds{downsample}_frag{frag_distro}.nohead"),
+        onlyhead = temp(cfdna_wgs_bams + "/{library}_ds{downsample}_frag{frag_distro}.only"),
+        final = cfdna_wgs_bams + "/{library}_ds{downsample}_frag{frag_distro}.bam",
+    params:
+        script = cfdna_wgs_scriptdir + "/frag_filt.sh",
+        threads = cfdna_wgs_threads,
+    shell:
+        """
+        frag_min=$(echo {wildcards.frag_distro} | sed -e "s/_.*$//g")
+        frag_max=$(echo {wildcards.frag_distro} | sed -e "s/^.*_//g")
+        {params.script} \
+        {input.main} \
+        {output.nohead} \
+        $frag_min \
+        $frag_max \
+        {config[threads]} \
+        {output.onlyhead} \
+        {output.final}
         """

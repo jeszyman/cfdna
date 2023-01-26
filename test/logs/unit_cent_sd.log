@@ -6,7 +6,7 @@
 ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
 ✖ dplyr::filter() masks stats::filter()
 ✖ dplyr::lag()    masks stats::lag()
-Rows: 2576 Columns: 7
+Rows: 3864 Columns: 7
 ── Column specification ────────────────────────────────────────────────────────
 Delimiter: "\t"
 chr (3): library, len_class, chr

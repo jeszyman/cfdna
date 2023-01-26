@@ -1,0 +1,39 @@
+FROM jeszyman/biotools:1.0.2
+
+#################
+###   Notes   ###
+#################
+#
+# After build, the image will be pushed to the dockerhub as
+# jeszyman/cfdna_wgs
+# (https://hub.docker.com/repository/docker/jeszyman/cfdna_wgs)
+
+#
+RUN cd /opt && \
+    git clone https://github.com/shahcompbio/hmmcopy_utils.git && \
+    cd hmmcopy_utils && \
+    cmake . && \
+    make
+
+#
+# ichorCNA
+##
+## linux dependencies
+RUN apt-get update \
+   && apt-get install -y \
+   libcurl4-openssl-dev \
+   libssl-dev \
+   libxml2-dev
+#RUN rm /usr/lib/x86_64-linux-gnu/libcurl.so.4
+#RUN ln -s /usr/lib/x86_64-linux-gnu/libcurl.so.4.5.0 /usr/lib/x86_64-linux-gnu/libcurl.so.4
+##
+## R dependencies
+RUN R -e 'install.packages("BiocManager"); BiocManager::install(); BiocManager::install("HMMcopy"); BiocManager::install("GenomeInfoDb"); BiocManager::install("GenomicRanges");'
+##
+## git clone install
+RUN cd /opt \
+    && git clone https://github.com/broadinstitute/ichorCNA.git \
+    && cd ichorCNA \
+    && R CMD INSTALL . \
+    && cd /opt
+##

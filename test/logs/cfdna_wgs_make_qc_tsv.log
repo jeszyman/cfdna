@@ -47,7 +47,7 @@ dbl (33): total_passed, total_failed, secondary_passed, secondary_failed, su...
 
 ℹ Use `spec()` to retrieve the full column specification for this data.
 ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-Rows: 1126 Columns: 3
+Rows: 1146 Columns: 3
 ── Column specification ────────────────────────────────────────────────────────
 Delimiter: "\t"
 chr (3): frag_len, frag_count, file

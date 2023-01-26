@@ -76,7 +76,7 @@
 |           multiqc | Search path : /home/jeszyman/repos/cfdna-wgs/test/analysis/qc/lib009_picard_depth.txt
 |           multiqc | Search path : /home/jeszyman/repos/cfdna-wgs/test/analysis/qc/deeptools_frag_lengths.txt
 |           multiqc | Search path : /home/jeszyman/repos/cfdna-wgs/test/analysis/qc/cfdna_wgs_coverage.tsv
-|         searching | ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 74/74  
+|         searching | ━━━━━━━━━━━━━━ 100% 74/74 
 |         deeptools | Found 12 total deepTools samples
 |            picard | Found 6 WgsMetrics reports
 |          samtools | Found 12 stats reports

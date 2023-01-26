@@ -23,10 +23,10 @@ rule make_gc_map_bind:
 
 # Make a bed file from filtered bam
 rule filt_bam_to_frag_bed:
-    benchmark: benchdir + "/{library}_cfdna_wgs_filt_bam_to_frag_bed.benchmark.txt",
+    benchmark: benchdir + "/{library}_filt_bam_to_frag_bed.benchmark.txt",
     container: cfdna_wgs_container,
-    input: cfdna_wgs_frag_input_bams + "/{library}.bam",
-    log: logdir + "/{library}_cfdna_wgs_filt_bam_to_frag_bed.log",
+    input: cfdna_wgs_bams + "/{library}_filt.bam",
+    log: logdir + "/{library}_filt_bam_to_frag_bed.log",
     output: cfdna_wgs_frag_beds + "/{library}_filt.bed",
     params:
         fasta = genome_fasta,
@@ -147,7 +147,7 @@ rule frag_window_count:
 rule cfdna_wgs_count_merge:
     benchmark: benchdir + "/cfdna_wgs_count_merge.benchmark.txt",
     container: cfdna_wgs_container,
-    input: expand(cfdna_wgs_frag_counts + "/{library}_cnt_{length}.tmp",  library = CNA_WGS_LIBRARIES, length = ["short","long"]),
+    input: expand(cfdna_wgs_frag_counts + "/{library}_cnt_{length}.tmp",  library = CFDNA_WGS_LIBRARIES, length = ["short","long"]),
     log: logdir + "/cfdna_wgs_count_merge.log",
     output:  cfdna_wgs_frag + "/frag_counts.tsv",
     params:

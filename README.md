@@ -21,6 +21,7 @@ Directory `workflow` contains two types of workflows- process-focused snakefiles
 
 # Changelog
 
+-   <span class="timestamp-wrapper"><span class="timestamp">[2023-01-26 Thu] </span></span> - Version 9.1.0: Repo cleanup
 -   <span class="timestamp-wrapper"><span class="timestamp">[2023-01-26 Thu] </span></span> - Version 9.0.0: Removed -f 3 flag for perfectly matched pairs in samtools filtering as the black from BWA removes some fragments at a set max length. Added framework for benchmark analysis. Added conditional execution of downsampling. Removed (temporarily) final wig and ichor commands of CNA as these don't currently run correctly without full genome alignment, so can't be validated on test data. Added local documentation of cfdna-wgs dockerfile.
 -   <span class="timestamp-wrapper"><span class="timestamp">[2023-01-21 Sat] </span></span> - Version 8.0.0: Corrected rule filt\_bam\_to\_frag\_bed to fix mates of inputs, which seems to prevent errors in the bamtobed call. Frag\_window\_count now uses windows of consistent 5 Mb size, which are generated from rule make\_gc\_map\_bind. Added a merged fragment counts file and zero-centered unit SD counts.
 -   <span class="timestamp-wrapper"><span class="timestamp">[2022-12-07 Wed] </span></span> - Version 7.0.0: Added copy number alteration and DELFI fragmentomics.

@@ -17,8 +17,8 @@
 [M::mem_pestat] low and high boundaries for computing mean and std.dev: (1, 16139)
 [M::mem_pestat] mean and std.dev: (5031.83, 2581.09)
 [M::mem_pestat] low and high boundaries for proper pairs: (1, 20612)
-[M::mem_process_seqs] Processed 49450 reads in 16.960 CPU sec, 5.537 real sec
+[M::mem_process_seqs] Processed 49450 reads in 16.889 CPU sec, 5.833 real sec
 [main] Version: 0.7.17-r1188
 [main] CMD: bwa mem -M -t 4 test/ref/chr8.fa test/analysis/cfdna_wgs/fastqs/lib009_processed_R1.fastq.gz test/analysis/cfdna_wgs/fastqs/lib009_processed_R2.fastq.gz
-[main] Real time: 5.763 sec; CPU: 17.088 sec
+[main] Real time: 6.102 sec; CPU: 17.007 sec
 [bam_sort_core] merging from 0 files and 4 in-memory blocks...

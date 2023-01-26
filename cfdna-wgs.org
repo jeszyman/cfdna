@@ -107,20 +107,19 @@ RUN cd /opt \
 :END:
 #+begin_src bash
 ###   Parameters intended to be common across workflows   ###
-benchdir: "test/benchmark"
+
 blklist: "test/inputs/hg38-blacklist.v2.bed"
 datadir: "test"
 default_container: "/home/jeszyman/sing_containers/biotools.1.0.2.sif"
 genome_fasta: "test/inputs/chr8.fa"
 genome_ref: "test/ref/chr8.fa"
-logdir: "test/logs"
 qcdir: "test/analysis/qc"
 threads: 4
 
 ###   Unique properties from this repo   ###
 
 cfdna_wgs_container: "/home/jeszyman/sing_containers/cfdna_wgs.1.0.0.sif"
-# Path to your downloaded singularity file
+
 cfdna_wgs_repo: "/home/jeszyman/repos/cfdna-wgs"
 
 downsample:
@@ -153,120 +152,64 @@ import numpy as np
 #+end_src
 *** Variable naming
 #+begin_src snakemake
-cfdna_wgs_scriptdir = config["cfdna_wgs_repo"] +  "/scripts"
-CFDNA_WGS_HEALTHY_LIBRARIES = ["lib003", "lib004"]
-
-# Values directly from configuration YAML
-benchdir = config["benchdir"]
+# Values directly from configuration file
 DOWNSAMPLE = config["downsample"]
-datadir = config["datadir"]
-qcdir = config["qcdir"]
-
-# Suggested directory structure:
-analysis      = config["datadir"] + "/analysis"
-cfdna_wgs     = analysis          + "/cfdna_wgs"
-logdir = config["datadir"] + "/logs"
-refdir = config["datadir"] + "/ref"
-
-# Terminal variable paths:
-#  (These variables are used directly in the reads snakefile)
-qc               = analysis + "/qc"
-qcdir = config["datadir"] + "/analysis/qc"
-cfdna_wgs_fastqs = cfdna_wgs + "/fastqs"
-cfdna_wgs_bams   = cfdna_wgs + "/bams"
-autosome_bed = refdir + "/hg38_autosomes.bed",
-keep_bed = refdir + "/hg38_keep.bed",
-
-cfdna_wgs_frag = cfdna_wgs + "/frag"
-cfdna_wgs_frag_beds = cfdna_wgs_frag + "/beds"
-cfdna_wgs_frag_gc_distros = cfdna_wgs_frag + "/distros"
-cfdna_wgs_frag_counts = cfdna_wgs_frag + "/counts"
-
 threads = config["threads"]
-
-
-#TMP
-cfdna_wgs_cna_in_bams = cfdna_wgs_bams
-cfdna_wgs_cna_frag_bams = cfdna_wgs_bams
-cfdna_wgs_cna_wigs = cfdna_wgs_bams
-cfdna_wgs_cna_ichor_nopon = cfdna_wgs_bams
-
-cfdna_wgs_wigs = cfdna_wgs + "/wigs"
-
-cfdna_wgs_ichor_nopon = cfdna_wgs + "/ichor_nopon"
-refdir = config["datadir"] + "/ref"
-
-chrs = "chr8"
 FRAG_DISTROS = config["frag_distro"]
 cfdna_wgs_threads = config["threads"]
-
 default_container = config["default_container"]
 cfdna_wgs_container = config["cfdna_wgs_container"]
-
-
-
-# Makes the name bwa index directory from the config genome fasta
-#  e.g. test/inputs/chr8.fa will make test/ref/chr8
 genome_fasta = config["genome_fasta"]
 genome_ref = config["genome_ref"]
-
-genome_ref = config["genome_ref"]
-# Directory structure under datadir:
-
-genome_fasta_cna = "/mnt/ris/aadel/Active/mpnst/inputs/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna"
-
-#chrs = "chr1,chr2,chr3,chr4,chr5,chr6,chr7,chr8,chr9,chr10,chr11,chr12,chr13,chr14,chr15,chr16,chr17,chr18,chr19,chr20,chr21,chr22,chrX,chrY,chrM",
-
-
 cfdna_wgs_repo = config["cfdna_wgs_repo"]
+
+# Directory values derived from datadir in configuration YAML
+datadir                   = config["datadir"]
+cfdna_wgs                 = datadir + "/analysis/cfdna_wgs"
+cfdna_wgs_bams            = datadir + "/analysis/cfdna_wgs/bams"
+cfdna_wgs_fastqs          = datadir + "/analysis/cfdna_wgs/fastqs"
+cfdna_wgs_frag            = datadir + "/analysis/cfdna_wgs/frag"
+cfdna_wgs_frag_beds       = datadir + "/analysis/cfdna_wgs/frag/beds"
+cfdna_wgs_frag_counts     = datadir + "/analysis/cfdna_wgs/frag/counts"
+cfdna_wgs_frag_gc_distros = datadir + "/analysis/cfdna_wgs/frag/distros"
+qcdir                     = datadir + "/analysis/qc"
+benchdir                  = datadir + "/benchmark"
+logdir                    = datadir + "/logs"
+refdir                    = datadir + "/ref"
+
+cfdna_wgs_scriptdir = config["cfdna_wgs_repo"] +  "/scripts"
+
 #+end_src
 *** Functions, miscellaneous
 #+begin_src snakemake
+
+###   Functions   ###
+
 # Setup sample name index as a python dictionary
-
-libraries = pd.read_table(config["datadir"] + "/inputs/libraries.tsv")
-
-readable = []
-for x in libraries.file:
-    readable.append(os.access(x, os.R_OK))
-libraries['readable']=readable
-
-cfdna_libraries = libraries
-cfdna_libraries = cfdna_libraries[cfdna_libraries.library_type == "wgs"]
-cfdna_libraries = cfdna_libraries[cfdna_libraries.isolation_type == "cfdna"]
-cfdna_libraries = cfdna_libraries[cfdna_libraries.readable == True]
-
-library_indict = cfdna_libraries["library"].tolist()
-file_indict = cfdna_libraries["file"].tolist()
-lib_dict = dict(zip(library_indict, file_indict))
-
-CFDNA_WGS_LIBRARIES = list(lib_dict.keys())
-CFDNA_WGS_FASTQS = list(lib_dict.values())
-
-#+begin_src snakemake
-libraries = pd.read_table(config["datadir"] + "/inputs/libraries.tsv")
+cfdna_wgs_libraries = pd.read_table(config["datadir"] + "/inputs/libraries.tsv")
 
 readable = []
-for x in libraries.file:
+for x in cfdna_wgs_libraries.file:
     readable.append(os.access(x, os.R_OK))
-libraries['readable']=readable
+# Ensure readable fastqs
+cfdna_wgs_libraries['readable']=readable
+cfdna__wgs_libraries = cfdna_wgs_libraries[cfdna_wgs_libraries.readable == True]
+# Ensure correct library type per sample sheet
+cfdna_wgs_libraries = cfdna_wgs_libraries[cfdna_wgs_libraries.library_type == "wgs"]
+cfdna_wgs_libraries = cfdna_wgs_libraries[cfdna_wgs_libraries.isolation_type == "cfdna"]
 
-cfdna_libraries = libraries
-cfdna_libraries = cfdna_libraries[cfdna_libraries.library_type == "wgs"]
-cfdna_libraries = cfdna_libraries[cfdna_libraries.isolation_type == "cfdna"]
-cfdna_libraries = cfdna_libraries[cfdna_libraries.readable == True]
+# Make the dictionary
+cfdna_wgs_library_indict = cfdna_wgs_libraries["library"].tolist()
+cfdna_wgs_file_indict = cfdna_wgs_libraries["file"].tolist()
+cfdna_wgs_lib_dict = dict(zip(cfdna_wgs_library_indict, cfdna_wgs_file_indict))
 
-library_indict = cfdna_libraries["library"].tolist()
-file_indict = cfdna_libraries["file"].tolist()
-lib_dict = dict(zip(library_indict, file_indict))
+CFDNA_WGS_LIBRARIES = list(cfdna_wgs_lib_dict.keys())
+CFDNA_WGS_FASTQS = list(cfdna_wgs_lib_dict.values())
 
-CFDNA_WGS_LIBRARIES = list(lib_dict.keys())
-
+# Make  a list of healthy libraries
+CFDNA_WGS_HEALTHY_LIBRARIES = cfdna_wgs_libraries[cfdna_wgs_libraries['cohort'] == 'healthy']['library'].tolist()
 #+end_src
-**** Get bams to downsample
-def get_ds_bams(wildcards):
-    qc_checkp_out = checkpoints.cfdna_wgs_make_qc_tsv.get(**wildcards).output[0]
-    return expand(
+
 *** All rule
 #+begin_src snakemake
 rule all:
@@ -282,7 +225,7 @@ rule all:
 
 onsuccess:
     shell("""
-        bash {cfdna_wgs_scriptdir}/agg_bench.sh {benchdir} {qc}/agg_bench.tsv
+        bash {cfdna_wgs_scriptdir}/agg_bench.sh {benchdir} {qcdir}/agg_bench.tsv
         """)
 #+end_src
 #+begin_src bash :tangle ./scripts/agg_bench.sh
@@ -339,7 +282,7 @@ bmk %>% mutate(outlier = ifelse(find_outlier(run_time), process_lib, NA)) %>%
 rule symlink_inputs:
     container: default_container,
     input:
-        lambda wildcards: lib_dict[wildcards.library],
+        lambda wildcards: cfdna_wgs_lib_dict[wildcards.library],
     output:
         read1 = cfdna_wgs_fastqs + "/{library}_raw_R1.fastq.gz",
         read2 = cfdna_wgs_fastqs + "/{library}_raw_R2.fastq.gz",
@@ -651,10 +594,10 @@ rule cfdna_wgs_fastqc:
     input: cfdna_wgs_fastqs + "/{library}_{processing}_{read}.fastq.gz",
     log: logdir + "/{library}_{processing}_{read}_cfdna_wgs_fastqc.log",
     output:
-        qc + "/{library}_{processing}_{read}_fastqc.html",
-        qc + "/{library}_{processing}_{read}_fastqc.zip",
+        qcdir + "/{library}_{processing}_{read}_fastqc.html",
+        qcdir + "/{library}_{processing}_{read}_fastqc.zip",
     params:
-        outdir = qc,
+        outdir = qcdir,
         script = cfdna_wgs_scriptdir + "/fastqc.sh",
         threads = cfdna_wgs_threads,
     shell:
@@ -693,8 +636,8 @@ rule cfdna_wgs_alignment_qc:
         flagstat = logdir + "/{library}_{processing}_flagstat_cfdna_wgs_alignment_qc.log",
         samstat = logdir + "/{library}_{processing}_samstats_cfdna_wgs_alignment_qc.log",
     output:
-        flagstat = qc + "/{library}_{processing}_flagstat.txt",
-        samstat = qc + "/{library}_{processing}_samstats.txt",
+        flagstat = qcdir + "/{library}_{processing}_flagstat.txt",
+        samstat = qcdir + "/{library}_{processing}_samstats.txt",
     params:
         script = cfdna_wgs_scriptdir + "/alignment_qc.sh",
         threads = cfdna_wgs_threads,
@@ -760,7 +703,7 @@ rule cfdna_wgs_picard_depth:
     container: cfdna_wgs_container,
     input: cfdna_wgs_bams + "/{library}_filt.bam",
     log: logdir + "/{library}_cfdna_wgs_picard_depth.log",
-    output: qc + "/{library}_picard_depth.txt",
+    output: qcdir + "/{library}_picard_depth.txt",
     params:
         script = cfdna_wgs_scriptdir + "/picard_depth.sh",
         threads = cfdna_wgs_threads,
@@ -797,8 +740,8 @@ rule cfdna_wgs_bampefragsize:
     input: expand(cfdna_wgs_bams + "/{library}_filt.bam", library = CFDNA_WGS_LIBRARIES),
     log: logdir + "/cfdna_wgs_bampefragsize.log",
     output:
-        raw = qc + "/deeptools_frag_lengths.txt",
-        hist = qc + "/deeptools_frag_lengths.png",
+        raw = qcdir + "/deeptools_frag_lengths.txt",
+        hist = qcdir + "/deeptools_frag_lengths.png",
     params:
         blacklist = config["blklist"],
         script = cfdna_wgs_scriptdir + "/bampefragsize.sh",
@@ -848,7 +791,7 @@ rule cfdna_wgs_bamcoverage:
     container: cfdna_wgs_container,
     input: cfdna_wgs_bams + "/{library}_filt.bam",
     log: logdir + "/{library}_cfdna_wgs_bamcoverage.log",
-    output: qc + "/{library}_bamcoverage.bg",
+    output: qcdir + "/{library}_bamcoverage.bg",
     params:
         bin = "10000",
         blacklist = config["blklist"],
@@ -897,8 +840,8 @@ rule cfdna_wgs_plotcoverage:
     input: expand(cfdna_wgs_bams + "/{library}_filt.bam", library = CFDNA_WGS_LIBRARIES),
     log: logdir + "/cfdna_wgs_plotcoverage.log",
     output:
-        raw = qc + "/cfdna_wgs_coverage.tsv",
-        plot = qc + "/cfdna_wgs_coverage.pdf",
+        raw = qcdir + "/cfdna_wgs_coverage.tsv",
+        plot = qcdir + "/cfdna_wgs_coverage.pdf",
     params:
         blacklist = config["blklist"],
         script = cfdna_wgs_scriptdir + "/plotcoverage.sh",
@@ -941,21 +884,21 @@ rule cfdna_wgs_multiqc:
     container: cfdna_wgs_container,
     input:
         expand(logdir + "/{library}_cfdna_wgs_fastp.json", library = CFDNA_WGS_LIBRARIES),
-        expand(qc + "/{library}_{processing}_{read}_fastqc.zip", library = CFDNA_WGS_LIBRARIES, processing = ["raw", "processed", "unpaired"], read = ["R1","R2"]),
-        expand(qc + "/{library}_{processing}_samstats.txt", library = CFDNA_WGS_LIBRARIES, processing = ["raw","filt"]),
-        expand(qc + "/{library}_{processing}_flagstat.txt", library = CFDNA_WGS_LIBRARIES, processing = ["raw","filt"]),
-        expand(qc + "/{library}_picard_depth.txt", library = CFDNA_WGS_LIBRARIES),
-        qc + "/deeptools_frag_lengths.txt",
-        qc + "/cfdna_wgs_coverage.tsv",
+        expand(qcdir + "/{library}_{processing}_{read}_fastqc.zip", library = CFDNA_WGS_LIBRARIES, processing = ["raw", "processed", "unpaired"], read = ["R1","R2"]),
+        expand(qcdir + "/{library}_{processing}_samstats.txt", library = CFDNA_WGS_LIBRARIES, processing = ["raw","filt"]),
+        expand(qcdir + "/{library}_{processing}_flagstat.txt", library = CFDNA_WGS_LIBRARIES, processing = ["raw","filt"]),
+        expand(qcdir + "/{library}_picard_depth.txt", library = CFDNA_WGS_LIBRARIES),
+        qcdir + "/deeptools_frag_lengths.txt",
+        qcdir + "/cfdna_wgs_coverage.tsv",
     log: logdir + "/cfdna_wgs_multiqc.log",
     output:
-        qc + "/cfdna_wgs_multiqc.html",
-        qc + "/cfdna_wgs_multiqc_data/multiqc_fastqc.txt",
-        qc + "/cfdna_wgs_multiqc_data/multiqc_samtools_stats.txt",
-        qc + "/cfdna_wgs_multiqc_data/multiqc_picard_wgsmetrics.txt",
-        qc + "/cfdna_wgs_multiqc_data/multiqc_samtools_flagstat.txt",
+        qcdir + "/cfdna_wgs_multiqc.html",
+        qcdir + "/cfdna_wgs_multiqc_data/multiqc_fastqc.txt",
+        qcdir + "/cfdna_wgs_multiqc_data/multiqc_samtools_stats.txt",
+        qcdir + "/cfdna_wgs_multiqc_data/multiqc_picard_wgsmetrics.txt",
+        qcdir + "/cfdna_wgs_multiqc_data/multiqc_samtools_flagstat.txt",
     params:
-        out_dir = qc,
+        out_dir = qcdir,
         out_name = "cfdna_wgs_multiqc",
         script = cfdna_wgs_scriptdir + "/multiqc.sh",
         threads = cfdna_wgs_threads,
@@ -995,16 +938,16 @@ checkpoint cfdna_wgs_make_qc_tsv:
     benchmark: benchdir + "/cfdna_wgs_make_qc_tsv.benchmark.txt",
     container: cfdna_wgs_container,
     input:
-        fq = qc + "/cfdna_wgs_multiqc_data/multiqc_fastqc.txt",
-        mqsam = qc + "/cfdna_wgs_multiqc_data/multiqc_samtools_stats.txt",
-        mqflag = qc + "/cfdna_wgs_multiqc_data/multiqc_samtools_flagstat.txt",
-        picard = qc + "/cfdna_wgs_multiqc_data/multiqc_picard_wgsmetrics.txt",
-        deeptools_frag = qc + "/deeptools_frag_lengths.txt",
-        deeptools_cov = qc + "/cfdna_wgs_coverage.tsv",
+        fq = qcdir + "/cfdna_wgs_multiqc_data/multiqc_fastqc.txt",
+        mqsam = qcdir + "/cfdna_wgs_multiqc_data/multiqc_samtools_stats.txt",
+        mqflag = qcdir + "/cfdna_wgs_multiqc_data/multiqc_samtools_flagstat.txt",
+        picard = qcdir + "/cfdna_wgs_multiqc_data/multiqc_picard_wgsmetrics.txt",
+        deeptools_frag = qcdir + "/deeptools_frag_lengths.txt",
+        deeptools_cov = qcdir + "/cfdna_wgs_coverage.tsv",
     log: logdir + "/cfdna_wgs_make_qc_tsv.log",
     output:
-        readqc = qc + "/cfdna_wgs_read_qc.tsv",
-        fraglen = qc + "/cfdna_wgs_frag_len.tsv",
+        readqc = qcdir + "/cfdna_wgs_read_qc.tsv",
+        fraglen = qcdir + "/cfdna_wgs_frag_len.tsv",
     params:
         script = cfdna_wgs_scriptdir + "/make_qc_tsv.R",
     shell:
@@ -1977,6 +1920,7 @@ Directory ~workflow~ contains two types of workflows- process-focused snakefiles
 - All software needed for the pipeline is present within the associated docker container (see ~docker~ and https://hub.docker.com/repository/docker/jeszyman/cfdna_wgs/general).
 - See the example configuration yaml ~config/int_test.yaml~ and wrapper workflow ~workflow/int_test~ for necessary run conditions.
 *** Changelog
+- [2023-01-26 Thu] - Version 9.1.0: Repo cleanup
 - [2023-01-26 Thu] - Version 9.0.0: Removed -f 3 flag for perfectly matched pairs in samtools filtering as the black from BWA removes some fragments at a set max length. Added framework for benchmark analysis. Added conditional execution of downsampling. Removed (temporarily) final wig and ichor commands of CNA as these don't currently run correctly without full genome alignment, so can't be validated on test data. Added local documentation of cfdna-wgs dockerfile.
 - [2023-01-21 Sat] - Version 8.0.0: Corrected rule filt_bam_to_frag_bed to fix mates of inputs, which seems to prevent errors in the bamtobed call. Frag_window_count now uses windows of consistent 5 Mb size, which are generated from rule make_gc_map_bind. Added a merged fragment counts file and zero-centered unit SD counts.
 - [2022-12-07 Wed] - Version 7.0.0: Added copy number alteration and DELFI fragmentomics.

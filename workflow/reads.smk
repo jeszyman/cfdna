@@ -136,10 +136,10 @@ rule cfdna_wgs_fastqc:
     input: cfdna_wgs_fastqs + "/{library}_{processing}_{read}.fastq.gz",
     log: logdir + "/{library}_{processing}_{read}_cfdna_wgs_fastqc.log",
     output:
-        qc + "/{library}_{processing}_{read}_fastqc.html",
-        qc + "/{library}_{processing}_{read}_fastqc.zip",
+        qcdir + "/{library}_{processing}_{read}_fastqc.html",
+        qcdir + "/{library}_{processing}_{read}_fastqc.zip",
     params:
-        outdir = qc,
+        outdir = qcdir,
         script = cfdna_wgs_scriptdir + "/fastqc.sh",
         threads = cfdna_wgs_threads,
     shell:
@@ -158,8 +158,8 @@ rule cfdna_wgs_alignment_qc:
         flagstat = logdir + "/{library}_{processing}_flagstat_cfdna_wgs_alignment_qc.log",
         samstat = logdir + "/{library}_{processing}_samstats_cfdna_wgs_alignment_qc.log",
     output:
-        flagstat = qc + "/{library}_{processing}_flagstat.txt",
-        samstat = qc + "/{library}_{processing}_samstats.txt",
+        flagstat = qcdir + "/{library}_{processing}_flagstat.txt",
+        samstat = qcdir + "/{library}_{processing}_samstats.txt",
     params:
         script = cfdna_wgs_scriptdir + "/alignment_qc.sh",
         threads = cfdna_wgs_threads,
@@ -180,7 +180,7 @@ rule cfdna_wgs_picard_depth:
     container: cfdna_wgs_container,
     input: cfdna_wgs_bams + "/{library}_filt.bam",
     log: logdir + "/{library}_cfdna_wgs_picard_depth.log",
-    output: qc + "/{library}_picard_depth.txt",
+    output: qcdir + "/{library}_picard_depth.txt",
     params:
         script = cfdna_wgs_scriptdir + "/picard_depth.sh",
         threads = cfdna_wgs_threads,
@@ -200,8 +200,8 @@ rule cfdna_wgs_bampefragsize:
     input: expand(cfdna_wgs_bams + "/{library}_filt.bam", library = CFDNA_WGS_LIBRARIES),
     log: logdir + "/cfdna_wgs_bampefragsize.log",
     output:
-        raw = qc + "/deeptools_frag_lengths.txt",
-        hist = qc + "/deeptools_frag_lengths.png",
+        raw = qcdir + "/deeptools_frag_lengths.txt",
+        hist = qcdir + "/deeptools_frag_lengths.png",
     params:
         blacklist = config["blklist"],
         script = cfdna_wgs_scriptdir + "/bampefragsize.sh",
@@ -223,7 +223,7 @@ rule cfdna_wgs_bamcoverage:
     container: cfdna_wgs_container,
     input: cfdna_wgs_bams + "/{library}_filt.bam",
     log: logdir + "/{library}_cfdna_wgs_bamcoverage.log",
-    output: qc + "/{library}_bamcoverage.bg",
+    output: qcdir + "/{library}_bamcoverage.bg",
     params:
         bin = "10000",
         blacklist = config["blklist"],
@@ -246,8 +246,8 @@ rule cfdna_wgs_plotcoverage:
     input: expand(cfdna_wgs_bams + "/{library}_filt.bam", library = CFDNA_WGS_LIBRARIES),
     log: logdir + "/cfdna_wgs_plotcoverage.log",
     output:
-        raw = qc + "/cfdna_wgs_coverage.tsv",
-        plot = qc + "/cfdna_wgs_coverage.pdf",
+        raw = qcdir + "/cfdna_wgs_coverage.tsv",
+        plot = qcdir + "/cfdna_wgs_coverage.pdf",
     params:
         blacklist = config["blklist"],
         script = cfdna_wgs_scriptdir + "/plotcoverage.sh",
@@ -268,21 +268,21 @@ rule cfdna_wgs_multiqc:
     container: cfdna_wgs_container,
     input:
         expand(logdir + "/{library}_cfdna_wgs_fastp.json", library = CFDNA_WGS_LIBRARIES),
-        expand(qc + "/{library}_{processing}_{read}_fastqc.zip", library = CFDNA_WGS_LIBRARIES, processing = ["raw", "processed", "unpaired"], read = ["R1","R2"]),
-        expand(qc + "/{library}_{processing}_samstats.txt", library = CFDNA_WGS_LIBRARIES, processing = ["raw","filt"]),
-        expand(qc + "/{library}_{processing}_flagstat.txt", library = CFDNA_WGS_LIBRARIES, processing = ["raw","filt"]),
-        expand(qc + "/{library}_picard_depth.txt", library = CFDNA_WGS_LIBRARIES),
-        qc + "/deeptools_frag_lengths.txt",
-        qc + "/cfdna_wgs_coverage.tsv",
+        expand(qcdir + "/{library}_{processing}_{read}_fastqc.zip", library = CFDNA_WGS_LIBRARIES, processing = ["raw", "processed", "unpaired"], read = ["R1","R2"]),
+        expand(qcdir + "/{library}_{processing}_samstats.txt", library = CFDNA_WGS_LIBRARIES, processing = ["raw","filt"]),
+        expand(qcdir + "/{library}_{processing}_flagstat.txt", library = CFDNA_WGS_LIBRARIES, processing = ["raw","filt"]),
+        expand(qcdir + "/{library}_picard_depth.txt", library = CFDNA_WGS_LIBRARIES),
+        qcdir + "/deeptools_frag_lengths.txt",
+        qcdir + "/cfdna_wgs_coverage.tsv",
     log: logdir + "/cfdna_wgs_multiqc.log",
     output:
-        qc + "/cfdna_wgs_multiqc.html",
-        qc + "/cfdna_wgs_multiqc_data/multiqc_fastqc.txt",
-        qc + "/cfdna_wgs_multiqc_data/multiqc_samtools_stats.txt",
-        qc + "/cfdna_wgs_multiqc_data/multiqc_picard_wgsmetrics.txt",
-        qc + "/cfdna_wgs_multiqc_data/multiqc_samtools_flagstat.txt",
+        qcdir + "/cfdna_wgs_multiqc.html",
+        qcdir + "/cfdna_wgs_multiqc_data/multiqc_fastqc.txt",
+        qcdir + "/cfdna_wgs_multiqc_data/multiqc_samtools_stats.txt",
+        qcdir + "/cfdna_wgs_multiqc_data/multiqc_picard_wgsmetrics.txt",
+        qcdir + "/cfdna_wgs_multiqc_data/multiqc_samtools_flagstat.txt",
     params:
-        out_dir = qc,
+        out_dir = qcdir,
         out_name = "cfdna_wgs_multiqc",
         script = cfdna_wgs_scriptdir + "/multiqc.sh",
         threads = cfdna_wgs_threads,
@@ -299,16 +299,16 @@ checkpoint cfdna_wgs_make_qc_tsv:
     benchmark: benchdir + "/cfdna_wgs_make_qc_tsv.benchmark.txt",
     container: cfdna_wgs_container,
     input:
-        fq = qc + "/cfdna_wgs_multiqc_data/multiqc_fastqc.txt",
-        mqsam = qc + "/cfdna_wgs_multiqc_data/multiqc_samtools_stats.txt",
-        mqflag = qc + "/cfdna_wgs_multiqc_data/multiqc_samtools_flagstat.txt",
-        picard = qc + "/cfdna_wgs_multiqc_data/multiqc_picard_wgsmetrics.txt",
-        deeptools_frag = qc + "/deeptools_frag_lengths.txt",
-        deeptools_cov = qc + "/cfdna_wgs_coverage.tsv",
+        fq = qcdir + "/cfdna_wgs_multiqc_data/multiqc_fastqc.txt",
+        mqsam = qcdir + "/cfdna_wgs_multiqc_data/multiqc_samtools_stats.txt",
+        mqflag = qcdir + "/cfdna_wgs_multiqc_data/multiqc_samtools_flagstat.txt",
+        picard = qcdir + "/cfdna_wgs_multiqc_data/multiqc_picard_wgsmetrics.txt",
+        deeptools_frag = qcdir + "/deeptools_frag_lengths.txt",
+        deeptools_cov = qcdir + "/cfdna_wgs_coverage.tsv",
     log: logdir + "/cfdna_wgs_make_qc_tsv.log",
     output:
-        readqc = qc + "/cfdna_wgs_read_qc.tsv",
-        fraglen = qc + "/cfdna_wgs_frag_len.tsv",
+        readqc = qcdir + "/cfdna_wgs_read_qc.tsv",
+        fraglen = qcdir + "/cfdna_wgs_frag_len.tsv",
     params:
         script = cfdna_wgs_scriptdir + "/make_qc_tsv.R",
     shell:

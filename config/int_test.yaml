@@ -1,18 +1,17 @@
 ###   Parameters intended to be common across workflows   ###
-benchdir: "test/benchmark"
+
 blklist: "test/inputs/hg38-blacklist.v2.bed"
 datadir: "test"
 default_container: "/home/jeszyman/sing_containers/biotools.1.0.2.sif"
 genome_fasta: "test/inputs/chr8.fa"
 genome_ref: "test/ref/chr8.fa"
-logdir: "test/logs"
 qcdir: "test/analysis/qc"
 threads: 4
 
 ###   Unique properties from this repo   ###
 
 cfdna_wgs_container: "/home/jeszyman/sing_containers/cfdna_wgs.1.0.0.sif"
-# Path to your downloaded singularity file
+
 cfdna_wgs_repo: "/home/jeszyman/repos/cfdna-wgs"
 
 downsample:

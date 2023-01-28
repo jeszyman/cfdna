@@ -1918,10 +1918,10 @@ Master branch of the repository contains most recent developments while stable v
 Directory ~workflow~ contains two types of workflows- process-focused snakefiles (reads.smk, cna.smk, frag.smk) suitable for integration into another snakemake pipeline using the :include command, and the _int_test snakefile with examples of such integration using the repository test data.
 *** Use
 - All software needed for the pipeline is present within the associated docker container (see ~docker~ and https://hub.docker.com/repository/docker/jeszyman/cfdna_wgs/general).
-- See the example configuration yaml ~config/int_test.yaml~ and wrapper workflow ~workflow/int_test~ for necessary run conditions.
+- See the example configuration yaml ~config/int_test.yaml~ and wrapper workflow ~workflow/int_test.smk~ for necessary run conditions.
 *** Changelog
 - [2023-01-26 Thu] - Version 9.1.0: Repo cleanup
-- [2023-01-26 Thu] - Version 9.0.0: Removed -f 3 flag for perfectly matched pairs in samtools filtering as the black from BWA removes some fragments at a set max length. Added framework for benchmark analysis. Added conditional execution of downsampling. Removed (temporarily) final wig and ichor commands of CNA as these don't currently run correctly without full genome alignment, so can't be validated on test data. Added local documentation of cfdna-wgs dockerfile.
+- [2023-01-26 Thu] - Version 9.0.0: Removed -f 3 flag for perfectly matched pairs in samtools filtering as the flag from BWA removes some fragments at a set max length. Added framework for benchmark analysis. Added conditional execution of downsampling. Removed (temporarily) final wig and ichor commands of CNA as these don't currently run correctly without full genome alignment, so can't be validated on test data. Added local documentation of cfdna-wgs dockerfile.
 - [2023-01-21 Sat] - Version 8.0.0: Corrected rule filt_bam_to_frag_bed to fix mates of inputs, which seems to prevent errors in the bamtobed call. Frag_window_count now uses windows of consistent 5 Mb size, which are generated from rule make_gc_map_bind. Added a merged fragment counts file and zero-centered unit SD counts.
 - [2022-12-07 Wed] - Version 7.0.0: Added copy number alteration and DELFI fragmentomics.
 - [2022-10-17 Mon] - Version 6.0.0: Using fastp for read trimming (replaces trimmomatic). Simplified naming schema. Removed downsampling (will reinstate in later version).

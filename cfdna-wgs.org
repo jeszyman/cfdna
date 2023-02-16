@@ -1,326 +1,102 @@
-* Cell-free DNA Whole-Genome Sequencing                             :biopipe:
+* Cell-free DNA Fragmentomics                                       :biopipe:
 :PROPERTIES:
 :header-args: :tangle no :mkdirp yes :tangle-mode (identity #o755)
 :header-args+: :noweb yes
 :END:
-** Setup inputs for testing
-- [[file:test/inputs/libraries.tsv]]
-- [[file:test/inputs/cna_libraries.tsv]]
-- Get my fastq inputs for read process & testing
+** Repository setup and administration
+*** Bash source
+#+begin_src bash :tangle ./config/bash_src
+data_dir="/mnt/ris/szymanski/Active/test"
+#+end_src
+*** Setup inputs for testing
+- blacklist
   #+begin_src bash
-#!/bin/echo For documentation, not intended to be executable:.
-mntpt=/mnt/ris/aadel/Active
-singularity shell --bind ${mntpt} ~/sing_containers/biotools.1.0.2.sif
-
-repo=/home/jeszyman/repos/cfdna-wgs
-mntpt=/mnt/ris/aadel/Active
-mkdir -p ${repo}/test/inputs
-
-fq_size=100000
-zcat ${mntpt}/mpnst/inputs/seq/MPNST/19_2_082_R1.fastq.gz | head -n $fq_size > ${repo}/test/inputs/mpnst1_R1.fastq
-zcat ${mntpt}/mpnst/inputs/seq/MPNST/19_2_082_R2.fastq.gz | head -n $fq_size > ${repo}/test/inputs/mpnst1_R2.fastq
-zcat ${mntpt}/mpnst/inputs/seq/MPNST/25_2_072_R1.fastq.gz | head -n $fq_size > ${repo}/test/inputs/mpnst2_R1.fastq
-zcat ${mntpt}/mpnst/inputs/seq/MPNST/25_2_072_R2.fastq.gz | head -n $fq_size > ${repo}/test/inputs/mpnst2_R2.fastq
-zcat ${mntpt}/mpnst/inputs/seq/PN/37_JS0050CD112717_R1.fastq.gz | head -n $fq_size > ${repo}/test/inputs/plex1_R1.fastq
-zcat ${mntpt}/mpnst/inputs/seq/PN/37_JS0050CD112717_R2.fastq.gz | head -n $fq_size > ${repo}/test/inputs/plex1_R2.fastq
-zcat ${mntpt}/mpnst/inputs/seq/PN/30_JS0044CD112818_R1.fastq.gz | head -n $fq_size > ${repo}/test/inputs/plex2_R1.fastq
-zcat ${mntpt}/mpnst/inputs/seq/PN/30_JS0044CD112818_R2.fastq.gz | head -n $fq_size > ${repo}/test/inputs/plex2_R2.fastq
-
-for file in ${repo}/test/inputs/*.fastq; do gzip -f $file; done
-
+source config/bash_src
+wget --directory-prefix="${data_dir}/inputs" \
+     --no-clobber \
+     wget https://github.com/Boyle-Lab/Blacklist/raw/master/lists/hg38-blacklist.v2.bed.gz
 #+end_src
-- Get bams for CNA and frag testing
+- hg38
   #+begin_src bash
-mntpt=/mnt/ris/aadel/Active
-singularity shell --bind ${mntpt} ~/sing_containers/biotools.1.0.2.sif
-
-repo=/home/jeszyman/repos/cfdna-wgs
-mntpt=/mnt/ris/aadel/Active
-mkdir -p ${repo}/test/inputs
-
-# Create small bam files to store in repo. Subsample real bams to ~100 Mb.
-sambamba view -s .005 -f bam -t 36 /mnt/ris/aadel/Active/mpnst/test/bam/new_HiSeq15_L002001_ACAC_extract_ds20.bam | samtools sort -@4 -n -o test/inputs/lib003_hg38.bam -
-
-sambamba view -s .005 -f bam -t 36 /mnt/ris/aadel/Active/mpnst/test/bam/new_HiSeq15_L002001_ATCG_extract_ds20.bam > test/bam/lib004_hg38.bam
-
-sambamba view -s 0.01 -f bam -t 4 /mnt/ris/aadel/Active/mpnst/bam/cfdna_wgs/ds/lib105_ds10.bam > test/inputs/lib005.bam
-
-sambamba view -s 0.01 -f bam -t 4 /mnt/ris/aadel/Active/mpnst/bam/cfdna_wgs/ds/lib205_ds10.bam > test/inputs/lib006.bam
-
-for file in test/inputs/*.bam; do samtools index $file; done
+source config/bash_src
+wget --directory-prefix="${data_dir}/inputs" \
+     --no-clobber \
+     ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/001/405/GCA_000001405.15_GRCh38/seqs_for_alignment_pipelines.ucsc_ids/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna.gz
 #+end_src
-** Dockerfile
-:PROPERTIES:
-:header-args:bash: :tangle ./docker/cfdna_wgs_Dockerfile
-:ID:       b10eb670-a855-4591-a74c-b458cb5f0581
-:END:
-*** Preamble
-#+begin_src bash
-FROM jeszyman/biotools:1.0.2
+- cfDNA WGS fastqs
+  #+begin_src bash
+source config/bash_src
 
-#################
-###   Notes   ###
-#################
-#
-# After build, the image will be pushed to the dockerhub as
-# jeszyman/cfdna_wgs
-# (https://hub.docker.com/repository/docker/jeszyman/cfdna_wgs)
+mntpt=/mnt/ris/aadel/Active
 
+fq_size=1000000
+
+zcat ${mntpt}/mpnst/inputs/seq/MPNST/19_2_082_R1.fastq.gz | head -n $fq_size > ${data_dir}/inputs/19_2_082_R1.fastq.gz
+zcat ${mntpt}/mpnst/inputs/seq/MPNST/19_2_082_R2.fastq.gz | head -n $fq_size > ${data_dir}/inputs/19_2_082_R2.fastq.gz
+
+zcat ${mntpt}/mpnst/inputs/seq/MPNST/25_2_072_R1.fastq.gz | head -n $fq_size > ${data_dir}/inputs/25_2_072_R1.fastq
+zcat ${mntpt}/mpnst/inputs/seq/MPNST/25_2_072_R2.fastq.gz | head -n $fq_size > ${data_dir}/inputs/25_2_072_R2.fastq
+
+zcat ${mntpt}/mpnst/inputs/seq/PN/37_JS0050CD112717_R1.fastq.gz | head -n $fq_size > ${data_dir}/inputs/JS0050CD112717_R1.fastq
+zcat ${mntpt}/mpnst/inputs/seq/PN/37_JS0050CD112717_R2.fastq.gz | head -n $fq_size > ${data_dir}/inputs/JS0050CD112717_R2.fastq
+
+zcat ${mntpt}/mpnst/inputs/seq/KO_10_23_17_R1.fastq.gz | head -n $fq_size > ${data_dir}/inputs/KO_10_23_17_R1.fastq.gz
+zcat ${mntpt}/mpnst/inputs/seq/KO_10_23_17_R2.fastq.gz | head -n $fq_size > ${data_dir}/inputs/KO_10_23_17_R2.fastq.gz
+
+zcat ${mntpt}/mpnst/inputs/seq/TS_36M_R1.fastq.gz | head -n $fq_size > ${data_dir}/inputs/TS_36M_R1.fastq.gz
+zcat ${mntpt}/mpnst/inputs/seq/TS_36M_R2.fastq.gz | head -n $fq_size > ${data_dir}/inputs/TS_36M_R2.fastq.gz
+
+zcat ${mntpt}/mpnst/inputs/seq/KS_30F_R1.fastq.gz | head -n $fq_size > ${data_dir}/inputs/KS_30F_R1.fastq.gz
+zcat ${mntpt}/mpnst/inputs/seq/KS_30F_R2.fastq.gz | head -n $fq_size > ${data_dir}/inputs/KS_30F_R2.fastq.gz
+
+for file in ${data_dir}/inputs/*.fastq; do gzip -f $file; done
 #+end_src
-*** IchorCNA
-#+begin_src bash
+- libraries.tsv [[file:/mnt/ris/szymanski/Active/test/inputs/cfdna_wgs_libraries.tsv]]
+  | library | r1_basename             | cohort    |
+  |---------+-------------------------+-----------|
+  | lib001  | 19_2_082_R1.fastq.gz    | mpnst     |
+  | lib002  | 25_2_072_R1.fastq       | mpnst     |
+  | lib003  | JS0050CD112717_R1.fastq | plexiform |
+  | lib004  | KO_10_23_17_R1.fastq.gz | plexiform |
+  | lib005  | TS_36M_R1.fastq.gz      | healthy   |
+  | lib006  | KS_30F_R1.fastq.gz      | healthy   |
+** Fragmentomics environment YAML
+#+begin_src bash :tangle ./config/frag_env.yaml
+name: frag
+channels:
+  - conda-forge
+  - bioconda
 
-#
-RUN cd /opt && \
-    git clone https://github.com/shahcompbio/hmmcopy_utils.git && \
-    cd hmmcopy_utils && \
-    cmake . && \
-    make
-
-#
-# ichorCNA
-##
-## linux dependencies
-RUN apt-get update \
-   && apt-get install -y \
-   libcurl4-openssl-dev \
-   libssl-dev \
-   libxml2-dev
-#RUN rm /usr/lib/x86_64-linux-gnu/libcurl.so.4
-#RUN ln -s /usr/lib/x86_64-linux-gnu/libcurl.so.4.5.0 /usr/lib/x86_64-linux-gnu/libcurl.so.4
-##
-## R dependencies
-RUN R -e 'install.packages("BiocManager"); BiocManager::install(); BiocManager::install("HMMcopy"); BiocManager::install("GenomeInfoDb"); BiocManager::install("GenomicRanges");'
-##
-## git clone install
-RUN cd /opt \
-    && git clone https://github.com/broadinstitute/ichorCNA.git \
-    && cd ichorCNA \
-    && R CMD INSTALL . \
-    && cd /opt
-##
-
+dependencies
+  - bwa
+  - r-tidyverse
+  - samtools
 #+end_src
 ** [[file:config/int_test.yaml][Snakemake configuration YAML]]
 :PROPERTIES:
 :header-args:bash: :tangle ./config/int_test.yaml
 :END:
 #+begin_src bash
-###   Parameters intended to be common across workflows   ###
 
-blklist: "test/inputs/hg38-blacklist.v2.bed"
-datadir: "test"
-default_container: "/home/jeszyman/sing_containers/biotools.1.0.2.sif"
-genome_fasta: "test/inputs/chr8.fa"
-genome_ref: "test/ref/chr8.fa"
-qcdir: "test/analysis/qc"
+##############################
+###   Configuration Yaml   ###
+##############################
+
+###   Parameters Intended To Be Common Across Workflows    ###
+
+blklist: "/mnt/ris/szymanski/Active/test/inputs/hg38-blacklist.v2.bed.gz"
+datadir: "/mnt/ris/szymanski/Active/test"
+genome_fasta: "/mnt/ris/szymanski/Active/test/inputs/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna.gz"
 threads: 4
 
 ###   Unique properties from this repo   ###
 
-cfdna_wgs_container: "/home/jeszyman/sing_containers/cfdna_wgs.1.0.0.sif"
-
 cfdna_wgs_repo: "/home/jeszyman/repos/cfdna-wgs"
-
-downsample:
-  - "0.001"
-  - "0.004"
 
 frag_distro: "90_150"
 
 gc5mb: "test/inputs/gc5mb.bed"
 
-picard_jar: "/opt/picard/picard.jar"
-
-#+end_src
-** INPROCESS [[file:workflow/reads_int_test.smk][Integration testing snakefile wrapper]]          :smk:
-:PROPERTIES:
-:header-args:snakemake: :tangle ./workflow/int_test.smk
-:END:
-*** Preamble
-#+begin_src snakemake
-
-##################################################################
-###   Integration testing snakefile for WGS cfDNA Processing   ###
-##################################################################
-
-import pandas as pd
-import re
-import numpy as np
-
-
-#+end_src
-*** Variable naming
-#+begin_src snakemake
-# Values directly from configuration file
-DOWNSAMPLE = config["downsample"]
-threads = config["threads"]
-FRAG_DISTROS = config["frag_distro"]
-cfdna_wgs_threads = config["threads"]
-default_container = config["default_container"]
-cfdna_wgs_container = config["cfdna_wgs_container"]
-genome_fasta = config["genome_fasta"]
-genome_ref = config["genome_ref"]
-cfdna_wgs_repo = config["cfdna_wgs_repo"]
-
-# Directory values derived from datadir in configuration YAML
-datadir                   = config["datadir"]
-cfdna_wgs                 = datadir + "/analysis/cfdna_wgs"
-cfdna_wgs_bams            = datadir + "/analysis/cfdna_wgs/bams"
-cfdna_wgs_fastqs          = datadir + "/analysis/cfdna_wgs/fastqs"
-cfdna_wgs_frag            = datadir + "/analysis/cfdna_wgs/frag"
-cfdna_wgs_frag_beds       = datadir + "/analysis/cfdna_wgs/frag/beds"
-cfdna_wgs_frag_counts     = datadir + "/analysis/cfdna_wgs/frag/counts"
-cfdna_wgs_frag_gc_distros = datadir + "/analysis/cfdna_wgs/frag/distros"
-qcdir                     = datadir + "/analysis/qc"
-benchdir                  = datadir + "/benchmark"
-logdir                    = datadir + "/logs"
-refdir                    = datadir + "/ref"
-
-cfdna_wgs_scriptdir = config["cfdna_wgs_repo"] +  "/scripts"
-
-#+end_src
-*** Functions, miscellaneous
-#+begin_src snakemake
-
-###   Functions   ###
-
-# Setup sample name index as a python dictionary
-cfdna_wgs_libraries = pd.read_table(config["datadir"] + "/inputs/libraries.tsv")
-
-readable = []
-for x in cfdna_wgs_libraries.file:
-    readable.append(os.access(x, os.R_OK))
-# Ensure readable fastqs
-cfdna_wgs_libraries['readable']=readable
-cfdna__wgs_libraries = cfdna_wgs_libraries[cfdna_wgs_libraries.readable == True]
-# Ensure correct library type per sample sheet
-cfdna_wgs_libraries = cfdna_wgs_libraries[cfdna_wgs_libraries.library_type == "wgs"]
-cfdna_wgs_libraries = cfdna_wgs_libraries[cfdna_wgs_libraries.isolation_type == "cfdna"]
-
-# Make the dictionary
-cfdna_wgs_library_indict = cfdna_wgs_libraries["library"].tolist()
-cfdna_wgs_file_indict = cfdna_wgs_libraries["file"].tolist()
-cfdna_wgs_lib_dict = dict(zip(cfdna_wgs_library_indict, cfdna_wgs_file_indict))
-
-CFDNA_WGS_LIBRARIES = list(cfdna_wgs_lib_dict.keys())
-CFDNA_WGS_FASTQS = list(cfdna_wgs_lib_dict.values())
-
-# Make  a list of healthy libraries
-CFDNA_WGS_HEALTHY_LIBRARIES = cfdna_wgs_libraries[cfdna_wgs_libraries['cohort'] == 'healthy']['library'].tolist()
-#+end_src
-
-*** All rule
-#+begin_src snakemake
-rule all:
-    input:
-        logdir + "/aggregate_output",
-        cfdna_wgs_frag + "/ratios.tsv",
-        qcdir + "/cfdna_wgs_read_qc.tsv",
-        qcdir + "/cfdna_wgs_frag_len.tsv",
-
-#+end_src
-*** Benchmark aggregation
-#+begin_src snakemake
-
-onsuccess:
-    shell("""
-        bash {cfdna_wgs_scriptdir}/agg_bench.sh {benchdir} {qcdir}/agg_bench.tsv
-        """)
-#+end_src
-#+begin_src bash :tangle ./scripts/agg_bench.sh
-# For unit testing
-indir="test/benchmark"
-output="test/analysis/qc/bench_agg.tsv"
-
-if [ -f $output ]; then rm $output; fi
-
-for file in $indir/*
-do
-    base=$(basename $file)
-    cat $file | awk -v OFS='\t' -v var=$base 'NR>1 {print var,$0}' >> $output
-done
-
-sed -i '1i\process\tfloat_sec\trun_time\tmax_rss\tmax_vms\tmax_uss\tmax_pss\tio_in\tio_out\tmean_load\tcpu_time' $output
-
-#+end_src
-
-#+begin_src R
-library(tidyverse)
-
-bmk_in = read_tsv("~/repos/cfdna-wgs/test/analysis/qc/bench_agg.tsv")
-
-bmk =
-  bmk_in %>%
-  mutate(process = gsub(".benchmark.txt", "", process)) %>%
-  mutate(library = process) %>%
-  mutate(library = ifelse(grepl("lib[0-9]{3}_", process),
-                          sub("^.*lib(\\d{3}).*$", "lib\\1", process), "all_libs")) %>%
-  mutate(process2 = process) %>%
-  mutate(process = gsub("^lib..._","", process)) %>%
-  rename(process_lib = process2)
-
-find_outlier <- function(x) {
-  return(x > quantile(x, .75) + 1.5*IQR(x))
-}
-
-bmk %>% mutate(outlier = ifelse(find_outlier(run_time), process_lib, NA)) %>%
-  ggplot(.,aes(y=run_time)) +
-  geom_boxplot() +
-  geom_text(aes( y = run_time, x = .1,label=outlier), na.rm=TRUE, position = position_jitter())
-
-bmk %>% mutate(outlier = ifelse(find_outlier(run_time), process_lib, NA)) %>%
-  ggplot(.,aes( y = run_time)) +
-  geom_boxplot() +
-  geom_text(aes( y = run_time, x = .1,label=outlier), na.rm=TRUE, position = position_jitter())
-
-#+end_src
-
-
-*** Symlink input fastqs
-#+begin_src snakemake
-rule symlink_inputs:
-    container: default_container,
-    input:
-        lambda wildcards: cfdna_wgs_lib_dict[wildcards.library],
-    output:
-        read1 = cfdna_wgs_fastqs + "/{library}_raw_R1.fastq.gz",
-        read2 = cfdna_wgs_fastqs + "/{library}_raw_R2.fastq.gz",
-    params:
-        outdir = cfdna_wgs_fastqs,
-        script = cfdna_wgs_scriptdir + "/symlink.sh",
-    shell:
-        """
-        {params.script} \
-        {input} \
-        {output.read1} \
-        {output.read2} \
-        {params.outdir}
-        """
-#+end_src
-#+begin_src bash :tangle ./scripts/symlink.sh
-#!/usr/bin/env bash
-set -o errexit   # abort on nonzero exitstatus
-set -o nounset   # abort on unbound variable
-set -o pipefail  # don't hide errors within pipes
-
-# Script variables
-input_read1="${1}"
-output_read1="${2}"
-output_read2="${3}"
-outdir="${4}"
-
-mkdir -p $outdir
-
-input_read2="$(echo $input_read1 | sed "s/_R1/_R2/g")"
-
-ln -sf --relative ${input_read1} ${output_read1}
-ln -sf --relative ${input_read2} ${output_read2}
-#+end_src
-*** Includes statements
-#+begin_src snakemake
-include: cfdna_wgs_repo + "/workflow/reads.smk"
-include: cfdna_wgs_repo + "/workflow/frag.smk"
 #+end_src
 ** Basic read processing :smk:
 :PROPERTIES:
@@ -342,6 +118,8 @@ include: cfdna_wgs_repo + "/workflow/frag.smk"
 - [[./workflow/reads.smk::rule cfdna_wgs_index][Snakemake]]
   #+begin_src snakemake
 
+GCA_000001405.15_GRcH38_no_alt_analysis_set.fna.sa
+
 # Make alignment index
 #  Note: Upon first run, this rule will touch an empty file with the same path
 #        as the index prefix. Thereafter, you can avoid repeat indexing when the
@@ -349,21 +127,27 @@ include: cfdna_wgs_repo + "/workflow/frag.smk"
 #        external reference, indexing can likewise be avoided with this empty
 #        file at the external index location.
 
-rule cfdna_wgs_index:
-    benchmark: benchdir + "/cfdna_wgs_index.benchmark.txt",
+rule frag_index:
+    benchmark: benchdir + "/frag_index.benchmark.txt",
     container: cfdna_wgs_container,
     input: genome_fasta,
-    log: logdir + "/cfdna_wgs_index.log",
-    output: done = touch(genome_ref),
+    log: logdir + "/frag_index.log",
+    output: "{data_dir}/ref/{fasta_base}.sa",
     params:
-        out_prefix = genome_ref,
+        out_prefix = bwa_dir + fasta_base,
         script = cfdna_wgs_scriptdir + "/index.sh",
-        threads = cfdna_wgs_threads,
     shell:
         """
-        bwa index -p {params.out_prefix} {input} &> {log}
+        {params.script} {input} &> {log}
         """
+#+end_src
+- Shell script
+  #+begin_src bash :tangle ./scripts/frag_index.sh
+#!/usr/bin/env bash
+in_fasta=$1
+out_prefix=$2
 
+bwa index -p $out_prefix $in_fasta
 #+end_src
 **** Adapter-trim and QC reads with fastp                          :smk_rule:
 - [[./workflow/reads.smk::rule cfdna_wgs_fastp][Snakemake]]
@@ -1096,7 +880,6 @@ rule downsample_bams:
 # For unit testing
 # in_bam=test/analysis/cfdna_wgs/bams/lib001_filt.bam
 # milreads=0.001
-# checker=test/tmp/lib001_ds0.001.txt
 # outdir=test/analysis/cfdna_wgs/bams
 # suffix=_filt.bam
 # threads=4
@@ -1699,6 +1482,195 @@ write_tsv(ratios, file = ratios_tsv)
 :PROPERTIES:
 :header-args:snakemake: :tangle no
 :END:
+** INPROCESS [[file:workflow/reads_int_test.smk][Integration testing snakefile wrapper]]          :smk:
+:PROPERTIES:
+:header-args:snakemake: :tangle ./workflow/int_test.smk
+:END:
+*** Preamble
+#+begin_src snakemake
+
+##################################################################
+###   Integration testing snakefile for WGS cfDNA Processing   ###
+##################################################################
+
+import pandas as pd
+import re
+import numpy as np
+
+
+#+end_src
+*** Variable naming
+#+begin_src snakemake
+# Values directly from configuration file
+DOWNSAMPLE = config["downsample"]
+threads = config["threads"]
+FRAG_DISTROS = config["frag_distro"]
+cfdna_wgs_threads = config["threads"]
+default_container = config["default_container"]
+cfdna_wgs_container = config["cfdna_wgs_container"]
+genome_fasta = config["genome_fasta"]
+genome_ref = config["genome_ref"]
+cfdna_wgs_repo = config["cfdna_wgs_repo"]
+
+# Directory values derived from datadir in configuration YAML
+datadir                   = config["datadir"]
+cfdna_wgs                 = datadir + "/analysis/cfdna_wgs"
+cfdna_wgs_bams            = datadir + "/analysis/cfdna_wgs/bams"
+cfdna_wgs_fastqs          = datadir + "/analysis/cfdna_wgs/fastqs"
+cfdna_wgs_frag            = datadir + "/analysis/cfdna_wgs/frag"
+cfdna_wgs_frag_beds       = datadir + "/analysis/cfdna_wgs/frag/beds"
+cfdna_wgs_frag_counts     = datadir + "/analysis/cfdna_wgs/frag/counts"
+cfdna_wgs_frag_gc_distros = datadir + "/analysis/cfdna_wgs/frag/distros"
+qcdir                     = datadir + "/analysis/qc"
+benchdir                  = datadir + "/benchmark"
+logdir                    = datadir + "/logs"
+refdir                    = datadir + "/ref"
+
+cfdna_wgs_scriptdir = config["cfdna_wgs_repo"] +  "/scripts"
+
+#+end_src
+*** Functions, miscellaneous
+#+begin_src snakemake
+
+###   Functions   ###
+
+# Setup sample name index as a python dictionary
+cfdna_wgs_libraries = pd.read_table(config["datadir"] + "/inputs/libraries.tsv")
+
+readable = []
+for x in cfdna_wgs_libraries.file:
+    readable.append(os.access(x, os.R_OK))
+# Ensure readable fastqs
+cfdna_wgs_libraries['readable']=readable
+cfdna__wgs_libraries = cfdna_wgs_libraries[cfdna_wgs_libraries.readable == True]
+# Ensure correct library type per sample sheet
+cfdna_wgs_libraries = cfdna_wgs_libraries[cfdna_wgs_libraries.library_type == "wgs"]
+cfdna_wgs_libraries = cfdna_wgs_libraries[cfdna_wgs_libraries.isolation_type == "cfdna"]
+
+# Make the dictionary
+cfdna_wgs_library_indict = cfdna_wgs_libraries["library"].tolist()
+cfdna_wgs_file_indict = cfdna_wgs_libraries["file"].tolist()
+cfdna_wgs_lib_dict = dict(zip(cfdna_wgs_library_indict, cfdna_wgs_file_indict))
+
+CFDNA_WGS_LIBRARIES = list(cfdna_wgs_lib_dict.keys())
+CFDNA_WGS_FASTQS = list(cfdna_wgs_lib_dict.values())
+
+# Make  a list of healthy libraries
+CFDNA_WGS_HEALTHY_LIBRARIES = cfdna_wgs_libraries[cfdna_wgs_libraries['cohort'] == 'healthy']['library'].tolist()
+#+end_src
+
+*** All rule
+#+begin_src snakemake
+rule all:
+    input:
+        logdir + "/aggregate_output",
+        cfdna_wgs_frag + "/ratios.tsv",
+        qcdir + "/cfdna_wgs_read_qc.tsv",
+        qcdir + "/cfdna_wgs_frag_len.tsv",
+
+#+end_src
+*** Benchmark aggregation
+#+begin_src snakemake
+
+onsuccess:
+    shell("""
+        bash {cfdna_wgs_scriptdir}/agg_bench.sh {benchdir} {qcdir}/agg_bench.tsv
+        """)
+#+end_src
+#+begin_src bash :tangle ./scripts/agg_bench.sh
+# For unit testing
+indir="test/benchmark"
+output="test/analysis/qc/bench_agg.tsv"
+
+if [ -f $output ]; then rm $output; fi
+
+for file in $indir/*
+do
+    base=$(basename $file)
+    cat $file | awk -v OFS='\t' -v var=$base 'NR>1 {print var,$0}' >> $output
+done
+
+sed -i '1i\process\tfloat_sec\trun_time\tmax_rss\tmax_vms\tmax_uss\tmax_pss\tio_in\tio_out\tmean_load\tcpu_time' $output
+
+#+end_src
+
+#+begin_src R
+library(tidyverse)
+
+bmk_in = read_tsv("~/repos/cfdna-wgs/test/analysis/qc/bench_agg.tsv")
+
+bmk =
+  bmk_in %>%
+  mutate(process = gsub(".benchmark.txt", "", process)) %>%
+  mutate(library = process) %>%
+  mutate(library = ifelse(grepl("lib[0-9]{3}_", process),
+                          sub("^.*lib(\\d{3}).*$", "lib\\1", process), "all_libs")) %>%
+  mutate(process2 = process) %>%
+  mutate(process = gsub("^lib..._","", process)) %>%
+  rename(process_lib = process2)
+
+find_outlier <- function(x) {
+  return(x > quantile(x, .75) + 1.5*IQR(x))
+}
+
+bmk %>% mutate(outlier = ifelse(find_outlier(run_time), process_lib, NA)) %>%
+  ggplot(.,aes(y=run_time)) +
+  geom_boxplot() +
+  geom_text(aes( y = run_time, x = .1,label=outlier), na.rm=TRUE, position = position_jitter())
+
+bmk %>% mutate(outlier = ifelse(find_outlier(run_time), process_lib, NA)) %>%
+  ggplot(.,aes( y = run_time)) +
+  geom_boxplot() +
+  geom_text(aes( y = run_time, x = .1,label=outlier), na.rm=TRUE, position = position_jitter())
+
+#+end_src
+
+
+*** Symlink input fastqs
+#+begin_src snakemake
+rule symlink_inputs:
+    container: default_container,
+    input:
+        lambda wildcards: cfdna_wgs_lib_dict[wildcards.library],
+    output:
+        read1 = cfdna_wgs_fastqs + "/{library}_raw_R1.fastq.gz",
+        read2 = cfdna_wgs_fastqs + "/{library}_raw_R2.fastq.gz",
+    params:
+        outdir = cfdna_wgs_fastqs,
+        script = cfdna_wgs_scriptdir + "/symlink.sh",
+    shell:
+        """
+        {params.script} \
+        {input} \
+        {output.read1} \
+        {output.read2} \
+        {params.outdir}
+        """
+#+end_src
+#+begin_src bash :tangle ./scripts/symlink.sh
+#!/usr/bin/env bash
+set -o errexit   # abort on nonzero exitstatus
+set -o nounset   # abort on unbound variable
+set -o pipefail  # don't hide errors within pipes
+
+# Script variables
+input_read1="${1}"
+output_read1="${2}"
+output_read2="${3}"
+outdir="${4}"
+
+mkdir -p $outdir
+
+input_read2="$(echo $input_read1 | sed "s/_R1/_R2/g")"
+
+ln -sf --relative ${input_read1} ${output_read1}
+ln -sf --relative ${input_read2} ${output_read2}
+#+end_src
+*** Includes statements
+#+begin_src snakemake
+include: cfdna_wgs_repo + "/workflow/reads.smk"
+include: cfdna_wgs_repo + "/workflow/frag.smk"
+#+end_src
 ** [[file:workflow/cna_frag_int_test.smk][CNA and fragmentomics integration testing]]                            :smk:
 :PROPERTIES:
 :header-args:snakemake: :tangle ./workflow/cna_frag_int_test.smk :tangle-mode
@@ -2815,5 +2787,57 @@ sambamba view -t $threads -S -f bam $input > $output_bam
 sambamba markdup -r -t $threads $output_bam $output_dedup
 sambamba sort -t $threads $output_dedup -o $output_sort
 sambamba index -t $threads $output_sort
+
+#+end_src
+*** Dockerfile
+:PROPERTIES:
+:header-args:bash: :tangle ./docker/cfdna_wgs_Dockerfile
+:ID:       b10eb670-a855-4591-a74c-b458cb5f0581
+:END:
+**** Preamble
+#+begin_src bash
+FROM jeszyman/biotools:1.0.2
+
+#################
+###   Notes   ###
+#################
+#
+# After build, the image will be pushed to the dockerhub as
+# jeszyman/cfdna_wgs
+# (https://hub.docker.com/repository/docker/jeszyman/cfdna_wgs)
+
+#+end_src
+**** IchorCNA
+#+begin_src bash
+
+#
+RUN cd /opt && \
+    git clone https://github.com/shahcompbio/hmmcopy_utils.git && \
+    cd hmmcopy_utils && \
+    cmake . && \
+    make
+
+#
+# ichorCNA
+##
+## linux dependencies
+RUN apt-get update \
+   && apt-get install -y \
+   libcurl4-openssl-dev \
+   libssl-dev \
+   libxml2-dev
+#RUN rm /usr/lib/x86_64-linux-gnu/libcurl.so.4
+#RUN ln -s /usr/lib/x86_64-linux-gnu/libcurl.so.4.5.0 /usr/lib/x86_64-linux-gnu/libcurl.so.4
+##
+## R dependencies
+RUN R -e 'install.packages("BiocManager"); BiocManager::install(); BiocManager::install("HMMcopy"); BiocManager::install("GenomeInfoDb"); BiocManager::install("GenomicRanges");'
+##
+## git clone install
+RUN cd /opt \
+    && git clone https://github.com/broadinstitute/ichorCNA.git \
+    && cd ichorCNA \
+    && R CMD INSTALL . \
+    && cd /opt
+##
 
 #+end_src

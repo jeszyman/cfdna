@@ -2,7 +2,6 @@
 # For unit testing
 # in_bam=test/analysis/cfdna_wgs/bams/lib001_filt.bam
 # milreads=0.001
-# checker=test/tmp/lib001_ds0.001.txt
 # outdir=test/analysis/cfdna_wgs/bams
 # suffix=_filt.bam
 # threads=4

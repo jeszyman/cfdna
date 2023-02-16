@@ -1,0 +1,7 @@
+library	r1_basename	cohort
+lib001	19_2_082_R1.fastq.gz	mpnst
+lib002	25_2_072_R1.fastq	mpnst
+lib003	JS0050CD112717_R1.fastq	plexiform
+lib004	KO_10_23_17_R1.fastq.gz	plexiform
+lib005	TS_36M_R1.fastq.gz	healthy
+lib006	KS_30F_R1.fastq.gz	healthy

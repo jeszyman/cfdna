@@ -5,33 +5,22 @@
 #                                                                              #
 #########1#########2#########3#########4#########5#########6#########7#########8
 
-GCA_000001405.15_GRcH38_no_alt_analysis_set.fna.sa
-
-# Make alignment index
-#  Note: Upon first run, this rule will touch an empty file with the same path
-#        as the index prefix. Thereafter, you can avoid repeat indexing when the
-#        rule "sees" this empty file. For repo intergration testing with an
-#        external reference, indexing can likewise be avoided with this empty
-#        file at the external index location.
-
 rule frag_index:
     benchmark: benchdir + "/frag_index.benchmark.txt",
-    container: cfdna_wgs_container,
     input: genome_fasta,
     log: logdir + "/frag_index.log",
-    output: "{data_dir}/ref/{fasta_base}.sa",
+    output: f"{data_dir}/ref/{fasta_base}.sa",
     params:
-        out_prefix = bwa_dir + fasta_base,
-        script = cfdna_wgs_scriptdir + "/index.sh",
+        out_prefix = f"{bwa_dir}/{fasta_base}",
+        script = f"{frag_script_dir}/frag_index.sh",
     shell:
         """
-        {params.script} {input} &> {log}
+        {params.script} {input} {params.out_prefix} &> {log}
         """
 
 # Adapter-trim and QC reads with fastp
 rule cfdna_wgs_fastp:
     benchmark: benchdir + "/{library}_cfdna_wgs_fastp.benchmark.txt",
-    container: cfdna_wgs_container,
     input:
         read1 = cfdna_wgs_fastqs + "/{library}_raw_R1.fastq.gz",
         read2 = cfdna_wgs_fastqs + "/{library}_raw_R2.fastq.gz",
@@ -68,9 +57,8 @@ rule cfdna_wgs_fastp:
 # Align reads with BWA
 rule cfdna_wgs_align:
     benchmark: benchdir + "/{library}_cfdna_wgs_align.benchmark.txt",
-    container: cfdna_wgs_container,
     input:
-        ref = genome_ref,
+        ref = "{data_dir}/ref/{fasta_base}",
         read1 = cfdna_wgs_fastqs + "/{library}_processed_R1.fastq.gz",
         read2 = cfdna_wgs_fastqs + "/{library}_processed_R2.fastq.gz",
     log: logdir + "/{library}_cfdna_wgs_align.log",
@@ -95,7 +83,6 @@ rule cfdna_wgs_align:
 # Remove PCR duplicates from aligned reads
 rule cfdna_wgs_dedup:
     benchmark: benchdir + "/{library}_cfdna_wgs_dedup.benchmark.txt",
-    container: cfdna_wgs_container,
     input: cfdna_wgs_bams + "/{library}_raw.bam",
     log: logdir + "/{library}_cfdna_wgs_dedup.log",
     output: cfdna_wgs_bams + "/{library}_dedup.bam",
@@ -115,7 +102,6 @@ rule cfdna_wgs_dedup:
 
 checkpoint cfdna_wgs_filter_alignment:
     benchmark: benchdir + "/{library}_cfdna_wgs_filter_alignment.benchmark.txt",
-    container: cfdna_wgs_container,
     input: cfdna_wgs_bams + "/{library}_dedup.bam",
     log: logdir + "/{library}_cfdna_wgs_filter_alignment.log",
     output: cfdna_wgs_bams + "/{library}_filt.bam",
@@ -133,7 +119,6 @@ checkpoint cfdna_wgs_filter_alignment:
 # Get read quality by FASTQC
 rule cfdna_wgs_fastqc:
     benchmark: benchdir+ "/{library}_{processing}_{read}_cfdna_wgs_fastqc.benchmark.txt",
-    container: cfdna_wgs_container,
     input: cfdna_wgs_fastqs + "/{library}_{processing}_{read}.fastq.gz",
     log: logdir + "/{library}_{processing}_{read}_cfdna_wgs_fastqc.log",
     output:
@@ -153,7 +138,6 @@ rule cfdna_wgs_fastqc:
 
 # Get alignment QC using samtools
 rule cfdna_wgs_alignment_qc:
-    container: cfdna_wgs_container,
     input: cfdna_wgs_bams + "/{library}_{processing}.bam",
     log:
         flagstat = logdir + "/{library}_{processing}_flagstat_cfdna_wgs_alignment_qc.log",
@@ -178,7 +162,6 @@ rule cfdna_wgs_alignment_qc:
 # Sequencing depth metrics via Picard
 rule cfdna_wgs_picard_depth:
     benchmark: benchdir + "/{library}_cfdna_wgs_picard_depth.benchmark.txt",
-    container: cfdna_wgs_container,
     input: cfdna_wgs_bams + "/{library}_filt.bam",
     log: logdir + "/{library}_cfdna_wgs_picard_depth.log",
     output: qcdir + "/{library}_picard_depth.txt",
@@ -197,8 +180,7 @@ rule cfdna_wgs_picard_depth:
 # Get fragment sizes using deepTools
 rule cfdna_wgs_bampefragsize:
     benchmark: benchdir + "/cfdna_wgs_bampefragsize.benchmark.txt",
-    container: cfdna_wgs_container,
-    input: expand(cfdna_wgs_bams + "/{library}_filt.bam", library = CFDNA_WGS_LIBRARIES),
+    input: expand(cfdna_wgs_bams + "/{library}_filt.bam", library = FRAG_LIBS),
     log: logdir + "/cfdna_wgs_bampefragsize.log",
     output:
         raw = qcdir + "/deeptools_frag_lengths.txt",
@@ -221,7 +203,6 @@ rule cfdna_wgs_bampefragsize:
 # Make deeptools bamCoverage bedfile
 rule cfdna_wgs_bamcoverage:
     benchmark: benchdir + "/{library}_cfdna_wgs_bamcoverage.benchmark.txt",
-    container: cfdna_wgs_container,
     input: cfdna_wgs_bams + "/{library}_filt.bam",
     log: logdir + "/{library}_cfdna_wgs_bamcoverage.log",
     output: qcdir + "/{library}_bamcoverage.bg",
@@ -243,8 +224,7 @@ rule cfdna_wgs_bamcoverage:
 # Make deepTools plotCoverage coverage maps for all filtered bams
 rule cfdna_wgs_plotcoverage:
     benchmark: benchdir + "/cfdna_wgs_plotcoverage.benchmark.txt",
-    container: cfdna_wgs_container,
-    input: expand(cfdna_wgs_bams + "/{library}_filt.bam", library = CFDNA_WGS_LIBRARIES),
+    input: expand(cfdna_wgs_bams + "/{library}_filt.bam", library = FRAG_LIBS),
     log: logdir + "/cfdna_wgs_plotcoverage.log",
     output:
         raw = qcdir + "/cfdna_wgs_coverage.tsv",
@@ -266,13 +246,12 @@ rule cfdna_wgs_plotcoverage:
 # Aggregate QC files using MultiQC
 rule cfdna_wgs_multiqc:
     benchmark: benchdir + "/cfdna_wgs_multiqc.benchmark.txt",
-    container: cfdna_wgs_container,
     input:
-        expand(logdir + "/{library}_cfdna_wgs_fastp.json", library = CFDNA_WGS_LIBRARIES),
-        expand(qcdir + "/{library}_{processing}_{read}_fastqc.zip", library = CFDNA_WGS_LIBRARIES, processing = ["raw", "processed", "unpaired"], read = ["R1","R2"]),
-        expand(qcdir + "/{library}_{processing}_samstats.txt", library = CFDNA_WGS_LIBRARIES, processing = ["raw","filt"]),
-        expand(qcdir + "/{library}_{processing}_flagstat.txt", library = CFDNA_WGS_LIBRARIES, processing = ["raw","filt"]),
-        expand(qcdir + "/{library}_picard_depth.txt", library = CFDNA_WGS_LIBRARIES),
+        expand(logdir + "/{library}_cfdna_wgs_fastp.json", library = FRAG_LIBS),
+        expand(qcdir + "/{library}_{processing}_{read}_fastqc.zip", library = FRAG_LIBS, processing = ["raw", "processed", "unpaired"], read = ["R1","R2"]),
+        expand(qcdir + "/{library}_{processing}_samstats.txt", library = FRAG_LIBS, processing = ["raw","filt"]),
+        expand(qcdir + "/{library}_{processing}_flagstat.txt", library = FRAG_LIBS, processing = ["raw","filt"]),
+        expand(qcdir + "/{library}_picard_depth.txt", library = FRAG_LIBS),
         qcdir + "/deeptools_frag_lengths.txt",
         qcdir + "/cfdna_wgs_coverage.tsv",
     log: logdir + "/cfdna_wgs_multiqc.log",
@@ -298,7 +277,6 @@ rule cfdna_wgs_multiqc:
 # Make a tab-separated aggregate QC table
 checkpoint cfdna_wgs_make_qc_tsv:
     benchmark: benchdir + "/cfdna_wgs_make_qc_tsv.benchmark.txt",
-    container: cfdna_wgs_container,
     input:
         fq = qcdir + "/cfdna_wgs_multiqc_data/multiqc_fastqc.txt",
         mqsam = qcdir + "/cfdna_wgs_multiqc_data/multiqc_samtools_stats.txt",
@@ -323,95 +301,4 @@ checkpoint cfdna_wgs_make_qc_tsv:
         {input.deeptools_cov} \
         {output.readqc} \
         {output.fraglen} >& {log}
-        """
-
-rule downsample_bams:
-    container: cfdna_wgs_container,
-    input: cfdna_wgs_bams + "/{library}_filt.bam",
-    output: touch(logdir + "/{library}_{downsample}_downsample.done"),
-    params:
-        out_dir = cfdna_wgs_bams,
-        script = cfdna_wgs_scriptdir + "/downsample_bams.sh",
-        suffix = "_filt.bam",
-        threads = cfdna_wgs_threads,
-    shell:
-        """
-        {params.script} \
-        {input} \
-        {wildcards.downsample} \
-        {params.out_dir} \
-        {params.suffix} \
-        {params.threads}
-        """
-
-# If downsample occured, then write filename into this per-library log, else leave the log file blank
-rule log_dowsample:
-    input: logdir + "/{library}_{downsample}_downsample.done",
-    output: logdir + "/{library}_{downsample}_made",
-    params:
-        bamdir = cfdna_wgs_bams,
-    shell:
-        """
-        dspath={params.bamdir}/{wildcards.library}_ds{wildcards.downsample}.bam
-        if [ -f $dspath ]; then echo "$dspath"  > {output}; else touch {output}; fi
-        """
-
-# Use the downsampled bam logs to make a single text file of conditionally executed final targets.
-# Specifically in this example, log text lines are in the form
-# cfdna_wgs_bams + "/{library}_ds{downsample}_frag90_150.bam" to setup conditional execution of fragment filtering ONLY on downsampled bams
-# Note alternative delimiter "~" to sed allows cfdna_wgs_wigs as param
-
-checkpoint ds_cond_target_list:
-    input: expand(logdir + "/{library}_{downsample}_made", library = CFDNA_WGS_LIBRARIES, downsample = DOWNSAMPLE),
-    output: logdir + "/ds_final_targets",
-    params:
-        outdir = cfdna_wgs_bams,
-        frag_distro=config["frag_distro"]
-    shell:
-        """
-        if [ -f {output} ]; then rm {output}; fi
-        cat {input} > {output}
-        sed -i 's~^.*lib~{params.outdir}/lib~g' {output}
-        sed -i 's/.bam$/_frag{params.frag_distro}.bam/g' {output}
-        """
-
-# Function jsut pulls the final target names out of ds_final_targets
-def get_ds_targets(wildcards):
-    with open(checkpoints.ds_cond_target_list.get(**wildcards).output[0], "r") as f:
-      non_empty_files = [l.strip() for l in f.readlines()]
-    return non_empty_files
-
-# This rule allows execution of rules which will generate the conditional targets in ds_cond_target_list
-rule make_ds_targets:
-    input:
-        get_ds_targets
-    output: logdir + "/aggregate_output"
-    run:
-        with open(output[0], "w") as f:
-            f.write("\n".join(input))
-
-rule frag_filt:
-    container: cfdna_wgs_container,
-    input:
-        main = cfdna_wgs_bams + "/{library}_ds{downsample}.bam",
-        check = logdir + "/{library}_{downsample}_made",
-    output:
-        nohead = temp(cfdna_wgs_bams + "/{library}_ds{downsample}_frag{frag_distro}.nohead"),
-        onlyhead = temp(cfdna_wgs_bams + "/{library}_ds{downsample}_frag{frag_distro}.only"),
-        final = cfdna_wgs_bams + "/{library}_ds{downsample}_frag{frag_distro}.bam",
-    params:
-        script = cfdna_wgs_scriptdir + "/frag_filt.sh",
-        threads = cfdna_wgs_threads,
-    shell:
-        """
-        frag_min=$(echo {wildcards.frag_distro} | sed -e "s/_.*$//g")
-        frag_max=$(echo {wildcards.frag_distro} | sed -e "s/^.*_//g")
-        {params.script} \
-        {input.main} \
-        {output.nohead} \
-        $frag_min \
-        $frag_max \
-        {config[threads]} \
-        {output.onlyhead} \
-        {output.final}
         """

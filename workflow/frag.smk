@@ -147,7 +147,7 @@ rule frag_window_count:
 rule cfdna_wgs_count_merge:
     benchmark: benchdir + "/cfdna_wgs_count_merge.benchmark.txt",
     container: cfdna_wgs_container,
-    input: expand(cfdna_wgs_frag_counts + "/{library}_cnt_{length}.tmp",  library = CFDNA_WGS_LIBRARIES, length = ["short","long"]),
+    input: expand(cfdna_wgs_frag_counts + "/{library}_cnt_{length}.tmp",  library = FRAG_LIBS, length = ["short","long"]),
     log: logdir + "/cfdna_wgs_count_merge.log",
     output:  cfdna_wgs_frag + "/frag_counts.tsv",
     params:

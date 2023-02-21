@@ -1,0 +1,9 @@
+name: frag
+channels:
+  - conda-forge
+  - bioconda
+
+dependencies:
+  - bwa
+  - r-tidyverse
+  - samtools

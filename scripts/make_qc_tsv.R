@@ -1,13 +1,14 @@
+bash [[file:~/repos/cfdna-wgs/cfdna-wgs.org::*Make%20aggregate%20QC%20table][Make aggregate QC table:2]]
 #!/usr/bin/env Rscript
 #
 # Unit test variables
-## mqc_dir="test/analysis/qc/cfdna_wgs_multiqc_data"
+## mqc_dir="test/analysis/qc/frag_multiqc_data"
 ## fastqc_input = paste0(mqc_dir,"/multiqc_fastqc.txt")
 ## samstats_input = paste0(mqc_dir, "/multiqc_samtools_stats.txt")
 ## flagstats_input = paste0(mqc_dir, "/multiqc_samtools_flagstat.txt")
 ## picard_input = paste0(mqc_dir, "/multiqc_picard_wgsmetrics.txt")
 ## deeptools_frag_input = "test/analysis/qc/deeptools_frag_lengths.txt"
-## deeptools_cov_input = "test/analysis/qc/cfdna_wgs_coverage.tsv"
+## deeptools_cov_input = "test/analysis/qc/frag_coverage.tsv"
 
 args = commandArgs(trailingOnly = TRUE)
 fastqc_input = args[1]
@@ -98,3 +99,4 @@ frag_len =
   replace(is.na(.), 0)
 
 write_tsv(frag_len, file = frag_len_out_tbl)
+bash Make aggregate QC table:2 ends here

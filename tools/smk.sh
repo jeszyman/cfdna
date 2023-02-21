@@ -1,3 +1,4 @@
+# [[file:~/repos/cfdna-wgs/cfdna-wgs.org::*Repository%20setup%20and%20administration][Repository setup and administration:1]]
 #!/usr/bin/env bash
 
 #######################################
@@ -38,3 +39,4 @@ if [ "$4" == "run" ]; then
 else
     run_dry $env $config $snkfile
 fi
+# Repository setup and administration:1 ends here

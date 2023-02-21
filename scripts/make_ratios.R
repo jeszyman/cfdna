@@ -1,7 +1,8 @@
+bash [[file:~/repos/cfdna-wgs/cfdna-wgs.org::*Make%20a%20zero-centered,%20unit%20SD%20fragment%20file][Make a zero-centered, unit SD fragment file:2]]
 #!/usr/bin/env Rscript
 
 # For unit testing
-frags_tsv = "test/analysis/cfdna_wgs/frag/frag_counts.tsv"
+frags_tsv = "test/analysis/frag/frag/frag_counts.tsv"
 ratios_tsv = "/home/jeszyman/mpnst/analysis/cfdna-wgs/frag/ratios.tsv"
 
 args = commandArgs(trailingOnly = TRUE)
@@ -29,3 +30,4 @@ ratios =
   mutate(ratio.centered = scale(fract, scale=F)[,1])
 
 write_tsv(ratios, file = ratios_tsv)
+bash Make a zero-centered, unit SD fragment file:2 ends here

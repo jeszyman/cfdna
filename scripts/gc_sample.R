@@ -1,3 +1,4 @@
+bash [[file:~/repos/cfdna-wgs/cfdna-wgs.org::*Sample%20fragments%20by%20healthy%20GC%20proportions][Sample fragments by healthy GC proportions:2]]
 #!/usr/bin/env Rscript
 args = commandArgs(trailingOnly = TRUE)
 healthy_med = args[1]
@@ -29,3 +30,4 @@ sampled = frag %>%
   slice_sample(., n = nrow(.), weight_by = med_frag_fract, replace = T) %>% select(chr, start, end, len, gc_strata)
 
 write.table(sampled, sep = "\t", col.names = F, row.names = F, quote = F, file = sampled_file)
+bash Sample fragments by healthy GC proportions:2 ends here

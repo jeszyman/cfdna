@@ -1,18 +1,21 @@
+# [[file:~/repos/cfdna-wgs/cfdna-wgs.org::*Preamble][Preamble:1]]
 #########1#########2#########3#########4#########5#########6#########7#########8
 #                                                                              #
 #     Fragmentomic Analysis of Cell-free DNA Whole Genome Sequencing           #
 #                                                                              #
 #########1#########2#########3#########4#########5#########6#########7#########8
+# Preamble:1 ends here
 
+# [[file:~/repos/cfdna-wgs/cfdna-wgs.org::*Make%20GC%20and%20mappability%20restricted%20bins][Make GC and mappability restricted bins:1]]
 rule make_gc_map_bind:
-    container: cfdna_wgs_container,
+    container: frag_container,
     input:
         gc5mb = config["gc5mb"],
         blklist = config["blklist"],
     log: logdir + "/make_gc_map_bind.log",
     output: refdir + "/keep_5mb.bed",
     params:
-        script = cfdna_wgs_scriptdir + "/make_gc_map_bind.sh",
+        script = "{frag_script_dir}/make_gc_map_bind.sh",
     shell:
         """
         {params.script} \
@@ -20,18 +23,20 @@ rule make_gc_map_bind:
         {input.blklist} \
         {output} &> {log}
         """
+# Make GC and mappability restricted bins:1 ends here
 
+# [[file:~/repos/cfdna-wgs/cfdna-wgs.org::*Make%20bedfile%20from%20filtered%20bam][Make bedfile from filtered bam:1]]
 # Make a bed file from filtered bam
 rule filt_bam_to_frag_bed:
     benchmark: benchdir + "/{library}_filt_bam_to_frag_bed.benchmark.txt",
-    container: cfdna_wgs_container,
-    input: cfdna_wgs_bams + "/{library}_filt.bam",
+    container: frag_container,
+    input: frag_bams + "/{library}_filt.bam",
     log: logdir + "/{library}_filt_bam_to_frag_bed.log",
-    output: cfdna_wgs_frag_beds + "/{library}_filt.bed",
+    output: frag_frag_beds + "/{library}_filt.bed",
     params:
         fasta = genome_fasta,
-        script = cfdna_wgs_scriptdir + "/filt_bam_to_frag_bed.sh",
-        threads = cfdna_wgs_threads,
+        script = "{frag_script_dir}/filt_bam_to_frag_bed.sh",
+        threads = frag_threads,
     shell:
         """
         {params.script} \
@@ -40,16 +45,18 @@ rule filt_bam_to_frag_bed:
         {params.threads} \
         {output}
         """
+# Make bedfile from filtered bam:1 ends here
 
+# [[file:~/repos/cfdna-wgs/cfdna-wgs.org::*Make%20GC%20distributions][Make GC distributions:1]]
 # Make GC distributions
 rule gc_distro:
-    benchmark: benchdir + "/{library}_cfdna_wgs_gc_distro.benchmark.txt",
-    container: cfdna_wgs_container,
-    input: cfdna_wgs_frag_beds + "/{library}_filt.bed",
-    log: logdir + "/{library}_cfdna_wgs_gc_distro.log",
-    output: cfdna_wgs_frag_gc_distros + "/{library}_gc_distro.csv",
+    benchmark: benchdir + "/{library}_frag_gc_distro.benchmark.txt",
+    container: frag_container,
+    input: frag_frag_beds + "/{library}_filt.bed",
+    log: logdir + "/{library}_frag_gc_distro.log",
+    output: frag_frag_gc_distros + "/{library}_gc_distro.csv",
     params:
-        script = cfdna_wgs_scriptdir + "/gc_distro.R",
+        script = "{frag_script_dir}/gc_distro.R",
     shell:
         """
         Rscript {params.script} \
@@ -57,17 +64,19 @@ rule gc_distro:
         {output} \
         > {log} 2>&1
         """
+# Make GC distributions:1 ends here
 
+# [[file:~/repos/cfdna-wgs/cfdna-wgs.org::*Make%20healthy%20GC%20distributions%20summary%20file][Make healthy GC distributions summary file:1]]
 # Make healthy GC distributions summary file
 rule healthy_gc:
-    benchmark: benchdir + "/cfdna_wgs_healthy_gc.benchmark.txt",
-    container: cfdna_wgs_container,
-    input: expand(cfdna_wgs_frag_gc_distros + "/{library}_gc_distro.csv", library = CFDNA_WGS_HEALTHY_LIBRARIES),
-    log: logdir + "/cfdna_wgs_healthy_gc.log",
-    output: cfdna_wgs_frag_gc_distros + "/healthy_med.rds",
+    benchmark: benchdir + "/frag_healthy_gc.benchmark.txt",
+    container: frag_container,
+    input: expand(frag_frag_gc_distros + "/{library}_gc_distro.csv", library = FRAG_HEALTHY_LIBRARIES),
+    log: logdir + "/frag_healthy_gc.log",
+    output: frag_frag_gc_distros + "/healthy_med.rds",
     params:
-        distro_dir = cfdna_wgs_frag_gc_distros,
-        script = cfdna_wgs_scriptdir + "/healthy_gc.R",
+        distro_dir = frag_frag_gc_distros,
+        script = "{frag_script_dir}/healthy_gc.R",
     shell:
         """
         Rscript {params.script} \
@@ -75,18 +84,20 @@ rule healthy_gc:
         "{input}" \
         {output} > {log} 2>&1
         """
+# Make healthy GC distributions summary file:1 ends here
 
+# [[file:~/repos/cfdna-wgs/cfdna-wgs.org::*Sample%20fragments%20by%20healthy%20GC%20proportions][Sample fragments by healthy GC proportions:1]]
 # Sample fragments by healthy GC proportions
-rule cfdna_wgs_gc_sample:
-    benchmark: benchdir + "/{library}_cfdna_wgs_gc_sample.benchmark.txt",
-    container: cfdna_wgs_container,
+rule frag_gc_sample:
+    benchmark: benchdir + "/{library}_frag_gc_sample.benchmark.txt",
+    container: frag_container,
     input:
-        frag_bed = cfdna_wgs_frag_beds + "/{library}_filt.bed",
-        healthy_med = cfdna_wgs_frag_gc_distros + "/healthy_med.rds",
-    log: logdir + "/{library}_cfdna_wgs_gc_sample.log",
-    output: cfdna_wgs_frag_beds + "/{library}_sampled_frag.bed",
+        frag_bed = frag_frag_beds + "/{library}_filt.bed",
+        healthy_med = frag_frag_gc_distros + "/healthy_med.rds",
+    log: logdir + "/{library}_frag_gc_sample.log",
+    output: frag_frag_beds + "/{library}_sampled_frag.bed",
     params:
-        script = cfdna_wgs_scriptdir + "/gc_sample.R",
+        script = "{frag_script_dir}/gc_sample.R",
     shell:
         """
         Rscript {params.script} \
@@ -94,42 +105,46 @@ rule cfdna_wgs_gc_sample:
         {input.frag_bed} \
         {output} > {log} 2>&1
         """
+# Sample fragments by healthy GC proportions:1 ends here
 
+# [[file:~/repos/cfdna-wgs/cfdna-wgs.org::*Sum%20fragments%20in%20genomic%20windows%20by%20length][Sum fragments in genomic windows by length:1]]
 # Sum fragments in short and long length groups
 
 rule frag_sum:
     benchmark: benchdir + "/{library}_frag_sum.benchmark.txt",
-    container: cfdna_wgs_container,
-    input: cfdna_wgs_frag_beds + "/{library}_sampled_frag.bed",
-    log: logdir + "/{library}_cfdna_wgs_frag_window_sum.log",
+    container: frag_container,
+    input: frag_frag_beds + "/{library}_sampled_frag.bed",
+    log: logdir + "/{library}_frag_frag_window_sum.log",
     output:
-        short = cfdna_wgs_frag_beds + "/{library}_norm_short.bed",
-        long =  cfdna_wgs_frag_beds + "/{library}_norm_long.bed",
+        short = frag_frag_beds + "/{library}_norm_short.bed",
+        long =  frag_frag_beds + "/{library}_norm_long.bed",
     params:
-        script = cfdna_wgs_scriptdir + "/frag_window_sum.sh",
-        threads = cfdna_wgs_threads,
+        script = "{frag_script_dir}/frag_window_sum.sh",
+        threads = frag_threads,
     shell:
         """
         {params.script} \
         {input} \
         {output.short} {output.long} &> {log}
         """
+# Sum fragments in genomic windows by length:1 ends here
 
+# [[file:~/repos/cfdna-wgs/cfdna-wgs.org::*Count%20fragments%20intersecting%20windows][Count fragments intersecting windows:1]]
 # Count short and long fragments intersecting kept genomic windows
 
 rule frag_window_count:
-    benchmark: benchdir + "/{library}_cfdna_wgs_frag_window_int.benchmark.txt",
-    container: cfdna_wgs_container,
+    benchmark: benchdir + "/{library}_frag_frag_window_int.benchmark.txt",
+    container: frag_container,
     input:
-        short = cfdna_wgs_frag_beds + "/{library}_norm_short.bed",
-        long = cfdna_wgs_frag_beds + "/{library}_norm_long.bed",
+        short = frag_frag_beds + "/{library}_norm_short.bed",
+        long = frag_frag_beds + "/{library}_norm_long.bed",
         matbed = refdir + "/keep_5mb.bed",
-    log: logdir + "/{library}_cfdna_wgs_frag_window_int.log",
+    log: logdir + "/{library}_frag_frag_window_int.log",
     output:
-        short = cfdna_wgs_frag_counts + "/{library}_cnt_short.tmp",
-        long = cfdna_wgs_frag_counts + "/{library}_cnt_long.tmp",
+        short = frag_frag_counts + "/{library}_cnt_short.tmp",
+        long = frag_frag_counts + "/{library}_cnt_long.tmp",
     params:
-        script = cfdna_wgs_scriptdir + "/frag_window_int.sh",
+        script = "{frag_script_dir}/frag_window_int.sh",
         threads = threads,
     shell:
         """
@@ -142,35 +157,40 @@ rule frag_window_count:
         {input.matbed} \
         {output.long}
         """
+# Count fragments intersecting windows:1 ends here
 
+# [[file:~/repos/cfdna-wgs/cfdna-wgs.org::*Merge%20counts%20across%20length%20and%20library][Merge counts across length and library:1]]
 # Merge short and long fragment counts by genomic poistion for all libraries
-rule cfdna_wgs_count_merge:
-    benchmark: benchdir + "/cfdna_wgs_count_merge.benchmark.txt",
-    container: cfdna_wgs_container,
-    input: expand(cfdna_wgs_frag_counts + "/{library}_cnt_{length}.tmp",  library = FRAG_LIBS, length = ["short","long"]),
-    log: logdir + "/cfdna_wgs_count_merge.log",
-    output:  cfdna_wgs_frag + "/frag_counts.tsv",
+rule frag_count_merge:
+    benchmark: benchdir + "/frag_count_merge.benchmark.txt",
+    container: frag_container,
+    input: expand(frag_frag_counts + "/{library}_cnt_{length}.tmp",  library = FRAG_LIBS, length = ["short","long"]),
+    log: logdir + "/frag_count_merge.log",
+    output:  frag_frag + "/frag_counts.tsv",
     params:
-        counts_dir = cfdna_wgs_frag + "/counts",
-        script = cfdna_wgs_scriptdir + "/count_merge.sh",
-        threads = cfdna_wgs_threads,
+        counts_dir = frag_frag + "/counts",
+        script = "{frag_script_dir}/count_merge.sh",
+        threads = frag_threads,
     shell:
         """
         {params.script} \
         {params.counts_dir} \
         {output} &> {log}
         """
+# Merge counts across length and library:1 ends here
 
+# [[file:~/repos/cfdna-wgs/cfdna-wgs.org::*Make%20a%20zero-centered,%20unit%20SD%20fragment%20file][Make a zero-centered, unit SD fragment file:1]]
 rule unit_cent_sd:
     benchmark: benchdir + "/unit_cent_sd.benchmark.txt",
-    container: cfdna_wgs_container,
-    input: cfdna_wgs_frag + "/frag_counts.tsv",
+    container: frag_container,
+    input: frag_frag + "/frag_counts.tsv",
     log: logdir + "/unit_cent_sd.log",
-    output: cfdna_wgs_frag + "/ratios.tsv",
+    output: frag_frag + "/ratios.tsv",
     params:
-        script = cfdna_wgs_scriptdir + "/make_ratios.R",
+        script = "{frag_script_dir}/make_ratios.R",
     shell:
         """
         Rscript {params.script} \
         {input} {output} > {log} 2>&1
         """
+# Make a zero-centered, unit SD fragment file:1 ends here

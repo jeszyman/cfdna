@@ -1,10 +1,12 @@
 * Cell-free DNA Fragmentomics                                       :biopipe:
 :PROPERTIES:
-:header-args: :tangle no :mkdirp yes :tangle-mode (identity #o755)
-:header-args+: :noweb yes
+:header-args: :tangle no :mkdirp yes :tangle-mode (identity #o755) :noweb yes :comments link
+:ID:       f0fbade8-2251-4aec-958f-ac1e1edd6c18
 :END:
-- [ ] update repos w/ alex pr https://mail.google.com/mail/u/0/#inbox/FMfcgzGrbbvPZCJdHScVHjnFTTtztFDv
 ** Repository setup and administration
+:PROPERTIES:
+:ID:       2b64f328-8636-4068-8d09-9d698cc26822
+:END:
 - Snakemake run with conda
   #+begin_src bash :tangle ./tools/smk.sh
 #!/usr/bin/env bash
@@ -108,10 +110,16 @@ build_or_update
 #+end_src
 
 *** Bash source
+:PROPERTIES:
+:ID:       1d8ba95c-8206-4b6b-9086-e9503193ec86
+:END:
 #+begin_src bash :tangle ./config/bash_src
 data_dir="/mnt/ris/szymanski/Active/test"
 #+end_src
 *** Setup inputs for testing
+:PROPERTIES:
+:ID:       439cfd95-f124-4597-95b3-085a912bc5b9
+:END:
 - blacklist
   #+begin_src bash
 source config/bash_src
@@ -163,7 +171,10 @@ for file in ${data_dir}/inputs/*.fastq; do gzip -f $file; done
   | lib004  | KO_10_23_17_R1.fastq.gz | plexiform |
   | lib005  | TS_36M_R1.fastq.gz      | healthy   |
   | lib006  | KS_30F_R1.fastq.gz      | healthy   |
-** Fragmentomics environment YAML
+** [[file:config/frag_env.yaml][Fragmentomics environment YAML]]
+:PROPERTIES:
+:ID:       4e606db9-72e7-4c62-acdc-224c34e4bc3d
+:END:
 #+begin_src bash :tangle ./config/frag_env.yaml
 name: frag
 channels:
@@ -178,6 +189,7 @@ dependencies:
 ** [[file:config/int_test.yaml][Snakemake configuration YAML]]
 :PROPERTIES:
 :header-args:bash: :tangle ./config/int_test.yaml
+:ID:       7b9f7d71-ef63-4980-90ce-21903eacbef7
 :END:
 #+begin_src bash
 
@@ -204,8 +216,12 @@ gc5mb: "test/inputs/gc5mb.bed"
 ** [[file:workflow/frag_reads.smk][Basic read processing]] :smk:
 :PROPERTIES:
 :header-args:snakemake: :tangle ./workflow/frag_reads.smk
+:ID:       5121ade9-a29a-451f-a14d-227b967d8f0a
 :END:
 *** Preamble
+:PROPERTIES:
+:ID:       d6cad938-2389-4fbd-9f9d-a0a5308d0aec
+:END:
 #+begin_src snakemake
 
 #########1#########2#########3#########4#########5#########6#########7#########8
@@ -217,18 +233,24 @@ gc5mb: "test/inputs/gc5mb.bed"
 
 #+end_src
 *** Read and alignment processing
+:PROPERTIES:
+:ID:       821ba448-d96e-4da7-9c48-499250c976a5
+:END:
 **** Make alignment index                                          :smk_rule:
+:PROPERTIES:
+:ID:       36473f6e-c7fd-4aff-b549-d7eac89f7bcc
+:END:
 - [[./workflow/reads.smk::rule cfdna_wgs_index][Snakemake]]
   #+begin_src snakemake
 
 rule frag_index:
-    benchmark: f"{bench_dir}/frag_index.benchmark.txt",
+    benchmark: "{bench_dir}/frag_index.benchmark.txt",
     input: genome_fasta,
-    log: f"{log_dir}/frag_index.log",
-    output: f"{data_dir}/ref/{fasta_base}.sa",
+    log: "{log_dir}/frag_index.log",
+    output: "{data_dir}/ref/{fasta_base}.sa",
     params:
-        out_prefix = f"{bwa_dir}/{fasta_base}",
-        script = f"{frag_script_dir}/frag_index.sh",
+        out_prefix = "{bwa_dir}/{fasta_base}",
+        script = "{frag_script_dir}/frag_index.sh",
     shell:
         """
         {params.script} {input} {params.out_prefix} &> {log}
@@ -243,26 +265,29 @@ out_prefix="${2}"
 bwa index -p $out_prefix $in_fasta
 #+end_src
 **** Adapter-trim and QC reads with fastp                          :smk_rule:
+:PROPERTIES:
+:ID:       8b5a87cc-8615-4df1-ae65-6142147fd42a
+:END:
 - [[./workflow/reads.smk::rule cfdna_wgs_fastp][Snakemake]]
   #+begin_src snakemake
 # Adapter-trim and QC reads with fastp
 rule frag_fastp:
-    benchmark: f"{bench_dir}/{{library}}_frag_fastp.benchmark.txt",
+    benchmark: "{bench_dir}/{{library}}_frag_fastp.benchmark.txt",
     input:
-        read1 = f"{frag_fastq_dir/{{library}}_raw_R1.fastq.gz",
-        read2 = f"{frag_fastq_dir/{{library}}_raw_R2.fastq.gz",
+        read1 = "{frag_fastq_dir/{{library}}_raw_R1.fastq.gz",
+        read2 = "{frag_fastq_dir/{{library}}_raw_R2.fastq.gz",
     log:
-        cmd = f"{log_dir/{{library}}_frag_fastp.log",
-        html = f"{log_dir/{{library}}_frag_fastp.html",
-        json = f"{log_dir/{{library}}_frag_fastp.json",
+        cmd = "{log_dir/{{library}}_frag_fastp.log",
+        html = "{log_dir/{{library}}_frag_fastp.html",
+        json = "{log_dir/{{library}}_frag_fastp.json",
     output:
-        read1 = f"{frag_fastq_dir}/{{library}}_processed_R1.fastq.gz",
-        read2 = f"{frag_fastq_dir}/{{library}}_processed_R2.fastq.gz",
-        failed = f"{frag_fastq_dir}/{{library}}_failed_fastp.fastq.gz",
-        unpaired1 = f"{frag_fastq_dir}/{{library}}_unpaired_R1.fastq.gz",
-        unpaired2 = f"{frag_fastq_dir}/{{library}}_unpaired_R2.fastq.gz",
+        read1 = "{frag_fastq_dir}/{{library}}_processed_R1.fastq.gz",
+        read2 = "{frag_fastq_dir}/{{library}}_processed_R2.fastq.gz",
+        failed = "{frag_fastq_dir}/{{library}}_failed_fastp.fastq.gz",
+        unpaired1 = "{frag_fastq_dir}/{{library}}_unpaired_R1.fastq.gz",
+        unpaired2 = "{frag_fastq_dir}/{{library}}_unpaired_R2.fastq.gz",
     params:
-        script = f"{frag_script_dir}/fastp.sh",
+        script = "{frag_script_dir}/fastp.sh",
         threads = frag_threads,
     resources:
         mem_mb = 500,
@@ -333,6 +358,9 @@ fastp_wrap(){
 main "$@"
 #+end_src
 **** Align reads with BWA                                          :smk_rule:
+:PROPERTIES:
+:ID:       224c54ff-b8bf-45ba-882b-c368d98d19f3
+:END:
 - [[./workflow/reads.smk::rule cfdna_wgs_align][Snakemake]]
   #+begin_src snakemake
 # Align reads with BWA
@@ -347,7 +375,7 @@ rule frag_align:
         sort = frag_bams + "/{library}_raw.bam",
         index = frag_bams + "/{library}_raw.bam.bai",
     params:
-        script = f"{frag_script_dir}/align.sh",
+        script = "{frag_script_dir}/align.sh",
         threads = 4,
     resources:
         mem_mb = 500,
@@ -379,6 +407,9 @@ bwa mem -M -t $threads \
 samtools index -@ threads $output_sort
 #+end_src
 **** Remove PCR duplicates                                         :smk_rule:
+:PROPERTIES:
+:ID:       334c3208-f64d-4ae4-bd3b-6bb3f8debef6
+:END:
 - [[./workflow/reads.smk::rule cfdna_wgs_dedup][Snakemake]]
   #+begin_src snakemake
 # Remove PCR duplicates from aligned reads
@@ -388,7 +419,7 @@ rule frag_dedup:
     log: logdir + "/{library}_frag_dedup.log",
     output: frag_bams + "/{library}_dedup.bam",
     params:
-        script = f"{frag_script_dir}/dedup.sh",
+        script = "{frag_script_dir}/dedup.sh",
         threads = frag_threads,
     shell:
         """
@@ -417,6 +448,9 @@ samtools sort -@ $threads -n -o - $raw_bam |
 samtools index $dedup_bam
 #+end_src
 **** Filter de-duplicated alignments                               :smk_rule:
+:PROPERTIES:
+:ID:       ed7f2412-8ad9-4ca1-a387-bd7b3707da69
+:END:
 - [[./workflow/reads.smk::rule cfdna_wgs_filter_alignment][Snakemake]]
   #+begin_src snakemake
 
@@ -429,7 +463,7 @@ checkpoint frag_filter_alignment:
     log: logdir + "/{library}_frag_filter_alignment.log",
     output: frag_bams + "/{library}_filt.bam",
     params:
-        script = f"{frag_script_dir}/filter_alignment.sh",
+        script = "{frag_script_dir}/filter_alignment.sh",
         threads = frag_threads,
     shell:
         """
@@ -457,7 +491,13 @@ samtools view -@ $threads -b -F 1284 -h -q 20 -o $output $input
 samtools index ${output}
 #+end_src
 *** Read and alignment QC
+:PROPERTIES:
+:ID:       57a875a7-f8ba-4e11-b2d7-a58bfe8a15e0
+:END:
 **** FastQC                                                        :smk_rule:
+:PROPERTIES:
+:ID:       12e81197-042f-432e-a83d-fffb5518e908
+:END:
 - [[./workflow/reads.smk::rule cfdna_wgs_fastqc][Snakemake]]
   #+begin_src snakemake
 # Get read quality by FASTQC
@@ -470,7 +510,7 @@ rule frag_fastqc:
         qcdir + "/{library}_{processing}_{read}_fastqc.zip",
     params:
         outdir = qcdir,
-        script = f"{frag_script_dir}/fastqc.sh",
+        script = "{frag_script_dir}/fastqc.sh",
         threads = frag_threads,
     shell:
         """
@@ -498,6 +538,9 @@ fastqc  --outdir $outdir \
         --threads $threads $input
 #+end_src
 **** Alignment QC                                                  :smk_rule:
+:PROPERTIES:
+:ID:       6f624cb4-4379-4ebb-8431-10ef3690843b
+:END:
 - [[./workflow/reads.smk::rule cfdna_wgs_alignment_qc][Snakemake]]
   #+begin_src snakemake
 # Get alignment QC using samtools
@@ -510,7 +553,7 @@ rule frag_alignment_qc:
         flagstat = qcdir + "/{library}_{processing}_flagstat.txt",
         samstat = qcdir + "/{library}_{processing}_samstats.txt",
     params:
-        script = f"{frag_script_dir}/alignment_qc.sh",
+        script = "{frag_script_dir}/alignment_qc.sh",
         threads = frag_threads,
     shell:
         """
@@ -566,6 +609,9 @@ samstats(){
 main "$@"
 #+end_src
 **** Sequencing depth metrics via Picard                           :smk_rule:
+:PROPERTIES:
+:ID:       0689d6cd-de86-4c12-a76b-52885a20ed8f
+:END:
 - [[./workflow/reads.smk::rule cfdna_wgs_picard_depth][Snakemake]]
   #+begin_src snakemake
 # Sequencing depth metrics via Picard
@@ -575,7 +621,7 @@ rule frag_picard_depth:
     log: logdir + "/{library}_frag_picard_depth.log",
     output: qcdir + "/{library}_picard_depth.txt",
     params:
-        script = f"{frag_script_dir}/picard_depth.sh",
+        script = "{frag_script_dir}/picard_depth.sh",
         threads = frag_threads,
     shell:
         """
@@ -601,6 +647,9 @@ java -jar $picard_jar CollectWgsMetrics \
        REFERENCE_SEQUENCE=$genome_fasta
 #+end_src
 **** deepTools fragment sizes                                      :smk_rule:
+:PROPERTIES:
+:ID:       6c4c06ac-f963-426a-95e9-2d4772374035
+:END:
 - [[./workflow/reads.smk::rule cfdna_wgs_bampefragsize][Snakemake]]
   #+begin_src snakemake
 # Get fragment sizes using deepTools
@@ -613,7 +662,7 @@ rule frag_bampefragsize:
         hist = qcdir + "/deeptools_frag_lengths.png",
     params:
         blacklist = config["blklist"],
-        script = f"{frag_script_dir}/bampefragsize.sh",
+        script = "{frag_script_dir}/bampefragsize.sh",
         threads = frag_threads,
     shell:
         """
@@ -652,6 +701,9 @@ bamPEFragmentSize --bamfiles $input \
                   --outRawFragmentLengths $output_raw
 #+end_src
 **** deepTools bamCoverage                                         :smk_rule:
+:PROPERTIES:
+:ID:       a750e80a-36bd-4498-8789-a0c9a076b484
+:END:
 - [[./workflow/reads.smk::rule cfdna_wgs_bamcoverage][Snakemake]]
   #+begin_src snakemake
 # Make deeptools bamCoverage bedfile
@@ -663,7 +715,7 @@ rule frag_bamcoverage:
     params:
         bin = "10000",
         blacklist = config["blklist"],
-        script = f"{frag_script_dir}/bamcoverage.sh",
+        script = "{frag_script_dir}/bamcoverage.sh",
         threads = frag_threads,
     shell:
         """
@@ -699,6 +751,9 @@ bamCoverage \
     --outFileName $out_bg
 #+end_src
 **** deepTools plotCoverage                                        :smk_rule:
+:PROPERTIES:
+:ID:       fd5c9058-8476-48d8-8a45-0784dde9e401
+:END:
 - [[./workflow/reads.smk::rule cfdna_wgs_plotcoverage][Snakemake]]
   #+begin_src snakemake
 # Make deepTools plotCoverage coverage maps for all filtered bams
@@ -708,10 +763,10 @@ rule frag_plotcoverage:
     log: logdir + "/frag_plotcoverage.log",
     output:
         raw = qcdir + "/frag_coverage.tsv",
-        plot = qcdir + "/frag_coverage.pdf",
+        plot = qcdir + "/frag_coverage.pd",
     params:
         blacklist = config["blklist"],
-        script = f"{frag_script_dir}/plotcoverage.sh",
+        script = "{frag_script_dir}/plotcoverage.sh",
         threads = frag_threads,
     shell:
         """
@@ -743,6 +798,9 @@ plotCoverage \
     --skipZeros
 #+end_src
 **** MultiQC                         :smk_rule:
+:PROPERTIES:
+:ID:       a3f3c091-2c6d-4509-9881-06ff186fb45d
+:END:
 - [[./workflow/reads.smk::rule cfdna_wgs_multiqc][Snakemake]]
   #+begin_src snakemake
 # Aggregate QC files using MultiQC
@@ -766,7 +824,7 @@ rule frag_multiqc:
     params:
         out_dir = qcdir,
         out_name = "frag_multiqc",
-        script = f"{frag_script_dir}/multiqc.sh",
+        script = "{frag_script_dir}/multiqc.sh",
         threads = frag_threads,
     shell:
         """
@@ -797,6 +855,9 @@ multiqc $input \
         --filename $out_name
 #+end_src
 **** Make aggregate QC table                                       :smk_rule:
+:PROPERTIES:
+:ID:       22dd84a2-de3e-4faf-8b54-d1408c76aa33
+:END:
 - [[./workflow/reads.smk::rule cfdna_wgs_make_qc_tsv][Snakemake]]
   #+begin_src snakemake
 # Make a tab-separated aggregate QC table
@@ -814,7 +875,7 @@ checkpoint frag_make_qc_tsv:
         readqc = qcdir + "/frag_read_qc.tsv",
         fraglen = qcdir + "/frag_frag_len.tsv",
     params:
-        script = f"{frag_script_dir}/make_qc_tsv.R",
+        script = "{frag_script_dir}/make_qc_tsv.R",
     shell:
         """
         Rscript {params.script} \
@@ -936,8 +997,12 @@ write_tsv(frag_len, file = frag_len_out_tbl)
 ** Fragmentomics                                                        :smk:
 :PROPERTIES:
 :header-args:snakemake: :tangle ./workflow/frag.smk
+:ID:       a72c2025-a18a-45a4-b4e7-efdafeaee80e
 :END:
 *** Preamble
+:PROPERTIES:
+:ID:       325d69b2-efcf-4695-a222-c9428a7d3d39
+:END:
 #+begin_src snakemake
 
 #########1#########2#########3#########4#########5#########6#########7#########8
@@ -948,6 +1013,9 @@ write_tsv(frag_len, file = frag_len_out_tbl)
 
 #+end_src
 *** Make GC and mappability restricted bins
+:PROPERTIES:
+:ID:       8976ec06-7aa2-40be-adfe-ee5a9df4feaf
+:END:
 - Snakemake
   #+begin_src snakemake
 rule make_gc_map_bind:
@@ -958,7 +1026,7 @@ rule make_gc_map_bind:
     log: logdir + "/make_gc_map_bind.log",
     output: refdir + "/keep_5mb.bed",
     params:
-        script = f"{frag_script_dir}/make_gc_map_bind.sh",
+        script = "{frag_script_dir}/make_gc_map_bind.sh",
     shell:
         """
         {params.script} \
@@ -978,6 +1046,9 @@ bedtools intersect -a $gc5mb -b $blklist -v -wa |
     awk '{ if ($4 >= 0.3) print $0 }' > $keep
 #+end_src
 *** Make bedfile from filtered bam                                 :smk_rule:
+:PROPERTIES:
+:ID:       8699bab9-85c6-4903-8f8b-35d6dca5a0d5
+:END:
 - error may be multimappers https://www.biostars.org/p/55149/
   - https://bioinformatics.stackexchange.com/questions/508/obtaining-uniquely-mapped-reads-from-bwa-mem-alignment
 - [[./workflow/frag.smk::rule cfdna_wgs_filt_bam_to_frag_bed][Snakemake]]
@@ -991,7 +1062,7 @@ rule filt_bam_to_frag_bed:
     output: frag_frag_beds + "/{library}_filt.bed",
     params:
         fasta = genome_fasta,
-        script = f"{frag_script_dir}/filt_bam_to_frag_bed.sh",
+        script = "{frag_script_dir}/filt_bam_to_frag_bed.sh",
         threads = frag_threads,
     shell:
         """
@@ -1037,6 +1108,9 @@ bam_to_frag $input_bam \
 
 #+end_src
 *** Make GC distributions                                          :smk_rule:
+:PROPERTIES:
+:ID:       9dd802f2-b7bc-44f6-a6a4-0c70da5ce763
+:END:
 - [[./workflow/frag.smk::rule cfdna_wgs_gc_distro][Snakemake]]
   #+begin_src snakemake
 # Make GC distributions
@@ -1047,7 +1121,7 @@ rule gc_distro:
     log: logdir + "/{library}_frag_gc_distro.log",
     output: frag_frag_gc_distros + "/{library}_gc_distro.csv",
     params:
-        script = f"{frag_script_dir}/gc_distro.R",
+        script = "{frag_script_dir}/gc_distro.R",
     shell:
         """
         Rscript {params.script} \
@@ -1083,6 +1157,9 @@ distro =
 
 #+end_src
 *** Make healthy GC distributions summary file                     :smk_rule:
+:PROPERTIES:
+:ID:       8b87de70-1d6c-4d59-b15a-98e1acae6073
+:END:
 - [[./workflow/frag.smk::rule cfdna_wgs_healthy_gc][Snakemake]]
   #+begin_src snakemake
 # Make healthy GC distributions summary file
@@ -1094,7 +1171,7 @@ rule healthy_gc:
     output: frag_frag_gc_distros + "/healthy_med.rds",
     params:
         distro_dir = frag_frag_gc_distros,
-        script = f"{frag_script_dir}/healthy_gc.R",
+        script = "{frag_script_dir}/healthy_gc.R",
     shell:
         """
         Rscript {params.script} \
@@ -1134,6 +1211,9 @@ healthy_med =
 saveRDS(healthy_med, file = healthy_med_file)
 #+end_src
 *** Sample fragments by healthy GC proportions                     :smk_rule:
+:PROPERTIES:
+:ID:       0e6e2eae-8a46-499e-a9fc-4168bdddeb09
+:END:
 - [[./workflow/frag.smk::rule cfdna_wgs_gc_sample][Snakemake]]
   #+begin_src snakemake
 # Sample fragments by healthy GC proportions
@@ -1146,7 +1226,7 @@ rule frag_gc_sample:
     log: logdir + "/{library}_frag_gc_sample.log",
     output: frag_frag_beds + "/{library}_sampled_frag.bed",
     params:
-        script = f"{frag_script_dir}/gc_sample.R",
+        script = "{frag_script_dir}/gc_sample.R",
     shell:
         """
         Rscript {params.script} \
@@ -1190,6 +1270,9 @@ sampled = frag %>%
 write.table(sampled, sep = "\t", col.names = F, row.names = F, quote = F, file = sampled_file)
 #+end_src
 *** Sum fragments in genomic windows by length                     :smk_rule:
+:PROPERTIES:
+:ID:       d14368b2-2ab0-4f04-bf51-faf66971d3cf
+:END:
 - [[./workflow/frag.smk::rule cfdna_wgs_frag_window_sum][Snakemake]]
   #+begin_src snakemake
 
@@ -1204,7 +1287,7 @@ rule frag_sum:
         short = frag_frag_beds + "/{library}_norm_short.bed",
         long =  frag_frag_beds + "/{library}_norm_long.bed",
     params:
-        script = f"{frag_script_dir}/frag_window_sum.sh",
+        script = "{frag_script_dir}/frag_window_sum.sh",
         threads = frag_threads,
     shell:
         """
@@ -1235,6 +1318,9 @@ make_long $input_frag $output_long
 
 #+end_src
 *** Count fragments intersecting windows                           :smk_rule:
+:PROPERTIES:
+:ID:       e94ee996-9543-4a29-9f85-b02469a3cbdb
+:END:
 - [[./workflow/frag.smk::rule cfdna_wgs_frag_window_int][Snakemake]]
   #+begin_src snakemake
 
@@ -1252,7 +1338,7 @@ rule frag_window_count:
         short = frag_frag_counts + "/{library}_cnt_short.tmp",
         long = frag_frag_counts + "/{library}_cnt_long.tmp",
     params:
-        script = f"{frag_script_dir}/frag_window_int.sh",
+        script = "{frag_script_dir}/frag_window_int.sh",
         threads = threads,
     shell:
         """
@@ -1279,6 +1365,9 @@ bedtools intersect -c \
 
 #+end_src
 *** Merge counts across length and library :smk_rule:
+:PROPERTIES:
+:ID:       97b6ff5e-0286-435c-adde-ceb3fdfcba65
+:END:
 - [[./workflow/frag.smk::rule cfdna_wgs_count_merge][Snakemake]]
   #+begin_src snakemake
 # Merge short and long fragment counts by genomic poistion for all libraries
@@ -1290,7 +1379,7 @@ rule frag_count_merge:
     output:  frag_frag + "/frag_counts.tsv",
     params:
         counts_dir = frag_frag + "/counts",
-        script = f"{frag_script_dir}/count_merge.sh",
+        script = "{frag_script_dir}/count_merge.sh",
         threads = frag_threads,
     shell:
         """
@@ -1353,6 +1442,9 @@ sed -i  '1 i\library	len_class	chr	start	end	count' $out_tsv
 
 #+end_src
 *** Make a zero-centered, unit SD fragment file
+:PROPERTIES:
+:ID:       d341f874-21d4-472e-9b5b-69436bcda5cd
+:END:
 - Snakemake
   #+begin_src snakemake
 rule unit_cent_sd:
@@ -1362,7 +1454,7 @@ rule unit_cent_sd:
     log: logdir + "/unit_cent_sd.log",
     output: frag_frag + "/ratios.tsv",
     params:
-        script = f"{frag_script_dir}/make_ratios.R",
+        script = "{frag_script_dir}/make_ratios.R",
     shell:
         """
         Rscript {params.script} \
@@ -1404,22 +1496,37 @@ ratios =
 write_tsv(ratios, file = ratios_tsv)
 #+end_src
 *** Reference :ref:
+:PROPERTIES:
+:ID:       b3b360ce-d696-4d55-b256-1eb70182b772
+:END:
 - Based on [[file:~/repos/biotools/biotools.org::*cfDNA fragmentomics][cfDNA fragmentomics]] cite:mathios2021
 **** [[46270062-e3f4-46c9-9d71-5868376e495b][smk yas]]
+:PROPERTIES:
+:ID:       a0568e74-7619-4205-a707-b5c146c7901e
+:END:
 **** [[file:./workflow/frag.smk][Link to Snakefile]]
+:PROPERTIES:
+:ID:       58500b2b-bc08-465f-9c53-363a3d7b2b5f
+:END:
 *** Development :dev:
 :PROPERTIES:
 :header-args:snakemake: :tangle no
+:ID:       bff6b6e6-6a68-4075-a5f1-008173bcb0f8
 :END:
 **** Ideas
 :PROPERTIES:
 :header-args:snakemake: :tangle no
+:ID:       7bdb150e-957d-42a1-9fbe-b04da98851b4
 :END:
 ** INPROCESS [[file:workflow/int_test.smk][Integration testing]] :smk:
 :PROPERTIES:
 :header-args:snakemake: :tangle ./workflow/int_test.smk
+:ID:       2d0f6107-7d99-444e-82e4-0019db1835c3
 :END:
 *** Preamble
+:PROPERTIES:
+:ID:       f8c1cb6f-88fd-4b4d-939a-eaeb18a5c10f
+:END:
 #+begin_src snakemake
 
 ##################################################################
@@ -1428,6 +1535,9 @@ write_tsv(ratios, file = ratios_tsv)
 
 #+end_src
 *** Load packages
+:PROPERTIES:
+:ID:       d7718025-b503-4920-8d36-a9eb428a62d2
+:END:
 #+begin_src snakemake
 
 import pandas as pd
@@ -1436,6 +1546,9 @@ import numpy as np
 
 #+end_src
 *** Variable naming
+:PROPERTIES:
+:ID:       c4a0072f-09e5-454c-85e1-97d67f54e8a4
+:END:
 #+begin_src snakemake
 # Values directly from configuration file
 threads = config["threads"]
@@ -1456,15 +1569,18 @@ frag_frag_gc_distros = data_dir + "/analysis/frag/frag/distros"
 qcdir                     = data_dir + "/analysis/qc"
 benchdir                  = data_dir + "/benchmark"
 logdir                    = data_dir + "/logs"
-refdir                    = data_dir + "/ref"
+refdir                    = data_dir + "/re"
 
 frag_scriptdir = config["frag_repo"] +  "/scripts"
 
-bwa_dir = f"{data_dir}/ref/hg38"
+bwa_dir = "{data_dir}/ref/hg38"
 fasta_base = "GCA_000001405.15_GRCh38_no_alt_analysis_set"
-frag_script_dir = f"{frag_repo}/scripts"
+frag_script_dir = "{frag_repo}/scripts"
 #+end_src
 *** Functions, miscellaneous
+:PROPERTIES:
+:ID:       f36b260e-d78e-453b-bc2f-ca330edf1097
+:END:
 #+begin_src snakemake
 
 #####################
@@ -1472,9 +1588,9 @@ frag_script_dir = f"{frag_repo}/scripts"
 #####################
 
 # Setup fragment sample name index as a python dictionary
-frag_libs = pd.read_table(f"{data_dir}/test/inputs/frag_libs.tsv")
+frag_libs = pd.read_table("{data_dir}/test/inputs/frag_libs.tsv")
 
-lib_path = f"{data_dir}/test/inputs"
+lib_path = "{data_dir}/test/inputs"
 
 # Ensure readable fastqs
 readable = []
@@ -1493,13 +1609,16 @@ FRAG_HEALTHY_LIBRARIES = frag_libs[frag_libs['cohort'] == 'healthy']['library'].
 #+end_src
 
 *** All rule
+:PROPERTIES:
+:ID:       d8b9017c-8cde-4d5e-a492-9f8d21f5fa20
+:END:
 #+begin_src snakemake
 rule all:
     input:
-        expand(f"{data_dir}/analysis/frag/fastqs/{{library}}_raw_{{read}}.fastq.gz",
+        expand("{data_dir}/analysis/frag/fastqs/{{library}}_raw_{{read}}.fastq.gz",
                library = list(frag_lib_dict.keys()),
                read = ["R1", "R2"]),
-        f"{data_dir}/ref/{fasta_base}.sa",
+        "{data_dir}/ref/{fasta_base}.sa",
         #"{data_dir}/ref/{fasta_base}.sa",
         #logdir + "/aggregate_output",
         #frag_frag + "/ratios.tsv",
@@ -1508,6 +1627,9 @@ rule all:
 
 #+end_src
 *** Benchmark aggregation
+:PROPERTIES:
+:ID:       f4bb1ce5-c04c-4a38-95b5-c71d4fe19b91
+:END:
 #+begin_src snakemake
 
 onsuccess:
@@ -1565,16 +1687,19 @@ bmk %>% mutate(outlier = ifelse(find_outlier(run_time), process_lib, NA)) %>%
 
 
 *** Symlink input fastqs
+:PROPERTIES:
+:ID:       76e4f021-76a3-4ebb-a179-0f5837ee246b
+:END:
 #+begin_src snakemake
 rule symlink_inputs:
     input:
         lambda wildcards: frag_lib_dict[wildcards.library],
     output:
-        read1 = f"{data_dir}/analysis/frag/fastqs/{{library}}_raw_R1.fastq.gz",
-        read2 = f"{data_dir}/analysis/frag/fastqs/{{library}}_raw_R2.fastq.gz",
+        read1 = "{data_dir}/analysis/frag/fastqs/{{library}}_raw_R1.fastq.gz",
+        read2 = "{data_dir}/analysis/frag/fastqs/{{library}}_raw_R2.fastq.gz",
     params:
         outdir = frag_fastqs,
-        script = f"{frag_script_dir}/symlink.sh",
+        script = "{frag_script_dir}/symlink.sh",
     shell:
         """
         {params.script} \
@@ -1604,6 +1729,9 @@ ln -sf --relative ${input_read1} ${output_read1}
 ln -sf --relative ${input_read2} ${output_read2}
 #+end_src
 *** Includes statements
+:PROPERTIES:
+:ID:       d78472f8-09a0-4546-b25a-72a78115c9c5
+:END:
 #+begin_src snakemake
 include: frag_repo + "/workflow/frag_reads.smk"
 #include: frag_repo + "/workflow/frag.smk"
@@ -1611,8 +1739,12 @@ include: frag_repo + "/workflow/frag_reads.smk"
 ** [[file:workflow/cna_frag_int_test.smk][CNA and fragmentomics integration testing]]                            :smk:
 :PROPERTIES:
 :header-args:snakemake: :tangle ./workflow/cna_frag_int_test.smk :tangle-mode
+:ID:       a0113146-6c32-48fd-b7e8-242df4b10c97
 :END:
 *** Preamble
+:PROPERTIES:
+:ID:       99b61b72-5f73-4f0c-b22b-45ae5049e1aa
+:END:
 #+begin_src snakemake
 
 #########1#########2#########3#########4#########5#########6#########7#########8
@@ -1629,6 +1761,9 @@ import numpy as np
 
 #+end_src
 *** Variable naming
+:PROPERTIES:
+:ID:       35c3ca1a-2318-4500-a997-18f6cc12b11c
+:END:
 #+begin_src snakemake
 
 # Variable naming
@@ -1656,7 +1791,7 @@ frag_frag_beds       = frag_frag + "/beds"
 
 frag_frag_counts     = frag_frag + "/counts"
 
-refdir                 = config["data_dir"] + "/ref"
+refdir                 = config["data_dir"] + "/re"
 
 # Additional variable names used directly in the cna snakefile:
 chrom_sizes = config["chrom_sizes"]
@@ -1671,7 +1806,7 @@ chrs = "chr1,chr2,chr3,chr4,chr5,chr6,chr7,chr8,chr9,chr10,chr11,chr12,chr13,chr
 
 keep_bed = refdir + "/hg38_keep.bed",
 blklist = config["blklist"]
-genome_ref = config["genome_ref"]
+genome_ref = config["genome_re"]
 
 
 FRAG_DISTROS = config["frag_distro"]
@@ -1700,6 +1835,9 @@ qc = config["data_dir"] + "/qc"
 # ichor_nopon = config["dir"]["data"] + "/ichor_nopon"
 #+end_src
 *** Functions
+:PROPERTIES:
+:ID:       60269b14-e3ec-42f7-8a07-880252f3e415
+:END:
 #+begin_src snakemake
 libraries = pd.read_table(config["data_dir"] + "/inputs/libraries.tsv")
 
@@ -1737,6 +1875,9 @@ CNA_WGS_LIBRARIES = list(lib_dict.keys())
 
 #+end_src
 *** All rule
+:PROPERTIES:
+:ID:       e35a6255-dbca-42ed-a91f-67efd791b7ee
+:END:
 #+begin_src snakemake
 rule all:
     input:
@@ -1793,6 +1934,9 @@ rule all:
 #+end_src
 
 *** Symlink input bams                                             :smk_rule:
+:PROPERTIES:
+:ID:       ceed5caf-114f-4893-b611-47025d244b04
+:END:
 - [[./workflow/cna_int.smk::rule frag_symlink][Snakemake]]
   #+begin_src snakemake
 # Symlink input bams
@@ -1806,12 +1950,18 @@ rule frag_symlink:
         """
 #+end_src
 *** Includes statements
+:PROPERTIES:
+:ID:       95dbbbe8-dfcc-4831-96f5-19d07eb453c9
+:END:
 #+begin_src snakemake
 include: frag_repo + "/workflow/reads.smk"
 include: frag_repo + "/workflow/cna.smk"
 include: frag_repo + "/workflow/frag.smk"
 #+end_src
 *** Filter downsampled bams to set fragment length distributions
+:PROPERTIES:
+:ID:       b49bd73f-5d02-4c8c-984d-a6631fc48c12
+:END:
 #+begin_src snakemake
 rule frag_filt:
     input:
@@ -1822,7 +1972,7 @@ rule frag_filt:
         onlyhead = temp(frag_bams + "/{library}_ds{downsample}_frag{frag_distro}.only"),
         final = frag_bams + "/{library}_ds{downsample}_frag{frag_distro}.bam",
     params:
-        script = f"{frag_script_dir}/frag_filt.sh",
+        script = "{frag_script_dir}/frag_filt.sh",
         threads = frag_threads,
     shell:
         """
@@ -1854,6 +2004,9 @@ cat $6 $2 | sambamba view -t 4 -S -f bam /dev/stdin | sambamba sort -t 4 -o $7 /
 
 #+end_src
 *** Setup conditional execution of downsampled bams
+:PROPERTIES:
+:ID:       6a626e68-c7b3-4702-86d1-5495425c9bf2
+:END:
 #+begin_src snakemake
 
 # If downsample occured, then write filename into this per-library log, else leave the log file blank
@@ -1904,6 +2057,9 @@ rule make_ds_targets:
 #+end_src
 
 *** Downsample bams                                                :smk_rule:
+:PROPERTIES:
+:ID:       bc8e3589-2293-4029-b46c-0cbc025fef58
+:END:
 - Snakemake
   #+begin_src snakemake
 rule downsample_bams:
@@ -1911,7 +2067,7 @@ rule downsample_bams:
     output: touch(logdir + "/{library}_{downsample}_downsample.done"),
     params:
         out_dir = frag_bams,
-        script = f"{frag_script_dir}/downsample_bams.sh",
+        script = "{frag_script_dir}/downsample_bams.sh",
         suffix = "_filt.bam",
         threads = frag_threads,
     shell:
@@ -1961,20 +2117,33 @@ downsample $in_bam $milreads $suffix
 :PROPERTIES:
 :export_file_name: ./README.md
 :export_options: toc:nil ^:nil
+:ID:       a94fc0ef-ea37-4ebb-9cce-4760fd637d15
 :END:
 *** Introduction
+:PROPERTIES:
+:ID:       0a8a24f4-7c5f-47d0-b057-026ebfddf4dc
+:END:
 This repository hosts a snakemake workflow for basic processing of whole-genome sequencing reads from cell-free DNA.
 
 [[file:resources/int_test.png]]
 
 *** Organization
+:PROPERTIES:
+:ID:       b826f026-70d1-480e-be6c-f829207124f0
+:END:
 Master branch of the repository contains most recent developments while stable versions are saved as terminal branches (/e.g./ stable.1.0.0).
 
 Directory ~workflow~ contains two types of workflows- process-focused snakefiles (reads.smk, cna.smk, frag.smk) suitable for integration into another snakemake pipeline using the :include command, and the _int_test snakefile with examples of such integration using the repository test data.
 *** Use
+:PROPERTIES:
+:ID:       b9eadaa0-d3ba-4c23-97a1-095f1cefcf6d
+:END:
 - All software needed for the pipeline is present within the associated docker container (see ~docker~ and https://hub.docker.com/repository/docker/jeszyman/frag/general).
 - See the example configuration yaml ~config/int_test.yaml~ and wrapper workflow ~workflow/int_test.smk~ for necessary run conditions.
 *** Changelog
+:PROPERTIES:
+:ID:       dbe230c9-b8a6-44f3-b9a1-67fd70f47895
+:END:
 - [2023-01-26 Thu] - Version 9.1.0: Repo cleanup
 - [2023-01-26 Thu] - Version 9.0.0: Removed -f 3 flag for perfectly matched pairs in samtools filtering as the flag from BWA removes some fragments at a set max length. Added framework for benchmark analysis. Added conditional execution of downsampling. Removed (temporarily) final wig and ichor commands of CNA as these don't currently run correctly without full genome alignment, so can't be validated on test data. Added local documentation of cfdna-wgs dockerfile.
 - [2023-01-21 Sat] - Version 8.0.0: Corrected rule filt_bam_to_frag_bed to fix mates of inputs, which seems to prevent errors in the bamtobed call. Frag_window_count now uses windows of consistent 5 Mb size, which are generated from rule make_gc_map_bind. Added a merged fragment counts file and zero-centered unit SD counts.
@@ -1993,17 +2162,31 @@ Directory ~workflow~ contains two types of workflows- process-focused snakefiles
 ** Development                                                          :dev:
 :PROPERTIES:
 :header-args: :tangle no
+:ID:       075335e3-4402-41c5-8e8a-739c399acedb
 :END:
 *** Version 9
+:PROPERTIES:
+:ID:       83223f42-7dcd-4687-a9e5-36ee2d34227f
+:END:
 - kill v7- not working for CNA
 **** TODO [[id:f6717c79-64ce-4b16-b455-649df2ba20fd][Project stable version update]]
+:PROPERTIES:
+:ID:       69e7dd12-62a3-4313-8e98-b0c0c7ddf090
+:END:
 **** Make benchmarking table
+:PROPERTIES:
+:ID:       0e94013b-876e-4e8b-bdd3-2e818179fa58
+:END:
 - for file in ./*; do base=$(basename $file); $(str = tail -n1 $file); echo $base $str; done
 *** Analysis of copy number alteration                                  :smk:
 :PROPERTIES:
 :header-args:snakemake: :tangle ./workflow/cna.smk
+:ID:       4af6463f-f3b9-4fd1-b8d3-ebeccdf24b13
 :END:
 **** Preamble
+:PROPERTIES:
+:ID:       c68d847e-8ac5-4162-b041-3ab09927de6f
+:END:
 #+begin_src snakemake
 
 #########1#########2#########3#########4#########5#########6#########7#########8
@@ -2016,6 +2199,9 @@ Directory ~workflow~ contains two types of workflows- process-focused snakefiles
 
 #+end_src
 **** Convert bam to wig                                            :smk_rule:
+:PROPERTIES:
+:ID:       1d0a8925-f8b8-476b-87e2-4192259e3568
+:END:
 - [[./workflow/cna.smk::rule frag_bam_to_wig][Snakemake]]
   #+begin_src snakemake
 # Use readCounter to create windowed wig from bam file
@@ -2028,7 +2214,7 @@ rule bam_to_wig:
     params:
         chrs = chrs,
         outdir = frag_wigs,
-        script = f"{frag_script_dir}/bam_to_wig.sh",
+        script = "{frag_script_dir}/bam_to_wig.sh",
         threads = frag_threads,
     shell:
         """
@@ -2052,6 +2238,9 @@ output=$2
 
 #+end_src
 **** Run ichorCNA without a panel of normals                       :smk_rule:
+:PROPERTIES:
+:ID:       1bc62c09-2794-4f35-bad2-ea3723fe3ecf
+:END:
 - [[./workflow/cna.smk::rule frag_ichor_nopon][Snakemake]]
   #+begin_src snakemake
 # Run ichorCNA without a panel of normals
@@ -2059,7 +2248,7 @@ rule ichor_nopon:
     input: frag_wigs + "/{library}_ds{downsample}_frag{frag_distro}.wig",
     output: frag_ichor_nopon + "/{library}_ds{downsample}_frag{frag_distro}.cna.seg",
     params:
-        script = f"{frag_script_dir}/MOD_runIchorCNA.R",
+        script = "{frag_script_dir}/MOD_runIchorCNA.R",
         out_dir = frag_ichor_nopon,
     container:
         frag_container,
@@ -2134,7 +2323,7 @@ option_list <- list(
   make_option(c("--includeHOMD"), type="logical", default=FALSE, help="If FALSE, then exclude HOMD state. Useful when using large bins (e.g. 1Mb). Default: [%default]"),
   make_option(c("--txnE"), type="numeric", default=0.9999999, help = "Self-transition probability. Increase to decrease number of segments. Default: [%default]"),
   make_option(c("--txnStrength"), type="numeric", default=1e7, help = "Transition pseudo-counts. Exponent should be the same as the number of decimal places of --txnE. Default: [%default]"),
-  make_option(c("--plotFileType"), type="character", default="pdf", help = "File format for output plots. Default: [%default]"),
+  make_option(c("--plotFileType"), type="character", default="pd", help = "File format for output plots. Default: [%default]"),
 	make_option(c("--plotYLim"), type="character", default="c(-2,2)", help = "ylim to use for chromosome plots. Default: [%default]"),
   make_option(c("--outDir"), type="character", default="./", help = "Output Directory. Default: [%default]"),
   make_option(c("--libdir"), type = "character", default=NULL, help = "Script library path. Usually exclude this argument unless custom modifications have been made to the ichorCNA R package code and the user would like to source those R files. Default: [%default]")
@@ -2479,7 +2668,7 @@ for(i in 1:length(ind)) {
   if (i == length(ind)){
   	turnDevOff <- TRUE
   }
-  plotGWSolution(hmmResults.cor, s=s, outPlotFile=outPlotFile, plotFileType="pdf",
+  plotGWSolution(hmmResults.cor, s=s, outPlotFile=outPlotFile, plotFileType="pd",
                      logR.column = "logR", call.column = "Corrected_Call",
                      plotYLim=plotYLim, estimateScPrevalence=estimateScPrevalence,
                      seqinfo = seqinfo,
@@ -2502,13 +2691,18 @@ outputParametersToFile(hmmResults.cor, file = outFile)
 **** Hold and test
 :PROPERTIES:
 :header-args:snakemake: :tangle no
+:ID:       015e0fa3-e595-4898-b7e9-1044fad17195
 :END:
 ***** Ideas
 :PROPERTIES:
 :header-args:snakemake: :tangle no
+:ID:       52812cc2-fc33-46cb-95e9-80aee5c38d7a
 :END:
 
 ***** Filter fragments by length                                   :smk_rule:
+:PROPERTIES:
+:ID:       802ed819-7b4e-4caf-9491-6d6e6c3fa469
+:END:
 - [[./workflow/cna.smk::rule cfdna_cna_frag_filt][Snakemake]]
   #+begin_src snakemake
 # Filter fragments by length
@@ -2522,7 +2716,7 @@ rule cna_frag_filt_tmp:
         onlyhead = temp(frag_cna_frag_bams) + "/{library}_frag{frag_distro}.only",
         final = frag_cna_frag_bams + "/{library}_frag{frag_distro}.bam",
     params:
-        script = f"{frag_script_dir}/frag_filt.sh",
+        script = "{frag_script_dir}/frag_filt.sh",
         threads = frag_threads,
     shell:
         """
@@ -2540,12 +2734,31 @@ rule cna_frag_filt_tmp:
 #+end_src
 
 **** Reference                                                          :ref:
+:PROPERTIES:
+:ID:       d6909085-d7cc-4a43-95e2-fa364680b576
+:END:
 ***** [[46270062-e3f4-46c9-9d71-5868376e495b][smk yas]]
+:PROPERTIES:
+:ID:       7f732c2d-27b5-4c95-acea-2f44fe268925
+:END:
 ***** [[file:./workflow/cna.smk][Link to Snakefile]]
+:PROPERTIES:
+:ID:       3739f63c-1a6c-4359-9730-dff71e88b33e
+:END:
 ** Ideas
+:PROPERTIES:
+:ID:       8052e364-df54-4c6f-a34f-fe2df8bf07b4
+:END:
+- [ ] update repos w/ alex pr https://mail.google.com/mail/u/0/#inbox/FMfcgzGrbbvPZCJdHScVHjnFTTtztFDv
 *** Multiple frag distros
+:PROPERTIES:
+:ID:       aff2bea4-dd71-4205-a596-a59c2b2e1a0f
+:END:
 note- this would require re-write of ds_cond_target_list
 *** Testing inputs update
+:PROPERTIES:
+:ID:       60c34d59-8eab-4d7b-82ee-7f15bf79e729
+:END:
 - Make a smaller fasta for indexing
   #+begin_src bash
 #!/bin/echo For documentation, not intended to be executable:.
@@ -2631,12 +2844,27 @@ tail -n +2 /tmp/gc5mb.tsv > test/inputs/gc5mb.bed
   - bedtools subtract -a "test/inputs/chr8.bed" -b "test/inputs/hg38-blacklist.v2.bed" > "test/inputs/keep.bed"
 
 *** Make example fastq more efficient-
+:PROPERTIES:
+:ID:       9c71dd59-31c8-4a88-a7ac-ee8847bf048c
+:END:
 - Find reads that map to early 8 and work back into a fastq
 *** filter CNA abberant regions
+:PROPERTIES:
+:ID:       71679fee-4d06-492f-9f2e-93a93514b380
+:END:
 - cite:dehner2021
 *** Check / explain - Prerequisites for local integration testing
+:PROPERTIES:
+:ID:       752985f3-8b2b-4f60-9df1-401278edb16a
+:END:
 *** update /simplify aggregate qc table
+:PROPERTIES:
+:ID:       310ae928-1a05-4531-b6e8-e0607bb16cb2
+:END:
 *** expand seq depth metrics
+:PROPERTIES:
+:ID:       99ef5f61-98b9-4874-95f1-406bdce98b3c
+:END:
   - using mosdepth
     #+name: mosdepth
     #+begin_src bash
@@ -2769,10 +2997,19 @@ tail -n +2 /tmp/gc5mb.tsv > test/inputs/gc5mb.bed
     - run and extract mosdepth
       mosdepthRAW = as_tibble(read.table(file.path(repo,"data/all_dedup_coverage.tsv"), header = T, sep = '\t', fill = TRUE))
 *** make consolidated per-cna file (see $data_dir/old/all_cna.bed)
+:PROPERTIES:
+:ID:       35acec46-a23e-46b9-a5df-f0ab5a9c4385
+:END:
 
 *** Bam  downsampling multiple downsampling sizes
+:PROPERTIES:
+:ID:       4efbd823-db02-41ab-bab5-97f75abf8c25
+:END:
 
 **** Downsample bams                                               :smk_rule:
+:PROPERTIES:
+:ID:       f447b30c-96dc-4969-b071-5baab4a5bca8
+:END:
 - [[./workflow/reads.smk::rule frag_downsample][Snakemake]]
   #+begin_src snakemake
 # Downsample bam file to a set number of reads
@@ -2784,7 +3021,7 @@ rule frag_downsample:
     output: frag_bams + "/{library}_ds{milreads}.bam",
     params:
         milreads = MILREADS,
-        script = f"{frag_script_dir}/downsample.sh",
+        script = "{frag_script_dir}/downsample.sh",
         threads = frag_threads,
     shell:
         """
@@ -2823,13 +3060,29 @@ fi
 ** Reference                                                            :ref:
 :PROPERTIES:
 :header-args: :tangle no
+:ID:       80bff0e2-0a40-46c8-bc63-15eff53ad00c
 :END:
 - https://github.com/jeszyman/cfdna-wgs
 *** [[id:271b4d5f-727e-496e-b835-8fe9f8655655][Bioinformatics project module]]
+:PROPERTIES:
+:ID:       66399318-4be5-4404-8f19-c872abb15255
+:END:
 *** [[https://github.com/jeszyman/cfdna-wgs][Github link]]
+:PROPERTIES:
+:ID:       801992bf-8dcd-4df6-a0c2-9778829e924d
+:END:
 *** [[id:13120759-71db-497c-8ed3-1c58e47a7840][Biotools headline]]
+:PROPERTIES:
+:ID:       43d7175a-a16e-4bde-8f5a-b59985de3b42
+:END:
 *** Old rules
+:PROPERTIES:
+:ID:       a6406c59-ea89-4d45-ac8e-6e787d145865
+:END:
 **** DONE Alignment processing                                     :smk_rule:
+:PROPERTIES:
+:ID:       e00df395-b730-493c-959c-79e5ca492420
+:END:
 #+begin_src snakemake
 # Alignment deduplication and sorting
 rule alignment_processing:
@@ -2878,6 +3131,9 @@ sambamba index -t $threads $output_sort
 :ID:       b10eb670-a855-4591-a74c-b458cb5f0581
 :END:
 **** Preamble
+:PROPERTIES:
+:ID:       dec91c64-7d9d-48be-80fd-00973e9b3d4d
+:END:
 #+begin_src bash
 FROM jeszyman/biotools:1.0.2
 
@@ -2891,6 +3147,9 @@ FROM jeszyman/biotools:1.0.2
 
 #+end_src
 **** IchorCNA
+:PROPERTIES:
+:ID:       4f7fe7be-f7e9-45c4-9910-455bd5c4793c
+:END:
 #+begin_src bash
 
 #

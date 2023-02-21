@@ -1,3 +1,4 @@
+bash [[file:~/repos/cfdna-wgs/cfdna-wgs.org::*Make%20healthy%20GC%20distributions%20summary%20file][Make healthy GC distributions summary file:2]]
 #!/usr/bin/env Rscript
 args = commandArgs(trailingOnly = TRUE)
 distro_dir = args[1]
@@ -25,3 +26,4 @@ healthy_med =
 
 # Save
 saveRDS(healthy_med, file = healthy_med_file)
+bash Make healthy GC distributions summary file:2 ends here

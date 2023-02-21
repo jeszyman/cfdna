@@ -1,3 +1,4 @@
+# [[file:~/repos/cfdna-wgs/cfdna-wgs.org::*Preamble][Preamble:1]]
 #########1#########2#########3#########4#########5#########6#########7#########8
 #                                                                              #
 #      Integration Testing Snakefile for Analysis of Cell-free DNA             #
@@ -9,33 +10,35 @@
 import pandas as pd
 import re
 import numpy as np
+# Preamble:1 ends here
 
+# [[file:~/repos/cfdna-wgs/cfdna-wgs.org::*Variable%20naming][Variable naming:1]]
 # Variable naming
 benchdir = config["benchdir"]
 frag_repo = config["frag_repo"]
-cfdna_wgs_scriptdir = config["cfdna_wgs_scriptdir"]
+frag_scriptdir = config["frag_scriptdir"]
 logdir = config["logdir"]
 threads = config["threads"]
 
 # Suggested directory structure:
 analysis = config["data_dir"] + "/analysis"
-cfdna_wgs = config["data_dir"]      + "/analysis/cfdna_wgs"
-cfdna_wgs_cna = config["data_dir"]  + "/analysis/cfdna_wgs/cna"
-cfdna_wgs_frag = config["data_dir"] + "/analysis/cfdna_wgs/frag"
+frag = config["data_dir"]      + "/analysis/frag"
+frag_cna = config["data_dir"]  + "/analysis/frag/cna"
+frag_frag = config["data_dir"] + "/analysis/frag/frag"
 
 # Terminal variable paths:
 #  (These variables are used directly in the cna snakefile)
-cfdna_wgs_cna_in_bams      = cfdna_wgs_cna + "/input_bams"
-cfdna_wgs_cna_frag_bams    = cfdna_wgs_cna + "/frag_bams"
-cfdna_wgs_cna_wigs         = cfdna_wgs_cna + "/wigs"
-cfdna_wgs_cna_ichor_nopon  = cfdna_wgs_cna + "/ichor_nopon"
+frag_cna_in_bams      = frag_cna + "/input_bams"
+frag_cna_frag_bams    = frag_cna + "/frag_bams"
+frag_cna_wigs         = frag_cna + "/wigs"
+frag_cna_ichor_nopon  = frag_cna + "/ichor_nopon"
 
-cfdna_wgs_frag_input_bams  = cfdna_wgs_cna + "/input_bams"
-cfdna_wgs_frag_beds       = cfdna_wgs_frag + "/beds"
+frag_frag_input_bams  = frag_cna + "/input_bams"
+frag_frag_beds       = frag_frag + "/beds"
 
-cfdna_wgs_frag_counts     = cfdna_wgs_frag + "/counts"
+frag_frag_counts     = frag_frag + "/counts"
 
-refdir                 = config["data_dir"] + "/ref"
+refdir                 = config["data_dir"] + "/re"
 
 # Additional variable names used directly in the cna snakefile:
 chrom_sizes = config["chrom_sizes"]
@@ -50,34 +53,36 @@ chrs = "chr1,chr2,chr3,chr4,chr5,chr6,chr7,chr8,chr9,chr10,chr11,chr12,chr13,chr
 
 keep_bed = refdir + "/hg38_keep.bed",
 blklist = config["blklist"]
-genome_ref = config["genome_ref"]
+genome_ref = config["genome_re"]
 
 
 FRAG_DISTROS = config["frag_distro"]
 
-cfdna_wgs_threads = config["threads"]
-cfdna_wgs_scriptdir = config["cfdna_wgs_scriptdir"]
+frag_threads = config["threads"]
+frag_scriptdir = config["frag_scriptdir"]
 
 
-cfdna_wgs_container = config["cfdna_wgs_container"]
+frag_container = config["frag_container"]
 default_container = config["default_container"]
 
 autosome_bed = refdir + "/hg38_autosomes.bed",
-cfdna_wgs_fastqs = cfdna_wgs + "/fastqs"
-cfdna_wgs_bams = cfdna_wgs + "/bams"
+frag_fastqs = frag + "/fastqs"
+frag_bams = frag + "/bams"
 qc = config["data_dir"] + "/qc"
 
-# cfdna_wgs_container = config["cfdna_wgs_container"]
+# frag_container = config["frag_container"]
 
 
-# cfdna_wgs_cna_bam_inputs   = config["dir"]["data"] + "/bam/filt"
-# cfdna_wgs_cna_bam_fragfilt = config["dir"]["data"] + "/bam/frag"
+# frag_cna_bam_inputs   = config["dir"]["data"] + "/bam/filt"
+# frag_cna_bam_fragfilt = config["dir"]["data"] + "/bam/frag"
 
 # wig = config["dir"]["data"] + "/wig"
 # ichor = config["dir"]["data"] + "/ichor"
-# cfdna_wgs_logs = config["dir"]["data"] + "logs/cfdna_wgs"
+# frag_logs = config["dir"]["data"] + "logs/frag"
 # ichor_nopon = config["dir"]["data"] + "/ichor_nopon"
+# Variable naming:1 ends here
 
+# [[file:~/repos/cfdna-wgs/cfdna-wgs.org::*Functions][Functions:1]]
 libraries = pd.read_table(config["data_dir"] + "/inputs/libraries.tsv")
 
 readable = []
@@ -110,27 +115,29 @@ file_indict = cna_libraries["bam_file"].tolist()
 lib_dict = dict(zip(library_indict, file_indict))
 
 CNA_WGS_LIBRARIES = list(lib_dict.keys())
+# Functions:1 ends here
 
+# [[file:~/repos/cfdna-wgs/cfdna-wgs.org::*All%20rule][All rule:1]]
 rule all:
     input:
 # # From this snakefile:
-#         # cfdna_wgs_symlink:
-#         expand(cfdna_wgs_cna_in_bams +
+#         # frag_symlink:
+#         expand(frag_cna_in_bams +
 #                "/{library}.bam",
 #                library = lib_dict.keys()),
 # # From cna.smk
 #         # cna_frag_filt:
-#         expand(cfdna_wgs_cna_frag_bams +
+#         expand(frag_cna_frag_bams +
 #                "/{library}_frag{frag_distro}.bam",
 #                library = CNA_WGS_LIBRARIES,
 #                frag_distro = FRAG_DISTROS),
 #         # bam_to_wig:
-#         expand(cfdna_wgs_cna_wigs +
+#         expand(frag_cna_wigs +
 #                "/{library}_frag{frag_distro}.wig",
 #                library = CNA_WGS_LIBRARIES,
 #                frag_distro = FRAG_DISTROS),
 #         # ichor_nopon:
-#         expand(cfdna_wgs_cna_ichor_nopon +
+#         expand(frag_cna_ichor_nopon +
 #                "/{library}_frag{frag_distro}.cna.seg",
 #                library = CNA_WGS_LIBRARIES,
 #                frag_distro = FRAG_DISTROS),
@@ -138,57 +145,63 @@ rule all:
         # make_gc_map_bind:
         refdir + "/keep_5mb.bed",
         # filt_bam_to_frag_bed:
-        expand(cfdna_wgs_frag_beds +
+        expand(frag_frag_beds +
                "/{library}_filt.bed",
                library = CNA_WGS_LIBRARIES),
         # # gc_distro:
-        # expand(cfdna_wgs_frag_gc_distros +
+        # expand(frag_frag_gc_distros +
         #        "/{library}_gc_distro.csv",
         #        library = CNA_WGS_LIBRARIES),
         # # healthy_gc:
-        # cfdna_wgs_frag_gc_distros + "/healthy_med.rds",
+        # frag_frag_gc_distros + "/healthy_med.rds",
         # #
-        # expand(cfdna_wgs_frag_beds +
+        # expand(frag_frag_beds +
         #        "/{library}_sampled_frag.bed",
         #       library = CNA_WGS_LIBRARIES),
-        # expand(cfdna_wgs_frag_beds) /
+        # expand(frag_frag_beds) /
         #        "{library}_norm_{length}.bed",
         #        library = CNA_WGS_LIBRARIES,
         #        length = ["short", "long"]),
-        expand(cfdna_wgs_frag_counts +
+        expand(frag_frag_counts +
                "/{library}_cnt_{length}.tmp",
                library = CNA_WGS_LIBRARIES,
                length = ["short", "long"]),
-        cfdna_wgs_frag + "/frag_counts.tsv",
+        frag_frag + "/frag_counts.tsv",
         #
         # unit_cent_sd:
-        cfdna_wgs_frag + "/ratios.tsv",
+        frag_frag + "/ratios.tsv",
+# All rule:1 ends here
 
+# [[file:~/repos/cfdna-wgs/cfdna-wgs.org::*Symlink%20input%20bams][Symlink input bams:1]]
 # Symlink input bams
-rule cfdna_wgs_symlink:
-    container: cfdna_wgs_container,
+rule frag_symlink:
+    container: frag_container,
     input: lambda wildcards: lib_dict[wildcards.library],
-    output: cfdna_wgs_cna_in_bams + "/{library}.bam",
+    output: frag_cna_in_bams + "/{library}.bam",
     shell:
         """
         ln --force --relative --symbolic {input} {output}
         """
+# Symlink input bams:1 ends here
 
+# [[file:~/repos/cfdna-wgs/cfdna-wgs.org::*Includes%20statements][Includes statements:1]]
 include: frag_repo + "/workflow/reads.smk"
 include: frag_repo + "/workflow/cna.smk"
 include: frag_repo + "/workflow/frag.smk"
+# Includes statements:1 ends here
 
+# [[file:~/repos/cfdna-wgs/cfdna-wgs.org::*Filter%20downsampled%20bams%20to%20set%20fragment%20length%20distributions][Filter downsampled bams to set fragment length distributions:1]]
 rule frag_filt:
     input:
-        main = cfdna_wgs_bams + "/{library}_ds{downsample}.bam",
+        main = frag_bams + "/{library}_ds{downsample}.bam",
         check = logdir + "/{library}_{downsample}_made",
     output:
-        nohead = temp(cfdna_wgs_bams + "/{library}_ds{downsample}_frag{frag_distro}.nohead"),
-        onlyhead = temp(cfdna_wgs_bams + "/{library}_ds{downsample}_frag{frag_distro}.only"),
-        final = cfdna_wgs_bams + "/{library}_ds{downsample}_frag{frag_distro}.bam",
+        nohead = temp(frag_bams + "/{library}_ds{downsample}_frag{frag_distro}.nohead"),
+        onlyhead = temp(frag_bams + "/{library}_ds{downsample}_frag{frag_distro}.only"),
+        final = frag_bams + "/{library}_ds{downsample}_frag{frag_distro}.bam",
     params:
-        script = cfdna_wgs_scriptdir + "/frag_filt.sh",
-        threads = cfdna_wgs_threads,
+        script = "{frag_script_dir}/frag_filt.sh",
+        threads = frag_threads,
     shell:
         """
         frag_min=$(echo {wildcards.frag_distro} | sed -e "s/_.*$//g")
@@ -202,13 +215,15 @@ rule frag_filt:
         {output.onlyhead} \
         {output.final}
         """
+# Filter downsampled bams to set fragment length distributions:1 ends here
 
+# [[file:~/repos/cfdna-wgs/cfdna-wgs.org::*Setup%20conditional%20execution%20of%20downsampled%20bams][Setup conditional execution of downsampled bams:1]]
 # If downsample occured, then write filename into this per-library log, else leave the log file blank
 rule log_dowsample:
     input: logdir + "/{library}_{downsample}_downsample.done",
     output: logdir + "/{library}_{downsample}_made",
     params:
-        bamdir = cfdna_wgs_bams,
+        bamdir = frag_bams,
     shell:
         """
         dspath={params.bamdir}/{wildcards.library}_ds{wildcards.downsample}.bam
@@ -217,14 +232,14 @@ rule log_dowsample:
 
 # Use the downsampled bam logs to make a single text file of conditionally executed final targets.
 # Specifically in this example, log text lines are in the form
-# cfdna_wgs_bams + "/{library}_ds{downsample}_frag90_150.bam" to setup conditional execution of fragment filtering ONLY on downsampled bams
-# Note alternative delimiter "~" to sed allows cfdna_wgs_wigs as param
+# frag_bams + "/{library}_ds{downsample}_frag90_150.bam" to setup conditional execution of fragment filtering ONLY on downsampled bams
+# Note alternative delimiter "~" to sed allows frag_wigs as param
 
 checkpoint ds_cond_target_list:
     input: expand(logdir + "/{library}_{downsample}_made", library = FRAG_LIBS, downsample = DOWNSAMPLE),
     output: logdir + "/ds_final_targets",
     params:
-        outdir = cfdna_wgs_bams,
+        outdir = frag_bams,
         frag_distro=config["frag_distro"]
     shell:
         """
@@ -248,15 +263,17 @@ rule make_ds_targets:
     run:
         with open(output[0], "w") as f:
             f.write("\n".join(input))
+# Setup conditional execution of downsampled bams:1 ends here
 
+# [[file:~/repos/cfdna-wgs/cfdna-wgs.org::*Downsample%20bams][Downsample bams:1]]
 rule downsample_bams:
-    input: cfdna_wgs_bams + "/{library}_filt.bam",
+    input: frag_bams + "/{library}_filt.bam",
     output: touch(logdir + "/{library}_{downsample}_downsample.done"),
     params:
-        out_dir = cfdna_wgs_bams,
-        script = cfdna_wgs_scriptdir + "/downsample_bams.sh",
+        out_dir = frag_bams,
+        script = "{frag_script_dir}/downsample_bams.sh",
         suffix = "_filt.bam",
-        threads = cfdna_wgs_threads,
+        threads = frag_threads,
     shell:
         """
         {params.script} \
@@ -266,3 +283,4 @@ rule downsample_bams:
         {params.suffix} \
         {params.threads}
         """
+# Downsample bams:1 ends here

@@ -1,3 +1,4 @@
+# [[file:~/repos/cfdna-wgs/cfdna-wgs.org::*Repository%20setup%20and%20administration][Repository setup and administration:3]]
 #!/usr/bin/env bash
 
 print_usage(){
@@ -39,3 +40,4 @@ conda deactivate
 if [ $# -ne 1 ]; then print_usage && exit 1; fi
 
 build_or_update
+# Repository setup and administration:3 ends here

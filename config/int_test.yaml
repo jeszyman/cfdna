@@ -1,3 +1,4 @@
+# [[file:~/repos/cfdna-wgs/cfdna-wgs.org::*%5B%5Bfile:config/int_test.yaml%5D%5BSnakemake%20configuration%20YAML%5D%5D][[[file:config/int_test.yaml][Snakemake configuration YAML]]:1]]
 ##############################
 ###   Configuration Yaml   ###
 ##############################
@@ -16,3 +17,4 @@ frag_repo: "/home/jszymanski/repos/cfdna-wgs"
 frag_distro: "90_150"
 
 gc5mb: "test/inputs/gc5mb.bed"
+# [[file:config/int_test.yaml][Snakemake configuration YAML]]:1 ends here

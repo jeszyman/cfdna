@@ -1,3 +1,4 @@
+# [[file:~/repos/cfdna-wgs/cfdna-wgs.org::*Adapter-trim%20and%20QC%20reads%20with%20fastp][Adapter-trim and QC reads with fastp:2]]
 #!/usr/bin/env bash
 set -o errexit   # abort on nonzero exitstatus
 set -o nounset   # abort on unbound variable
@@ -46,3 +47,4 @@ fastp_wrap(){
 
 # Run
 main "$@"
+# Adapter-trim and QC reads with fastp:2 ends here

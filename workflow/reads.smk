@@ -5,6 +5,8 @@
 #                                                                              #
 #########1#########2#########3#########4#########5#########6#########7#########8
 
+GCA_000001405.15_GRcH38_no_alt_analysis_set.fna.sa
+
 # Make alignment index
 #  Note: Upon first run, this rule will touch an empty file with the same path
 #        as the index prefix. Thereafter, you can avoid repeat indexing when the
@@ -12,19 +14,18 @@
 #        external reference, indexing can likewise be avoided with this empty
 #        file at the external index location.
 
-rule cfdna_wgs_index:
-    benchmark: benchdir + "/cfdna_wgs_index.benchmark.txt",
+rule frag_index:
+    benchmark: benchdir + "/frag_index.benchmark.txt",
     container: cfdna_wgs_container,
     input: genome_fasta,
-    log: logdir + "/cfdna_wgs_index.log",
-    output: done = touch(genome_ref),
+    log: logdir + "/frag_index.log",
+    output: "{data_dir}/ref/{fasta_base}.sa",
     params:
-        out_prefix = genome_ref,
+        out_prefix = bwa_dir + fasta_base,
         script = cfdna_wgs_scriptdir + "/index.sh",
-        threads = cfdna_wgs_threads,
     shell:
         """
-        bwa index -p {params.out_prefix} {input} &> {log}
+        {params.script} {input} &> {log}
         """
 
 # Adapter-trim and QC reads with fastp

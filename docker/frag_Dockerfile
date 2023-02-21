@@ -5,8 +5,8 @@ FROM jeszyman/biotools:1.0.2
 #################
 #
 # After build, the image will be pushed to the dockerhub as
-# jeszyman/cfdna_wgs
-# (https://hub.docker.com/repository/docker/jeszyman/cfdna_wgs)
+# jeszyman/frag
+# (https://hub.docker.com/repository/docker/jeszyman/frag)
 
 #
 RUN cd /opt && \

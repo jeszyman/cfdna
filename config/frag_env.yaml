@@ -1,0 +1,11 @@
+# [[file:~/repos/cfdna-wgs/cfdna-wgs.org::*%5B%5Bfile:config/frag_env.yaml%5D%5BFragmentomics%20environment%20YAML%5D%5D][[[file:config/frag_env.yaml][Fragmentomics environment YAML]]:1]]
+name: frag
+channels:
+  - conda-forge
+  - bioconda
+
+dependencies:
+  - bwa
+  - r-tidyverse
+  - samtools
+# [[file:config/frag_env.yaml][Fragmentomics environment YAML]]:1 ends here

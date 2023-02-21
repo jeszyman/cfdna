@@ -8,16 +8,16 @@
 
 # Use readCounter to create windowed wig from bam file
 rule bam_to_wig:
-    benchmark: benchdir + "/{library}_ds{downsample}_{frag_distro}_cfdna_wgs_bam_to_wig.benchmark.txt",
-    container: cfdna_wgs_container,
-    input: cfdna_wgs_bams + "/{library}_ds{downsample}_frag{frag_distro}.bam",
-    log: logdir + "/{library}_ds{downsample}_{frag_distro}_cfdna_wgs_bam_to_wig.log",
-    output: cfdna_wgs_wigs + "/{library}_ds{downsample}_frag{frag_distro}.wig",
+    benchmark: benchdir + "/{library}_ds{downsample}_{frag_distro}_frag_bam_to_wig.benchmark.txt",
+    container: frag_container,
+    input: frag_bams + "/{library}_ds{downsample}_frag{frag_distro}.bam",
+    log: logdir + "/{library}_ds{downsample}_{frag_distro}_frag_bam_to_wig.log",
+    output: frag_wigs + "/{library}_ds{downsample}_frag{frag_distro}.wig",
     params:
         chrs = chrs,
-        outdir = cfdna_wgs_wigs,
-        script = cfdna_wgs_scriptdir + "/bam_to_wig.sh",
-        threads = cfdna_wgs_threads,
+        outdir = frag_wigs,
+        script = "{frag_script_dir}/bam_to_wig.sh",
+        threads = frag_threads,
     shell:
         """
         mkdir -p {params.outdir}
@@ -30,13 +30,13 @@ rule bam_to_wig:
 
 # Run ichorCNA without a panel of normals
 rule ichor_nopon:
-    input: cfdna_wgs_wigs + "/{library}_ds{downsample}_frag{frag_distro}.wig",
-    output: cfdna_wgs_ichor_nopon + "/{library}_ds{downsample}_frag{frag_distro}.cna.seg",
+    input: frag_wigs + "/{library}_ds{downsample}_frag{frag_distro}.wig",
+    output: frag_ichor_nopon + "/{library}_ds{downsample}_frag{frag_distro}.cna.seg",
     params:
-        script = cfdna_wgs_scriptdir + "/MOD_runIchorCNA.R",
-        out_dir = cfdna_wgs_ichor_nopon,
+        script = "{frag_script_dir}/MOD_runIchorCNA.R",
+        out_dir = frag_ichor_nopon,
     container:
-        cfdna_wgs_container,
+        frag_container,
     shell:
         """
         Rscript {params.script} \

@@ -1,25 +1,20 @@
-###   Parameters intended to be common across workflows   ###
+# [[file:~/repos/cfdna-wgs/cfdna-wgs.org::*%5B%5Bfile:config/int_test.yaml%5D%5BSnakemake%20configuration%20YAML%5D%5D][[[file:config/int_test.yaml][Snakemake configuration YAML]]:1]]
+##############################
+###   Configuration Yaml   ###
+##############################
 
-blklist: "test/inputs/hg38-blacklist.v2.bed"
-datadir: "test"
-default_container: "/home/jeszyman/sing_containers/biotools.1.0.2.sif"
-genome_fasta: "test/inputs/chr8.fa"
-genome_ref: "test/ref/chr8.fa"
-qcdir: "test/analysis/qc"
+###   Parameters Intended To Be Common Across Workflows    ###
+
+blklist: "/mnt/ris/szymanski/Active/test/inputs/hg38-blacklist.v2.bed.gz"
+data_dir: "/mnt/ris/szymanski/Active/test"
+genome_fasta: "/mnt/ris/szymanski/Active/test/inputs/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna.gz"
 threads: 4
 
 ###   Unique properties from this repo   ###
 
-cfdna_wgs_container: "/home/jeszyman/sing_containers/cfdna_wgs.1.0.0.sif"
-
-cfdna_wgs_repo: "/home/jeszyman/repos/cfdna-wgs"
-
-downsample:
-  - "0.001"
-  - "0.004"
+frag_repo: "/home/jszymanski/repos/cfdna-wgs"
 
 frag_distro: "90_150"
 
 gc5mb: "test/inputs/gc5mb.bed"
-
-picard_jar: "/opt/picard/picard.jar"
+# [[file:config/int_test.yaml][Snakemake configuration YAML]]:1 ends here

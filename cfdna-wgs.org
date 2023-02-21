@@ -103,18 +103,22 @@ gc5mb: "test/inputs/gc5mb.bed"
 :header-args:snakemake: :tangle ./workflow/reads.smk
 :END:
 *** Preamble
+:PROPERTIES:
+:ID:       a6a9f575-a201-4661-8c3d-fe1cfd076707
+:END:
 #+begin_src snakemake
-
 #########1#########2#########3#########4#########5#########6#########7#########8
 #                                                                              #
 #                    Basic Read and Alignment Processing of                    #
-#                    Cell-free DNA Whole Genome Sequencing                     #
+#              Cell-free DNA Whole Genome Sequencing Fragmentomics             #
 #                                                                              #
 #########1#########2#########3#########4#########5#########6#########7#########8
-
 #+end_src
 *** Read and alignment processing
 **** Make alignment index                                          :smk_rule:
+:PROPERTIES:
+:ID:       ca64abc7-3729-405e-957a-45e69a138c6b
+:END:
 - [[./workflow/reads.smk::rule cfdna_wgs_index][Snakemake]]
   #+begin_src snakemake
 
@@ -150,6 +154,9 @@ out_prefix=$2
 bwa index -p $out_prefix $in_fasta
 #+end_src
 **** Adapter-trim and QC reads with fastp                          :smk_rule:
+:PROPERTIES:
+:ID:       d9bd8440-08c9-4d15-8ea6-f7f6d0b5c3d5
+:END:
 - [[./workflow/reads.smk::rule cfdna_wgs_fastp][Snakemake]]
   #+begin_src snakemake
 # Adapter-trim and QC reads with fastp

@@ -1,4 +1,3 @@
-# [[file:~/repos/cfdna-wgs/cfdna-wgs.org::*Alignment%20QC][Alignment QC:2]]
 #!/usr/bin/env bash
 set -o errexit   # abort on nonzero exitstatus
 set -o nounset   # abort on unbound variable
@@ -38,4 +37,3 @@ samstats(){
 
 # Run
 main "$@"
-# Alignment QC:2 ends here

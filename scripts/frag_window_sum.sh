@@ -1,4 +1,3 @@
-# [[file:~/repos/cfdna-wgs/cfdna-wgs.org::*Sum%20fragments%20in%20genomic%20windows%20by%20length][Sum fragments in genomic windows by length:2]]
 #!/usr/bin/env bash
 input_frag="$1"
 output_short="$2"
@@ -16,4 +15,3 @@ make_long(){
 # Run command
 make_short $input_frag $output_short
 make_long $input_frag $output_long
-# Sum fragments in genomic windows by length:2 ends here

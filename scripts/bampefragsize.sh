@@ -1,4 +1,3 @@
-# [[file:~/repos/cfdna-wgs/cfdna-wgs.org::*deepTools%20fragment%20sizes][deepTools fragment sizes:2]]
 #!/usr/bin/env bash
 #!/usr/bin/env bash
 set -o errexit   # abort on nonzero exitstatus
@@ -21,4 +20,3 @@ bamPEFragmentSize --bamfiles $input \
                   --histogram $output_hist \
                   --maxFragmentLength 1000 \
                   --outRawFragmentLengths $output_raw
-# deepTools fragment sizes:2 ends here

@@ -1,4 +1,3 @@
-bash [[file:~/repos/cfdna-wgs/cfdna-wgs.org::*Make%20GC%20distributions][Make GC distributions:2]]
 #!/usr/bin/env Rscript
 args = commandArgs(trailingOnly = TRUE)
 bed_file = args[1]
@@ -21,4 +20,3 @@ distro =
   mutate(fract_frags = n/sum(n)) %>% mutate(library_id = gsub("_frag.bed", "", gsub("^.*lib", "lib", bed_file))) %>%
   select(library_id,gc_strata,fract_frags) %>%
   write.csv(file = distro_file, row.names = F)
-bash Make GC distributions:2 ends here

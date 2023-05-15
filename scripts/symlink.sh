@@ -1,4 +1,3 @@
-# [[file:~/repos/cfdna-wgs/cfdna-wgs.org::*Symlink%20input%20fastqs][Symlink input fastqs:2]]
 #!/usr/bin/env bash
 set -o errexit   # abort on nonzero exitstatus
 set -o nounset   # abort on unbound variable
@@ -16,4 +15,3 @@ input_read2="$(echo $input_read1 | sed "s/_R1/_R2/g")"
 
 ln -sf --relative ${input_read1} ${output_read1}
 ln -sf --relative ${input_read2} ${output_read2}
-# Symlink input fastqs:2 ends here

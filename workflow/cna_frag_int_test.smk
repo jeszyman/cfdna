@@ -1,4 +1,3 @@
-# [[file:~/repos/cfdna-wgs/cfdna-wgs.org::*Preamble][Preamble:1]]
 #########1#########2#########3#########4#########5#########6#########7#########8
 #                                                                              #
 #      Integration Testing Snakefile for Analysis of Cell-free DNA             #
@@ -10,9 +9,7 @@
 import pandas as pd
 import re
 import numpy as np
-# Preamble:1 ends here
 
-# [[file:~/repos/cfdna-wgs/cfdna-wgs.org::*Variable%20naming][Variable naming:1]]
 # Variable naming
 benchdir = config["benchdir"]
 frag_repo = config["frag_repo"]
@@ -80,9 +77,7 @@ qc = config["data_dir"] + "/qc"
 # ichor = config["dir"]["data"] + "/ichor"
 # frag_logs = config["dir"]["data"] + "logs/frag"
 # ichor_nopon = config["dir"]["data"] + "/ichor_nopon"
-# Variable naming:1 ends here
 
-# [[file:~/repos/cfdna-wgs/cfdna-wgs.org::*Functions][Functions:1]]
 libraries = pd.read_table(config["data_dir"] + "/inputs/libraries.tsv")
 
 readable = []
@@ -115,9 +110,7 @@ file_indict = cna_libraries["bam_file"].tolist()
 lib_dict = dict(zip(library_indict, file_indict))
 
 CNA_WGS_LIBRARIES = list(lib_dict.keys())
-# Functions:1 ends here
 
-# [[file:~/repos/cfdna-wgs/cfdna-wgs.org::*All%20rule][All rule:1]]
 rule all:
     input:
 # # From this snakefile:
@@ -170,9 +163,7 @@ rule all:
         #
         # unit_cent_sd:
         frag_frag + "/ratios.tsv",
-# All rule:1 ends here
 
-# [[file:~/repos/cfdna-wgs/cfdna-wgs.org::*Symlink%20input%20bams][Symlink input bams:1]]
 # Symlink input bams
 rule frag_symlink:
     container: frag_container,
@@ -182,15 +173,11 @@ rule frag_symlink:
         """
         ln --force --relative --symbolic {input} {output}
         """
-# Symlink input bams:1 ends here
 
-# [[file:~/repos/cfdna-wgs/cfdna-wgs.org::*Includes%20statements][Includes statements:1]]
 include: frag_repo + "/workflow/reads.smk"
 include: frag_repo + "/workflow/cna.smk"
 include: frag_repo + "/workflow/frag.smk"
-# Includes statements:1 ends here
 
-# [[file:~/repos/cfdna-wgs/cfdna-wgs.org::*Filter%20downsampled%20bams%20to%20set%20fragment%20length%20distributions][Filter downsampled bams to set fragment length distributions:1]]
 rule frag_filt:
     input:
         main = frag_bams + "/{library}_ds{downsample}.bam",
@@ -215,9 +202,7 @@ rule frag_filt:
         {output.onlyhead} \
         {output.final}
         """
-# Filter downsampled bams to set fragment length distributions:1 ends here
 
-# [[file:~/repos/cfdna-wgs/cfdna-wgs.org::*Setup%20conditional%20execution%20of%20downsampled%20bams][Setup conditional execution of downsampled bams:1]]
 # If downsample occured, then write filename into this per-library log, else leave the log file blank
 rule log_dowsample:
     input: logdir + "/{library}_{downsample}_downsample.done",
@@ -263,9 +248,7 @@ rule make_ds_targets:
     run:
         with open(output[0], "w") as f:
             f.write("\n".join(input))
-# Setup conditional execution of downsampled bams:1 ends here
 
-# [[file:~/repos/cfdna-wgs/cfdna-wgs.org::*Downsample%20bams][Downsample bams:1]]
 rule downsample_bams:
     input: frag_bams + "/{library}_filt.bam",
     output: touch(logdir + "/{library}_{downsample}_downsample.done"),
@@ -283,4 +266,3 @@ rule downsample_bams:
         {params.suffix} \
         {params.threads}
         """
-# Downsample bams:1 ends here

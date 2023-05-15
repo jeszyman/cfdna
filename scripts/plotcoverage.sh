@@ -1,4 +1,3 @@
-# [[file:~/repos/cfdna-wgs/cfdna-wgs.org::*deepTools%20plotCoverage][deepTools plotCoverage:2]]
 #!/usr/bin/env bash
 in_bam_string=$1
 blacklist=$2
@@ -15,4 +14,3 @@ plotCoverage \
     --plotFile $out_plot \
     --plotFileFormat pdf \
     --skipZeros
-# deepTools plotCoverage:2 ends here

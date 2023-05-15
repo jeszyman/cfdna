@@ -1,4 +1,3 @@
-# [[file:~/repos/cfdna-wgs/cfdna-wgs.org::*Make%20bedfile%20from%20filtered%20bam][Make bedfile from filtered bam:2]]
 #!/usr/bin/env bash
 
 # Snakemake variables
@@ -29,4 +28,3 @@ bam_to_frag(){
 bam_to_frag $input_bam \
             $params_fasta \
             $output_frag_bed
-# Make bedfile from filtered bam:2 ends here

@@ -1,6 +1,6 @@
 * Cell-free DNA Fragmentomics                                       :biopipe:
 :PROPERTIES:
-:header-args: :tangle no :mkdirp yes :tangle-mode (identity #o755) :noweb yes :comments link
+:header-args: :tangle no :mkdirp yes :tangle-mode (identity #o555)
 :ID:       f0fbade8-2251-4aec-958f-ac1e1edd6c18
 :END:
 ** Repository setup and administration
@@ -163,19 +163,19 @@ zcat ${mntpt}/mpnst/inputs/seq/KS_30F_R2.fastq.gz | head -n $fq_size > ${data_di
 for file in ${data_dir}/inputs/*.fastq; do gzip -f $file; done
 #+end_src
 - frag_ligs.tsv [[file:/mnt/ris/szymanski/Active/test/inputs/frag_libs.tsv]]
-  | library | r1_basename             | cohort    |
-  |---------+-------------------------+-----------|
-  | lib001  | 19_2_082_R1.fastq.gz    | mpnst     |
-  | lib002  | 25_2_072_R1.fastq       | mpnst     |
-  | lib003  | JS0050CD112717_R1.fastq | plexiform |
-  | lib004  | KO_10_23_17_R1.fastq.gz | plexiform |
-  | lib005  | TS_36M_R1.fastq.gz      | healthy   |
-  | lib006  | KS_30F_R1.fastq.gz      | healthy   |
+  | library  | r1_basename  | cohort  |
+  |---+---+---|
+  | lib001  | 19_2_082_R1.fastq.gz  | mpnst  |
+  | lib002  | 25_2_072_R1.fastq  | mpnst  |
+  | lib003  | JS0050CD112717_R1.fastq  | plexiform  |
+  | lib004  | KO_10_23_17_R1.fastq.gz  | plexiform  |
+  | lib005  | TS_36M_R1.fastq.gz  | healthy  |
+  | lib006  | KS_30F_R1.fastq.gz  | healthy  |
 ** [[file:config/frag_env.yaml][Fragmentomics environment YAML]]
 :PROPERTIES:
 :ID:       4e606db9-72e7-4c62-acdc-224c34e4bc3d
 :END:
-#+begin_src bash :tangle ./config/frag_env.yaml
+#+begin_src fundamental :tangle ./config/frag_env.yaml
 name: frag
 channels:
   - conda-forge
@@ -185,6 +185,7 @@ dependencies:
   - bwa
   - r-tidyverse
   - samtools
+  - snakemake
 #+end_src
 ** [[file:config/int_test.yaml][Snakemake configuration YAML]]
 :PROPERTIES:
@@ -223,138 +224,16 @@ gc5mb: "test/inputs/gc5mb.bed"
 :ID:       a6a9f575-a201-4661-8c3d-fe1cfd076707
 :END:
 #+begin_src snakemake
-#########1#########2#########3#########4#########5#########6#########7#########8
-#                                                                              #
-#                    Basic Read and Alignment Processing of                    #
-#              Cell-free DNA Whole Genome Sequencing Fragmentomics             #
-#                                                                              #
-#########1#########2#########3#########4#########5#########6#########7#########8
+##################################################################
+###   Integration testing snakefile for WGS cfDNA Processing   ###
+##################################################################
 #+end_src
 *** Read and alignment processing
 :PROPERTIES:
 :ID:       821ba448-d96e-4da7-9c48-499250c976a5
 :END:
-**** Make alignment index                                          :smk_rule:
-:PROPERTIES:
-:ID:       36473f6e-c7fd-4aff-b549-d7eac89f7bcc
-:END:
-- [[./workflow/reads.smk::rule cfdna_wgs_index][Snakemake]]
-  #+begin_src snakemake
 
-rule frag_index:
-    benchmark: "{bench_dir}/frag_index.benchmark.txt",
-    input: genome_fasta,
-    log: "{log_dir}/frag_index.log",
-    output: "{data_dir}/ref/{fasta_base}.sa",
-    params:
-        out_prefix = "{bwa_dir}/{fasta_base}",
-        script = "{frag_script_dir}/frag_index.sh",
-    shell:
-        """
-        {params.script} {input} {params.out_prefix} &> {log}
-        """
-#+end_src
-- Shell script
-  #+begin_src bash :tangle ./scripts/frag_index.sh
-#!/usr/bin/env bash
-in_fasta="${1}"
-out_prefix="${2}"
 
-bwa index -p $out_prefix $in_fasta
-#+end_src
-**** Adapter-trim and QC reads with fastp                          :smk_rule:
-:PROPERTIES:
-:ID:       8b5a87cc-8615-4df1-ae65-6142147fd42a
-:END:
-- [[./workflow/reads.smk::rule cfdna_wgs_fastp][Snakemake]]
-  #+begin_src snakemake
-# Adapter-trim and QC reads with fastp
-rule frag_fastp:
-    benchmark: "{bench_dir}/{{library}}_frag_fastp.benchmark.txt",
-    input:
-        read1 = "{frag_fastq_dir/{{library}}_raw_R1.fastq.gz",
-        read2 = "{frag_fastq_dir/{{library}}_raw_R2.fastq.gz",
-    log:
-        cmd = "{log_dir/{{library}}_frag_fastp.log",
-        html = "{log_dir/{{library}}_frag_fastp.html",
-        json = "{log_dir/{{library}}_frag_fastp.json",
-    output:
-        read1 = "{frag_fastq_dir}/{{library}}_processed_R1.fastq.gz",
-        read2 = "{frag_fastq_dir}/{{library}}_processed_R2.fastq.gz",
-        failed = "{frag_fastq_dir}/{{library}}_failed_fastp.fastq.gz",
-        unpaired1 = "{frag_fastq_dir}/{{library}}_unpaired_R1.fastq.gz",
-        unpaired2 = "{frag_fastq_dir}/{{library}}_unpaired_R2.fastq.gz",
-    params:
-        script = "{frag_script_dir}/fastp.sh",
-        threads = frag_threads,
-    resources:
-        mem_mb = 500,
-    shell:
-        """
-        {params.script} \
-        {input.read1} \
-        {input.read2} \
-        {log.html} \
-        {log.json} \
-        {output.read1} \
-        {output.read2} \
-        {output.failed} \
-        {output.unpaired1} \
-        {output.unpaired2} \
-        {params.threads} &> {log.cmd}
-        """
-#+end_src
-- [[file:scripts/fastp.sh][Shell script]]
-  #+begin_src bash :tangle ./scripts/fastp.sh
-#!/usr/bin/env bash
-set -o errexit   # abort on nonzero exitstatus
-set -o nounset   # abort on unbound variable
-set -o pipefail  # don't hide errors within pipes
-
-# Script variables
-
-input_read1="${1}"
-input_read2="${2}"
-log_html="${3}"
-log_json="${4}"
-output_read1="${5}"
-output_read2="${6}"
-output_failed="${7}"
-output_unpaired1="${8}"
-output_unpaired2="${9}"
-params_threads="${10}"
-
-# Functions
-main(){
-    fastp_wrap $output_failed \
-               $input_read1 \
-               $input_read2 \
-               $log_html \
-               $log_json \
-               $output_read1 \
-               $output_read2 \
-               $output_unpaired1 \
-               $output_unpaired2 \
-               $params_threads
-}
-
-fastp_wrap(){
-    fastp --detect_adapter_for_pe \
-          --failed_out $output_failed \
-          --in1 $input_read1 \
-          --in2 $input_read2 \
-          --html $log_html \
-          --json $log_json \
-          --out1 $output_read1 \
-          --out2 $output_read2 \
-          --unpaired1 $output_unpaired1 \
-          --unpaired2 $output_unpaired2 \
-          --thread $params_threads
-    }
-
-# Run
-main "$@"
-#+end_src
 **** Align reads with BWA                                          :smk_rule:
 :PROPERTIES:
 :ID:       224c54ff-b8bf-45ba-882b-c368d98d19f3
@@ -1586,7 +1465,7 @@ frag_script_dir = "{frag_repo}/scripts"
 #####################
 
 # Setup fragment sample name index as a python dictionary
-frag_libs = pd.read_table("{data_dir}/test/inputs/frag_libs.tsv")
+frag_libs = pd.read_table("~/test/inputs/frag_libs.tsv")
 
 lib_path = "{data_dir}/test/inputs"
 
@@ -1611,12 +1490,13 @@ FRAG_HEALTHY_LIBRARIES = frag_libs[frag_libs['cohort'] == 'healthy']['library'].
 :ID:       d8b9017c-8cde-4d5e-a492-9f8d21f5fa20
 :END:
 #+begin_src snakemake
+data_dir="~/test"
 rule all:
     input:
         expand("{data_dir}/analysis/frag/fastqs/{{library}}_raw_{{read}}.fastq.gz",
                library = list(frag_lib_dict.keys()),
                read = ["R1", "R2"]),
-        "{data_dir}/ref/{fasta_base}.sa",
+        #"{data_dir}/ref/{fasta_base}.sa",
         #"{data_dir}/ref/{fasta_base}.sa",
         #logdir + "/aggregate_output",
         #frag_frag + "/ratios.tsv",

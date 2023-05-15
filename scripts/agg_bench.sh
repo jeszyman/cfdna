@@ -1,4 +1,3 @@
-# [[file:~/repos/cfdna-wgs/cfdna-wgs.org::*Benchmark%20aggregation][Benchmark aggregation:2]]
 # For unit testing
 indir="test/benchmark"
 output="test/analysis/qc/bench_agg.tsv"
@@ -12,4 +11,3 @@ do
 done
 
 sed -i '1i\process\tfloat_sec\trun_time\tmax_rss\tmax_vms\tmax_uss\tmax_pss\tio_in\tio_out\tmean_load\tcpu_time' $output
-# Benchmark aggregation:2 ends here

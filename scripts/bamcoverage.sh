@@ -1,4 +1,3 @@
-# [[file:~/repos/cfdna-wgs/cfdna-wgs.org::*deepTools%20bamCoverage][deepTools bamCoverage:2]]
 #!/usr/bin/env bash
 
 in_bam=$1
@@ -19,4 +18,3 @@ bamCoverage \
     --numberOfProcessors $threads \
     --outFileFormat bedgraph \
     --outFileName $out_bg
-# deepTools bamCoverage:2 ends here

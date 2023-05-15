@@ -1,4 +1,3 @@
-# [[file:~/repos/cfdna-wgs/cfdna-wgs.org::*Downsample%20bams][Downsample bams:2]]
 #!/usr/bin/env bash
 # For unit testing
 # in_bam=test/analysis/frag/bams/lib001_filt.bam
@@ -29,4 +28,3 @@ downsample(){
 }
 
 downsample $in_bam $milreads $suffix
-# Downsample bams:2 ends here

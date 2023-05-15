@@ -1,4 +1,3 @@
-# [[file:~/repos/cfdna-wgs/cfdna-wgs.org::*Filter%20de-duplicated%20alignments][Filter de-duplicated alignments:2]]
 #!/usr/bin/env bash
 
 input=$1
@@ -13,4 +12,3 @@ output=$3
 samtools view -@ $threads -b -F 1284 -h -q 20 -o $output $input
 
 samtools index ${output}
-# Filter de-duplicated alignments:2 ends here

@@ -1,12 +1,9 @@
-# [[file:~/repos/cfdna-wgs/cfdna-wgs.org::*Preamble][Preamble:1]]
 #########1#########2#########3#########4#########5#########6#########7#########8
 #                                                                              #
 #     Fragmentomic Analysis of Cell-free DNA Whole Genome Sequencing           #
 #                                                                              #
 #########1#########2#########3#########4#########5#########6#########7#########8
-# Preamble:1 ends here
 
-# [[file:~/repos/cfdna-wgs/cfdna-wgs.org::*Make%20GC%20and%20mappability%20restricted%20bins][Make GC and mappability restricted bins:1]]
 rule make_gc_map_bind:
     container: frag_container,
     input:
@@ -23,9 +20,7 @@ rule make_gc_map_bind:
         {input.blklist} \
         {output} &> {log}
         """
-# Make GC and mappability restricted bins:1 ends here
 
-# [[file:~/repos/cfdna-wgs/cfdna-wgs.org::*Make%20bedfile%20from%20filtered%20bam][Make bedfile from filtered bam:1]]
 # Make a bed file from filtered bam
 rule filt_bam_to_frag_bed:
     benchmark: benchdir + "/{library}_filt_bam_to_frag_bed.benchmark.txt",
@@ -45,9 +40,7 @@ rule filt_bam_to_frag_bed:
         {params.threads} \
         {output}
         """
-# Make bedfile from filtered bam:1 ends here
 
-# [[file:~/repos/cfdna-wgs/cfdna-wgs.org::*Make%20GC%20distributions][Make GC distributions:1]]
 # Make GC distributions
 rule gc_distro:
     benchmark: benchdir + "/{library}_frag_gc_distro.benchmark.txt",
@@ -64,9 +57,7 @@ rule gc_distro:
         {output} \
         > {log} 2>&1
         """
-# Make GC distributions:1 ends here
 
-# [[file:~/repos/cfdna-wgs/cfdna-wgs.org::*Make%20healthy%20GC%20distributions%20summary%20file][Make healthy GC distributions summary file:1]]
 # Make healthy GC distributions summary file
 rule healthy_gc:
     benchmark: benchdir + "/frag_healthy_gc.benchmark.txt",
@@ -84,9 +75,7 @@ rule healthy_gc:
         "{input}" \
         {output} > {log} 2>&1
         """
-# Make healthy GC distributions summary file:1 ends here
 
-# [[file:~/repos/cfdna-wgs/cfdna-wgs.org::*Sample%20fragments%20by%20healthy%20GC%20proportions][Sample fragments by healthy GC proportions:1]]
 # Sample fragments by healthy GC proportions
 rule frag_gc_sample:
     benchmark: benchdir + "/{library}_frag_gc_sample.benchmark.txt",
@@ -105,9 +94,7 @@ rule frag_gc_sample:
         {input.frag_bed} \
         {output} > {log} 2>&1
         """
-# Sample fragments by healthy GC proportions:1 ends here
 
-# [[file:~/repos/cfdna-wgs/cfdna-wgs.org::*Sum%20fragments%20in%20genomic%20windows%20by%20length][Sum fragments in genomic windows by length:1]]
 # Sum fragments in short and long length groups
 
 rule frag_sum:
@@ -127,9 +114,7 @@ rule frag_sum:
         {input} \
         {output.short} {output.long} &> {log}
         """
-# Sum fragments in genomic windows by length:1 ends here
 
-# [[file:~/repos/cfdna-wgs/cfdna-wgs.org::*Count%20fragments%20intersecting%20windows][Count fragments intersecting windows:1]]
 # Count short and long fragments intersecting kept genomic windows
 
 rule frag_window_count:
@@ -157,9 +142,7 @@ rule frag_window_count:
         {input.matbed} \
         {output.long}
         """
-# Count fragments intersecting windows:1 ends here
 
-# [[file:~/repos/cfdna-wgs/cfdna-wgs.org::*Merge%20counts%20across%20length%20and%20library][Merge counts across length and library:1]]
 # Merge short and long fragment counts by genomic poistion for all libraries
 rule frag_count_merge:
     benchmark: benchdir + "/frag_count_merge.benchmark.txt",
@@ -177,9 +160,7 @@ rule frag_count_merge:
         {params.counts_dir} \
         {output} &> {log}
         """
-# Merge counts across length and library:1 ends here
 
-# [[file:~/repos/cfdna-wgs/cfdna-wgs.org::*Make%20a%20zero-centered,%20unit%20SD%20fragment%20file][Make a zero-centered, unit SD fragment file:1]]
 rule unit_cent_sd:
     benchmark: benchdir + "/unit_cent_sd.benchmark.txt",
     container: frag_container,
@@ -193,4 +174,3 @@ rule unit_cent_sd:
         Rscript {params.script} \
         {input} {output} > {log} 2>&1
         """
-# Make a zero-centered, unit SD fragment file:1 ends here

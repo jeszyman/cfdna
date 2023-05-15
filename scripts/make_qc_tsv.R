@@ -1,4 +1,3 @@
-bash [[file:~/repos/cfdna-wgs/cfdna-wgs.org::*Make%20aggregate%20QC%20table][Make aggregate QC table:2]]
 #!/usr/bin/env Rscript
 #
 # Unit test variables
@@ -99,4 +98,3 @@ frag_len =
   replace(is.na(.), 0)
 
 write_tsv(frag_len, file = frag_len_out_tbl)
-bash Make aggregate QC table:2 ends here

@@ -1,13 +1,7 @@
-# [[file:~/repos/cfdna-wgs/cfdna-wgs.org::*Preamble][Preamble:1]]
-#########1#########2#########3#########4#########5#########6#########7#########8
-#                                                                              #
-#                    Basic Read and Alignment Processing of                    #
-#              Cell-free DNA Whole Genome Sequencing Fragmentomics             #
-#                                                                              #
-#########1#########2#########3#########4#########5#########6#########7#########8
-# Preamble:1 ends here
+##################################################################
+###   Integration testing snakefile for WGS cfDNA Processing   ###
+##################################################################
 
-# [[file:~/repos/cfdna-wgs/cfdna-wgs.org::*Make%20alignment%20index][Make alignment index:1]]
 rule frag_index:
     benchmark: "{bench_dir}/frag_index.benchmark.txt",
     input: genome_fasta,
@@ -20,9 +14,7 @@ rule frag_index:
         """
         {params.script} {input} {params.out_prefix} &> {log}
         """
-# Make alignment index:1 ends here
 
-# [[file:~/repos/cfdna-wgs/cfdna-wgs.org::*Adapter-trim%20and%20QC%20reads%20with%20fastp][Adapter-trim and QC reads with fastp:1]]
 # Adapter-trim and QC reads with fastp
 rule frag_fastp:
     benchmark: "{bench_dir}/{{library}}_frag_fastp.benchmark.txt",
@@ -58,9 +50,7 @@ rule frag_fastp:
         {output.unpaired2} \
         {params.threads} &> {log.cmd}
         """
-# Adapter-trim and QC reads with fastp:1 ends here
 
-# [[file:~/repos/cfdna-wgs/cfdna-wgs.org::*Align%20reads%20with%20BWA][Align reads with BWA:1]]
 # Align reads with BWA
 rule frag_align:
     benchmark: benchdir + "/{library}_frag_align.benchmark.txt",
@@ -86,9 +76,7 @@ rule frag_align:
         {params.threads} \
         {output.sort} &> {log}
         """
-# Align reads with BWA:1 ends here
 
-# [[file:~/repos/cfdna-wgs/cfdna-wgs.org::*Remove%20PCR%20duplicates][Remove PCR duplicates:1]]
 # Remove PCR duplicates from aligned reads
 rule frag_dedup:
     benchmark: benchdir + "/{library}_frag_dedup.benchmark.txt",
@@ -105,9 +93,7 @@ rule frag_dedup:
         {output} \
         {params.threads} &> {log}
         """
-# Remove PCR duplicates:1 ends here
 
-# [[file:~/repos/cfdna-wgs/cfdna-wgs.org::*Filter%20de-duplicated%20alignments][Filter de-duplicated alignments:1]]
 # Filter de-duplicated alignments.
 # Remove unmapped, not primary, and duplicate reads. Additional location filter by config bedfile variable.
 
@@ -126,9 +112,7 @@ checkpoint frag_filter_alignment:
         {params.threads} \
         {output} &> {log}
         """
-# Filter de-duplicated alignments:1 ends here
 
-# [[file:~/repos/cfdna-wgs/cfdna-wgs.org::*FastQC][FastQC:1]]
 # Get read quality by FASTQC
 rule frag_fastqc:
     benchmark: benchdir+ "/{library}_{processing}_{read}_frag_fastqc.benchmark.txt",
@@ -148,9 +132,7 @@ rule frag_fastqc:
         {params.outdir} \
         {params.threads} &> {log}
         """
-# FastQC:1 ends here
 
-# [[file:~/repos/cfdna-wgs/cfdna-wgs.org::*Alignment%20QC][Alignment QC:1]]
 # Get alignment QC using samtools
 rule frag_alignment_qc:
     input: frag_bams + "/{library}_{processing}.bam",
@@ -173,9 +155,7 @@ rule frag_alignment_qc:
         {output.samstat} \
         {params.threads}
         """
-# Alignment QC:1 ends here
 
-# [[file:~/repos/cfdna-wgs/cfdna-wgs.org::*Sequencing%20depth%20metrics%20via%20Picard][Sequencing depth metrics via Picard:1]]
 # Sequencing depth metrics via Picard
 rule frag_picard_depth:
     benchmark: benchdir + "/{library}_frag_picard_depth.benchmark.txt",
@@ -193,9 +173,7 @@ rule frag_picard_depth:
         {config[genome_fasta]} \
         {output}
         """
-# Sequencing depth metrics via Picard:1 ends here
 
-# [[file:~/repos/cfdna-wgs/cfdna-wgs.org::*deepTools%20fragment%20sizes][deepTools fragment sizes:1]]
 # Get fragment sizes using deepTools
 rule frag_bampefragsize:
     benchmark: benchdir + "/frag_bampefragsize.benchmark.txt",
@@ -218,9 +196,7 @@ rule frag_bampefragsize:
         {params.blacklist} \
         {params.threads}
         """
-# deepTools fragment sizes:1 ends here
 
-# [[file:~/repos/cfdna-wgs/cfdna-wgs.org::*deepTools%20bamCoverage][deepTools bamCoverage:1]]
 # Make deeptools bamCoverage bedfile
 rule frag_bamcoverage:
     benchmark: benchdir + "/{library}_frag_bamcoverage.benchmark.txt",
@@ -241,9 +217,7 @@ rule frag_bamcoverage:
         {params.blacklist} \
         {params.threads} &> {log}
         """
-# deepTools bamCoverage:1 ends here
 
-# [[file:~/repos/cfdna-wgs/cfdna-wgs.org::*deepTools%20plotCoverage][deepTools plotCoverage:1]]
 # Make deepTools plotCoverage coverage maps for all filtered bams
 rule frag_plotcoverage:
     benchmark: benchdir + "/frag_plotcoverage.benchmark.txt",
@@ -265,9 +239,7 @@ rule frag_plotcoverage:
         {output.raw} \
         {output.plot} &> {log}
         """
-# deepTools plotCoverage:1 ends here
 
-# [[file:~/repos/cfdna-wgs/cfdna-wgs.org::*MultiQC][MultiQC:1]]
 # Aggregate QC files using MultiQC
 rule frag_multiqc:
     benchmark: benchdir + "/frag_multiqc.benchmark.txt",
@@ -298,9 +270,7 @@ rule frag_multiqc:
         {params.out_name} \
         {params.out_dir} &> {log}
         """
-# MultiQC:1 ends here
 
-# [[file:~/repos/cfdna-wgs/cfdna-wgs.org::*Make%20aggregate%20QC%20table][Make aggregate QC table:1]]
 # Make a tab-separated aggregate QC table
 checkpoint frag_make_qc_tsv:
     benchmark: benchdir + "/frag_make_qc_tsv.benchmark.txt",
@@ -329,4 +299,3 @@ checkpoint frag_make_qc_tsv:
         {output.readqc} \
         {output.fraglen} >& {log}
         """
-# Make aggregate QC table:1 ends here

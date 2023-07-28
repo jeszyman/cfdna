@@ -190,14 +190,18 @@ for file in ${data_dir}/inputs/*.fastq; do gzip -f $file; done
 *** Make BWA index
 #+begin_src snakemake
 rule cfdna_wgs_index:
-    input: f"{ref_dir}/{{build}}.fa"
-    output: f"{ref_dir}/bwa/bwa_{{build}}.fa",
+    input:
+    output: f"{ref_dir}/{{build}}_bwa/{{build}}.fa.sa",
     params:
-        out_prefix = f"{ref_dir}/bwa/bwa_{{build}}",
-        script = f"{cfdna_script_dir}/frag_index.sh",
+        ref_dir = f"{ref_dir}",
+        ftp = lambda wildcards: genome_build_map[wildcards.build]['ftp'],
+        out_prefix = f"{ref_dir}/{{build}}_bwa/{{build}}.fa",
     shell:
         """
-        {params.script} {input} {params.out_prefix} &> {log}
+        base=$(basename "{params.ftp}")
+        wget -N -P {params.ref_dir} {params.ftp}
+        gunzip -c {params.ref_dir}/$base > {params.out_prefix}
+        bwa index {params.out_prefix}
         """
 #+end_src
 - Shell script

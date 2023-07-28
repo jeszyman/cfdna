@@ -57,7 +57,7 @@ rule cfdna_wgs_fastp:
 rule frag_align:
     benchmark: bench_dir + "/{{library}}_{{build}}frag_align.benchmark.txt",
     input:
-        ref = f"{ref_dir}/bwa/bwa_{{build}}.fa",
+        ref = f"{ref_dir}/{{build}}_bwa/{{build}}.fa",
         read1 = f"{cfdna_wgs_dir}/fastqs/{{library}}_proc_R1.fastq.gz",
         read2 = f"{cfdna_wgs_dir}/fastqs/{{library}}_proc_R2.fastq.gz",
     log: f"{log_dir}/{{library}}_{{build}}frag_align.log",

@@ -55,13 +55,14 @@ rule cfdna_wgs_fastp:
 
 # Align reads with BWA
 rule frag_align:
-    benchmark: bench_dir + "/{{library}}_{{build}}frag_align.benchmark.txt",
+    benchmark: f"{bench_dir}//{{library}}_{{build}}frag_align.benchmark.txt",
     input:
-        ref = f"{ref_dir}/{{build}}_bwa/{{build}}.fa",
+        ref = f"{ref_dir}/{{build}}_bwa/{{build}}.fa.sa",
         read1 = f"{cfdna_wgs_dir}/fastqs/{{library}}_proc_R1.fastq.gz",
         read2 = f"{cfdna_wgs_dir}/fastqs/{{library}}_proc_R2.fastq.gz",
     log: f"{log_dir}/{{library}}_{{build}}frag_align.log",
     output:
+        ref = f"{ref_dir}/{{build}}_bwa/{{build}}.fa",
         sort = f"{cfdna_wgs_dir}/bams/{{library}}_{{build}}_raw.bam",
         index = f"{cfdna_wgs_dir}/bams/{{library}}_{{build}}_raw.bam.bai",
     params:
@@ -72,7 +73,7 @@ rule frag_align:
     shell:
         """
         {params.script} \
-        {input.ref} \
+        {params.ref} \
         {input.read1} \
         {input.read2} \
         {params.threads} \

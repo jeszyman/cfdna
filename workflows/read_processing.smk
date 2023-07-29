@@ -55,7 +55,7 @@ rule cfdna_wgs_fastp:
 
 # Align reads with BWA
 rule frag_align:
-    benchmark: f"{bench_dir}//{{library}}_{{build}}_frag_align.benchmark.txt",
+    benchmark: f"{bench_dir}/{{library}}_{{build}}_frag_align.benchmark.txt",
     input:
         ref = f"{ref_dir}/{{build}}_bwa/{{build}}.fa.sa",
         read1 = f"{cfdna_wgs_dir}/fastqs/{{library}}_proc_R1.fastq.gz",

@@ -163,14 +163,14 @@ zcat ${mntpt}/mpnst/inputs/seq/KS_30F_R2.fastq.gz | head -n $fq_size > ${data_di
 for file in ${data_dir}/inputs/*.fastq; do gzip -f $file; done
 #+end_src
 - frag_ligs.tsv [[file:/mnt/ris/szymanski/Active/test/inputs/frag_libs.tsv]]
-  | library | r1_basename             | cohort    |
-  |---------+-------------------------+-----------|
-  | lib001  | 19_2_082_R1.fastq.gz    | mpnst     |
-  | lib002  | 25_2_072_R1.fastq       | mpnst     |
-  | lib003  | JS0050CD112717_R1.fastq | plexiform |
-  | lib004  | KO_10_23_17_R1.fastq.gz | plexiform |
-  | lib005  | TS_36M_R1.fastq.gz      | healthy   |
-  | lib006  | KS_30F_R1.fastq.gz      | healthy   |
+  | library  | r1_basename  | cohort  |
+  |---+---+---|
+  | lib001  | 19_2_082_R1.fastq.gz  | mpnst  |
+  | lib002  | 25_2_072_R1.fastq  | mpnst  |
+  | lib003  | JS0050CD112717_R1.fastq  | plexiform  |
+  | lib004  | KO_10_23_17_R1.fastq.gz  | plexiform  |
+  | lib005  | TS_36M_R1.fastq.gz  | healthy  |
+  | lib006  | KS_30F_R1.fastq.gz  | healthy  |
 ** [[file:workflow/frag_reads.smk][Basic read processing]] :smk:
 :PROPERTIES:
 :header-args:snakemake: :tangle ./workflows/read_processing.smk
@@ -316,7 +316,7 @@ main "$@"
   #+begin_src snakemake
 # Align reads with BWA
 rule frag_align:
-    benchmark: f"{bench_dir}//{{library}}_{{build}}_frag_align.benchmark.txt",
+    benchmark: f"{bench_dir}/{{library}}_{{build}}_frag_align.benchmark.txt",
     input:
         ref = f"{ref_dir}/{{build}}_bwa/{{build}}.fa.sa",
         read1 = f"{cfdna_wgs_dir}/fastqs/{{library}}_proc_R1.fastq.gz",
@@ -355,8 +355,7 @@ bwa mem -M -t $threads \
     $input_r1 \
     $input_r2 |
     samtools view --threads $threads --bam - --output - |
-    samtools sort --threads $threads - --output $output_sort
-samtools index -@ threads $output_sort
+    samtools sort --threads $threads - --output $output_sort && samtools index -@ threads $output_sort
 #+end_src
 **** Remove PCR duplicates                                         :smk_rule:
 :PROPERTIES:

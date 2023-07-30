@@ -190,8 +190,9 @@ for file in ${data_dir}/inputs/*.fastq; do gzip -f $file; done
 *** Make BWA index
 #+begin_src snakemake
 rule cfdna_wgs_index:
-    input:
-    output: f"{ref_dir}/{{build}}_bwa/{{build}}.fa.sa",
+    output:
+        f"{ref_dir}/{{build}}_bwa/{{build}}.fa.sa",
+        f"{ref_dir}/{{build}}_bwa/{{build}}.fa",
     params:
         ref_dir = f"{ref_dir}",
         ftp = lambda wildcards: genome_build_map[wildcards.build]['ftp'],
@@ -559,11 +560,48 @@ samstats(){
 # Run
 main "$@"
 #+end_src
-*** Development
+*** Sequencing depth metrics via Picard                            :smk_rule:
 :PROPERTIES:
-:header-args:snakemake: :tangle no
+:ID:       0689d6cd-de86-4c12-a76b-52885a20ed8f
 :END:
-**** deepTools fragment sizes                                      :smk_rule:
+- [[./workflow/reads.smk::rule cfdna_wgs_picard_depth][Snakemake]]
+  #+begin_src snakemake
+# Sequencing depth metrics via Picard
+rule frag_picard_depth:
+    benchmark: f"{bench_dir}/{{library}}_{{build}}_frag_picard_depth.benchmark.txt",
+    input:
+        ref = f"{ref_dir}/{{build}}_bwa/{{build}}.fa",
+        bam = f"{cfdna_wgs_dir}/bams/{{library}}_{{build}}_filt.bam",
+    log: f"{cfdna_wgs_dir}/bams/{{library}}_{{build}}_frag_picard_depth.log",
+    output: f"{qc_dir}/{{library}}_{{build}}_picard_depth.txt",
+    params:
+        picard_jar = picard_jar,
+        script = f"{cfdna_script_dir}/picard_depth.sh",
+        threads = threads,
+    shell:
+        """
+        {params.script} \
+        {input.bam} \
+        {params.picard_jar} \
+        {input.ref} \
+        {output}
+        """
+#+end_src
+- [[file:scripts/picard_depth.sh][Shell script]]
+  #+begin_src bash :tangle ./scripts/picard_depth.sh
+#!/usr/bin/env bash
+input=$1
+picard_jar=$2
+genome_fasta=$3
+output=$4
+
+java -jar $picard_jar CollectWgsMetrics \
+       INPUT=$input \
+       OUTPUT=$output \
+       READ_LENGTH=150 \
+       REFERENCE_SEQUENCE=$genome_fasta
+#+end_src
+*** deepTools fragment sizes                                       :smk_rule:
 :PROPERTIES:
 :ID:       6c4c06ac-f963-426a-95e9-2d4772374035
 :END:
@@ -571,16 +609,18 @@ main "$@"
   #+begin_src snakemake
 # Get fragment sizes using deepTools
 rule frag_bampefragsize:
-    benchmark: benchdir + "/frag_bampefragsize.benchmark.txt",
-    input: expand(frag_bams + "/{library}_filt.bam", library = FRAG_LIBS),
-    log: logdir + "/frag_bampefragsize.log",
+    input:
+        lambda wildcards: expand(f"{cfdna_wgs_dir}/bams/{{library}}_{{build}}_filt.bam",
+                                 library = lib_map[wildcards.lib_set]['libs'],
+                                 build = lib_map[wildcards.lib_set]['build']),
+    log: f"{log_dir}/{{lib_set}}_bampefragsize.log",
     output:
-        raw = qcdir + "/deeptools_frag_lengths.txt",
-        hist = qcdir + "/deeptools_frag_lengths.png",
+        raw = f"{qc_dir}/deeptools_{{lib_set}}_lengths.txt",
+        hist = f"{qc_dir}/deeptools_{{lib_set}}_lengths.png",
     params:
-        blacklist = config["blklist"],
-        script = "{cfdna_script_dir}/bampefragsize.sh",
-        threads = frag_threads,
+        blacklist = lambda wildcards: lib_map[wildcards.lib_set]['blacklist'],
+        script = f"{cfdna_script_dir}/bampefragsize.sh",
+        threads = threads,
     shell:
         """
         {params.script} \
@@ -617,6 +657,10 @@ bamPEFragmentSize --bamfiles $input \
                   --maxFragmentLength 1000 \
                   --outRawFragmentLengths $output_raw
 #+end_src
+*** Development
+:PROPERTIES:
+:header-args:snakemake: :tangle no
+:END:
 **** deepTools bamCoverage                                         :smk_rule:
 :PROPERTIES:
 :ID:       a750e80a-36bd-4498-8789-a0c9a076b484
@@ -713,63 +757,6 @@ plotCoverage \
     --plotFile $out_plot \
     --plotFileFormat pdf \
     --skipZeros
-#+end_src
-**** MultiQC                                                       :smk_rule:
-:PROPERTIES:
-:ID:       a3f3c091-2c6d-4509-9881-06ff186fb45d
-:END:
-- [[./workflow/reads.smk::rule cfdna_wgs_multiqc][Snakemake]]
-  #+begin_src snakemake
-# Aggregate QC files using MultiQC
-rule frag_multiqc:
-    benchmark: benchdir + "/frag_multiqc.benchmark.txt",
-    input:
-        expand(logdir + "/{library}_frag_fastp.json", library = FRAG_LIBS),
-        expand(qcdir + "/{library}_{processing}_{read}_fastqc.zip", library = FRAG_LIBS, processing = ["raw", "processed", "unpaired"], read = ["R1","R2"]),
-        expand(qcdir + "/{library}_{processing}_samstats.txt", library = FRAG_LIBS, processing = ["raw","filt"]),
-        expand(qcdir + "/{library}_{processing}_flagstat.txt", library = FRAG_LIBS, processing = ["raw","filt"]),
-        expand(qcdir + "/{library}_picard_depth.txt", library = FRAG_LIBS),
-        qcdir + "/deeptools_frag_lengths.txt",
-        qcdir + "/frag_coverage.tsv",
-    log: logdir + "/frag_multiqc.log",
-    output:
-        qcdir + "/frag_multiqc.html",
-        qcdir + "/frag_multiqc_data/multiqc_fastqc.txt",
-        qcdir + "/frag_multiqc_data/multiqc_samtools_stats.txt",
-        qcdir + "/frag_multiqc_data/multiqc_picard_wgsmetrics.txt",
-        qcdir + "/frag_multiqc_data/multiqc_samtools_flagstat.txt",
-    params:
-        out_dir = qcdir,
-        out_name = "frag_multiqc",
-        script = "{cfdna_script_dir}/multiqc.sh",
-        threads = frag_threads,
-    shell:
-        """
-        {params.script} \
-        "{input}" \
-        {params.out_name} \
-        {params.out_dir} &> {log}
-        """
-#+end_src
-- [[file:scripts/multiqc.sh][Shell script]]
-  #+begin_src bash :tangle ./scripts/multiqc.sh
-#!/usr/bin/env bash
-set -o errexit   # abort on nonzero exitstatus
-set -o nounset   # abort on unbound variable
-set -o pipefail  # don't hide errors within pipes
-
-# Script variables
-
-   input="${1}"
-out_name="${2}"
- out_dir="${3}"
-
-# Functions
-
-multiqc $input \
-        --force \
-        --outdir $out_dir \
-        --filename $out_name
 #+end_src
 **** Make aggregate QC table                                       :smk_rule:
 :PROPERTIES:
@@ -928,43 +915,69 @@ rule get_cfdna_wgs_fasta:
 #!/usr/bin/env bash
 #+end_src
 
-**** Sequencing depth metrics via Picard                           :smk_rule:
+**** MultiQC                                                       :smk_rule:
 :PROPERTIES:
-:ID:       0689d6cd-de86-4c12-a76b-52885a20ed8f
+:ID:       a3f3c091-2c6d-4509-9881-06ff186fb45d
 :END:
-- [[./workflow/reads.smk::rule cfdna_wgs_picard_depth][Snakemake]]
+- [[./workflow/reads.smk::rule cfdna_wgs_multiqc][Snakemake]]
   #+begin_src snakemake
-# Sequencing depth metrics via Picard
-rule frag_picard_depth:
-    benchmark: f"{bench_dir}/{{library}}_{{build}}_frag_picard_depth.benchmark.txt",
-    input: f"{cfdna_wgs_dir}/bams/{{library}}_{{build}}_filt.bam",
-    log: f"{cfdna_wgs_dir}/bams/{{library}}_{{build}}_frag_picard_depth.log",
-    output: f"{qc_dir}/{{library}}_{{build}}_picard_depth.txt",
+# Aggregate QC files using MultiQC
+rule frag_multiqc:
+    input:
+        expand(f"{qc_dir}/{{library}}_cfdna_wgs_fastp.json", library = FRAG_LIBS),
+        expand(f"{qc_dir}/{{library}}_{{processing}}_{{read}}_fastqc.zip",
+               library = FRAG_LIBS,
+               processing = ["raw", "proc", "unpaired"],
+               read = ["R1","R2"]),
+        expand(f"{qc_dir}/{{library}}_{{processing}}_samstats.txt",
+               library = FRAG_LIBS,
+               processing = ["raw","filt"]),
+        expand(f"{qc_dir}/{{library}}_{{processing}}_flagstat.txt",
+               library = FRAG_LIBS,
+               processing = ["raw","filt"]),
+        expand(f"{qc_dir}/{{library}}_picard_depth.txt",
+               library = FRAG_LIBS),
+        f"{qc_dir}/deeptools_frag_lengths.txt",
+        f"{qc_dir}/frag_coverage.tsv",
+    log: f"{log_dir}/frag_multiqc.log",
+    output:
+        f"{qc_dir}/frag_multiqc.html",
+        f"{qc_dir}/frag_multiqc_data/multiqc_fastqc.txt",
+        f"{qc_dir}/frag_multiqc_data/multiqc_samtools_stats.txt",
+        f"{qc_dir}/frag_multiqc_data/multiqc_picard_wgsmetrics.txt",
+        f"{qc_dir}/frag_multiqc_data/multiqc_samtools_flagstat.txt",
     params:
-        script = "{cfdna_script_dir}/picard_depth.sh",
+        out_dir = f"{qc_dir}",
+        out_name = "frag_multiqc",
+        script = "{cfdna_script_dir}/multiqc.sh",
         threads = threads,
     shell:
         """
         {params.script} \
-        {input} \
-        {config[picard_jar]} \
-        {config[genome_fasta]} \
-        {output}
+        "{input}" \
+        {params.out_name} \
+        {params.out_dir} &> {log}
         """
 #+end_src
-- [[file:scripts/picard_depth.sh][Shell script]]
-  #+begin_src bash :tangle ./scripts/picard_depth.sh
+- [[file:scripts/multiqc.sh][Shell script]]
+  #+begin_src bash :tangle ./scripts/multiqc.sh
 #!/usr/bin/env bash
-input=$1
-picard_jar=$2
-genome_fasta=$3
-output=$4
+set -o errexit   # abort on nonzero exitstatus
+set -o nounset   # abort on unbound variable
+set -o pipefail  # don't hide errors within pipes
 
-java -jar $picard_jar CollectWgsMetrics \
-       INPUT=$input \
-       OUTPUT=$output \
-       READ_LENGTH=150 \
-       REFERENCE_SEQUENCE=$genome_fasta
+# Script variables
+
+   input="${1}"
+out_name="${2}"
+ out_dir="${3}"
+
+# Functions
+
+multiqc $input \
+        --force \
+        --outdir $out_dir \
+        --filename $out_name
 #+end_src
 
 ** [[file:config/frag_env.yaml][Fragmentomics environment YAML]]

@@ -5,8 +5,9 @@
 #########1#########2#########3#########4#########5#########6#########7#########8
 
 rule cfdna_wgs_index:
-    input:
-    output: f"{ref_dir}/{{build}}_bwa/{{build}}.fa.sa",
+    output:
+        f"{ref_dir}/{{build}}_bwa/{{build}}.fa.sa",
+        f"{ref_dir}/{{build}}_bwa/{{build}}.fa",
     params:
         ref_dir = f"{ref_dir}",
         ftp = lambda wildcards: genome_build_map[wildcards.build]['ftp'],
@@ -153,5 +154,51 @@ rule frag_alignment_qc:
         {log.samstat} \
         {output.flagstat} \
         {output.samstat} \
+        {params.threads}
+        """
+
+# Sequencing depth metrics via Picard
+rule frag_picard_depth:
+    benchmark: f"{bench_dir}/{{library}}_{{build}}_frag_picard_depth.benchmark.txt",
+    input:
+        ref = f"{ref_dir}/{{build}}_bwa/{{build}}.fa",
+        bam = f"{cfdna_wgs_dir}/bams/{{library}}_{{build}}_filt.bam",
+    log: f"{cfdna_wgs_dir}/bams/{{library}}_{{build}}_frag_picard_depth.log",
+    output: f"{qc_dir}/{{library}}_{{build}}_picard_depth.txt",
+    params:
+        picard_jar = picard_jar,
+        script = f"{cfdna_script_dir}/picard_depth.sh",
+        threads = threads,
+    shell:
+        """
+        {params.script} \
+        {input.bam} \
+        {params.picard_jar} \
+        {input.ref} \
+        {output}
+        """
+
+# Get fragment sizes using deepTools
+rule frag_bampefragsize:
+    input:
+        lambda wildcards: expand(f"{cfdna_wgs_dir}/bams/{{library}}_{{build}}_filt.bam",
+                                 library = lib_map[wildcards.lib_set]['libs'],
+                                 build = lib_map[wildcards.lib_set]['build']),
+    log: f"{log_dir}/{{lib_set}}_bampefragsize.log",
+    output:
+        raw = f"{qc_dir}/deeptools_{{lib_set}}_lengths.txt",
+        hist = f"{qc_dir}/deeptools_{{lib_set}}_lengths.png",
+    params:
+        blacklist = lambda wildcards: lib_map[wildcards.lib_set]['blacklist'],
+        script = f"{cfdna_script_dir}/bampefragsize.sh",
+        threads = threads,
+    shell:
+        """
+        {params.script} \
+        "{input}" \
+        {log} \
+        {output.hist} \
+        {output.raw} \
+        {params.blacklist} \
         {params.threads}
         """

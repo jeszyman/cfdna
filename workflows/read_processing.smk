@@ -98,7 +98,7 @@ rule frag_dedup:
         """
 
 rule frag_filter_alignment:
-    benchmark: f"{bench_dir}/{{library}}_{{build}}frag_filter_alignment.benchmark.txt",
+    benchmark: f"{bench_dir}/{{library}}_{{build}}_frag_filter_alignment.benchmark.txt",
     input: f"{cfdna_wgs_dir}/bams/{{library}}_{{build}}_dedup.bam",
     log: f"{log_dir}/{{library}}_{{build}}_frag_filter_alignment.log",
     output: f"{cfdna_wgs_dir}/bams/{{library}}_{{build}}_filt.bam",
@@ -123,7 +123,7 @@ rule frag_fastqc:
         f"{qc_dir}/{{library}}_{{processing}}_{{read}}_fastqc.zip",
     params:
         outdir = f"{qc_dir}",
-        script = "{cfdna_script_dir}/fastqc.sh",
+        script = f"{cfdna_script_dir}/fastqc.sh",
         threads = threads,
     shell:
         """
@@ -143,7 +143,7 @@ rule frag_alignment_qc:
         flagstat = f"{qc_dir}/{{library}}_{{build}}_{{processing}}_flagstat.txt",
         samstat = f"{qc_dir}/{{library}}_{{build}}_{{processing}}_samstats.txt",
     params:
-        script = "{cfdna_script_dir}/alignment_qc.sh",
+        script = f"{cfdna_script_dir}/alignment_qc.sh",
         threads = threads,
     shell:
         """

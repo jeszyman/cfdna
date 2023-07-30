@@ -575,14 +575,12 @@ rule frag_picard_depth:
     log: f"{cfdna_wgs_dir}/bams/{{library}}_{{build}}_frag_picard_depth.log",
     output: f"{qc_dir}/{{library}}_{{build}}_picard_depth.txt",
     params:
-        picard_jar = picard_jar,
         script = f"{cfdna_script_dir}/picard_depth.sh",
         threads = threads,
     shell:
         """
         {params.script} \
         {input.bam} \
-        {params.picard_jar} \
         {input.ref} \
         {output}
         """
@@ -591,11 +589,10 @@ rule frag_picard_depth:
   #+begin_src bash :tangle ./scripts/picard_depth.sh
 #!/usr/bin/env bash
 input=$1
-picard_jar=$2
-genome_fasta=$3
-output=$4
+genome_fasta=$2
+output=$3
 
-java -jar $picard_jar CollectWgsMetrics \
+picard CollectWgsMetrics \
        INPUT=$input \
        OUTPUT=$output \
        READ_LENGTH=150 \

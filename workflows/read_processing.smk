@@ -166,14 +166,12 @@ rule frag_picard_depth:
     log: f"{cfdna_wgs_dir}/bams/{{library}}_{{build}}_frag_picard_depth.log",
     output: f"{qc_dir}/{{library}}_{{build}}_picard_depth.txt",
     params:
-        picard_jar = picard_jar,
         script = f"{cfdna_script_dir}/picard_depth.sh",
         threads = threads,
     shell:
         """
         {params.script} \
         {input.bam} \
-        {params.picard_jar} \
         {input.ref} \
         {output}
         """

@@ -178,6 +178,7 @@ rule frag_picard_depth:
 
 # Get fragment sizes using deepTools
 rule frag_bampefragsize:
+    conda: "deeptools",
     input:
         lambda wildcards: expand(f"{cfdna_wgs_dir}/bams/{{library}}_{{build}}_filt.bam",
                                  library = lib_map[wildcards.lib_set]['libs'],

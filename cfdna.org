@@ -493,8 +493,7 @@ fastqc  --outdir $outdir \
 :PROPERTIES:
 :ID:       6f624cb4-4379-4ebb-8431-10ef3690843b
 :END:
-- [[./workflow/reads.smk::rule cfdna_wgs_alignment_qc][Snakemake]]
-  #+begin_src snakemake
+#+begin_src snakemake
 # Get alignment QC using samtools
 rule frag_alignment_qc:
     input: f"{cfdna_wgs_dir}/bams/{{library}}_{{build}}_{{processing}}.bam",
@@ -655,61 +654,7 @@ bamPEFragmentSize --bamfiles $input \
                   --maxFragmentLength 1000 \
                   --outRawFragmentLengths $output_raw
 #+end_src
-*** Development
-:PROPERTIES:
-:header-args:snakemake: :tangle no
-:END:
-**** deepTools bamCoverage                                         :smk_rule:
-:PROPERTIES:
-:ID:       a750e80a-36bd-4498-8789-a0c9a076b484
-:END:
-- [[./workflow/reads.smk::rule cfdna_wgs_bamcoverage][Snakemake]]
-  #+begin_src snakemake
-# Make deeptools bamCoverage bedfile
-rule frag_bamcoverage:
-    benchmark: benchdir + "/{library}_frag_bamcoverage.benchmark.txt",
-    input: frag_bams + "/{library}_filt.bam",
-    log: logdir + "/{library}_frag_bamcoverage.log",
-    output: qcdir + "/{library}_bamcoverage.bg",
-    params:
-        bin = "10000",
-        blacklist = config["blklist"],
-        script = "{cfdna_script_dir}/bamcoverage.sh",
-        threads = frag_threads,
-    shell:
-        """
-        {params.script} \
-        {input} \
-        {output} \
-        {params.bin} \
-        {params.blacklist} \
-        {params.threads} &> {log}
-        """
-#+end_src
-- [[file:scripts/bamcoverage.sh][Shell script]]
-  #+begin_src bash :tangle ./scripts/bamcoverage.sh
-#!/usr/bin/env bash
-
-in_bam=$1
-bin=$3
-blacklist=$4
-threads=$5
-out_bg=$2
-
-bamCoverage \
-    --bam $in_bam \
-    --binSize $bin \
-    --blackListFileName $blacklist \
-    --effectiveGenomeSize 2913022398 \
-    --extendReads \
-    --ignoreDuplicates \
-    --ignoreForNormalization chrX \
-    --normalizeUsing RPGC \
-    --numberOfProcessors $threads \
-    --outFileFormat bedgraph \
-    --outFileName $out_bg
-#+end_src
-**** deepTools plotCoverage                                        :smk_rule:
+*** deepTools plotCoverage                                         :smk_rule:
 :PROPERTIES:
 :ID:       fd5c9058-8476-48d8-8a45-0784dde9e401
 :END:
@@ -717,16 +662,19 @@ bamCoverage \
   #+begin_src snakemake
 # Make deepTools plotCoverage coverage maps for all filtered bams
 rule frag_plotcoverage:
-    benchmark: benchdir + "/frag_plotcoverage.benchmark.txt",
-    input: expand(frag_bams + "/{library}_filt.bam", library = FRAG_LIBS),
-    log: logdir + "/frag_plotcoverage.log",
+    conda: "deeptools",
+    input:
+        lambda wildcards: expand(f"{cfdna_wgs_dir}/bams/{{library}}_{{build}}_filt.bam",
+                                 library = lib_map[wildcards.lib_set]['libs'],
+                                 build = lib_map[wildcards.lib_set]['build']),
+    log: f"{log_dir}/{{lib_set}}_frag_plotcoverage.log",
     output:
-        raw = qcdir + "/frag_coverage.tsv",
-        plot = qcdir + "/frag_coverage.pd",
+        raw = f"{qc_dir}/{{lib_set}}_frag_coverage.tsv",
+        plot = f"{qc_dir}/{{lib_set}}_frag_coverage.pdf",
     params:
-        blacklist = config["blklist"],
-        script = "{cfdna_script_dir}/plotcoverage.sh",
-        threads = frag_threads,
+        blacklist = lambda wildcards: lib_map[wildcards.lib_set]['blacklist'],
+        script = f"{cfdna_script_dir}/plotcoverage.sh",
+        threads = threads,
     shell:
         """
         {params.script} \
@@ -756,28 +704,95 @@ plotCoverage \
     --plotFileFormat pdf \
     --skipZeros
 #+end_src
-**** Make aggregate QC table                                       :smk_rule:
+*** MultiQC                                                        :smk_rule:
+:PROPERTIES:
+:ID:       a3f3c091-2c6d-4509-9881-06ff186fb45d
+:END:
+#+begin_src snakemake
+# Aggregate QC files using MultiQC
+rule frag_multiqc:
+    input:
+        lambda wildcards: expand(f"{qc_dir}/{{library}}_cfdna_wgs_fastp.json",
+                                 library = lib_map[wildcards.lib_set]['libs']),
+        lambda wildcards: expand(f"{qc_dir}/{{library}}_{{processing}}_{{read}}_fastqc.zip",
+                                 library = lib_map[wildcards.lib_set]['libs'],
+                                 processing = ['raw','proc',],
+                                 read = ['R1','R2']),
+        lambda wildcards: expand(f"{qc_dir}/{{library}}_{{build}}_{{processing}}_samstats.txt",
+                                 library = lib_map[wildcards.lib_set]['libs'],
+                                 build = lib_map[wildcards.lib_set]['build'],
+                                 processing = ['raw','dedup','filt']),
+        lambda wildcards: expand(f"{qc_dir}/{{library}}_{{build}}_{{processing}}_flagstat.txt",
+                                 library = lib_map[wildcards.lib_set]['libs'],
+                                 build = lib_map[wildcards.lib_set]['build'],
+                                 processing = ['raw','dedup','filt']),
+        lambda wildcards: expand(f"{qc_dir}/{{library}}_{{build}}_picard_depth.txt",
+                                 library = lib_map[wildcards.lib_set]['libs'],
+                                 build = lib_map[wildcards.lib_set]['build']),
+        f"{qc_dir}/deeptools_{{lib_set}}_lengths.txt",
+        f"{qc_dir}/{{lib_set}}_frag_coverage.tsv",
+    log: f"{log_dir}/{{lib_set}}_cfdna_wgs_multiqc.log",
+    output:
+        f"{qc_dir}/{{lib_set}}_cfdna_wgs_multiqc.html",
+        f"{qc_dir}/{{lib_set}}_cfdna_wgs_multiqc_fastqc.txt",
+        f"{qc_dir}/{{lib_set}}_cfdna_wgs_multiqc_data/multiqc_samtools_stats.txt",
+        f"{qc_dir}/{{lib_set}}_cfdna_wgs_multiqc_data/multiqc_picard_wgsmetrics.txt",
+        f"{qc_dir}/{{lib_set}}_cfdna_wgs_multiqc_data/multiqc_samtools_flagstat.txt",
+    params:
+        out_dir = f"{qc_dir}",
+        out_name = "frag_multiqc",
+        script = f"{cfdna_script_dir}/multiqc.sh",
+        threads = threads,
+    shell:
+        """
+        {params.script} \
+        "{input}" \
+        {params.out_name} \
+        {params.out_dir} &> {log}
+        """
+#+end_src
+- [[file:scripts/multiqc.sh][Shell script]]
+  #+begin_src bash :tangle ./scripts/multiqc.sh
+#!/usr/bin/env bash
+set -o errexit   # abort on nonzero exitstatus
+set -o nounset   # abort on unbound variable
+set -o pipefail  # don't hide errors within pipes
+
+# Script variables
+
+   input="${1}"
+out_name="${2}"
+ out_dir="${3}"
+
+# Functions
+
+multiqc $input \
+        --force \
+        --outdir $out_dir \
+        --filename $out_name
+#+end_src
+
+*** Make aggregate QC table                                        :smk_rule:
 :PROPERTIES:
 :ID:       22dd84a2-de3e-4faf-8b54-d1408c76aa33
 :END:
-- [[./workflow/reads.smk::rule cfdna_wgs_make_qc_tsv][Snakemake]]
-  #+begin_src snakemake
+
+#+begin_src snakemake
 # Make a tab-separated aggregate QC table
-rule: frag_make_qc_tsv:
-    benchmark: benchdir + "/frag_make_qc_tsv.benchmark.txt",
+rule make_cfdna_wgs_qc_tsv:
     input:
-        fq = qcdir + "/frag_multiqc_data/multiqc_fastqc.txt",
-        mqsam = qcdir + "/frag_multiqc_data/multiqc_samtools_stats.txt",
-        mqflag = qcdir + "/frag_multiqc_data/multiqc_samtools_flagstat.txt",
-        picard = qcdir + "/frag_multiqc_data/multiqc_picard_wgsmetrics.txt",
-        deeptools_frag = qcdir + "/deeptools_frag_lengths.txt",
-        deeptools_cov = qcdir + "/frag_coverage.tsv",
-    log: logdir + "/frag_make_qc_tsv.log",
+        fq = f"{qc_dir}/{{lib_set}}_cfdna_wgs_multiqc_data/multiqc_fastqc.txt",
+        mqsam = f"{qc_dir}/{{lib_set}}_cfdna_wgs_multiqc_data/multiqc_samtools_stats.txt",
+        mqflag = f"{qc_dir}/{{lib_set}}_cfdna_multiqc_data/multiqc_samtools_flagstat.txt",
+        picard = f"{qc_dir}/{{lib_set}}_multiqc_data/multiqc_picard_wgsmetrics.txt",
+        deeptools_frag = f"{qc_dir}/{{lib_set}}_deeptools_cfdna_wgs_lengths.txt",
+        deeptools_cov = f"{qc_dir}/{{lib_set}}_cfdna_wgs_coverage.tsv",
+    log: f"{log_dir}/{{lib_set}}_cfdna_wgs_make_qc_tsv.log",
     output:
-        readqc = qcdir + "/frag_read_qc.tsv",
-        fraglen = qcdir + "/frag_frag_len.tsv",
+        readqc = f"{qc_dir}/{{lib_set}}_cfdna_wgs_read_qc.tsv",
+        fraglen = f"{qc_dir}/{{lib_set}}_cfdna_wgs_len.tsv",
     params:
-        script = "{cfdna_script_dir}/make_qc_tsv.R",
+        script = f"{cfdna_script_dir}/make_qc_tsv.R",
     shell:
         """
         Rscript {params.script} \
@@ -895,6 +910,60 @@ frag_len =
 write_tsv(frag_len, file = frag_len_out_tbl)
 
 #+end_src
+*** Development
+:PROPERTIES:
+:header-args:snakemake: :tangle no
+:END:
+**** deepTools bamCoverage                                         :smk_rule:
+:PROPERTIES:
+:ID:       a750e80a-36bd-4498-8789-a0c9a076b484
+:END:
+- [[./workflow/reads.smk::rule cfdna_wgs_bamcoverage][Snakemake]]
+  #+begin_src snakemake
+# Make deeptools bamCoverage bedfile
+rule frag_bamcoverage:
+    benchmark: benchdir + "/{library}_frag_bamcoverage.benchmark.txt",
+    input: frag_bams + "/{library}_filt.bam",
+    log: logdir + "/{library}_frag_bamcoverage.log",
+    output: qcdir + "/{library}_bamcoverage.bg",
+    params:
+        bin = "10000",
+        blacklist = config["blklist"],
+        script = "{cfdna_script_dir}/bamcoverage.sh",
+        threads = frag_threads,
+    shell:
+        """
+        {params.script} \
+        {input} \
+        {output} \
+        {params.bin} \
+        {params.blacklist} \
+        {params.threads} &> {log}
+        """
+#+end_src
+- [[file:scripts/bamcoverage.sh][Shell script]]
+  #+begin_src bash :tangle ./scripts/bamcoverage.sh
+#!/usr/bin/env bash
+
+in_bam=$1
+bin=$3
+blacklist=$4
+threads=$5
+out_bg=$2
+
+bamCoverage \
+    --bam $in_bam \
+    --binSize $bin \
+    --blackListFileName $blacklist \
+    --effectiveGenomeSize 2913022398 \
+    --extendReads \
+    --ignoreDuplicates \
+    --ignoreForNormalization chrX \
+    --normalizeUsing RPGC \
+    --numberOfProcessors $threads \
+    --outFileFormat bedgraph \
+    --outFileName $out_bg
+#+end_src
 **** Get fasta
 #+begin_src snakemake
 rule get_cfdna_wgs_fasta:
@@ -911,71 +980,6 @@ rule get_cfdna_wgs_fasta:
 
 #+begin_src bash :tangle ./scripts/get_cfdna_wgs_fasta.sh
 #!/usr/bin/env bash
-#+end_src
-
-**** MultiQC                                                       :smk_rule:
-:PROPERTIES:
-:ID:       a3f3c091-2c6d-4509-9881-06ff186fb45d
-:END:
-- [[./workflow/reads.smk::rule cfdna_wgs_multiqc][Snakemake]]
-  #+begin_src snakemake
-# Aggregate QC files using MultiQC
-rule frag_multiqc:
-    input:
-        expand(f"{qc_dir}/{{library}}_cfdna_wgs_fastp.json", library = FRAG_LIBS),
-        expand(f"{qc_dir}/{{library}}_{{processing}}_{{read}}_fastqc.zip",
-               library = FRAG_LIBS,
-               processing = ["raw", "proc", "unpaired"],
-               read = ["R1","R2"]),
-        expand(f"{qc_dir}/{{library}}_{{processing}}_samstats.txt",
-               library = FRAG_LIBS,
-               processing = ["raw","filt"]),
-        expand(f"{qc_dir}/{{library}}_{{processing}}_flagstat.txt",
-               library = FRAG_LIBS,
-               processing = ["raw","filt"]),
-        expand(f"{qc_dir}/{{library}}_picard_depth.txt",
-               library = FRAG_LIBS),
-        f"{qc_dir}/deeptools_frag_lengths.txt",
-        f"{qc_dir}/frag_coverage.tsv",
-    log: f"{log_dir}/frag_multiqc.log",
-    output:
-        f"{qc_dir}/frag_multiqc.html",
-        f"{qc_dir}/frag_multiqc_data/multiqc_fastqc.txt",
-        f"{qc_dir}/frag_multiqc_data/multiqc_samtools_stats.txt",
-        f"{qc_dir}/frag_multiqc_data/multiqc_picard_wgsmetrics.txt",
-        f"{qc_dir}/frag_multiqc_data/multiqc_samtools_flagstat.txt",
-    params:
-        out_dir = f"{qc_dir}",
-        out_name = "frag_multiqc",
-        script = "{cfdna_script_dir}/multiqc.sh",
-        threads = threads,
-    shell:
-        """
-        {params.script} \
-        "{input}" \
-        {params.out_name} \
-        {params.out_dir} &> {log}
-        """
-#+end_src
-- [[file:scripts/multiqc.sh][Shell script]]
-  #+begin_src bash :tangle ./scripts/multiqc.sh
-#!/usr/bin/env bash
-set -o errexit   # abort on nonzero exitstatus
-set -o nounset   # abort on unbound variable
-set -o pipefail  # don't hide errors within pipes
-
-# Script variables
-
-   input="${1}"
-out_name="${2}"
- out_dir="${3}"
-
-# Functions
-
-multiqc $input \
-        --force \
-        --outdir $out_dir \
-        --filename $out_name
 #+end_src
 
 ** [[file:config/frag_env.yaml][Fragmentomics environment YAML]]

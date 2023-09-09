@@ -981,6 +981,368 @@ rule get_cfdna_wgs_fasta:
 #+begin_src bash :tangle ./scripts/get_cfdna_wgs_fasta.sh
 #!/usr/bin/env bash
 #+end_src
+** cfDNA WGS CNA
+:PROPERTIES:
+:header-args:snakemake: :tangle ./workflows/cfdna_wgs_cna.smk
+:END:
+*** Preamble
+:PROPERTIES:
+:ID:       99b61b72-5f73-4f0c-b22b-45ae5049e1aa
+:END:
+#+begin_src snakemake
+
+#########1#########2#########3#########4#########5#########6#########7#########8
+#                                                                              #
+#                   Snakefile for Analysis of Cell-free DNA                    #
+#    Whole Genome Sequencing Copy Number Alteration and Fragmentomics          #
+#                                                                              #
+#########1#########2#########3#########4#########5#########6#########7#########8
+
+#+end_src
+*** Downsample all bam files to a consistent read pair count       :smk_rule:
+:PROPERTIES:
+:ID:       bc8e3589-2293-4029-b46c-0cbc025fef58
+:END:
+
+Downsample bam files on a per-directory basis
+
+Note: The associated shell script will not result downsampled bams if sufficent reads do not exist in the original. Sufficent reads need to be confirmed externally.
+
+#+begin_src snakemake
+rule cfdna_wgs_downsample_bam:
+    input: f"{cfdna_wgs_dir}/bams/{{library}}_{{build}}_filt.bam",
+    log: f"{log_dir}/{{library}}_{{build}}_ds{{mil_reads}}_cfdna_wgs_downsample_bam.log",
+    output: f"{cfdna_wgs_dir}/bams/{{library}}_{{build}}_ds{{mil_reads}}.bam",
+    params:
+        milreads = lambda wildcards: wildcards.mil_reads,
+        script = f"{cfdna_script_dir}/downsample_bam.sh",
+        threads = threads,
+    shell:
+        """
+        {params.script} \
+        {input} \
+        {params.milreads} &> {log}
+        """
+#+end_src
+
+#+begin_src bash :tangle ./scripts/downsample_bam.sh
+#!/usr/bin/env bash
+
+in_bam=$1
+milreads="$2"
+
+reads=$(echo |awk -v var1=$milreads '{ print 1000000*var1 }')
+
+out_bam=$(echo $in_bam | sed 's/_filt.bam/_ds10.bam/g')
+
+## Calculate the sampling factor based on the intended number of reads:
+
+FACTOR=$(samtools idxstats $in_bam | cut -f3 | awk -v COUNT=$reads 'BEGIN {total=0} {total += $1} END {print COUNT/total}')
+
+samtools view -@ 4 -s $FACTOR -b $in_bam > $out_bam
+
+samtools index $out_bam
+#+end_src
+*** Filter cfDNA fragments by length range
+
+Note: an index is needed for subsequent wig creation
+
+#+begin_src snakemake
+rule cfdna_wgs_frag_filt:
+    input: f"{cfdna_wgs_dir}/bams/{{library}}_{{build}}_ds{{mil_reads}}.bam",
+    log: f"{log_dir}/{{library}}_{{build}}_ds{{mil_reads}}_{{frag_distro}}_cfdna_wgs_frag_filt.log",
+    params: script = f"{cfdna_script_dir}/wgs_frag_filt.sh",
+    output:
+        nohead = temp(f"{cfdna_wgs_dir}/frag_bams/{{library}}_{{build}}_ds{{mil_reads}}_frag{{frag_distro}}.nohead"),
+        onlyhead = temp(f"{cfdna_wgs_dir}/frag_bams/{{library}}_{{build}}_ds{{mil_reads}}_frag{{frag_distro}}.onlyhead"),
+        final = f"{cfdna_wgs_dir}/frag_bams/{{library}}_{{build}}_ds{{mil_reads}}_frag{{frag_distro}}.bam",
+        index = f"{cfdna_wgs_dir}/frag_bams/{{library}}_{{build}}_ds{{mil_reads}}_frag{{frag_distro}}.bam.bai",
+    shell:
+        """
+        frag_min=$(echo {wildcards.frag_distro} | sed -e "s/_.*$//g")
+        frag_max=$(echo {wildcards.frag_distro} | sed -e "s/^.*_//g")
+        {params.script} \
+        {input} \
+        {output.nohead} \
+        $frag_min \
+        $frag_max \
+        4 \
+        {output.onlyhead} \
+        {output.final} &> {log}
+        samtools index {output.final}
+        """
+#+end_src
+
+#+begin_src bash :tangle ./scripts/wgs_frag_filt.sh
+#!/usr/bin/env bash
+
+#########################################
+###   Filter Bam By Fragment Length   ###
+#########################################
+
+inbam="${1}"
+nohead="${2}"
+min="${3}"
+max="${4}"
+threads="${5}"
+onlyhead="${6}"
+outbam="${7}"
+
+# Filter by absolute value of TLEN for each read
+samtools view -@ $threads $inbam |
+    awk -F'\t' -v upper="$max" 'sqrt($9*$9) < upper {print $0}' |
+    awk -F'\t' -v lower="$min" 'sqrt($9*$9) > lower {print $0}'> $nohead
+
+# Restore header
+samtools view -@ $threads --header-only $inbam > $onlyhead
+
+
+cat $onlyhead $nohead |
+    samtools view -@ $threads --bam /dev/stdin |
+    samtools sort -@ $threads -o $outbam /dev/stdin
+
+
+#+end_src
+*** Convert fragment length filtered bams to wigs
+#+begin_src snakemake
+rule bam_to_wig:
+    input: f"{cfdna_wgs_dir}/frag_bams/{{library}}_{{build}}_ds{{mil_reads}}_frag{{frag_distro}}.bam",
+    log: f"{log_dir}/{{library}}_{{build}}_{{mil_reads}}_{{frag_distro}}_cfdna_bam_to_wig.log",
+    output: ensure(f"{cfdna_wgs_dir}/cna/wigs/{{library}}_{{build}}_ds{{mil_reads}}_frag{{frag_distro}}.wig", non_empty=True),
+    params:
+        chrs = "chr1,chr2,chr3,chr4,chr5,chr6,chr7,chr8,chr9,chr10,chr11,chr12,chr13,chr14,chr15,chr16,chr17,chr18,chr19,chr20,chr21,chr22,chrX,chrY",
+        out_dir = f"{cfdna_wgs_dir}/cna/wigs",
+    shell:
+        """
+        mkdir -p {params.out_dir} && readCounter --window 1000000 --quality 20 --chromosome {params.chrs} {input} > {output}
+        """
+
+#+end_src
+*** Run ichorCNA
+#+begin_src snakemake
+rule cfdna_wgs_ichor:
+    input: f"{cfdna_wgs_dir}/cna/wigs/{{library}}_{{build}}_ds{{mil_reads}}_frag{{frag_distro}}.wig",
+    log: f"{log_dir}/{{library}}_{{build}}_ds{{mil_reads}}_frag{{frag_distro}}_cfdna_wgs_ichor.log",
+    output: f"{cfdna_wgs_dir}/cna/ichor_nopon/{{library}}_{{build}}_ds{{mil_reads}}_frag{{frag_distro}}.RData",
+    params: out_dir = f"{cfdna_wgs_dir}/cna/ichor_nopon",
+    shell:
+        """
+        Rscript /opt/miniconda3/envs/mpnst/bin/runIchorCNA.R \
+        --id {wildcards.library}_frag{wildcards.frag_distro} \
+        --WIG {input} \
+        --gcWig /opt/miniconda3/envs/mpnst/lib/R/library/ichorCNA/extdata/gc_hg38_1000kb.wig \
+        --mapWig /opt/miniconda3/envs/mpnst/lib/R/library/ichorCNA/extdata/map_hg38_1000kb.wig \
+        --centromere /opt/miniconda3/envs/mpnst/lib/R/library/ichorCNA/extdata/GRCh38.GCA_000001405.2_centromere_acen.txt \
+        --normal "c(0.95, 0.99, 0.995, 0.999)" \
+        --ploidy "c(2)" \
+        --maxCN 3 \
+        --estimateScPrevalence FALSE \
+        --scStates "c()" \
+        --outDir {params.out_dir}
+        """
+
+#+end_src
+
+*** Development
+:PROPERTIES:
+:header-args:snakemake: :tangle no
+:END:
+***** Functions
+:PROPERTIES:
+:ID:       60269b14-e3ec-42f7-8a07-880252f3e415
+:END:
+#+begin_src snakemake
+libraries = pd.read_table(config["data_dir"] + "/inputs/libraries.tsv")
+
+readable = []
+for x in libraries.file:
+    readable.append(os.access(x, os.R_OK))
+libraries['readable']=readable
+
+cfdna_libraries = libraries
+cfdna_libraries = cfdna_libraries[cfdna_libraries.library_type == "wgs"]
+cfdna_libraries = cfdna_libraries[cfdna_libraries.isolation_type == "cfdna"]
+cfdna_libraries = cfdna_libraries[cfdna_libraries.readable == True]
+
+library_indict = cfdna_libraries["library"].tolist()
+file_indict = cfdna_libraries["file"].tolist()
+lib_dict = dict(zip(library_indict, file_indict))
+
+FRAG_LIBS = list(lib_dict.keys())
+
+cna_libraries = pd.read_table(config["data_dir"] + "/inputs/cna_libraries.tsv")
+
+readable = []
+for x in cna_libraries.bam_file:
+    readable.append(os.access(x, os.R_OK))
+cna_libraries['readable']=readable
+
+cna_libraries = cna_libraries[cna_libraries.readable == True]
+
+library_indict = cna_libraries["library"].tolist()
+file_indict = cna_libraries["bam_file"].tolist()
+lib_dict = dict(zip(library_indict, file_indict))
+
+CNA_WGS_LIBRARIES = list(lib_dict.keys())
+
+
+#+end_src
+***** All rule
+:PROPERTIES:
+:ID:       e35a6255-dbca-42ed-a91f-67efd791b7ee
+:END:
+#+begin_src snakemake
+rule all:
+    input:
+# # From this snakefile:
+#         # frag_symlink:
+#         expand(frag_cna_in_bams +
+#                "/{library}.bam",
+#                library = lib_dict.keys()),
+# # From cna.smk
+#         # cna_frag_filt:
+#         expand(frag_cna_frag_bams +
+#                "/{library}_frag{frag_distro}.bam",
+#                library = CNA_WGS_LIBRARIES,
+#                frag_distro = FRAG_DISTROS),
+#         # bam_to_wig:
+#         expand(frag_cna_wigs +
+#                "/{library}_frag{frag_distro}.wig",
+#                library = CNA_WGS_LIBRARIES,
+#                frag_distro = FRAG_DISTROS),
+#         # ichor_nopon:
+#         expand(frag_cna_ichor_nopon +
+#                "/{library}_frag{frag_distro}.cna.seg",
+#                library = CNA_WGS_LIBRARIES,
+#                frag_distro = FRAG_DISTROS),
+# From frag.smk
+        # make_gc_map_bind:
+        refdir + "/keep_5mb.bed",
+        # filt_bam_to_frag_bed:
+        expand(frag_frag_beds +
+               "/{library}_filt.bed",
+               library = CNA_WGS_LIBRARIES),
+        # # gc_distro:
+        # expand(frag_frag_gc_distros +
+        #        "/{library}_gc_distro.csv",
+        #        library = CNA_WGS_LIBRARIES),
+        # # healthy_gc:
+        # frag_frag_gc_distros + "/healthy_med.rds",
+        # #
+        # expand(frag_frag_beds +
+        #        "/{library}_sampled_frag.bed",
+        #       library = CNA_WGS_LIBRARIES),
+        # expand(frag_frag_beds) /
+        #        "{library}_norm_{length}.bed",
+        #        library = CNA_WGS_LIBRARIES,
+        #        length = ["short", "long"]),
+        expand(frag_frag_counts +
+               "/{library}_cnt_{length}.tmp",
+               library = CNA_WGS_LIBRARIES,
+               length = ["short", "long"]),
+        frag_frag + "/frag_counts.tsv",
+        #
+        # unit_cent_sd:
+        frag_frag + "/ratios.tsv",
+#+end_src
+
+***** Filter downsampled bams to set fragment length distributions
+:PROPERTIES:
+:ID:       b49bd73f-5d02-4c8c-984d-a6631fc48c12
+:END:
+#+begin_src snakemake
+rule frag_filt:
+    input:
+        main = frag_bams + "/{library}_ds{downsample}.bam",
+        check = logdir + "/{library}_{downsample}_made",
+    output:
+        nohead = temp(frag_bams + "/{library}_ds{downsample}_frag{frag_distro}.nohead"),
+        onlyhead = temp(frag_bams + "/{library}_ds{downsample}_frag{frag_distro}.only"),
+        final = frag_bams + "/{library}_ds{downsample}_frag{frag_distro}.bam",
+    params:
+        script = "{frag_script_dir}/frag_filt.sh",
+        threads = frag_threads,
+    shell:
+        """
+        frag_min=$(echo {wildcards.frag_distro} | sed -e "s/_.*$//g")
+        frag_max=$(echo {wildcards.frag_distro} | sed -e "s/^.*_//g")
+        {params.script} \
+        {input.main} \
+        {output.nohead} \
+        $frag_min \
+        $frag_max \
+        {config[threads]} \
+        {output.onlyhead} \
+        {output.final}
+        """
+#+end_src
+- [[file:./scripts/frag_filt.sh][Shell script]]
+  #+begin_src bash :tangle ./scripts/frag_filt.sh
+#!/usr/bin/env bash
+
+# Steps
+## Filter by absolute value of TLEN for each read
+sambamba view -t $5 $1 | awk -F'\t' -v upper="$4" 'sqrt($9*$9) < upper {print $0}' | awk -F'\t' -v lower="$3" 'sqrt($9*$9) > lower {print $0}'> $2
+
+## Restore header
+sambamba view -H $1 > $6
+
+cat $6 $2 | sambamba view -t 4 -S -f bam /dev/stdin | sambamba sort -t 4 -o $7 /dev/stdin
+
+
+#+end_src
+***** Setup conditional execution of downsampled bams
+:PROPERTIES:
+:ID:       6a626e68-c7b3-4702-86d1-5495425c9bf2
+:END:
+#+begin_src snakemake
+
+# If downsample occured, then write filename into this per-library log, else leave the log file blank
+rule log_dowsample:
+    input: logdir + "/{library}_{downsample}_downsample.done",
+    output: logdir + "/{library}_{downsample}_made",
+    params:
+        bamdir = frag_bams,
+    shell:
+        """
+        dspath={params.bamdir}/{wildcards.library}_ds{wildcards.downsample}.bam
+        if [ -f $dspath ]; then echo "$dspath"  > {output}; else touch {output}; fi
+        """
+
+# Use the downsampled bam logs to make a single text file of conditionally executed final targets.
+# Specifically in this example, log text lines are in the form
+# frag_bams + "/{library}_ds{downsample}_frag90_150.bam" to setup conditional execution of fragment filtering ONLY on downsampled bams
+# Note alternative delimiter "~" to sed allows frag_wigs as param
+
+checkpoint ds_cond_target_list:
+    input: expand(logdir + "/{library}_{downsample}_made", library = FRAG_LIBS, downsample = DOWNSAMPLE),
+    output: logdir + "/ds_final_targets",
+    params:
+        outdir = frag_bams,
+        frag_distro=config["frag_distro"]
+    shell:
+        """
+        if [ -f {output} ]; then rm {output}; fi
+        cat {input} > {output}
+        sed -i 's~^.*lib~{params.outdir}/lib~g' {output}
+        sed -i 's/.bam$/_frag{params.frag_distro}.bam/g' {output}
+        """
+
+# Function jsut pulls the final target names out of ds_final_targets
+def get_ds_targets(wildcards):
+    with open(checkpoints.ds_cond_target_list.get(**wildcards).output[0], "r") as f:
+      non_empty_files = [l.strip() for l in f.readlines()]
+    return non_empty_files
+
+# This rule allows execution of rules which will generate the conditional targets in ds_cond_target_list
+rule make_ds_targets:
+    input:
+        get_ds_targets
+    output: logdir + "/aggregate_output"
+    run:
+        with open(output[0], "w") as f:
+            f.write("\n".join(input))
+#+end_src
 
 ** [[file:config/frag_env.yaml][Fragmentomics environment YAML]]
 :PROPERTIES:
@@ -1767,383 +2129,6 @@ ln -sf --relative ${input_read2} ${output_read2}
 #+begin_src snakemake
 include: frag_repo + "/workflow/frag_reads.smk"
 #include: frag_repo + "/workflow/frag.smk"
-#+end_src
-** [[file:workflow/cna_frag_int_test.smk][CNA and fragmentomics integration testing]]                            :smk:
-:PROPERTIES:
-:header-args:snakemake: :tangle ./workflow/cna_frag_int_test.smk :tangle-mode
-:ID:       a0113146-6c32-48fd-b7e8-242df4b10c97
-:END:
-*** Preamble
-:PROPERTIES:
-:ID:       99b61b72-5f73-4f0c-b22b-45ae5049e1aa
-:END:
-#+begin_src snakemake
-
-#########1#########2#########3#########4#########5#########6#########7#########8
-#                                                                              #
-#      Integration Testing Snakefile for Analysis of Cell-free DNA             #
-#    Whole Genome Sequencing Copy Number Alteration and Fragmentomics          #
-#                                                                              #
-#########1#########2#########3#########4#########5#########6#########7#########8
-
-# Load necessary packages for snakemake run
-import pandas as pd
-import re
-import numpy as np
-
-#+end_src
-*** Variable naming
-:PROPERTIES:
-:ID:       35c3ca1a-2318-4500-a997-18f6cc12b11c
-:END:
-#+begin_src snakemake
-
-# Variable naming
-benchdir = config["benchdir"]
-frag_repo = config["frag_repo"]
-frag_scriptdir = config["frag_scriptdir"]
-logdir = config["logdir"]
-threads = config["threads"]
-
-# Suggested directory structure:
-analysis = config["data_dir"] + "/analysis"
-frag = config["data_dir"]      + "/analysis/frag"
-frag_cna = config["data_dir"]  + "/analysis/frag/cna"
-frag_frag = config["data_dir"] + "/analysis/frag/frag"
-
-# Terminal variable paths:
-#  (These variables are used directly in the cna snakefile)
-frag_cna_in_bams      = frag_cna + "/input_bams"
-frag_cna_frag_bams    = frag_cna + "/frag_bams"
-frag_cna_wigs         = frag_cna + "/wigs"
-frag_cna_ichor_nopon  = frag_cna + "/ichor_nopon"
-
-frag_frag_input_bams  = frag_cna + "/input_bams"
-frag_frag_beds       = frag_frag + "/beds"
-
-frag_frag_counts     = frag_frag + "/counts"
-
-refdir                 = config["data_dir"] + "/re"
-
-# Additional variable names used directly in the cna snakefile:
-chrom_sizes = config["chrom_sizes"]
-genome_fasta = "/mnt/ris/aadel/Active/mpnst/inputs/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna"
-
-
-#TMP_FRAG_LIBS = ["lib001_filt","lib002_filt"]
-
-#chrs = "chr8"
-
-chrs = "chr1,chr2,chr3,chr4,chr5,chr6,chr7,chr8,chr9,chr10,chr11,chr12,chr13,chr14,chr15,chr16,chr17,chr18,chr19,chr20,chr21,chr22,chrX,chrY,chrM",
-
-keep_bed = refdir + "/hg38_keep.bed",
-blklist = config["blklist"]
-genome_ref = config["genome_re"]
-
-
-FRAG_DISTROS = config["frag_distro"]
-
-frag_threads = config["threads"]
-frag_scriptdir = config["frag_scriptdir"]
-
-
-frag_container = config["frag_container"]
-default_container = config["default_container"]
-
-autosome_bed = refdir + "/hg38_autosomes.bed",
-frag_fastqs = frag + "/fastqs"
-frag_bams = frag + "/bams"
-qc = config["data_dir"] + "/qc"
-
-# frag_container = config["frag_container"]
-
-
-# frag_cna_bam_inputs   = config["dir"]["data"] + "/bam/filt"
-# frag_cna_bam_fragfilt = config["dir"]["data"] + "/bam/frag"
-
-# wig = config["dir"]["data"] + "/wig"
-# ichor = config["dir"]["data"] + "/ichor"
-# frag_logs = config["dir"]["data"] + "logs/frag"
-# ichor_nopon = config["dir"]["data"] + "/ichor_nopon"
-#+end_src
-*** Functions
-:PROPERTIES:
-:ID:       60269b14-e3ec-42f7-8a07-880252f3e415
-:END:
-#+begin_src snakemake
-libraries = pd.read_table(config["data_dir"] + "/inputs/libraries.tsv")
-
-readable = []
-for x in libraries.file:
-    readable.append(os.access(x, os.R_OK))
-libraries['readable']=readable
-
-cfdna_libraries = libraries
-cfdna_libraries = cfdna_libraries[cfdna_libraries.library_type == "wgs"]
-cfdna_libraries = cfdna_libraries[cfdna_libraries.isolation_type == "cfdna"]
-cfdna_libraries = cfdna_libraries[cfdna_libraries.readable == True]
-
-library_indict = cfdna_libraries["library"].tolist()
-file_indict = cfdna_libraries["file"].tolist()
-lib_dict = dict(zip(library_indict, file_indict))
-
-FRAG_LIBS = list(lib_dict.keys())
-
-cna_libraries = pd.read_table(config["data_dir"] + "/inputs/cna_libraries.tsv")
-
-readable = []
-for x in cna_libraries.bam_file:
-    readable.append(os.access(x, os.R_OK))
-cna_libraries['readable']=readable
-
-cna_libraries = cna_libraries[cna_libraries.readable == True]
-
-library_indict = cna_libraries["library"].tolist()
-file_indict = cna_libraries["bam_file"].tolist()
-lib_dict = dict(zip(library_indict, file_indict))
-
-CNA_WGS_LIBRARIES = list(lib_dict.keys())
-
-
-#+end_src
-*** All rule
-:PROPERTIES:
-:ID:       e35a6255-dbca-42ed-a91f-67efd791b7ee
-:END:
-#+begin_src snakemake
-rule all:
-    input:
-# # From this snakefile:
-#         # frag_symlink:
-#         expand(frag_cna_in_bams +
-#                "/{library}.bam",
-#                library = lib_dict.keys()),
-# # From cna.smk
-#         # cna_frag_filt:
-#         expand(frag_cna_frag_bams +
-#                "/{library}_frag{frag_distro}.bam",
-#                library = CNA_WGS_LIBRARIES,
-#                frag_distro = FRAG_DISTROS),
-#         # bam_to_wig:
-#         expand(frag_cna_wigs +
-#                "/{library}_frag{frag_distro}.wig",
-#                library = CNA_WGS_LIBRARIES,
-#                frag_distro = FRAG_DISTROS),
-#         # ichor_nopon:
-#         expand(frag_cna_ichor_nopon +
-#                "/{library}_frag{frag_distro}.cna.seg",
-#                library = CNA_WGS_LIBRARIES,
-#                frag_distro = FRAG_DISTROS),
-# From frag.smk
-        # make_gc_map_bind:
-        refdir + "/keep_5mb.bed",
-        # filt_bam_to_frag_bed:
-        expand(frag_frag_beds +
-               "/{library}_filt.bed",
-               library = CNA_WGS_LIBRARIES),
-        # # gc_distro:
-        # expand(frag_frag_gc_distros +
-        #        "/{library}_gc_distro.csv",
-        #        library = CNA_WGS_LIBRARIES),
-        # # healthy_gc:
-        # frag_frag_gc_distros + "/healthy_med.rds",
-        # #
-        # expand(frag_frag_beds +
-        #        "/{library}_sampled_frag.bed",
-        #       library = CNA_WGS_LIBRARIES),
-        # expand(frag_frag_beds) /
-        #        "{library}_norm_{length}.bed",
-        #        library = CNA_WGS_LIBRARIES,
-        #        length = ["short", "long"]),
-        expand(frag_frag_counts +
-               "/{library}_cnt_{length}.tmp",
-               library = CNA_WGS_LIBRARIES,
-               length = ["short", "long"]),
-        frag_frag + "/frag_counts.tsv",
-        #
-        # unit_cent_sd:
-        frag_frag + "/ratios.tsv",
-#+end_src
-
-*** Symlink input bams                                             :smk_rule:
-:PROPERTIES:
-:ID:       ceed5caf-114f-4893-b611-47025d244b04
-:END:
-- [[./workflow/cna_int.smk::rule frag_symlink][Snakemake]]
-  #+begin_src snakemake
-# Symlink input bams
-rule frag_symlink:
-    container: frag_container,
-    input: lambda wildcards: lib_dict[wildcards.library],
-    output: frag_cna_in_bams + "/{library}.bam",
-    shell:
-        """
-        ln --force --relative --symbolic {input} {output}
-        """
-#+end_src
-*** Includes statements
-:PROPERTIES:
-:ID:       95dbbbe8-dfcc-4831-96f5-19d07eb453c9
-:END:
-#+begin_src snakemake
-include: frag_repo + "/workflow/reads.smk"
-include: frag_repo + "/workflow/cna.smk"
-include: frag_repo + "/workflow/frag.smk"
-#+end_src
-*** Filter downsampled bams to set fragment length distributions
-:PROPERTIES:
-:ID:       b49bd73f-5d02-4c8c-984d-a6631fc48c12
-:END:
-#+begin_src snakemake
-rule frag_filt:
-    input:
-        main = frag_bams + "/{library}_ds{downsample}.bam",
-        check = logdir + "/{library}_{downsample}_made",
-    output:
-        nohead = temp(frag_bams + "/{library}_ds{downsample}_frag{frag_distro}.nohead"),
-        onlyhead = temp(frag_bams + "/{library}_ds{downsample}_frag{frag_distro}.only"),
-        final = frag_bams + "/{library}_ds{downsample}_frag{frag_distro}.bam",
-    params:
-        script = "{frag_script_dir}/frag_filt.sh",
-        threads = frag_threads,
-    shell:
-        """
-        frag_min=$(echo {wildcards.frag_distro} | sed -e "s/_.*$//g")
-        frag_max=$(echo {wildcards.frag_distro} | sed -e "s/^.*_//g")
-        {params.script} \
-        {input.main} \
-        {output.nohead} \
-        $frag_min \
-        $frag_max \
-        {config[threads]} \
-        {output.onlyhead} \
-        {output.final}
-        """
-#+end_src
-- [[file:./scripts/frag_filt.sh][Shell script]]
-  #+begin_src bash :tangle ./scripts/frag_filt.sh
-#!/usr/bin/env bash
-
-# Steps
-## Filter by absolute value of TLEN for each read
-sambamba view -t $5 $1 | awk -F'\t' -v upper="$4" 'sqrt($9*$9) < upper {print $0}' | awk -F'\t' -v lower="$3" 'sqrt($9*$9) > lower {print $0}'> $2
-
-## Restore header
-sambamba view -H $1 > $6
-
-cat $6 $2 | sambamba view -t 4 -S -f bam /dev/stdin | sambamba sort -t 4 -o $7 /dev/stdin
-
-
-#+end_src
-*** Setup conditional execution of downsampled bams
-:PROPERTIES:
-:ID:       6a626e68-c7b3-4702-86d1-5495425c9bf2
-:END:
-#+begin_src snakemake
-
-# If downsample occured, then write filename into this per-library log, else leave the log file blank
-rule log_dowsample:
-    input: logdir + "/{library}_{downsample}_downsample.done",
-    output: logdir + "/{library}_{downsample}_made",
-    params:
-        bamdir = frag_bams,
-    shell:
-        """
-        dspath={params.bamdir}/{wildcards.library}_ds{wildcards.downsample}.bam
-        if [ -f $dspath ]; then echo "$dspath"  > {output}; else touch {output}; fi
-        """
-
-# Use the downsampled bam logs to make a single text file of conditionally executed final targets.
-# Specifically in this example, log text lines are in the form
-# frag_bams + "/{library}_ds{downsample}_frag90_150.bam" to setup conditional execution of fragment filtering ONLY on downsampled bams
-# Note alternative delimiter "~" to sed allows frag_wigs as param
-
-checkpoint ds_cond_target_list:
-    input: expand(logdir + "/{library}_{downsample}_made", library = FRAG_LIBS, downsample = DOWNSAMPLE),
-    output: logdir + "/ds_final_targets",
-    params:
-        outdir = frag_bams,
-        frag_distro=config["frag_distro"]
-    shell:
-        """
-        if [ -f {output} ]; then rm {output}; fi
-        cat {input} > {output}
-        sed -i 's~^.*lib~{params.outdir}/lib~g' {output}
-        sed -i 's/.bam$/_frag{params.frag_distro}.bam/g' {output}
-        """
-
-# Function jsut pulls the final target names out of ds_final_targets
-def get_ds_targets(wildcards):
-    with open(checkpoints.ds_cond_target_list.get(**wildcards).output[0], "r") as f:
-      non_empty_files = [l.strip() for l in f.readlines()]
-    return non_empty_files
-
-# This rule allows execution of rules which will generate the conditional targets in ds_cond_target_list
-rule make_ds_targets:
-    input:
-        get_ds_targets
-    output: logdir + "/aggregate_output"
-    run:
-        with open(output[0], "w") as f:
-            f.write("\n".join(input))
-#+end_src
-
-*** Downsample bams                                                :smk_rule:
-:PROPERTIES:
-:ID:       bc8e3589-2293-4029-b46c-0cbc025fef58
-:END:
-- Snakemake
-  #+begin_src snakemake
-rule downsample_bams:
-    input: frag_bams + "/{library}_filt.bam",
-    output: touch(logdir + "/{library}_{downsample}_downsample.done"),
-    params:
-        out_dir = frag_bams,
-        script = "{frag_script_dir}/downsample_bams.sh",
-        suffix = "_filt.bam",
-        threads = frag_threads,
-    shell:
-        """
-        {params.script} \
-        {input} \
-        {wildcards.downsample} \
-        {params.out_dir} \
-        {params.suffix} \
-        {params.threads}
-        """
-#+end_src
-- [[file:scripts/downsample_bams.sh][Shell script]]
-  #+begin_src bash :tangle ./scripts/downsample_bams.sh
-#!/usr/bin/env bash
-# For unit testing
-# in_bam=test/analysis/frag/bams/lib001_filt.bam
-# milreads=0.001
-# outdir=test/analysis/frag/bams
-# suffix=_filt.bam
-# threads=4
-
-in_bam="${1}"
-milreads="${2}"
-outdir="${3}"
-suffix="${4}"
-threads="${5}"
-
-downsample(){
-    # Derived variables
-    milreads_full=$(awk -v milreads="${milreads}" 'BEGIN{milreads_full=(1000000*milreads); print milreads_full}')
-    factor=$(samtools idxstats $in_bam |
-                 cut -f3 |
-                 awk -v count=$milreads_full 'BEGIN {total=0} {total += $1} END {print count/total}')
-    base=$(basename -s $suffix $in_bam)
-    out_bam=${outdir}/${base}_ds${milreads}.bam
-    #
-    # Downsample
-    if [[ $factor < 1 ]]; then
-    samtools view -s $factor -b -@ $threads $in_bam > $out_bam
-    fi
-}
-
-downsample $in_bam $milreads $suffix
 #+end_src
 ** README
 :PROPERTIES:

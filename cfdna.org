@@ -1387,6 +1387,161 @@ frag_distro: "90_150"
 gc5mb: "test/inputs/gc5mb.bed"
 
 #+end_src
+** End motifs
+*** Sample 5' motifs from a bam file
+
+**** Shell
+#+begin_src bash :tangle ./scripts/sample_motifs.sh
+in_bam="${1}"
+in_fasta="${2}"
+n_motif="${3}"
+n_reads="${4}"
+seed="${5}"
+threads="${6}"
+out_merged="${7}"
+
+main(){
+    forward_motif \
+        $in_bam \
+        $seed \
+        $threads \
+        $n_reads \
+        $in_fasta \
+        $n_motif > $out_merged
+    reverse_motif \
+        $in_bam \
+        $seed \
+        $threads \
+        $n_reads \
+        $in_fasta \
+        $n_motif >> $out_merged
+}
+
+#########1#########2#########3#########4#########5#########6#########7#########8
+forward_motif(){
+    #
+    local in_bam="${1}"
+    local seed="${2}"
+    local threads="${3}"
+    local n_reads="${4}"
+    local in_fasta="${5}"
+    local n_motif="${6}"
+    #
+    # Calculate the samtools sampling factor based on the intended number of
+    # reads. This will be 2x the n_read input plus some margin of error as
+    # the next set will only to forward reads.
+    f_reads=$(( 3*$n_reads ))
+    factor=$(samtools idxstats $in_bam |
+                 cut -f3 |
+                 awk -v nreads=$f_reads 'BEGIN {total=0} {total += $1} END {print nreads/total}')
+    #
+    # Take first read in mapped, paired, with normal FS orientation.
+    # View perfect matching reads (for BWA), first in pair.
+    samtools view \
+             --with-header \
+             --min-MQ 60 \
+             --require-flags 65 \
+             --subsample $factor \
+             --subsample-seed $seed \
+             --threads $threads $in_bam |
+        # Fetch reference for n reads
+        bedtools bamtobed -i stdin | head -n $n_reads |
+        bedtools getfasta -bed stdin -fi $in_fasta |
+        # Sed magic to extract motifs from fasta
+        sed "1d; n; d" | sed -E "s/(.{$n_motif}).*/\1/"
+}
+
+#########1#########2#########3#########4#########5#########6#########7#########8
+reverse_motif(){
+    #
+    local in_bam="${1}"
+    local seed="${2}"
+    local threads="${3}"
+    local n_reads="${4}"
+    local in_fasta="${5}"
+    local n_motif="${6}"
+    #
+    # Calculate the samtools sampling factor based on the intended number of
+    # reads. This will be 2x the n_read input plus some margin of error as
+    # the next set will only to forward reads.
+    f_reads=$(( 3*$n_reads ))
+    factor=$(samtools idxstats $in_bam |
+                 cut -f3 |
+                 awk -v nreads=$f_reads 'BEGIN {total=0} {total += $1} END {print nreads/total}')
+    #
+    # Take SECOND read in mapped, paired, with normal FS orientation.
+    # View perfect matching reads (for BWA).
+    samtools view \
+             --with-header \
+             --min-MQ 60 \
+             --require-flags 129 \
+             --subsample $factor \
+             --subsample-seed $seed \
+             --threads $threads $in_bam |
+        # Fetch reference for n reads
+        bedtools bamtobed -i stdin | head -n $n_reads |
+        bedtools getfasta -bed stdin -fi $in_fasta |
+        # Sed magic to extract motifs from fasta
+        sed "1d; n; d" | sed -E "s/.*(.{$n_motif})/\1/" |
+        # Generate reverse compliment
+        tr ACGT TGCA | rev
+}
+
+main "$@"
+#+end_src
+*** Create matrix of all motif sampling from 5' sampling
+#+begin_src R :tangle ./scripts/motif.mat.R
+#!/usr/bin/env Rscript
+
+########################################
+###   Make End Motif Single Matrix   ###
+########################################
+
+args = commandArgs(trailingOnly = TRUE)
+motif_str = args[1]
+motif_tsv = args[2]
+
+# Load required packages, data, and functions
+library(tidyverse)
+
+# Define possible 4-mer motifs
+possible_motifs =
+  expand.grid(rep(list(c('A', 'G', 'T', 'C')), 4)) %>%
+  as_tibble() %>%
+  mutate(motif = paste0(Var1,Var2,Var3,Var4)) %>%
+  select(motif) %>% arrange(motif)
+possible_motifs
+
+# Define motif files list
+#motif_str = "~/mpnst/analysis/frag/motifs/lib005_motifs.txt ~/mpnst/analysis/frag/motifs/lib507_motifs.txt"
+(motif_files = strsplit(motif_str, " ")[[1]])
+(names(motif_files) = substr(gsub("^.*lib","lib",motif_files), 1, 6))
+
+
+#(motif_files = list.files(motif_samples_dir, full.names = TRUE, pattern = "^lib.*motifs.txt"))
+#(names(motif_files)=substr(list.files(motif_samples_dir, pattern = "^lib.*motifs.txt"),1,6))
+
+# Make per-libary motif frequencies
+ingest_motif = function(motif_file){
+  read_tsv(motif_file,
+           col_names = c("motif")) %>%
+    group_by(motif) %>%
+    summarise(count = n()) %>%
+    mutate(fract = count/sum(count)) %>%
+    select(motif, fract)
+}
+
+motif_tibs = lapply(motif_files, ingest_motif)
+
+# Make single matrix tsv
+motifs = bind_rows(motif_tibs, .id = "library") %>% pivot_wider(names_from = library, values_from = fract) %>% filter(motif %in% possible_motifs$motif)
+
+motifs %>% write_tsv(., motif_tsv)
+
+#+end_src
+
+*** F-profile NMF
+***
 ** Fragmentomics                                                        :smk:
 :PROPERTIES:
 :header-args:snakemake: :tangle ./workflow/frag.smk

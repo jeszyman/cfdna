@@ -57,10 +57,10 @@ frag_lib_dict = dict(zip(FRAG_LIBS, frag_libs_file_indict))
 # Make  a list of healthy libraries
 FRAG_HEALTHY_LIBRARIES = frag_libs[frag_libs['cohort'] == 'healthy']['library'].tolist()
 
-data_dir2="~/test"
+data_dir="~/test"
 rule all:
     input:
-        expand(f"{data_dir2}/analysis/frag/fastqs/{{library}}_raw_{{read}}.fastq.gz",
+        expand("{data_dir}/analysis/frag/fastqs/{{library}}_raw_{{read}}.fastq.gz",
                library = list(frag_lib_dict.keys()),
                read = ["R1", "R2"]),
         #"{data_dir}/ref/{fasta_base}.sa",

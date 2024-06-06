@@ -1,10 +1,9 @@
 #!/usr/bin/env bash
 input=$1
-picard_jar=$2
-genome_fasta=$3
-output=$4
+genome_fasta=$2
+output=$3
 
-java -jar $picard_jar CollectWgsMetrics \
+picard CollectWgsMetrics \
        INPUT=$input \
        OUTPUT=$output \
        READ_LENGTH=150 \

@@ -9,6 +9,5 @@ bwa mem -M -t $threads \
     $input_ref \
     $input_r1 \
     $input_r2 |
-    samtools view -@ $threads -Sb - -o - |
-    samtools sort -@ $threads - -o $output_sort
-samtools index -@ threads $output_sort
+    samtools view -@ $threads --bam - -o - |
+    samtools sort -@ $threads - -o $output_sort && samtools index -@ threads $output_sort

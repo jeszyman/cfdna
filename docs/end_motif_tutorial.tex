@@ -1,4 +1,4 @@
-% Created 2024-08-23 Fri 12:31
+% Created 2024-08-23 Fri 12:34
 % Intended LaTeX compiler: pdflatex
 \documentclass{article}
 \newcommand\foo{bar}
@@ -17,12 +17,14 @@ Dependencies
 \begin{itemize}
 \item R and python packages as specified per script.
 \item Small bam files human1-5 in data/bams
+\item Appropriate reference fasta, \texttt{GCA\_000001405.15\_GRCh38\_no\_alt\_analysis\_set.fna} (available from \url{ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/001/405/GCA\_000001405.15\_GRCh38/seqs\_for\_alignment\_pipelines.ucsc\_ids/GCA\_000001405.15\_GRCh38\_no\_alt\_analysis\_set.fna.gz})
+
 \item Appropriate reference fasta, GCA\_000001405.15\_GRCh38\_no\_alt\_analysis\_set.fna (available from \url{ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/001/405/GCA\_000001405.15\_GRCh38/seqs\_for\_alignment\_pipelines.ucsc\_ids/GCA\_000001405.15\_GRCh38\_no\_alt\_analysis\_set.fna.gz})
 \end{itemize}
 
 
 \section*{1. Clear motifs data directory if present:}
-\label{sec:org010d905}
+\label{sec:org473b507}
 
 \begin{minted}[]{bash}
 if [ -d data/motifs ]; then rm -rf data/motifs; fi
@@ -30,7 +32,7 @@ mkdir data/motifs
 \end{minted}
 
 \section*{2. Generate motifs from 5' ends of bams:}
-\label{sec:org2ae4076}
+\label{sec:org229c580}
 
 \begin{minted}[]{bash}
 scripts/sample_motifs.py -h
@@ -56,7 +58,7 @@ done
 \end{minted}
 
 \section*{3. Consolidate to a single matrix:}
-\label{sec:org2181b00}
+\label{sec:orgd133429}
 (In R)
 \begin{minted}[]{r}
 library(tidyverse)
@@ -98,7 +100,7 @@ write_tsv(motif_data_fractions, "data/combined_motif_fractions_matrix.tsv")
 \end{minted}
 
 \section*{4. Motif diversity score}
-\label{sec:org4d9a99e}
+\label{sec:orga9a1d06}
 (In R)
 \begin{minted}[]{r}
 annotation = data.frame(library = c("human1_motifs","human2_motifs","human3_motifs","human4_motifs","human5_motifs"),
@@ -126,7 +128,7 @@ mds
 \end{minted}
 
 \section*{5. F-profiles}
-\label{sec:orgb94d28e}
+\label{sec:org0be7b82}
 
 \begin{minted}[]{bash}
 scripts/fprofiles.py -h

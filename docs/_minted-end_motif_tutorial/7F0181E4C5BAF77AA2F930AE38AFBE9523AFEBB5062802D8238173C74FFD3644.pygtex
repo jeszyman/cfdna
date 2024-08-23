@@ -1,0 +1,4 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{k}{if}\PYG{+w}{ }\PYG{o}{[}\PYG{+w}{ }\PYGZhy{}d\PYG{+w}{ }data/motifs\PYG{+w}{ }\PYG{o}{]}\PYG{p}{;}\PYG{+w}{ }\PYG{k}{then}\PYG{+w}{ }rm\PYG{+w}{ }\PYGZhy{}rf\PYG{+w}{ }data/motifs\PYG{p}{;}\PYG{+w}{ }\PYG{k}{fi}
+mkdir\PYG{+w}{ }data/motifs
+\end{Verbatim}

@@ -1,0 +1,24 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{n}{annotation}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n+nf}{data.frame}\PYG{p}{(}\PYG{n}{library}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n+nf}{c}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}human1\PYGZus{}motifs\PYGZdq{}}\PYG{p}{,}\PYG{l+s}{\PYGZdq{}human2\PYGZus{}motifs\PYGZdq{}}\PYG{p}{,}\PYG{l+s}{\PYGZdq{}human3\PYGZus{}motifs\PYGZdq{}}\PYG{p}{,}\PYG{l+s}{\PYGZdq{}human4\PYGZus{}motifs\PYGZdq{}}\PYG{p}{,}\PYG{l+s}{\PYGZdq{}human5\PYGZus{}motifs\PYGZdq{}}\PYG{p}{),}
+\PYG{+w}{                        }\PYG{n}{cohort}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n+nf}{c}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}healthy\PYGZdq{}}\PYG{p}{,}\PYG{l+s}{\PYGZdq{}cancer\PYGZdq{}}\PYG{p}{,}\PYG{l+s}{\PYGZdq{}healthy\PYGZdq{}}\PYG{p}{,}\PYG{l+s}{\PYGZdq{}cancer\PYGZdq{}}\PYG{p}{,}\PYG{l+s}{\PYGZdq{}healthy\PYGZdq{}}\PYG{p}{))}
+\PYG{n}{annotation}
+
+\PYG{n}{motifs}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n+nf}{read\PYGZus{}tsv}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}data/combined\PYGZus{}motif\PYGZus{}fractions\PYGZus{}matrix.tsv\PYGZdq{}}\PYG{p}{)}
+
+\PYG{n}{motifs}
+
+\PYG{n}{motifs\PYGZus{}long}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}
+\PYG{+w}{  }\PYG{n+nf}{pivot\PYGZus{}longer}\PYG{p}{(}\PYG{n}{motifs}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{cols}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{o}{!}\PYG{n}{motif}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{names\PYGZus{}to}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}library\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{values\PYGZus{}to}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}fraction\PYGZdq{}}\PYG{p}{)}\PYG{+w}{ }\PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
+\PYG{+w}{  }\PYG{n+nf}{left\PYGZus{}join}\PYG{p}{(}\PYG{n}{annotation}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{by}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}library\PYGZdq{}}\PYG{p}{)}\PYG{+w}{ }\PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
+\PYG{+w}{  }\PYG{n+nf}{select}\PYG{p}{(}\PYG{n}{motif}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{library}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{fraction}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{cohort}\PYG{p}{)}
+
+\PYG{n}{motifs\PYGZus{}long}
+
+\PYG{n}{mds}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{motifs\PYGZus{}long}\PYG{+w}{ }\PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
+\PYG{+w}{  }\PYG{n+nf}{mutate}\PYG{p}{(}\PYG{n}{fraction}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n+nf}{ifelse}\PYG{p}{(}\PYG{n}{fraction}\PYG{+w}{ }\PYG{o}{==}\PYG{+w}{ }\PYG{l+m}{0}\PYG{p}{,}\PYG{+w}{ }\PYG{l+m}{1e\PYGZhy{}10}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{fraction}\PYG{p}{))}\PYG{+w}{ }\PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}\PYG{+w}{  }\PYG{c+c1}{\PYGZsh{} Add a small constant to avoid log(0)}
+\PYG{+w}{  }\PYG{n+nf}{mutate}\PYG{p}{(}\PYG{n}{mds}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{o}{\PYGZhy{}}\PYG{n}{fraction}\PYG{+w}{ }\PYG{o}{*}\PYG{+w}{ }\PYG{n+nf}{log}\PYG{p}{(}\PYG{n}{fraction}\PYG{p}{)}\PYG{+w}{ }\PYG{o}{/}\PYG{+w}{ }\PYG{n+nf}{log}\PYG{p}{(}\PYG{l+m}{256}\PYG{p}{))}\PYG{+w}{ }\PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
+\PYG{+w}{  }\PYG{n+nf}{group\PYGZus{}by}\PYG{p}{(}\PYG{n}{library}\PYG{p}{)}\PYG{+w}{ }\PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
+\PYG{+w}{  }\PYG{n+nf}{summarize}\PYG{p}{(}\PYG{n}{mds}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n+nf}{sum}\PYG{p}{(}\PYG{n}{mds}\PYG{p}{))}
+
+\PYG{n}{mds}
+\end{Verbatim}

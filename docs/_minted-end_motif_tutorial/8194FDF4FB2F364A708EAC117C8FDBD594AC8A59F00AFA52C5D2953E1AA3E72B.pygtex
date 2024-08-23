@@ -1,0 +1,38 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{n+nf}{library}\PYG{p}{(}\PYG{n}{tidyverse}\PYG{p}{)}
+
+\PYG{c+c1}{\PYGZsh{} Function to read a file and format it for merging with counts}
+\PYG{n}{read\PYGZus{}motif\PYGZus{}file\PYGZus{}counts}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n+nf}{function}\PYG{p}{(}\PYG{n}{file}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{  }\PYG{n}{df}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n+nf}{read\PYGZus{}tsv}\PYG{p}{(}\PYG{n}{file}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{col\PYGZus{}names}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n+nf}{c}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}motif\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}count\PYGZdq{}}\PYG{p}{))}
+\PYG{+w}{  }\PYG{n}{file\PYGZus{}name}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n}{tools}\PYG{o}{::}\PYG{n+nf}{file\PYGZus{}path\PYGZus{}sans\PYGZus{}ext}\PYG{p}{(}\PYG{n+nf}{basename}\PYG{p}{(}\PYG{n}{file}\PYG{p}{))}
+\PYG{+w}{  }\PYG{n}{df}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n}{df}\PYG{+w}{ }\PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}\PYG{+w}{ }\PYG{n+nf}{rename}\PYG{p}{(}\PYG{o}{!!}\PYG{n}{file\PYGZus{}name}\PYG{+w}{ }\PYG{o}{:=}\PYG{+w}{ }\PYG{n}{count}\PYG{p}{)}
+\PYG{+w}{  }\PYG{n+nf}{return}\PYG{p}{(}\PYG{n}{df}\PYG{p}{)}
+\PYG{p}{\PYGZcb{}}
+
+\PYG{c+c1}{\PYGZsh{} Function to read a file and format it for merging with fractions}
+\PYG{n}{read\PYGZus{}motif\PYGZus{}file\PYGZus{}fractions}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n+nf}{function}\PYG{p}{(}\PYG{n}{file}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{  }\PYG{n}{df}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n+nf}{read\PYGZus{}tsv}\PYG{p}{(}\PYG{n}{file}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{col\PYGZus{}names}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n+nf}{c}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}motif\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}count\PYGZdq{}}\PYG{p}{))}
+\PYG{+w}{  }\PYG{n}{total\PYGZus{}count}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n+nf}{sum}\PYG{p}{(}\PYG{n}{df}\PYG{o}{\PYGZdl{}}\PYG{n}{count}\PYG{p}{)}
+\PYG{+w}{  }\PYG{n}{df}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n}{df}\PYG{+w}{ }\PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}\PYG{+w}{ }\PYG{n+nf}{mutate}\PYG{p}{(}\PYG{n}{fraction}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{count}\PYG{+w}{ }\PYG{o}{/}\PYG{+w}{ }\PYG{n}{total\PYGZus{}count}\PYG{p}{)}
+\PYG{+w}{  }\PYG{n}{file\PYGZus{}name}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n}{tools}\PYG{o}{::}\PYG{n+nf}{file\PYGZus{}path\PYGZus{}sans\PYGZus{}ext}\PYG{p}{(}\PYG{n+nf}{basename}\PYG{p}{(}\PYG{n}{file}\PYG{p}{))}
+\PYG{+w}{  }\PYG{n}{df}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n}{df}\PYG{+w}{ }\PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}\PYG{+w}{ }\PYG{n+nf}{select}\PYG{p}{(}\PYG{n}{motif}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{fraction}\PYG{p}{)}\PYG{+w}{ }\PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}\PYG{+w}{ }\PYG{n+nf}{rename}\PYG{p}{(}\PYG{o}{!!}\PYG{n}{file\PYGZus{}name}\PYG{+w}{ }\PYG{o}{:=}\PYG{+w}{ }\PYG{n}{fraction}\PYG{p}{)}
+\PYG{+w}{  }\PYG{n+nf}{return}\PYG{p}{(}\PYG{n}{df}\PYG{p}{)}
+\PYG{p}{\PYGZcb{}}
+
+\PYG{c+c1}{\PYGZsh{} List of files}
+\PYG{n}{files}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n+nf}{list.files}\PYG{p}{(}\PYG{n}{path}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}data/motifs\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{pattern}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}*.tsv\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{full.names}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{k+kc}{TRUE}\PYG{p}{)}
+
+\PYG{c+c1}{\PYGZsh{} Read and merge all files for counts}
+\PYG{n}{motif\PYGZus{}data\PYGZus{}counts}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n}{files}\PYG{+w}{ }\PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
+\PYG{+w}{  }\PYG{n+nf}{map}\PYG{p}{(}\PYG{n}{read\PYGZus{}motif\PYGZus{}file\PYGZus{}counts}\PYG{p}{)}\PYG{+w}{ }\PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
+\PYG{+w}{  }\PYG{n+nf}{reduce}\PYG{p}{(}\PYG{n}{full\PYGZus{}join}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{by}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}motif\PYGZdq{}}\PYG{p}{)}
+
+\PYG{c+c1}{\PYGZsh{} Read and merge all files for fractions}
+\PYG{n}{motif\PYGZus{}data\PYGZus{}fractions}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n}{files}\PYG{+w}{ }\PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
+\PYG{+w}{  }\PYG{n+nf}{map}\PYG{p}{(}\PYG{n}{read\PYGZus{}motif\PYGZus{}file\PYGZus{}fractions}\PYG{p}{)}\PYG{+w}{ }\PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
+\PYG{+w}{  }\PYG{n+nf}{reduce}\PYG{p}{(}\PYG{n}{full\PYGZus{}join}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{by}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}motif\PYGZdq{}}\PYG{p}{)}
+
+\PYG{c+c1}{\PYGZsh{} Save the resulting matrices}
+\PYG{n+nf}{write\PYGZus{}tsv}\PYG{p}{(}\PYG{n}{motif\PYGZus{}data\PYGZus{}counts}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}data/combined\PYGZus{}motif\PYGZus{}counts\PYGZus{}matrix.tsv\PYGZdq{}}\PYG{p}{)}
+\PYG{n+nf}{write\PYGZus{}tsv}\PYG{p}{(}\PYG{n}{motif\PYGZus{}data\PYGZus{}fractions}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}data/combined\PYGZus{}motif\PYGZus{}fractions\PYGZus{}matrix.tsv\PYGZdq{}}\PYG{p}{)}
+\end{Verbatim}

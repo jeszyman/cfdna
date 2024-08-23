@@ -1,0 +1,136 @@
+% Created 2024-08-23 Fri 12:31
+% Intended LaTeX compiler: pdflatex
+\documentclass{article}
+\newcommand\foo{bar}
+
+
+\usepackage{/home/jeszyman/repos/latex/sty/tutorial}
+\author{Jeffrey Szymanski}
+\date{\today}
+\title{End Motif Tutorial}
+\begin{document}
+
+\maketitle
+Minimal working example.
+
+Dependencies
+\begin{itemize}
+\item R and python packages as specified per script.
+\item Small bam files human1-5 in data/bams
+\item Appropriate reference fasta, GCA\_000001405.15\_GRCh38\_no\_alt\_analysis\_set.fna (available from \url{ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/001/405/GCA\_000001405.15\_GRCh38/seqs\_for\_alignment\_pipelines.ucsc\_ids/GCA\_000001405.15\_GRCh38\_no\_alt\_analysis\_set.fna.gz})
+\end{itemize}
+
+
+\section*{1. Clear motifs data directory if present:}
+\label{sec:org010d905}
+
+\begin{minted}[]{bash}
+if [ -d data/motifs ]; then rm -rf data/motifs; fi
+mkdir data/motifs
+\end{minted}
+
+\section*{2. Generate motifs from 5' ends of bams:}
+\label{sec:org2ae4076}
+
+\begin{minted}[]{bash}
+scripts/sample_motifs.py -h
+
+REFERENCE_GENOME="/home/jeszyman/pnst/inputs/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna"
+
+scripts/sample_motifs.py --bam_file data/bams/human1.bam \
+			 --output_file data/motifs/human1_motifs.tsv \
+			 --motif_length 4 \
+			 --num_reads 10000 \
+			 --threads 4 \
+			 --reference_genome $REFERENCE_GENOME
+
+for bam in data/bams/*.bam; do
+    base_name=$(basename "$bam" .bam)
+
+    output_file="data/motifs/${base_name}_motifs.tsv"
+
+    scripts/sample_motifs.py --bam_file "$bam" --output_file "$output_file" \
+                             --motif_length 4 --num_reads 10000 \
+                             --threads 4 --reference_genome "$REFERENCE_GENOME"
+done
+\end{minted}
+
+\section*{3. Consolidate to a single matrix:}
+\label{sec:org2181b00}
+(In R)
+\begin{minted}[]{r}
+library(tidyverse)
+
+# Function to read a file and format it for merging with counts
+read_motif_file_counts <- function(file) {
+  df <- read_tsv(file, col_names = c("motif", "count"))
+  file_name <- tools::file_path_sans_ext(basename(file))
+  df <- df %>% rename(!!file_name := count)
+  return(df)
+}
+
+# Function to read a file and format it for merging with fractions
+read_motif_file_fractions <- function(file) {
+  df <- read_tsv(file, col_names = c("motif", "count"))
+  total_count <- sum(df$count)
+  df <- df %>% mutate(fraction = count / total_count)
+  file_name <- tools::file_path_sans_ext(basename(file))
+  df <- df %>% select(motif, fraction) %>% rename(!!file_name := fraction)
+  return(df)
+}
+
+# List of files
+files <- list.files(path = "data/motifs", pattern = "*.tsv", full.names = TRUE)
+
+# Read and merge all files for counts
+motif_data_counts <- files %>%
+  map(read_motif_file_counts) %>%
+  reduce(full_join, by = "motif")
+
+# Read and merge all files for fractions
+motif_data_fractions <- files %>%
+  map(read_motif_file_fractions) %>%
+  reduce(full_join, by = "motif")
+
+# Save the resulting matrices
+write_tsv(motif_data_counts, "data/combined_motif_counts_matrix.tsv")
+write_tsv(motif_data_fractions, "data/combined_motif_fractions_matrix.tsv")
+\end{minted}
+
+\section*{4. Motif diversity score}
+\label{sec:org4d9a99e}
+(In R)
+\begin{minted}[]{r}
+annotation = data.frame(library = c("human1_motifs","human2_motifs","human3_motifs","human4_motifs","human5_motifs"),
+                        cohort = c("healthy","cancer","healthy","cancer","healthy"))
+annotation
+
+motifs = read_tsv("data/combined_motif_fractions_matrix.tsv")
+
+motifs
+
+motifs_long <-
+  pivot_longer(motifs, cols = !motif, names_to = "library", values_to = "fraction") %>%
+  left_join(annotation, by = "library") %>%
+  select(motif, library, fraction, cohort)
+
+motifs_long
+
+mds = motifs_long %>%
+  mutate(fraction = ifelse(fraction == 0, 1e-10, fraction)) %>%  # Add a small constant to avoid log(0)
+  mutate(mds = -fraction * log(fraction) / log(256)) %>%
+  group_by(library) %>%
+  summarize(mds = sum(mds))
+
+mds
+\end{minted}
+
+\section*{5. F-profiles}
+\label{sec:orgb94d28e}
+
+\begin{minted}[]{bash}
+scripts/fprofiles.py -h
+
+scripts/fprofiles.py --data_file ./data/combined_motif_fractions_matrix.tsv --output_fprof_per_lib ./data/fprofiles.tsv --output_motif_per_fprof ./data/motif_per_fprofile.tsv
+\end{minted}
+\end{document}

@@ -1,0 +1,22 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+scripts/sample\PYGZus{}motifs.py\PYG{+w}{ }\PYGZhy{}h
+
+\PYG{n+nv}{REFERENCE\PYGZus{}GENOME}\PYG{o}{=}\PYG{l+s+s2}{\PYGZdq{}/home/jeszyman/pnst/inputs/GCA\PYGZus{}000001405.15\PYGZus{}GRCh38\PYGZus{}no\PYGZus{}alt\PYGZus{}analysis\PYGZus{}set.fna\PYGZdq{}}
+
+scripts/sample\PYGZus{}motifs.py\PYG{+w}{ }\PYGZhy{}\PYGZhy{}bam\PYGZus{}file\PYG{+w}{ }data/bams/human1.bam\PYG{+w}{ }\PYG{l+s+se}{\PYGZbs{}}
+\PYG{+w}{			 }\PYGZhy{}\PYGZhy{}output\PYGZus{}file\PYG{+w}{ }data/motifs/human1\PYGZus{}motifs.tsv\PYG{+w}{ }\PYG{l+s+se}{\PYGZbs{}}
+\PYG{+w}{			 }\PYGZhy{}\PYGZhy{}motif\PYGZus{}length\PYG{+w}{ }\PYG{l+m}{4}\PYG{+w}{ }\PYG{l+s+se}{\PYGZbs{}}
+\PYG{+w}{			 }\PYGZhy{}\PYGZhy{}num\PYGZus{}reads\PYG{+w}{ }\PYG{l+m}{10000}\PYG{+w}{ }\PYG{l+s+se}{\PYGZbs{}}
+\PYG{+w}{			 }\PYGZhy{}\PYGZhy{}threads\PYG{+w}{ }\PYG{l+m}{4}\PYG{+w}{ }\PYG{l+s+se}{\PYGZbs{}}
+\PYG{+w}{			 }\PYGZhy{}\PYGZhy{}reference\PYGZus{}genome\PYG{+w}{ }\PYG{n+nv}{\PYGZdl{}REFERENCE\PYGZus{}GENOME}
+
+\PYG{k}{for}\PYG{+w}{ }bam\PYG{+w}{ }\PYG{k}{in}\PYG{+w}{ }data/bams/*.bam\PYG{p}{;}\PYG{+w}{ }\PYG{k}{do}
+\PYG{+w}{    }\PYG{n+nv}{base\PYGZus{}name}\PYG{o}{=}\PYG{k}{\PYGZdl{}(}basename\PYG{+w}{ }\PYG{l+s+s2}{\PYGZdq{}}\PYG{n+nv}{\PYGZdl{}bam}\PYG{l+s+s2}{\PYGZdq{}}\PYG{+w}{ }.bam\PYG{k}{)}
+
+\PYG{+w}{    }\PYG{n+nv}{output\PYGZus{}file}\PYG{o}{=}\PYG{l+s+s2}{\PYGZdq{}data/motifs/}\PYG{l+s+si}{\PYGZdl{}\PYGZob{}}\PYG{n+nv}{base\PYGZus{}name}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{\PYGZus{}motifs.tsv\PYGZdq{}}
+
+\PYG{+w}{    }scripts/sample\PYGZus{}motifs.py\PYG{+w}{ }\PYGZhy{}\PYGZhy{}bam\PYGZus{}file\PYG{+w}{ }\PYG{l+s+s2}{\PYGZdq{}}\PYG{n+nv}{\PYGZdl{}bam}\PYG{l+s+s2}{\PYGZdq{}}\PYG{+w}{ }\PYGZhy{}\PYGZhy{}output\PYGZus{}file\PYG{+w}{ }\PYG{l+s+s2}{\PYGZdq{}}\PYG{n+nv}{\PYGZdl{}output\PYGZus{}file}\PYG{l+s+s2}{\PYGZdq{}}\PYG{+w}{ }\PYG{l+s+se}{\PYGZbs{}}
+\PYG{+w}{                             }\PYGZhy{}\PYGZhy{}motif\PYGZus{}length\PYG{+w}{ }\PYG{l+m}{4}\PYG{+w}{ }\PYGZhy{}\PYGZhy{}num\PYGZus{}reads\PYG{+w}{ }\PYG{l+m}{10000}\PYG{+w}{ }\PYG{l+s+se}{\PYGZbs{}}
+\PYG{+w}{                             }\PYGZhy{}\PYGZhy{}threads\PYG{+w}{ }\PYG{l+m}{4}\PYG{+w}{ }\PYGZhy{}\PYGZhy{}reference\PYGZus{}genome\PYG{+w}{ }\PYG{l+s+s2}{\PYGZdq{}}\PYG{n+nv}{\PYGZdl{}REFERENCE\PYGZus{}GENOME}\PYG{l+s+s2}{\PYGZdq{}}
+\PYG{k}{done}
+\end{Verbatim}

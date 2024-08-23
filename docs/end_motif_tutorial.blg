@@ -1,0 +1,9 @@
+[0] Config.pm:307> INFO - This is Biber 2.17
+[0] Config.pm:310> INFO - Logfile is 'end_motif_tutorial.blg'
+[46] biber:340> INFO - === Fri Aug 23, 2024, 12:18:34
+[54] Biber.pm:418> INFO - Reading 'end_motif_tutorial.bcf'
+[83] Biber.pm:972> INFO - Found 0 citekeys in bib section 0
+[90] bbl.pm:654> INFO - Writing 'end_motif_tutorial.bbl' with encoding 'UTF-8'
+[90] bbl.pm:757> INFO - Output to end_motif_tutorial.bbl
+[90] Biber.pm:130> WARN - The file 'end_motif_tutorial.bcf' does not contain any citations!
+[90] Biber.pm:132> INFO - WARNINGS: 1

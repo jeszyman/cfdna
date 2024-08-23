@@ -1,0 +1,5 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+scripts/fprofiles.py\PYG{+w}{ }\PYGZhy{}h
+
+scripts/fprofiles.py\PYG{+w}{ }\PYGZhy{}\PYGZhy{}data\PYGZus{}file\PYG{+w}{ }./data/combined\PYGZus{}motif\PYGZus{}fractions\PYGZus{}matrix.tsv\PYG{+w}{ }\PYGZhy{}\PYGZhy{}output\PYGZus{}fprof\PYGZus{}per\PYGZus{}lib\PYG{+w}{ }./data/fprofiles.tsv\PYG{+w}{ }\PYGZhy{}\PYGZhy{}output\PYGZus{}motif\PYGZus{}per\PYGZus{}fprof\PYG{+w}{ }./data/motif\PYGZus{}per\PYGZus{}fprofile.tsv
+\end{Verbatim}

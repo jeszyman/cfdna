@@ -18,7 +18,6 @@ done
 mamba env update --name cfdna --file ./basecamp/basecamp_env.yaml
 mamba env update --name cfdna --file ./biotools/biotools_env.yaml
 #+end_src
-
 ** [[https://github.com/jeszyman/cfdna][GitHub]]
 ** Repository setup and administration
 :PROPERTIES:
@@ -1467,146 +1466,151 @@ python3 ~/repos/biotools/scripts/subsample_bam.py --bam_file /mnt/data/projects/
 
 **** Basic motifs
 ***** Sample 5' motifs from a bam file
-****** Shell
+
+#+begin_src python :tangle ./scripts/sample_motifs.py :tangle-mode (identity #o755) :comments no
+#!/usr/bin/env python3
+"""
+Script to sample the end motifs at the 5' end of reads in a BAM file.
+
+This script uses samtools and bedtools to extract motifs of a specified length at the 5' end
+of reads in a BAM file, and then counts the occurrence of each unique motif.
+
+Example usage:
+    python3 sample_motifs.py --bam_file path/to/file.bam --output_file path/to/output.txt --motif_length 4 --threads 4 --num_reads 100000 --reference_genome path/to/reference.fasta
+"""
+
+import argparse
+import itertools
+import os
+import logging
+import sh
+from collections import Counter
+
+# --- Load Inputs --- #
+# ------------------- #
+
+def load_inputs():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--bam_file", type=str, required=True, help="Path to BAM file")
+    parser.add_argument("--output_file", type=str, required=True, help="Path to output file")
+    parser.add_argument("--motif_length", type=int, required=False, default=4, help="Length of the motif to extract (default: 4)")
+    parser.add_argument("--num_reads", type=int, required=False, help="Number of reads to process (default: all)")
+    parser.add_argument("--threads", type=int, required=False, default=1, help="Number of threads to use with samtools (default: 1)")
+    parser.add_argument("--reference_genome", type=str, required=True, help="Path to the reference genome")
+    parser.add_argument("--seed", type=int, required=False, default=12345, help="Seed for subsampling (default: 12345)")
+
+    args = parser.parse_args()
+
+    if not os.path.exists(args.bam_file):
+        raise FileNotFoundError(f"Input BAM file not found: {args.bam_file}")
+
+    if args.reference_genome and not os.path.exists(args.reference_genome):
+        raise FileNotFoundError(f"Reference genome not found: {args.reference_genome}")
+
+    return args
+
+# --- Main Function --- #
+# --------------------- #
+
+def main():
+    args = load_inputs()
+    logging.basicConfig(level=logging.INFO)
+    logging.info(f"Processing BAM file: {args.bam_file}")
+
+    factor = calculate_sampling_factor(args.bam_file, args.num_reads)
+    logging.info(f"Calculated sampling factor: {factor}")
+
+    # Initialize motifs with zero counts for all possible motifs
+    all_possible_motifs = generate_all_possible_motifs(args.motif_length)
+    all_motifs = Counter({motif: 0 for motif in all_possible_motifs})
+
+    # Apply end motif sampler to both forward and reverse flags
+    forward_motifs = end_motif_sampler(args.bam_file, args.motif_length, args.num_reads, args.threads, args.reference_genome, factor, args.seed, 65)
+    reverse_motifs = end_motif_sampler(args.bam_file, args.motif_length, args.num_reads, args.threads, args.reference_genome, factor, args.seed, 129)
+    all_motifs.update(forward_motifs)
+    all_motifs.update(reverse_motifs)
+
+    logging.info(f"Writing results to: {args.output_file}")
+    write_output(args.output_file, all_motifs)
+
+# --- Functions --- #
+# ----------------- #
+
+def generate_all_possible_motifs(motif_length):
+    """Generate all possible motifs of a given length."""
+    bases = 'ACGT'
+    return [''.join(p) for p in itertools.product(bases, repeat=motif_length)]
+
+def calculate_sampling_factor(bam_file, num_reads):
+    """Calculate the samtools sampling factor based on the intended number of reads."""
+    f_reads = 3 * num_reads
+
+    # Run samtools idxstats and calculate total reads
+    total_reads_cmd = f"samtools idxstats {bam_file} | cut -f3 | awk '{{total += $1}} END {{print total}}'"
+    try:
+        total_reads = int(sh.bash('-c', total_reads_cmd).strip())
+    except Exception as e:
+        logging.error(f"Error calculating total reads: {e}")
+        raise
+
+    # Calculate the sampling factor
+    factor = f_reads / total_reads
+    return factor
+
+def end_motif_sampler(bam_file, motif_length, num_reads, threads, reference_genome, factor, seed, flags):
+    """Extract motifs from the 5' end of reads in the BAM file using the specified flags."""
+    logging.info(f"Extracting motifs with motif length {motif_length} and flags {flags}.")
+
+    cmd = f"""
+    samtools view \
+        --with-header \
+        --min-MQ 60 \
+        --require-flags {flags} \
+        --subsample {factor} \
+        --subsample-seed {seed} \
+        --threads {threads} {bam_file} |
+    bedtools bamtobed -i stdin | head -n {num_reads} |
+    bedtools getfasta -bed stdin -fi {reference_genome} |
+    sed "1d; n; d" | sed -E "s/(.{{{motif_length}}}).*/\\1/"
+    """
+
+    try:
+        result = sh.bash('-c', cmd)
+        motifs = count_motifs(result, motif_length)
+    except Exception as e:
+        logging.error(f"Error extracting motifs with flags {flags}: {e}")
+        raise
+
+    return motifs
+
+def count_motifs(result, motif_length):
+    """Count motifs from the result stream."""
+    motifs = Counter()
+    for line in result.splitlines():
+        motif = line.strip()
+        if len(motif) == motif_length:
+            motifs[motif] += 1
+    return motifs
+
+def write_output(output_file, motifs):
+    with open(output_file, 'w') as f:
+        for motif, count in sorted(motifs.items()):
+            f.write(f"{motif}\t{count}\n")
+
+# --- Main Guard --- #
+# ------------------ #
+
+if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO)
+    main()
+#+end_src
+
 #+begin_src bash
-mkdir -p ~/repos/cfdna/data/motifs
+/tmp/test.py -h
 
-# ~/repos/cfdna/scripts/sample_motifs.sh \
-#     ~/repos/cfdna/data/bams/human1.bam \
-#     ~/pnst/inputs/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna \
-#     4 \
-#     10000 \
-#     .1 \
-#     4 \
-#     ~/repos/cfdna/data/motifs/human1.txt
-
-#!/bin/bash
-
-BAM_DIR=~/repos/cfdna/data/bams
-REF_GENOME=~/pnst/inputs/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna
-MOTIF_DIR=~/repos/cfdna/data/motifs
-THREADS=4
-REGION_SIZE=10000
-FRACTION=.1
-NUM_REGIONS=4
-
-for BAM_FILE in "$BAM_DIR"/*.bam; do
-    BASENAME=$(basename "$BAM_FILE" .bam)
-    OUTPUT_FILE="$MOTIF_DIR/${BASENAME}.txt"
-
-    ~/repos/cfdna/scripts/sample_motifs.sh \
-        "$BAM_FILE" \
-        "$REF_GENOME" \
-        "$THREADS" \
-        "$REGION_SIZE" \
-        "$FRACTION" \
-        "$NUM_REGIONS" \
-        "$OUTPUT_FILE"
-done
-
+/tmp/test.py --bam_file ~/repos/cfdna/data/bams/human1.bam --output_file /tmp/test1.txt --motif_length 6 --num_reads 10000 --threads 3 --reference_genome ~/pnst/inputs/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna
 #+end_src
 
-- [ ] output is really double the input nreads
-- [ ] pythonize?
-
-#+begin_src bash :tangle ./scripts/sample_motifs.sh
-in_bam="${1}"
-in_fasta="${2}"
-n_motif="${3}"
-n_reads="${4}"
-seed="${5}"
-threads="${6}"
-out_merged="${7}"
-
-main(){
-    forward_motif \
-        $in_bam \
-        $seed \
-        $threads \
-        $n_reads \
-        $in_fasta \
-        $n_motif > $out_merged
-    reverse_motif \
-        $in_bam \
-        $seed \
-        $threads \
-        $n_reads \
-        $in_fasta \
-        $n_motif >> $out_merged
-}
-
-#########1#########2#########3#########4#########5#########6#########7#########8
-forward_motif(){
-    #
-    local in_bam="${1}"
-    local seed="${2}"
-    local threads="${3}"
-    local n_reads="${4}"
-    local in_fasta="${5}"
-    local n_motif="${6}"
-    #
-    # Calculate the samtools sampling factor based on the intended number of
-    # reads. This will be 2x the n_read input plus some margin of error as
-    # the next set will only to forward reads.
-    f_reads=$(( 3*$n_reads ))
-    factor=$(samtools idxstats $in_bam |
-                 cut -f3 |
-                 awk -v nreads=$f_reads 'BEGIN {total=0} {total += $1} END {print nreads/total}')
-    #
-    # Take first read in mapped, paired, with normal FS orientation.
-    # View perfect matching reads (for BWA), first in pair.
-    samtools view \
-             --with-header \
-             --min-MQ 60 \
-             --require-flags 65 \
-             --subsample $factor \
-             --subsample-seed $seed \
-             --threads $threads $in_bam |
-        # Fetch reference for n reads
-        bedtools bamtobed -i stdin | head -n $n_reads |
-        bedtools getfasta -bed stdin -fi $in_fasta |
-        # Sed magic to extract motifs from fasta
-        sed "1d; n; d" | sed -E "s/(.{$n_motif}).*/\1/"
-}
-
-#########1#########2#########3#########4#########5#########6#########7#########8
-reverse_motif(){
-    #
-    local in_bam="${1}"
-    local seed="${2}"
-    local threads="${3}"
-    local n_reads="${4}"
-    local in_fasta="${5}"
-    local n_motif="${6}"
-    #
-    # Calculate the samtools sampling factor based on the intended number of
-    # reads. This will be 2x the n_read input plus some margin of error as
-    # the next set will only to forward reads.
-    f_reads=$(( 3*$n_reads ))
-    factor=$(samtools idxstats $in_bam |
-                 cut -f3 |
-                 awk -v nreads=$f_reads 'BEGIN {total=0} {total += $1} END {print nreads/total}')
-    #
-    # Take SECOND read in mapped, paired, with normal FS orientation.
-    # View perfect matching reads (for BWA).
-    samtools view \
-             --with-header \
-             --min-MQ 60 \
-             --require-flags 129 \
-             --subsample $factor \
-             --subsample-seed $seed \
-             --threads $threads $in_bam |
-        # Fetch reference for n reads
-        bedtools bamtobed -i stdin | head -n $n_reads |
-        bedtools getfasta -bed stdin -fi $in_fasta |
-        # Sed magic to extract motifs from fasta
-        sed "1d; n; d" | sed -E "s/.*(.{$n_motif})/\1/" |
-        # Generate reverse compliment
-        tr ACGT TGCA | rev
-}
-
-main "$@"
-#+end_src
 ***** Create matrix of all motif sampling from 5' sampling
 better input sting handling?
 
@@ -1786,159 +1790,7 @@ mds
 - https://claude.ai/chat/3565c5c3-1204-497b-be1b-3abb0c207468
 
 
-#+begin_src python
-import numpy as np
-from sklearn.decomposition import NMF
-from scipy.optimize import nnls
-import pandas as pd
-
-# Load the motif frequency data from a TSV file
-motifs_df = pd.read_csv('~/repos/cfdna/data/motifs/all_motifs_mat.tsv', delimiter='\t', dtype=str)
-
-# Convert the DataFrame to a NumPy array, excluding the first column (motif names)
-# and transposing so that rows are samples and columns are motifs
-M = motifs_df.iloc[:, 1:].astype(float).T
-print(M)
-print(M.shape)
-
-# Set the number of components (F-profiles)
-n_components = 6
-
-# Initialize the NMF model
-model = NMF(n_components=n_components, init='random', random_state=0, max_iter=100000)
-
-# Fit the NMF model to the data matrix M
-# W will contain the weights of each F-profile for each sample
-# F will contain the F-profiles themselves
-W = model.fit_transform(M)
-F = model.components_
-
-# Perform deconvolution analysis using Non-Negative Least Squares (NNLS)
-nnls_contributions_df = pd.DataFrame()
-
-# Iterate over each sample (library) in the DataFrame
-for lib in motifs_df.columns[1:]:  # Exclude the 'motif' column
-    # Extract the motif frequencies for the current sample
-    sample_motif_frequencies = motifs_df[lib].values.astype(float)
-
-    # Perform NNLS to get the contributions of each F-profile for this sample
-    P, _ = nnls(F.T, sample_motif_frequencies)
-
-    # Normalize P so that the sum of contributions equals 100%
-    P_normalized = 100 * P / np.sum(P)
-
-    # Add the normalized contributions to the DataFrame
-    nnls_contributions_df[lib] = P_normalized
-
-# Add row labels corresponding to the F-profile names
-nnls_contributions_df.index = ['fprof{}'.format(i) for i in range(1, n_components+1)]
-
-# Display the contributions DataFrame
-print(nnls_contributions_df)
-
-# Save the contributions to a TSV file
-nnls_contributions_df.to_csv('~/repos/cfdna/data/motifs/fprof_per_lib.tsv', sep='\t')
-
-# Extract motif names from the original DataFrame
-motif_names = motifs_df.iloc[:, 0]
-
-# Create a DataFrame of the F-profiles
-F_df = pd.DataFrame(F, columns=motif_names, index=[f'fprof{i+1}' for i in range(n_components)])
-
-# Save the F-profiles to a TSV file
-F_df.to_csv('/tmp/fdf.tsv', sep='\t', index=True)
-
-# Normalize the F-profiles so that each row (F-profile) sums to 1
-F_normalized = F / F.sum(axis=1, keepdims=True)
-
-# Create a DataFrame of the normalized F-profiles
-F_df_normalized = pd.DataFrame(F_normalized, columns=motif_names, index=[f'fprof{i+1}' for i in range(n_components)])
-
-# Save the normalized F-profiles to a TSV file
-F_df_normalized.to_csv('~/repos/cfdna/data/motifs/normalized_motif_in_fprof.tsv', sep='\t', index=True)
-#+end_src
-
-
-#+begin_src python
-import numpy as np
-from sklearn.decomposition import NMF
-from scipy.optimize import nnls
-import pandas as pd
-
-
-
-
-#
-motifs_df = pd.read_csv('/tmp/motifs.tsv', delimiter='\t', dtype=str)
-
-
-# Convert the filtered DataFrame to a NumPy array
-motifs = motifs_df.to_numpy()
-
-#M = motifs[1:, 1:].astype(float)
-M = motifs[:, 1:].astype(float)
-M = M.T
-
-print(M)
-print(M.shape)
-
-n_components = 6
-
-model = NMF(n_components=n_components, init='random', random_state=0, max_iter = 100000)
-
-# Fit the model to M
-W = model.fit_transform(M)
-F = model.components_
-
-#########1#########2#########3#########4#########5#########6#########7#########8
-# Initialize an empty DataFrame to store the NNLS outputs
-nnls_contributions_df = pd.DataFrame()
-
-# Iterate over each library (sample) in the DataFrame
-for lib in motifs_df.columns[1:]:  # Exclude the 'motif' column
-# Extract the motif frequencies for the current library
-    sample_motif_frequencies = motifs_df[lib].values.astype(float)
-
-    # Perform NNLS to get the contributions of each F-profile
-    P, _ = nnls(F.T, sample_motif_frequencies)
-
-    # Normalize P so that the sum equals 100%
-    P_normalized = 100 * P / np.sum(P)
-
-    # Add the normalized contributions to the DataFrame
-    nnls_contributions_df[lib] = P_normalized
-
-# Optionally, if you want to add row labels corresponding to the component names
-nnls_contributions_df.index = ['fprof{}'.format(i) for i in range(1, n_components+1)]
-
-# Display or save the DataFrame
-print(nnls_contributions_df)
-
-# To save the DataFrame to a CSV file
-nnls_contributions_df.to_csv('/tmp/nnls_contributions.tsv', sep='\t')
-#########1#########2#########3#########4#########5#########6#########7#########8
-motif_names = motifs[:, 0]
-
-F_df = pd.DataFrame(F, columns=motif_names, index=[f'fprof{i+1}' for i in range(n_components)])
-
-
-F_df.to_csv('/tmp/fdf.tsv', sep='\t', index=True)
-
-#########1#########2#########3#########4#########5#########6#########7#########8
-
-# Normalize the rows of the F matrix so that each row sums to 1
-F_normalized = F / F.sum(axis=1, keepdims=True)
-
-# Convert the normalized matrix to a DataFrame
-F_df = pd.DataFrame(F_normalized, columns=motif_names, index=[f'fprof{i+1}' for i in range(n_components)])
-
-# Save the DataFrame to a file
-F_df.to_csv('/tmp/fdf_normalized.tsv', sep='\t', index=True)
-
-#+end_src
-
-
-#+begin_src python
+#+begin_src python :tangle /tmp/test.py
 import numpy as np
 from sklearn.decomposition import NMF
 from scipy.optimize import nnls
@@ -2005,8 +1857,273 @@ F_df_normalized = pd.DataFrame(F_normalized, columns=motif_names, index=[f'fprof
 F_df_normalized.to_csv('~/repos/cfdna/data/motifs/normalized_motif_in_fprof.tsv', sep='\t', index=True)
 #+end_src
 
+#+begin_src python :tangle /tmp/test.py
+#!/usr/bin/env python3
+"""
+Script to perform Non-negative Matrix Factorization (NMF) on motif frequency data from a TSV file,
+followed by deconvolution analysis using Non-Negative Least Squares (NNLS).
+"""
+
+import numpy as np
+import pandas as pd
+from sklearn.decomposition import NMF
+from scipy.optimize import nnls
+import logging
+import argparse
+
+# --- Load Inputs --- #
+def load_inputs():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--data_file", type=str, required=True, help="Path to the TSV file containing motif frequencies")
+    parser.add_argument("--output_fprofiles", type=str, required=True, help="Path to output file for F-profiles per library")
+    parser.add_argument("--output_normalized", type=str, required=True, help="Path to output file for normalized motif F-profiles")
+    args = parser.parse_args()
+    return args
+
+# --- Helper Functions --- #
+def load_data(filepath):
+    """Load motif data from a TSV file."""
+    return pd.read_csv(filepath, delimiter='\t', dtype=str)
+
+def perform_nmf(data_matrix, n_components=6):
+    """Perform NMF on the provided data matrix."""
+    model = NMF(n_components=n_components, init='random', random_state=0, max_iter=100000)
+    return model.fit_transform(data_matrix), model.components_
+
+def perform_nnls(F, sample_motif_frequencies):
+    """Perform NNLS to decompose sample motif frequencies into F-profile contributions."""
+    P, _ = nnls(F.T, sample_motif_frequencies)
+    return 100 * P / np.sum(P)
+
+# --- Main Function --- #
+def main():
+    logging.basicConfig(level=logging.INFO)
+    args = load_inputs()
+
+    logging.info("Loading motif frequency data...")
+    motifs_df = load_data(args.data_file)
+    M = motifs_df.iloc[:, 1:].astype(float).T
+
+    logging.info(f"Data loaded with shape {M.shape}. Performing NMF...")
+    W, F = perform_nmf(M, n_components=6)  # Ensure n_components is defined or pass it as a parameter
+
+    nnls_contributions_df = pd.DataFrame()
+    for lib in motifs_df.columns[1:]:
+        logging.info(f"Processing sample {lib}...")
+        sample_motif_frequencies = motifs_df[lib].values.astype(float)
+        P_normalized = perform_nnls(F, sample_motif_frequencies)
+        nnls_contributions_df[lib] = P_normalized
+
+    nnls_contributions_df.index = [f'fprof{i+1}' for i in range(F.shape[0])]
+    nnls_contributions_df.to_csv(args.output_fprofiles, sep='\t')
+    logging.info(f"NNLS contributions saved to {args.output_fprofiles}.")
+
+    F_normalized = F / F.sum(axis=1, keepdims=True)
+    F_df_normalized = pd.DataFrame(F_normalized, columns=motifs_df.iloc[:, 0], index=[f'fprof{i+1}' for i in range(F.shape[0])])
+    F_df_normalized.to_csv(args.output_normalized, sep='\t', index=True)
+    logging.info(f"Normalized motif profiles saved to {args.output_normalized}.")
+
+# --- Main Guard --- #
+if __name__ == "__main__":
+    main()
+
+#+end_src
+
+#+begin_src python :tangle ./scripts/fprofiles.py :tangle-mode (identity #o755) :comments no
+#!/usr/bin/env python3
+"""
+Script to perform Non-negative Matrix Factorization (NMF) on motif frequency data from a TSV file,
+followed by deconvolution analysis using Non-Negative Least Squares (NNLS).
+"""
+
+import numpy as np
+import pandas as pd
+from sklearn.decomposition import NMF
+from scipy.optimize import nnls
+import logging
+import argparse
+
+# --- Load Arguments --- #
+def load_arguments():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--data_file", type=str, required=True, help="Path to the TSV file containing motif frequencies")
+    parser.add_argument("--output_fprof_per_lib", type=str, required=True, help="Path to output file for F-profiles per library")
+    parser.add_argument("--output_motif_per_fprof", type=str, required=True, help="Path to output file for normalized motif F-profiles")
+    args = parser.parse_args()
+    return args
+
+# --- Helper Functions --- #
+def load_data(filepath):
+    """Load motif data from a TSV file."""
+    return pd.read_csv(filepath, delimiter='\t', dtype=str)
+
+def perform_nmf(data_matrix, n_components=6):
+    """Perform NMF on the provided data matrix."""
+    model = NMF(n_components=n_components, init='random', random_state=0, max_iter=100000)
+    return model.fit_transform(data_matrix), model.components_
+
+def perform_nnls(F, sample_motif_frequencies):
+    """Perform NNLS to decompose sample motif frequencies into F-profile contributions."""
+    P, _ = nnls(F.T, sample_motif_frequencies)
+    return 100 * P / np.sum(P)
+
+# --- Main Function --- #
+def main():
+    logging.basicConfig(level=logging.INFO)
+    args = load_arguments()
+
+    logging.info("Loading motif frequency data...")
+    motifs_df = load_data(args.data_file)
+    M = motifs_df.iloc[:, 1:].astype(float).T
+
+    logging.info(f"Data loaded with shape {M.shape}. Performing NMF...")
+    W, F = perform_nmf(M, n_components=6)  # Ensure n_components is defined or pass it as a parameter
+
+    nnls_contributions_df = pd.DataFrame()
+    for lib in motifs_df.columns[1:]:
+        logging.info(f"Processing sample {lib}...")
+        sample_motif_frequencies = motifs_df[lib].values.astype(float)
+        P_normalized = perform_nnls(F, sample_motif_frequencies)
+        nnls_contributions_df[lib] = P_normalized
+
+    nnls_contributions_df.index = [f'fprof{i+1}' for i in range(F.shape[0])]
+    nnls_contributions_df.to_csv(args.output_fprof_per_lib, sep='\t')
+    logging.info(f"NNLS contributions saved to {args.output_fprof_per_lib}.")
+
+    F_normalized = F / F.sum(axis=1, keepdims=True)
+    F_df_normalized = pd.DataFrame(F_normalized, columns=motifs_df.iloc[:, 0], index=[f'fprof{i+1}' for i in range(F.shape[0])])
+    F_df_normalized.to_csv(args.output_motif_per_fprof, sep='\t', index=True)
+    logging.info(f"Normalized motif profiles saved to {args.output_motif_per_fprof}.")
+
+# --- Main Guard --- #
+if __name__ == "__main__":
+    main()
+
+#+end_src
 
 
+
+**** End motif tutorial
+:PROPERTIES:
+:export_file_name: ./docs/end_motif_tutorial.pdf
+:export_latex_class: empty
+:export_latex_header+: \usepackage{/home/jeszyman/repos/latex/sty/tutorial}
+:export_title: End Motif Tutorial
+:header-args: :exports code
+:ID:       bafa6e4d-e602-4983-b2a8-11194b1cdb3f
+:CUSTOM_ID:       bafa6e4d-e602-4983-b2a8-11194b1cdb3f
+:END:
+
+Minimal working example.
+
+Dependencies
+- R and python packages as specified per script.
+- Small bam files human1-5 in data/bams
+- Appropriate reference fasta, GCA_000001405.15_GRCh38_no_alt_analysis_set.fna (available from ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/001/405/GCA_000001405.15_GRCh38/seqs_for_alignment_pipelines.ucsc_ids/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna.gz)
+
+
+Clear motifs data directory if present:
+
+#+begin_src bash :exports code
+if [ -d data/motifs ]; then rm -rf data/motifs; fi
+mkdir data/motifs
+#+end_src
+
+Generate motifs from 5' ends of bams:
+
+#+begin_src bash :exports code
+scripts/sample_motifs.py -h
+
+REFERENCE_GENOME="/home/jeszyman/pnst/inputs/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna"
+
+scripts/sample_motifs.py --bam_file data/bams/human1.bam --output_file data/motifs/human1_motifs.tsv --motif_length 4 --num_reads 10000 --threads 4 --reference_genome $REFERENCE_GENOME
+
+for bam in data/bams/*.bam; do
+    base_name=$(basename "$bam" .bam)
+
+    output_file="data/motifs/${base_name}_motifs.tsv"
+
+    scripts/sample_motifs.py --bam_file "$bam" --output_file "$output_file" \
+                             --motif_length 4 --num_reads 10000 \
+                             --threads 4 --reference_genome "$REFERENCE_GENOME"
+done
+#+end_src
+
+Consolidate to a single matrix:
+
+#+begin_src R :exports code
+library(tidyverse)
+
+# Function to read a file and format it for merging with counts
+read_motif_file_counts <- function(file) {
+  df <- read_tsv(file, col_names = c("motif", "count"))
+  file_name <- tools::file_path_sans_ext(basename(file))
+  df <- df %>% rename(!!file_name := count)
+  return(df)
+}
+
+# Function to read a file and format it for merging with fractions
+read_motif_file_fractions <- function(file) {
+  df <- read_tsv(file, col_names = c("motif", "count"))
+  total_count <- sum(df$count)
+  df <- df %>% mutate(fraction = count / total_count)
+  file_name <- tools::file_path_sans_ext(basename(file))
+  df <- df %>% select(motif, fraction) %>% rename(!!file_name := fraction)
+  return(df)
+}
+
+# List of files
+files <- list.files(path = "data/motifs", pattern = "*.tsv", full.names = TRUE)
+
+# Read and merge all files for counts
+motif_data_counts <- files %>%
+  map(read_motif_file_counts) %>%
+  reduce(full_join, by = "motif")
+
+# Read and merge all files for fractions
+motif_data_fractions <- files %>%
+  map(read_motif_file_fractions) %>%
+  reduce(full_join, by = "motif")
+
+# Save the resulting matrices
+write_tsv(motif_data_counts, "data/combined_motif_counts_matrix.tsv")
+write_tsv(motif_data_fractions, "data/combined_motif_fractions_matrix.tsv")
+#+end_src
+
+Motif diversity score
+
+#+begin_src R :exports code
+annotation = data.frame(library = c("human1_motifs","human2_motifs","human3_motifs","human4_motifs","human5_motifs"),
+                        cohort = c("healthy","cancer","healthy","cancer","healthy"))
+annotation
+
+motifs = read_tsv("data/combined_motif_fractions_matrix.tsv")
+
+motifs
+
+motifs_long <-
+  pivot_longer(motifs, cols = !motif, names_to = "library", values_to = "fraction") %>%
+  left_join(annotation, by = "library") %>%
+  select(motif, library, fraction, cohort)
+
+motifs_long
+
+mds = motifs_long %>%
+  mutate(fraction = ifelse(fraction == 0, 1e-10, fraction)) %>%  # Add a small constant to avoid log(0)
+  mutate(mds = -fraction * log(fraction) / log(256)) %>%
+  group_by(library) %>%
+  summarize(mds = sum(mds))
+
+mds
+#+end_src
+
+F-profiles
+
+#+begin_src bash
+scripts/fprofiles.py -h
+
+scripts/fprofiles.py --data_file ./data/combined_motif_fractions_matrix.tsv --output_fprof_per_lib ./data/fprofiles.tsv --output_motif_per_fprof ./data/motif_per_fprofile.tsv
+#+end_src
 *** Fragmentomics                                                       :smk:
 :PROPERTIES:
 :header-args:snakemake: :tangle ./workflow/frag.smk

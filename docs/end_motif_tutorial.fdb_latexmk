@@ -1,5 +1,5 @@
 # Fdb version 3
-["lualatex"] 1724434298 "end_motif_tutorial.tex" "end_motif_tutorial.pdf" "end_motif_tutorial" 1724434299
+["lualatex"] 1724434660 "end_motif_tutorial.tex" "end_motif_tutorial.pdf" "end_motif_tutorial" 1724434662
   "/home/jeszyman/.texlive2021/texmf-var/luatex-cache/generic/fonts/otl/lato-black.luc" 1724433095 1537718 57ae89a1035d4cde76f45bd4ce7b406f ""
   "/home/jeszyman/.texlive2021/texmf-var/luatex-cache/generic/fonts/otl/lato-blackitalic.luc" 1724433096 1613940 1fe106fd51afa559b6d2ccfea341113e ""
   "/home/jeszyman/.texlive2021/texmf-var/luatex-cache/generic/fonts/otl/lato-bold.luc" 1724433092 1514696 d39ff2641de7eace266e7566064c21a5 ""
@@ -228,8 +228,8 @@
   "_minted-end_motif_tutorial/91FAEC4CC1DF9324A33BC34BD26FE39023AFEBB5062802D8238173C74FFD3644.pygtex" 1724434109 2349 51959c93dca713ece704b62fd4bc6e9e ""
   "_minted-end_motif_tutorial/CAD0E5034FA769D3347E89DD202A4C3023AFEBB5062802D8238173C74FFD3644.pygtex" 1724434026 475 e45df7fffcbf1ae1aa99ff101efcaa44 ""
   "_minted-end_motif_tutorial/default.pygstyle" 1724433353 6428 74aba51736a5bc6590f8f7dd413c6f27 ""
-  "end_motif_tutorial.aux" 1724434299 655 b3fb998fb093b059e72daee1071b2e9c "lualatex"
-  "end_motif_tutorial.tex" 1724434294 4215 ee39fe9aaf3e52421bb0a1553480dac8 ""
+  "end_motif_tutorial.aux" 1724434661 688 1e3f6c7a676a2208ed33f8fcc6170b93 "lualatex"
+  "end_motif_tutorial.tex" 1724434656 4465 e269c74feaeb6862eafb0f94adcbc5ad ""
   (generated)
   "end_motif_tutorial.aux"
   "end_motif_tutorial.log"

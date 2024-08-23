@@ -1,4 +1,4 @@
-This is LuaHBTeX, Version 1.14.0 (TeX Live 2022/dev/Debian)  (format=lualatex 2024.6.5)  23 AUG 2024 12:31
+This is LuaHBTeX, Version 1.14.0 (TeX Live 2022/dev/Debian)  (format=lualatex 2024.6.5)  23 AUG 2024 12:37
  system commands enabled.
 **end_motif_tutorial.tex
 (./end_motif_tutorial.tex
@@ -1591,8 +1591,21 @@ LaTeX Font Info:    External font `cmex10' loaded for size
 (Font)              <8> on input line 13.
 LaTeX Font Info:    External font `cmex10' loaded for size
 (Font)              <6> on input line 13.
+LaTeX Font Info:    Font shape `TU/Lato(0)/m/n' will be
+(Font)              scaled to size 14.4pt on input line 14.
+LaTeX Font Info:    Font shape `TU/Lato(0)/b/n' will be
+(Font)              scaled to size 14.4pt on input line 14.
 ! Undefined control sequence.
-l.20 ..._alt\_analysis\_set.fna (available from \url
+l.19 ...mple\_motifs.py is currently designed \uline
+                                                  {ONLY} for use with BWA- o...
+The control sequence at the end of the top line
+of your error message was never \def'ed. If you have
+misspelled it (e.g., `\hobx'), type `I' and the correct
+spelling (e.g., `I\hbox'). Otherwise just continue,
+and I'll forget about whatever was undefined.
+
+! Undefined control sequence.
+l.22 ...alt\_analysis\_set.fna} (available from \url
                                                   {ftp://ftp.ncbi.nlm.nih.go...
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -1601,16 +1614,11 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 
-Overfull \hbox (445.31071pt too wide) in paragraph at lines 20--21
-[]\TU/Lato(0)/m/n/10 Ap-pro-pri-ate ref-er-ence fasta, GCA_000001405.15_GRCh38_n
-o_alt_anal-y-sis_set.fna (avail-able from ftp://ftp.ncbi.nlm.nih.gov/genomes/all
-/GCA/000/001/405/GCA_000001405.15_GRCh38/seqs_for_align-
+Overfull \hbox (18.53503pt too wide) in paragraph at lines 22--23
+\TU/Lato(0)/m/n/10 ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/001/405/GCA_00
+0001405.15_GRCh38/seqs_for_align-
  []
 
-LaTeX Font Info:    Font shape `TU/Lato(0)/m/n' will be
-(Font)              scaled to size 14.4pt on input line 24.
-LaTeX Font Info:    Font shape `TU/Lato(0)/b/n' will be
-(Font)              scaled to size 14.4pt on input line 24.
 
 \openout4 = end_motif_tutorial.pyg
 (./_minted-end_motif_tutorial/default.pygstyle)
@@ -1635,18 +1643,18 @@ LaTeX Font Info:    Font shape `TU/Lato(0)/m/n' will be
 38173C74FFD3644.pygtex
 LaTeX Font Info:    Font shape `TU/Lato(0)/m/n' will be
 (Font)              scaled to size 5.0pt on input line 4.
-)
-\openout4 = end_motif_tutorial.pyg
- [1
+) [1
 
 {/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}]
+\openout4 = end_motif_tutorial.pyg
+
 (./_minted-end_motif_tutorial/8194FDF4FB2F364A708EAC117C8FDBD594AC8A59F00AFA52C
 5D2953E1AA3E72B.pygtex
 LaTeX Font Info:    Font shape `TU/Lato(0)/m/it' will be
 (Font)              scaled to size 8.0pt on input line 4.
-)
+) [2]
 \openout4 = end_motif_tutorial.pyg
- [2]
+
 (./_minted-end_motif_tutorial/790D6E768AC8EC49A33EDE1C84E21B1894AC8A59F00AFA52C
 5D2953E1AA3E72B.pygtex)
 \openout4 = end_motif_tutorial.pyg
@@ -1657,25 +1665,24 @@ runsystem(rm end_motif_tutorial.pyg)...executed
 )
 
 Here is how much of LuaTeX's memory you used:
- 20863 strings out of 477805
- 244189,953878 words of node,token memory allocated
+ 20864 strings out of 477805
+ 244179,953878 words of node,token memory allocated
  653 words of node memory still in use:
    3 hlist, 1 vlist, 1 rule, 2 glue, 3 kern, 1 glyph, 5 attribute, 96 glue_spec,
  5 attribute_list, 2 write nodes
-   avail lists: 1:1,2:7213,3:231,4:684,5:2688,6:80,7:10571,8:3,9:7912,10:124,11:
-2464
- 40637 multiletter control sequences out of 65536+600000
+   avail lists: 2:7824,3:242,4:758,5:2816,6:81,7:11103,8:5,9:8308,10:124,11:2575
+ 40638 multiletter control sequences out of 65536+600000
  71 fonts using 17844567 bytes
  114i,10n,122p,605b,776s stack positions out of 5000i,500n,10000p,200000b,80000s
 </usr/share/texmf/fonts/opentype/public/lm/lmmono10-italic.otf></usr/share/texmf
-/fonts/opentype/public/lm/lmmono10-regular.otf></usr/share/texmf/fonts/opentype/
-public/lm/lmmonolt10-bold.otf></usr/share/texmf/fonts/opentype/public/lm/lmroman
-5-regular.otf></usr/share/texlive/texmf-dist/fonts/truetype/typoland/lato/Lato-R
+/fonts/opentype/public/lm/lmmonolt10-bold.otf></usr/share/texmf/fonts/opentype/p
+ublic/lm/lmroman5-regular.otf></usr/share/texmf/fonts/opentype/public/lm/lmmono1
+0-regular.otf></usr/share/texlive/texmf-dist/fonts/truetype/typoland/lato/Lato-R
 egular.ttf></usr/share/texlive/texmf-dist/fonts/truetype/typoland/lato/Lato-Bold
 .ttf></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi5.pfb></u
 sr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy5.pfb></usr/share
 /texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy6.pfb>
-Output written on end_motif_tutorial.pdf (3 pages, 78831 bytes).
+Output written on end_motif_tutorial.pdf (3 pages, 80295 bytes).
 
 PDF statistics: 71 PDF objects out of 1000 (max. 8388607)
  44 compressed objects within 1 object stream

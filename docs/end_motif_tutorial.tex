@@ -1,4 +1,4 @@
-% Created 2024-08-23 Fri 12:34
+% Created 2024-08-23 Fri 12:37
 % Intended LaTeX compiler: pdflatex
 \documentclass{article}
 \newcommand\foo{bar}
@@ -11,20 +11,19 @@
 \begin{document}
 
 \maketitle
-Minimal working example.
+\section*{Notes and Dependencies}
+\label{sec:org2b91946}
 
-Dependencies
 \begin{itemize}
+\item This is a minimal working example intended to be run from the main repo directory
+\item sample\_motifs.py is currently designed \uline{ONLY} for use with BWA- other aligners will have different samtools flags called.
 \item R and python packages as specified per script.
 \item Small bam files human1-5 in data/bams
 \item Appropriate reference fasta, \texttt{GCA\_000001405.15\_GRCh38\_no\_alt\_analysis\_set.fna} (available from \url{ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/001/405/GCA\_000001405.15\_GRCh38/seqs\_for\_alignment\_pipelines.ucsc\_ids/GCA\_000001405.15\_GRCh38\_no\_alt\_analysis\_set.fna.gz})
-
-\item Appropriate reference fasta, GCA\_000001405.15\_GRCh38\_no\_alt\_analysis\_set.fna (available from \url{ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/001/405/GCA\_000001405.15\_GRCh38/seqs\_for\_alignment\_pipelines.ucsc\_ids/GCA\_000001405.15\_GRCh38\_no\_alt\_analysis\_set.fna.gz})
 \end{itemize}
 
-
 \section*{1. Clear motifs data directory if present:}
-\label{sec:org473b507}
+\label{sec:org0b3be21}
 
 \begin{minted}[]{bash}
 if [ -d data/motifs ]; then rm -rf data/motifs; fi
@@ -32,7 +31,7 @@ mkdir data/motifs
 \end{minted}
 
 \section*{2. Generate motifs from 5' ends of bams:}
-\label{sec:org229c580}
+\label{sec:org17189ae}
 
 \begin{minted}[]{bash}
 scripts/sample_motifs.py -h
@@ -58,7 +57,7 @@ done
 \end{minted}
 
 \section*{3. Consolidate to a single matrix:}
-\label{sec:orgd133429}
+\label{sec:orgb2088bf}
 (In R)
 \begin{minted}[]{r}
 library(tidyverse)
@@ -100,7 +99,7 @@ write_tsv(motif_data_fractions, "data/combined_motif_fractions_matrix.tsv")
 \end{minted}
 
 \section*{4. Motif diversity score}
-\label{sec:orga9a1d06}
+\label{sec:org9427518}
 (In R)
 \begin{minted}[]{r}
 annotation = data.frame(library = c("human1_motifs","human2_motifs","human3_motifs","human4_motifs","human5_motifs"),
@@ -128,7 +127,7 @@ mds
 \end{minted}
 
 \section*{5. F-profiles}
-\label{sec:org0be7b82}
+\label{sec:org3969570}
 
 \begin{minted}[]{bash}
 scripts/fprofiles.py -h

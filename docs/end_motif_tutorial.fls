@@ -359,6 +359,7 @@ INPUT /usr/share/texlive/texmf-dist/fonts/tfm/public/cm/cmex10.tfm
 INPUT /usr/share/texlive/texmf-dist/fonts/tfm/public/cm/cmr12.tfm
 INPUT /usr/share/texlive/texmf-dist/fonts/tfm/public/cm/cmr8.tfm
 INPUT /usr/share/texlive/texmf-dist/fonts/tfm/public/cm/cmr6.tfm
+INPUT /home/jeszyman/.texlive2021/texmf-var/luatex-cache/generic/fonts/otl/lmmono10-regular.luc
 OUTPUT end_motif_tutorial.pyg
 INPUT ./_minted-end_motif_tutorial/default.pygstyle
 INPUT ./_minted-end_motif_tutorial/default.pygstyle
@@ -368,7 +369,6 @@ INPUT ./_minted-end_motif_tutorial/7F0181E4C5BAF77AA2F930AE38AFBE9523AFEBB506280
 INPUT ./_minted-end_motif_tutorial/7F0181E4C5BAF77AA2F930AE38AFBE9523AFEBB5062802D8238173C74FFD3644.pygtex
 INPUT ./_minted-end_motif_tutorial/7F0181E4C5BAF77AA2F930AE38AFBE9523AFEBB5062802D8238173C74FFD3644.pygtex
 INPUT ./_minted-end_motif_tutorial/7F0181E4C5BAF77AA2F930AE38AFBE9523AFEBB5062802D8238173C74FFD3644.pygtex
-INPUT /home/jeszyman/.texlive2021/texmf-var/luatex-cache/generic/fonts/otl/lmmono10-regular.luc
 INPUT /home/jeszyman/.texlive2021/texmf-var/luatex-cache/generic/fonts/otl/lmmonolt10-bold.luc
 INPUT /home/jeszyman/.texlive2021/texmf-var/luatex-cache/generic/fonts/otl/lmroman5-regular.luc
 INPUT /usr/share/texlive/texmf-dist/fonts/tfm/public/cm/cmmi5.tfm
@@ -381,11 +381,11 @@ INPUT ./_minted-end_motif_tutorial/91FAEC4CC1DF9324A33BC34BD26FE39023AFEBB506280
 INPUT ./_minted-end_motif_tutorial/91FAEC4CC1DF9324A33BC34BD26FE39023AFEBB5062802D8238173C74FFD3644.pygtex
 INPUT ./_minted-end_motif_tutorial/91FAEC4CC1DF9324A33BC34BD26FE39023AFEBB5062802D8238173C74FFD3644.pygtex
 INPUT ./_minted-end_motif_tutorial/91FAEC4CC1DF9324A33BC34BD26FE39023AFEBB5062802D8238173C74FFD3644.pygtex
+OUTPUT end_motif_tutorial.pdf
+INPUT /var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map
 OUTPUT end_motif_tutorial.pyg
 INPUT ./end_motif_tutorial.pyg
 INPUT ./_minted-end_motif_tutorial/8194FDF4FB2F364A708EAC117C8FDBD594AC8A59F00AFA52C5D2953E1AA3E72B.pygtex
-OUTPUT end_motif_tutorial.pdf
-INPUT /var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map
 INPUT ./_minted-end_motif_tutorial/8194FDF4FB2F364A708EAC117C8FDBD594AC8A59F00AFA52C5D2953E1AA3E72B.pygtex
 INPUT ./_minted-end_motif_tutorial/8194FDF4FB2F364A708EAC117C8FDBD594AC8A59F00AFA52C5D2953E1AA3E72B.pygtex
 INPUT ./_minted-end_motif_tutorial/8194FDF4FB2F364A708EAC117C8FDBD594AC8A59F00AFA52C5D2953E1AA3E72B.pygtex

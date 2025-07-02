@@ -27,6 +27,13 @@ echo -e "$(date)\n$output"
 
 #+end_src
 
+#+RESULTS: git-workflow-up
+Wed Jul  2 07:13:15 AM CDT 2025
+[master 78d0110] .
+ 1 file changed, 5 insertions(+)
+To github.com:jeszyman/emseq.git
+   5461750..78d0110  master -> master
+
 
 *** Conda environmental YAMLs
 **** cfDNA CNA

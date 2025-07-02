@@ -203,7 +203,7 @@ rule cfdna_wgs_bwa_index:
         sa  = f"{data_dir}/ref/bwa/{{name}}/{{name}}.sa",
     params:
         bwa_prefix = lambda wildcards: f"{data_dir}/ref/bwa/{wildcards.name}/{wildcards.name}",
-        script = "../scripts/cfdna_wgs_bwa_index.sh",
+        script = config["cfdna-scripts-dir"]
     log:
         f"{data_dir}/logs/{{name}}_bwa_index.log"
     shell:

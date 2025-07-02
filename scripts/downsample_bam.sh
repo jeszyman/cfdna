@@ -1,16 +1,48 @@
 #!/usr/bin/env bash
+set -o errexit
+set -o nounset
+set -o pipefail
 
-in_bam=$1
-milreads="$2"
+print_usage() {
+    cat <<EOF
+USAGE: cfdna_downsample.sh <IN_BAM> <MILLION_READS>
 
-reads=$(echo |awk -v var1=$milreads '{ print 1000000*var1 }')
+DESCRIPTION:
+  Downsamples BAM to an approximate target number of reads (in millions) using samtools -s.
 
-out_bam=$(echo $in_bam | sed 's/_filt.bam/_ds10.bam/g')
+REQUIRED ARGUMENTS:
+  <IN_BAM>          Input BAM file
+  <MILLION_READS>   Target number of reads, in millions (e.g. 10 for ~10 million reads)
 
-## Calculate the sampling factor based on the intended number of reads:
+EXAMPLE:
+  cfdna_downsample.sh sample_filt.bam 10
 
-FACTOR=$(samtools idxstats $in_bam | cut -f3 | awk -v COUNT=$reads 'BEGIN {total=0} {total += $1} END {print COUNT/total}')
+NOTE:
+  Output BAM will be named by replacing '_filt.bam' with '_ds10.bam'
+EOF
+}
 
-samtools view -@ 4 -s $FACTOR -b $in_bam > $out_bam
+parse_args() {
+    if [[ "$#" -ne 2 ]] || [[ "$1" == "-h" ]] || [[ "$1" == "--help" ]]; then
+        print_usage
+        exit 1
+    fi
 
-samtools index $out_bam
+    in_bam="$1"
+    million_reads="$2"
+}
+
+main() {
+    reads=$(awk -v m="$million_reads" 'BEGIN { print m * 1000000 }')
+
+    out_bam=$(echo "$in_bam" | sed 's/_filt.bam/_ds10.bam/g')
+
+    factor=$(samtools idxstats "$in_bam" | cut -f3 |
+        awk -v count="$reads" 'BEGIN { total = 0 } { total += $1 } END { print count / total }')
+
+    samtools view -@ 4 -s "$factor" -b "$in_bam" > "$out_bam"
+    samtools index "$out_bam"
+}
+
+parse_args "$@"
+main

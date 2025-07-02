@@ -1,0 +1,12 @@
+name: cfdna_wgs
+channels:
+  - conda-forge
+  - bioconda
+
+dependencies:
+  - bwa
+  - deeptools
+  - fastp
+  - fastqc
+  - samtools
+  - snakemake

@@ -7,7 +7,6 @@ FROM jeszyman/biotools:1.0.2
 # After build, the image will be pushed to the dockerhub as
 # jeszyman/frag
 # (https://hub.docker.com/repository/docker/jeszyman/frag)
-
 #
 RUN cd /opt && \
     git clone https://github.com/shahcompbio/hmmcopy_utils.git && \

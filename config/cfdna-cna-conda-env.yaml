@@ -1,0 +1,14 @@
+name: cfdna_wgs
+channels:
+  - conda-forge
+  - bioconda
+
+dependencies:
+  - bioconductor-genomeinfodb
+  - bioconductor-genomicranges
+  - bioconductor-hmmcopy
+  - hmmcopy
+  - r-argparse
+  - r-optparse
+  - samtools
+  - snakemake

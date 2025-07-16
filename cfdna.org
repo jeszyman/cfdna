@@ -778,7 +778,7 @@ rule cfdna_frag_filt:
     conda:
         "../config/cfdna-wgs-conda-env.yaml"
     input:
-        f"{data_dir}/cfdna-cna/bams/{{wkflow_id}}.bam",
+        f"{data_dir}/cfdna-cna/input_bams/{{wkflow_id}}.bam",
     log:
         f"{data_dir}/logs/{{wkflow_id}}_cfdna_frag_filt.log",
     output:
@@ -787,8 +787,8 @@ rule cfdna_frag_filt:
         final = f"{data_dir}/cfdna-cna/bams/{{wkflow_id}}.frag{{frag_distro}}.bam",
         index = f"{data_dir}/cfdna-cna/bams/{{wkflow_id}}.frag{{frag_distro}}.bam.bai",
     params:
-        script = f"{cfdna_script_dir}/cfdna_frag_filt.sh",
-        tmp_dir = config["tmp_dir"],
+        script = f"{config['cfdna-scripts-dir']}/cfdna_frag_filt.sh",
+        tmp_dir = config["data-tmp-dir"],
     shell:
         """
         frag_min=$(echo {wildcards.frag_distro} | sed -e "s/_.*$//g")
@@ -1090,7 +1090,6 @@ rule cfdna_cna_extract_tumor_fractions:
                         out.write(f"{sample}\t{tf}\n")
 
 #+end_src
-
 **** Development
 :PROPERTIES:
 :ID:       d7114139-00ab-4a79-8324-8876095b436e
@@ -1257,6 +1256,9 @@ rule ichor:
 #+end_src
 
 
+**** Ideas
+- https://www.medrxiv.org/content/10.1101/19002550v3.full.pdf+html
+      - In order to maximize sensitivity of CNAs while preventing false positive detections, Spearman’s rank correlation between local mean fragment length and copy number was used as a disqualifier of CNA call sets (Hellwig et al. 2018; Mouliere et al. 2018
 *** End motifs
 **** Sample 5' motifs per filtered bam file
 #+begin_src snakemake

@@ -545,6 +545,7 @@ rule cfdna_wgs_bam_dedup:
         tmp_dir = config["data-tmp-dir"]
     shell:
         """
+        rm -rf {params.tmp_dir}
         mkdir -p {params.tmp_dir}
         samtools sort -@ 8 -n -T {params.tmp_dir}/{wildcards.library_id}.namesort -o - {input} \
         | samtools fixmate -@ 8 -m - - \

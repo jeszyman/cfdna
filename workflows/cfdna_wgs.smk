@@ -258,8 +258,8 @@ rule cfdna_wgs_bam_dedup:
         tmp_dir = config["data-tmp-dir"]
     shell:
         """
-        rm -rf {params.tmp_dir}
-        mkdir -p {params.tmp_dir}
+        rm -rf  {params.tmp_dir}/{wildcards.library_id}.namesort
+        mkdir -p {params.tmp_dir}/{wildcards.library_id}.namesort
         samtools sort -@ 8 -n -T {params.tmp_dir}/{wildcards.library_id}.namesort -o - {input} \
         | samtools fixmate -@ 8 -m - - \
         | samtools sort -@ 8 -T {params.tmp_dir}/{wildcards.library_id}.namesort -o - - \
@@ -334,7 +334,7 @@ rule cfdna_wgs_mosdepth:
         thresholds = f"{data_dir}/cfdna-wgs/qc/mosdepth_{{library_id}}.{{ref_name}}.{{align_method}}.thresholds.bed.gz",
         thresholds_idx = f"{data_dir}/cfdna-wgs/qc/mosdepth_{{library_id}}.{{ref_name}}.{{align_method}}.thresholds.bed.gz.csi",
     params:
-        script = f"{cfdna_script_dir}/emseq_mosdepth.sh",
+        script = f"{cfdna_script_dir}/cdfna_wgs_mosdepth.sh",
         quant_levels = config["mosdepth-quant-levels"],
         out_dir = f"{data_dir}/cfdna-wgs/qc",
     threads: 8,

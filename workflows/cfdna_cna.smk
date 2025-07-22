@@ -108,3 +108,35 @@ rule cfdna_ichor:
             --outDir {params.ichor_out_main_dir}/{wildcards.wkflow_id}.frag{wildcards.frag_distro}.ds{wildcards.mil_reads} \
             --libdir {params.ichor_repo}
         """
+# Snakefile
+# at the top of your Snakefile (if not already):
+from pathlib import Path
+import os
+
+# … your other rules …
+
+rule cfdna_cna_extract_tumor_fractions:
+    conda:
+        f"{config['cfdna-cna-conda-env']}"
+    input:
+        # dynamically find every .params.txt under ichor/
+        params=lambda wc: sorted(
+            str(p) for p in Path(config['cfdna-cna-dir'], "ichor")
+                       .rglob("*.params.txt")
+        )
+    output:
+        tf_summary=os.path.join(
+            config['cfdna-cna-dir'], "ichor", "ichor_tumor_fractions.tsv"
+        )
+    shell:
+        r"""
+        # write header
+        echo -e "library\ttf" > {output.tf_summary}
+
+        # for each params.txt, pull the second field on line 2
+        for f in {input.params}; do
+            sample=$(basename "$f" .params.txt)
+            tf=$(awk 'NR==2 {{print $2}}' "$f")
+            echo -e "$sample\t$tf"
+        done >> {output.tf_summary}
+        """

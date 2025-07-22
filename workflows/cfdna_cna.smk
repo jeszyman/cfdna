@@ -24,7 +24,7 @@ rule cfdna_frag_filt:
         {output.nohead} \
         $frag_min \
         $frag_max \
-        ${threads} \
+        {threads} \
         {output.onlyhead} \
         {output.final} \
         {params.tmp_dir} &> {log}

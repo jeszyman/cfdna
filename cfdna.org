@@ -225,6 +225,617 @@ Directory ~workflow~ contains two types of workflows- process-focused snakefiles
 :PROPERTIES:
 :header-args:snakemake: :tangle ./workflows/cfdna_wgs.smk
 :END:
+[[file:workflows/cfdna_wgs.smk]]
+*** Preamble
+#+begin_src snakemake
+###############################
+###   cfDNA WGS Snakefile   ###
+###############################
+
+#########1#########2#########3#########4#########5#########6#########7#########8
+# A snakefile for basic processing of cell-free DNA whole-genome sequecing data.
+
+# ---   Dependencies   --- #
+# ------------------------ #
+
+# ./config/cfdna-wgs-conda-env.yaml, a conda environment file
+# Scripts within ./scripts
+
+# ---   Configuration Parameters   --- #
+# ------------------------------------ #
+
+# Parameters to be defined at the configuration yaml include:
+#
+# available_concurrency:
+# data-temp-dir:
+# mosdepth-quant-levels:
+#
+# ref_assemblies:
+#   <ASSEMBLY ID>:
+#     url:
+#     name:
+#     input:
+
+# Example minimal configuration yaml:
+# This is a nested map, e.g.:
+# ref_assemblies:
+#   ncbi_decoy_hg38:
+#     url: https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/001/405/GCA_000001405.15_GRCh38/seqs_for_alignment_pipelines.ucsc_ids/GCA_000001405.15_GRCh38_no_alt_plus_hs38d1_analysis_set.fna.gz
+#     name: ncbi_decoy_hg38
+#     input: GCA_000001405.15_GRCh38_no_alt_plus_hs38d1_analysis_set.fa.gz
+
+
+# {Parameters} to be defined at the level of the snakefile include
+#
+# data_dir
+# cfdna_script_dir
+
+# {{Wildcards}} to be defined in the wrapper snakefile rule all include:
+#
+# library_id
+# processing
+# read
+# ref_name
+# align_method
+
+<#~/repos/basecamp/basecamp.org:smk_comment_modular()#>
+
+<#~/repos/basecamp/basecamp.org:smk_comment_datadir()#>
+
+# Specifically here, most ouputs will return to {data_dir}/cfdna-wgs
+
+<#~/repos/basecamp/basecamp.org:smk_comment_conda()#>
+
+<#~/repos/basecamp/basecamp.org:smk_comment_concurrency()#>
+
+#+end_src
+
+*** Fastq processing with fastp
+#+begin_src snakemake
+
+rule cfdna_wgs_fastp:
+    #
+    # fastp for cfDNA WGS. Uses a set thread count of 8. Adapters are
+    # auto-detected.
+    #
+    conda:
+        "../config/cfdna-wgs-conda-env.yaml"
+    input:
+        r1 = f"{config['cfdna-wgs-dir']}/fastqs/{{library_id}}.raw_R1.fastq.gz",
+        r2 = f"{config['cfdna-wgs-dir']}/fastqs/{{library_id}}.raw_R2.fastq.gz",
+    log:
+        html = f"{config['log-dir']}/{{library_id}}_cfdna_wgs_fastp.html",
+        json = f"{config['log-dir']}/{{library_id}}_cfdna_wgs_fastp.json",
+        run = f"{config['log-dir']}/{{library_id}}_cfdna_wgs_fastp.log",
+    output:
+        failed = f"{config['cfdna-wgs-dir']}/fastqs/{{library_id}}.failed.fastq.gz",
+        r1 = f"{config['cfdna-wgs-dir']}/fastqs/{{library_id}}.processed_R1.fastq.gz",
+        r2 = f"{config['cfdna-wgs-dir']}/fastqs/{{library_id}}.processed_R2.fastq.gz",
+        up1 = f"{config['cfdna-wgs-dir']}/fastqs/{{library_id}}.unpaired_R1.fastq.gz",
+        up2 = f"{config['cfdna-wgs-dir']}/fastqs/{{library_id}}.unpaired_R2.fastq.gz",
+    resources:
+        concurrency=12,
+    threads:
+        10
+    shell:
+        """
+        fastp --detect_adapter_for_pe \
+        --failed_out {output.failed} \
+        --in1 {input.r1} --in2 {input.r2} \
+        --html {log.html} --json {log.json} \
+        --out1 {output.r1} --out2 {output.r2} \
+        --unpaired1 {output.up1} --unpaired2 {output.up2} \
+        --thread {threads} &> {log.run}
+        """
+#+end_src
+*** FastQC
+#+begin_src snakemake
+rule cfdna_wgs_fastqc:
+    conda:
+        "../config/cfdna-wgs-conda-env.yaml"
+    input:
+        f"{config['cfdna-wgs-dir']}/fastqs/{{library_id}}.{{processing}}_{{read}}.fastq.gz",
+    log:
+        f"{config['log-dir']}/{{library_id}}.{{processing}}_{{read}}_cfdna_wgs_fastqc.log",
+    output:
+        f"{config['cfdna-wgs-dir']}/qc/{{library_id}}.{{processing}}_{{read}}_fastqc.html",
+        f"{config['cfdna-wgs-dir']}/qc/{{library_id}}.{{processing}}_{{read}}_fastqc.zip",
+    params:
+        outdir = f"{config['cfdna-wgs-dir']}/qc",
+    resources:
+        concurrency = 25,
+    threads:
+        2
+    shell:
+        """
+        fastqc \
+        --outdir {params.outdir} \
+        --quiet \
+        --svg \
+        --threads {threads} \
+        {input} &> {log}
+        """
+
+#+end_src
+*** BWA index
+#+begin_src snakemake
+
+#########1#########2#########3#########4#########5#########6#########7#########8
+rule cfdna_wgs_bwa_index:
+    #
+    # Builds BWA reference off of an existing fasta file in the
+    # {data_dir}/inputs directory. Uses a nested map from the config yaml. Also
+    # created are a fasta index (.fai) and a bed file of the primary assembly
+    # (numbered chromosomes and X and Y, no mitochondria or other contigs).
+    #
+    conda:
+        "../config/cfdna-wgs-conda-env.yaml"
+    input:
+        lambda wildcards: f"{config['data-dir']}/inputs/{config['ref_assemblies'][wildcards.name]['input']}",
+    output:
+        fa = f"{config['data-dir']}/ref/bwa/{{name}}/{{name}}.fa",
+        fai = f"{config['data-dir']}/ref/bwa/{{name}}/{{name}}.fa.fai",
+        bed = f"{config['data-dir']}/ref/bwa/{{name}}/{{name}}.primary.bed",
+        amb = f"{config['data-dir']}/ref/bwa/{{name}}/{{name}}.amb",
+        ann = f"{config['data-dir']}/ref/bwa/{{name}}/{{name}}.ann",
+        bwt = f"{config['data-dir']}/ref/bwa/{{name}}/{{name}}.bwt",
+        pac = f"{config['data-dir']}/ref/bwa/{{name}}/{{name}}.pac",
+        sa  = f"{config['data-dir']}/ref/bwa/{{name}}/{{name}}.sa",
+    params:
+        bwa_prefix = lambda wildcards: f"{config['data-dir']}/ref/bwa/{wildcards.name}/{wildcards.name}",
+        script = f"{config['cfdna-scripts-dir']}/cfdna_wgs_bwa_index.sh",
+    log:
+        f"{config['log-dir']}/{{name}}_bwa_index.log"
+    shell:
+        """
+        {params.script} \
+        {input} \
+        {output.fa} \
+        {output.fai} \
+        {output.bed} \
+        {params.bwa_prefix} \
+        {log}
+        """
+
+#+end_src
+
+- Shell script
+  #+begin_src bash :tangle ./scripts/cfdna_wgs_bwa_index.sh
+#!/usr/bin/env bash
+set -o errexit
+set -o nounset
+set -o pipefail
+
+print_usage() {
+    cat <<EOF
+USAGE: bwa_index.sh <INPUT_FASTA_GZ> <OUTPUT_FASTA> <OUTPUT_FAI> <OUTPUT_BED> <BWA_PREFIX> <LOG_FILE>
+
+DESCRIPTION:
+  Prepare a BWA index from a gzipped FASTA input, including .fai indexing and BED file generation.
+
+REQUIRED ARGUMENTS:
+  <INPUT_FASTA_GZ>   Path to input .fa.gz file
+  <OUTPUT_FASTA>     Ungzipped target FASTA output path
+  <OUTPUT_FAI>       Output .fai file (samtools faidx)
+  <OUTPUT_BED>       Output BED file for primary chromosomes
+  <BWA_PREFIX>       Prefix for BWA index files
+  <LOG_FILE>         Log file for BWA index command
+
+OPTIONS:
+  -h, --help         Show this help message
+
+EXAMPLE:
+  bwa_index.sh hg38.fa.gz ref/hg38/hg38.fa ref/hg38/hg38.fa.fai ref/hg38/hg38.primary.bed ref/hg38/hg38 ref/hg38/bwa_index.log
+EOF
+}
+
+main() {
+    parse_args "$@"
+    make_index_dir
+    decompress_fasta
+    index_fasta
+    generate_bed
+    run_bwa_index
+}
+
+parse_args() {
+    if [[ "${1:-}" == "-h" || "${1:-}" == "--help" ]]; then
+        print_usage
+        exit 0
+    fi
+
+    if [[ $# -ne 6 ]]; then
+        echo "Error: Expected 6 arguments."
+        print_usage
+        exit 1
+    fi
+
+    declare -g input_fasta_gz="$1"
+    declare -g output_fasta="$2"
+    declare -g output_fai="$3"
+    declare -g output_bed="$4"
+    declare -g bwa_prefix="$5"
+    declare -g log_file="$6"
+}
+
+make_index_dir() {
+    mkdir -p "$(dirname "$output_fasta")"
+}
+
+decompress_fasta() {
+    echo "Decompressing $input_fasta_gz to $output_fasta"
+    gzip -dc "$input_fasta_gz" > "$output_fasta"
+}
+
+index_fasta() {
+    echo "Indexing $output_fasta with samtools faidx"
+    samtools faidx "$output_fasta"
+}
+
+generate_bed() {
+    echo "Generating BED file: $output_bed"
+    cut -f1,2 "$output_fai" \
+        | grep -E '^chr([1-9]|1[0-9]|2[0-2]|X|Y)\s' \
+        | awk '{print $1 "\t0\t" $2}' > "$output_bed"
+}
+
+run_bwa_index() {
+    echo "Running bwa index: $bwa_prefix"
+    bwa index -p "$bwa_prefix" "$output_fasta" > "$log_file" 2>&1
+}
+
+main "$@"
+
+#+end_src
+
+*** BWA align
+- [ ] ensure the tmps go to local
+#+begin_src snakemake
+
+
+rule cfdna_wgs_bwa_mem:
+    conda:
+        "../config/cfdna-wgs-conda-env.yaml"
+    input:
+        r1 = f"{config['cfdna-wgs-dir']}/fastqs/{{library_id}}.processed_R1.fastq.gz",
+        r2 = f"{config['cfdna-wgs-dir']}/fastqs/{{library_id}}.processed_R2.fastq.gz",
+        sa_check = f"{config['data-dir']}/ref/bwa/{{ref_name}}/{{ref_name}}.sa",
+    output:
+        bam = f"{config['cfdna-wgs-dir']}/bams/{{library_id}}.{{ref_name}}.bwa.coorsort.bam",
+    params:
+        ref = f"{config['data-dir']}/ref/bwa/{{ref_name}}/{{ref_name}}",
+    resources:
+        concurrency = 100,
+    threads:
+        50
+    shell:
+        """
+        bwa mem -M -t {threads} \
+        {params.ref} {input.r1} {input.r2} \
+        | samtools view -@ 4 -Sb - -o - \
+        | samtools sort -@ 4 - -o {output.bam}
+        samtools index -@ 4 {output.bam}
+        """
+
+#+end_src
+
+*** De-duplicate bams
+#+begin_src snakemake
+
+rule cfdna_wgs_bam_dedup:
+    #
+    # 1) Name sort, required by fixmate
+    # 2) Fixmate adds mate-pair info needed for deduping
+    # 3) Coordinate sorting, required by markdup
+    # 4) Markdup REMOVING PCR duplicates
+    #
+    conda:
+        "../config/cfdna-wgs-conda-env.yaml",
+    input:
+        f"{config['cfdna-wgs-dir']}/bams/{{library_id}}.{{ref_name}}.{{align_method}}.coorsort.bam",
+    log:
+        f"{config['log-dir']}/{{library_id}}.{{ref_name}}.{{align_method}}_cfdna_wgs_bam_dedup.log",
+    output:
+        bam = f"{config['cfdna-wgs-dir']}/bams/{{library_id}}.{{ref_name}}.{{align_method}}.dedup.coorsort.bam",
+        bai = f"{config['cfdna-wgs-dir']}/bams/{{library_id}}.{{ref_name}}.{{align_method}}.dedup.coorsort.bam.bai",
+    params:
+        tmp_dir = config["local-tmp-dir"]
+    shell:
+        """
+        rm -rf  {params.tmp_dir}/{wildcards.library_id}.namesort
+        mkdir -p {params.tmp_dir}/{wildcards.library_id}.namesort
+        samtools sort -@ 8 -n -T {params.tmp_dir}/{wildcards.library_id}.namesort -o - {input} \
+        | samtools fixmate -@ 8 -m - - \
+        | samtools sort -@ 8 -T {params.tmp_dir}/{wildcards.library_id}.namesort -o - - \
+        | samtools markdup -@ 8 -r -T {params.tmp_dir}/{wildcards.library_id}.namesort - {output.bam}
+        samtools index -@ 4 {output.bam}
+        """
+
+#+end_src
+*** Filter bams
+#+begin_src snakemake
+rule cfdna_wgs_bam_filt:
+    #
+    # Excludes any unmapped (0x4),
+    #  not primary alignment (0x100),
+    #  or duplicates (0x400)
+    #
+    # Only MAPQ > 20
+    #
+    # Restrict to primary chromosomes
+    #
+    # DO NOT restrict to "proper pairs"- this clips long cfDNA fragments!
+    #
+    conda:
+        "../config/cfdna-wgs-conda-env.yaml",
+    input:
+        bam = f"{config['cfdna-wgs-dir']}/bams/{{library_id}}.{{ref_name}}.{{align_method}}.dedup.coorsort.bam",
+        bed = f"{config['data-dir']}/ref/bwa/{{ref_name}}/{{ref_name}}.primary.bed",
+    log:
+        f"{config['log-dir']}/{{library_id}}.{{ref_name}}.{{align_method}}_cfdna_wgs_bam_filt.log",
+    output:
+        bam = f"{config['cfdna-wgs-dir']}/bams/{{library_id}}.{{ref_name}}.{{align_method}}.dedup.coorsort.filt.bam",
+        bai = f"{config['cfdna-wgs-dir']}/bams/{{library_id}}.{{ref_name}}.{{align_method}}.dedup.coorsort.filt.bam.bai",
+    shell:
+        """
+        samtools view -@ 8 -b -F 1284 -h -q 20 -L {input.bed} -o {output.bam} {input.bam}
+        samtools index {output.bam}
+        """
+#+end_src
+*** Alignment QC
+**** Samtools
+#+begin_src snakemake
+rule cfdna_wgs_samtools_alignment_qc:
+    conda:
+        "../config/cfdna-wgs-conda-env.yaml",
+    input:
+        f"{config['cfdna-wgs-dir']}/bams/{{library_id}}.{{ref_name}}.{{align_method}}.{{processing}}.bam",
+    log:
+        flagstat = f"{config['log-dir']}/{{library_id}}.{{ref_name}}.{{align_method}}.{{processing}}_cfdna_wgs_flagstat.log",
+        samstat = f"{config['log-dir']}/{{library_id}}.{{ref_name}}.{{align_method}}.{{processing}}_cfdna_wgs_samstat.log",
+    output:
+        flagstat = f"{config['cfdna-wgs-dir']}/qc/{{library_id}}.{{ref_name}}.{{align_method}}.{{processing}}_flagstat.txt",
+        samstat = f"{config['cfdna-wgs-dir']}/qc/{{library_id}}.{{ref_name}}.{{align_method}}.{{processing}}_samstat.txt",
+    params:
+        script = f"{cfdna_script_dir}/samtools_alignment_qc.sh",
+        threads = 8,
+    shell:
+        """
+        {params.script} \
+        {input} \
+        {log.flagstat} \
+        {log.samstat} \
+        {output.flagstat} \
+        {output.samstat} \
+        {params.threads}
+        """
+#+end_src
+
+- [[file:scripts/alignment_qc.sh][Shell script]]
+  #+begin_src bash :tangle ./scripts/samtools_alignment_qc.sh
+#!/usr/bin/env bash
+set -o errexit   # abort on nonzero exitstatus
+set -o nounset   # abort on unbound variable
+set -o pipefail  # don't hide errors within pipes
+
+# Script variables
+input="${1}"
+log_flagstat="${2}"
+log_samstat="${3}"
+output_flagstat="${4}"
+output_samstat="${5}"
+threads="${6}"
+
+# Functions
+main(){
+    flagstat $input $output_flagstat $log_flagstat $threads
+    samstats $input $output_samstat $log_samstat $threads
+}
+
+flagstat(){
+    local input="${1}"
+    local output="${2}"
+    local log="${3}"
+    local threads="${4}"
+    #
+    samtools flagstat -@ $threads $input > $output 2>$log
+}
+
+samstats(){
+    local input="${1}"
+    local output="${2}"
+    local log="${3}"
+    local threads="${4}"
+    #
+    samtools stats -@ $threads $input > $output 2>$log
+}
+
+# Run
+main "$@"
+#+end_src
+
+**** Mosdepth
+#+begin_src snakemake
+rule cfdna_wgs_mosdepth:
+    conda:
+        "../config/cfdna-wgs/conda-env.yaml",
+    input:
+        bam = f"{config['cfdna-wgs-dir']}/bams/{{library_id}}.{{ref_name}}.{{align_method}}.dedup.coorsort.filt.bam",
+        index = f"{config['cfdna-wgs-dir']}/bams/{{library_id}}.{{ref_name}}.{{align_method}}.dedup.coorsort.filt.bam",
+    output:
+        summary = f"{config['cfdna-wgs-dir']}/qc/mosdepth_{{library_id}}.{{ref_name}}.{{align_method}}.mosdepth.summary.txt",
+        global_dist = f"{config['cfdna-wgs-dir']}/qc/mosdepth_{{library_id}}.{{ref_name}}.{{align_method}}.mosdepth.global.dist.txt",
+        region_dist = f"{config['cfdna-wgs-dir']}/qc/mosdepth_{{library_id}}.{{ref_name}}.{{align_method}}.mosdepth.region.dist.txt",
+        regions = f"{config['cfdna-wgs-dir']}/qc/mosdepth_{{library_id}}.{{ref_name}}.{{align_method}}.regions.bed.gz",
+        regions_idx = f"{config['cfdna-wgs-dir']}/qc/mosdepth_{{library_id}}.{{ref_name}}.{{align_method}}.regions.bed.gz.csi",
+        quantized = f"{config['cfdna-wgs-dir']}/qc/mosdepth_{{library_id}}.{{ref_name}}.{{align_method}}.quantized.bed.gz",
+        quantized_idx = f"{config['cfdna-wgs-dir']}/qc/mosdepth_{{library_id}}.{{ref_name}}.{{align_method}}.quantized.bed.gz.csi",
+        thresholds = f"{config['cfdna-wgs-dir']}/qc/mosdepth_{{library_id}}.{{ref_name}}.{{align_method}}.thresholds.bed.gz",
+        thresholds_idx = f"{config['cfdna-wgs-dir']}/qc/mosdepth_{{library_id}}.{{ref_name}}.{{align_method}}.thresholds.bed.gz.csi",
+    params:
+        script = f"{cfdna_script_dir}/cdfna_wgs_mosdepth.sh",
+        quant_levels = config["mosdepth-quant-levels"],
+        out_dir = f"{config['cfdna-wgs-dir']}/qc",
+    threads: 8,
+    resources:
+        concurrency = 20,
+    shell:
+        """
+        {params.script} \
+        {input.bam} \
+        {params.out_dir} \
+        {wildcards.library_id}.{wildcards.ref_name}.{wildcards.align_method} \
+        '{params.quant_levels}' \
+        {threads}
+        """
+
+#+end_src
+  #+begin_src bash :tangle ./scripts/cdfna_wgs_mosdepth.sh :tangle-mode (identity #o555)
+#!/usr/bin/env bash
+set -euo pipefail
+
+# -----------------------------------------------------------------------------
+# mosdepth-wrapper.sh
+#
+# This script wraps the `mosdepth` tool to compute read depth over a BAM file,
+# optimized for EM-seq cfDNA data. It configures the run to:
+#   - use median depth (`--use-median`)
+#   - run in fast mode (no per-base depth)
+#   - report thresholds and quantized bins
+#   - generate output in 1000bp windows
+#
+# Output files are written using a prefix of "mosdepth_<OUT_PREFIX>" in <OUT_DIR>.
+# Designed for use in explicit I/O workflows like Snakemake or manual batch calls.
+# -----------------------------------------------------------------------------
+
+print_usage() {
+    cat <<EOF
+USAGE: mosdepth-wrapper.sh <BAM> <OUT_DIR> <OUT_PREFIX> <QUANT_LEVELS> [THREADS]
+
+DESCRIPTION:
+  Run mosdepth on a BAM file with EM-seq-appropriate settings.
+  QUANT_LEVELS is a comma-separated string of coverage cutoffs (e.g. 1,5,10,20).
+  The OUT_PREFIX will be prepended with 'mosdepth_' before being passed to mosdepth.
+  Output files (e.g. mosdepth_<OUT_PREFIX>.summary.txt) will be written to OUT_DIR.
+  THREADS is optional (default: 8).
+EOF
+}
+
+main() {
+    parse_args "$@"
+    run_mosdepth
+}
+
+parse_args() {
+    if [[ "${1:-}" == "-h" || "${1:-}" == "--help" ]]; then
+        print_usage
+        exit 0
+    fi
+
+    if [[ $# -lt 4 ]]; then
+        echo "Error: Missing required arguments." >&2
+        print_usage
+        exit 1
+    fi
+
+    declare -g bam_file="$1"                         # Input BAM file
+    declare -g out_dir="$2"                          # Output directory
+    declare -g user_prefix="$3"                      # Base prefix from user
+    declare -g quant_levels="$4"                     # Coverage thresholds (e.g. 1,5,10)
+    declare -g threads="${5:-8}"                     # Optional threads param (default: 8)
+
+    [[ -f "$bam_file" ]] || { echo "Error: BAM file not found: $bam_file" >&2; exit 1; }
+
+    mkdir -p "$out_dir"
+
+    declare -g out_prefix="mosdepth_${user_prefix}"  # Final output prefix
+    declare -g out_path="${out_dir%/}/${out_prefix}" # Full path to output base
+    declare -g quant_str="0:${quant_levels//,/:}"    # Convert to colon-delimited format
+}
+
+run_mosdepth() {
+    echo "[INFO] PID $$ running mosdepth on $bam_file" >&2
+    echo "[INFO] Output prefix: $out_path" >&2
+    echo "[INFO] Quantize string: $quant_str" >&2
+    echo "[INFO] Threads: $threads" >&2
+
+    mosdepth \
+        --threads "$threads" \
+        --no-per-base \
+        --fast-mode \
+        --use-median \
+        --quantize "$quant_str" \
+        --by 1000 \
+        --thresholds "$quant_levels" \
+        "$out_path" "$bam_file"
+
+    echo "[INFO] mosdepth complete for PID $$" >&2
+}
+
+main "$@"
+#+end_src
+
+**** deepTools fragment sizes
+:PROPERTIES:
+:ID:       6c4c06ac-f963-426a-95e9-2d4772374035
+:END:
+#+begin_src snakemake
+
+# Get fragment sizes using deepTools
+rule cfdna_wgs_frag_bampefragsize:
+    conda:
+        "../config/cfdna-wgs-conda-env.yaml",
+    input:
+        lambda wildcards: expand(f"{config['data-dir']}/cfdna_wgs/bams/{{library}}.{{ref_name}}.{{align_method}}.dedup.coorsort.filt.bam",
+                                 library = cdfna_wgs_map[wildcards.lib_set]['libs'],
+                                 build = lib_map[wildcards.lib_set]['build']),
+    log: f"{config['log-dir']}/{{lib_set}}_cfdna_wgs_bampefragsize.log",
+    output:
+        raw = f"{config['data-dir']}/cfdna_wgs/qc/{{lib_set}}_bampefragsize.txt",
+        hist = f"{config['data-dir']}/cfdna_wgs/qc/{{lib_set}}_bampefragsize.png",
+    params:
+        blacklist = lambda wildcards: lib_map[wildcards.lib_set]['blacklist'],
+        script = f"{cfdna_script_dir}/bampefragsize.sh",
+    shell:
+        """
+        {params.script} \
+        "{input}" \
+        {log} \
+        {output.hist} \
+        {output.raw} \
+        {params.blacklist} \
+        12
+        """
+#+end_src
+- [[file:scripts/bampefragsize.sh][Shell script]]
+  #+begin_src bash :tangle ./scripts/bampefragsize.sh
+#!/usr/bin/env bash
+#!/usr/bin/env bash
+set -o errexit   # abort on nonzero exitstatus
+set -o nounset   # abort on unbound variable
+set -o pipefail  # don't hide errors within pipes
+
+# Script variables
+
+input="${1}"
+log="${2}"
+output_hist="${3}"
+output_raw="${4}"
+blacklist="${5}"
+threads="${6}"
+
+
+bamPEFragmentSize --bamfiles $input \
+                  --numberOfProcessors $threads \
+                  --blackListFileName $blacklist \
+                  --histogram $output_hist \
+                  --maxFragmentLength 1000 \
+                  --outRawFragmentLengths $output_raw
+#+end_src
+
+** OLD cfDNA WGS
+:PROPERTIES:
+:END:
 *** Preamble
 #+begin_src snakemake
 ###############################
@@ -881,7 +1492,7 @@ for key in unique_keys:
 : - cfdna-cna-conda-env
 : - cfdna-cna-dir
 : - cfdna-script-dir
-: - data-tmp-dir
+: - local-tmp-dir
 : - ichor_repo
 : - log-dir
 
@@ -901,7 +1512,7 @@ rule cfdna_frag_filt:
         index = f"{config['cfdna-cna-dir']}/bams/{{wkflow_id}}.frag{{frag_distro}}.bam.bai",
     params:
         script = f"{config['cfdna-script-dir']}/cfdna_frag_filt.sh",
-        tmp_dir = config["data-tmp-dir"],
+        tmp_dir = config["local-tmp-dir"],
     threads:
         12
     shell:
@@ -1147,6 +1758,132 @@ rule make_wig:
         """
 
 #+end_src
+#+begin_src bash
+#ssh jeff-nf1
+#conda activate base
+#mamba env create --file ~/repos/cfdna/config/cfdna-cna-conda-env.yaml
+#conda activate cfdna_wgs
+
+#!/usr/bin/env bash
+set -o errexit
+set -o nounset
+set -o pipefail
+
+usage() {
+    cat <<EOF
+Usage: $(basename "$0") <in_bam> <out_wig>
+
+Generate a WIG from a BAM using readCounter.
+
+Positional arguments:
+  in_bam   Path to input BAM file
+  out_wig  Path to output WIG file
+EOF
+    exit 1
+}
+
+if [[ $# -ne 2 ]]; then
+    usage
+fi
+
+IN_BAM=$1
+OUT_WIG=$2
+
+#IN_BAM=/mnt/gcs/jeszyman/projects/nf1/cfdna-wgs/bams/kh_02.ncbi_decoy_hg38.bwa.dedup.coorsort.filt.bam
+
+IN_BAM=/mnt/gcs/jeszyman/projects/nf1/cfdna-wgs/bams/kh_02.ncbi_decoy_hg38.bwa.coorsort.bam
+
+IN_BAM=/mnt/gcs/ris/mpnst/analysis/cfdna-wgs/bams/lib424_filt.bam
+
+IN_BAM=/mnt/gcs/ris/mpnst/analysis/cfdna-wgs/cna/frag_bams/lib424_frag90_150.bam
+
+IN_BAM=/mnt/gcs/jeszyman/projects/nf1/emseq/bams/emseq_06.ncbi_decoy_hg38.bwa_meth.coorsort.deduped.bam
+OUT_WIG=/mnt/gcs/jeszyman/projects/nf1/tmp/TEST3.wig
+
+# parameters (override via env if desired)
+WINDOW=${WINDOW:-1000000}
+QUALITY=${QUALITY:-20}
+CHROMS=${CHROMS:-chr1,chr2,chr3,chr4,chr5,chr6,chr7,chr8,chr9,chr10,chr11,chr12,chr13,chr14,chr15,chr16,chr17,chr18,chr19,chr20,chr21,chr22,chrX,chrY}
+
+mkdir -p "$(dirname "$OUT_WIG")"
+
+readCounter \
+    --window "$WINDOW" \
+    --quality "$QUALITY" \
+    --chromosome "$CHROMS" \
+    "$IN_BAM" > "$OUT_WIG"
+
+
+
+#mkdir -p /tmp/ichor
+mkdir -p /mnt/gcs/jeszyman/projects/nf1/tmp/ichor
+
+Rscript ~/repos/ichorCNA-patched/scripts/runIchorCNA.R \
+        --id TEST3 \
+        --WIG $OUT_WIG \
+        --normal "c(0.95, 0.99, 0.995, 0.999)" \
+        --genomeBuild hg38 \
+        --ploidy "c(2)" \
+        --gcWig ~/repos/ichorCNA-patched/inst/extdata/gc_hg38_1000kb.wig \
+        --mapWig ~/repos/ichorCNA-patched/inst/extdata/map_hg38_1000kb.wig \
+        --centromere ~/repos/ichorCNA-patched/inst/extdata/GRCh38.GCA_000001405.2_centromere_acen.txt \
+        --normalPanel ~/repos/ichorCNA-patched/inst/extdata/HD_ULP_PoN_1Mb_median_normAutosome_mapScoreFiltered_median.rds \
+        --includeHOMD FALSE \
+        --chrs "c(1:22)" \
+        --chrTrain "c(1:22)" \
+        --estimateNormal TRUE \
+        --estimatePloidy TRUE \
+        --estimateScPrevalence FALSE \
+        --scStates "c()" \
+        --txnE 0.9999 \
+        --txnStrength 10000 \
+        --outDir /mnt/gcs/jeszyman/projects/nf1/tmp/ichor \
+        --libdir ~/repos/ichorCNA-patched
+
+cat /mnt/gcs/jeszyman/projects/nf1/tmp/ichor/TEST.params.txt
+cat /mnt/gcs/jeszyman/projects/nf1/tmp/ichor/TEST2.params.txt
+cat /mnt/gcs/jeszyman/projects/nf1/tmp/ichor/TEST3.params.txt
+
+##########1##########2##########3##########4##########5##########6##########7##########8
+
+Rscript ~/repos/ichorCNA-patched/scripts/runIchorCNA.R \
+        --id TEST \
+        --WIG $OUT_WIG \
+        --normal "c(0.95, 0.99, 0.995, 0.999)" \
+        --genomeBuild hg38 \
+        --ploidy "c(2)" \
+        --gcWig ~/repos/ichorCNA-patched/inst/extdata/gc_hg38_1000kb.wig \
+        --mapWig ~/repos/ichorCNA-patched/inst/extdata/map_hg38_1000kb.wig \
+        --centromere ~/repos/ichorCNA-patched/inst/extdata/GRCh38.GCA_000001405.2_centromere_acen.txt \
+        --normalPanel ~/repos/ichorCNA-patched/inst/extdata/HD_ULP_PoN_1Mb_median_normAutosome_mapScoreFiltered_median.rds \
+        --includeHOMD FALSE \
+        --chrs "c(1:22)" \
+        --chrTrain "c(1:22)" \
+        --estimateNormal TRUE \
+        --estimatePloidy FALSE \
+	--estimateScPrevalence FALSE --scStates "c()" \
+        --txnE 0.9999 \
+        --txnStrength 10000 \
+        --outDir /mnt/gcs/jeszyman/projects/nf1/tmp/ichor \
+        --libdir ~/repos/ichorCNA-patched
+
+
+Rscript ~/repos/ichorCNA-patched/scripts/runIchorCNA.R \
+        --id TEST \
+        --WIG $OUT_WIG \
+        --normal "c(0.5,0.6,0.7,0.8,0.9)" --maxCN 5 \
+        --gcWig ~/repos/ichorCNA-patched/inst/extdata/gc_hg38_1000kb.wig \
+        --mapWig ~/repos/ichorCNA-patched/inst/extdata/map_hg38_1000kb.wig \
+        --centromere ~/repos/ichorCNA-patched/inst/extdata/GRCh38.GCA_000001405.2_centromere_acen.txt \
+        --normalPanel ~/repos/ichorCNA-patched/inst/extdata/HD_ULP_PoN_1Mb_median_normAutosome_mapScoreFiltered_median.rds \
+	--includeHOMD False --chrs "c(1:22)" --chrTrain "c(1:22)" \
+	--estimateNormal True --estimatePloidy True --estimateScPrevalence True \
+	--txnE 0.9999 --txnStrength 10000 \
+	--scStates "c()" \
+	--outDir /mnt/gcs/jeszyman/projects/nf1/tmp/ichor \
+        --libdir ~/repos/ichorCNA-patched
+#+end_src
+
 *** ichor
 #+begin_src snakemake
 rule cfdna_ichor:
@@ -1186,6 +1923,38 @@ rule cfdna_ichor:
         """
 
 #+end_src
+#+begin_src bash
+# conda activate base
+# mamba env create -f ~/repos/cfdna/config/cfdna-cna-conda-env.yaml
+
+# conda activate cfdna_wgs
+
+#mkdir -p /tmp/ichor
+
+Rscript ~/repos/ichorCNA-patched/scripts/runIchorCNA.R \
+        --id TEST \
+        --WIG ~/kh_02.wig \
+        --normal "c(0.95, 0.99, 0.995, 0.999)" \
+        --genomeBuild hg38 \
+        --ploidy "c(2)" \
+        --gcWig ~/repos/ichorCNA-patched/inst/extdata/gc_hg38_1000kb.wig \
+        --mapWig ~/repos/ichorCNA-patched/inst/extdata/map_hg38_1000kb.wig \
+        --centromere ~/repos/ichorCNA-patched/inst/extdata/GRCh38.GCA_000001405.2_centromere_acen.txt \
+        --normalPanel ~/repos/ichorCNA-patched/inst/extdata/HD_ULP_PoN_1Mb_median_normAutosome_mapScoreFiltered_median.rds \
+        --includeHOMD FALSE \
+        --chrs "c(1:22)" \
+        --chrTrain "c(1:22)" \
+        --estimateNormal TRUE \
+        --estimatePloidy TRUE \
+        --estimateScPrevalence TRUE \
+        --scStates "c()" \
+        --txnE 0.9999 \
+        --txnStrength 10000 \
+        --outDir /tmp/ichor \
+        --libdir ~/repos/ichorCNA-patched
+
+#+end_src
+
 *** Extract and aggregate tumor fractions
 #+begin_src snakemake
 # Snakefile
@@ -3160,6 +3929,379 @@ ichor does cn loh calls- check out
 :ID:       aff2bea4-dd71-4205-a596-a59c2b2e1a0f
 :END:
 note- this would require re-write of ds_cond_target_list
+*** Stats tabular aggregator
+# Adapter-trim and QC reads with fastp
+# - [[./workflow/reads.smk::rule cfdna_wgs_fastp][Snakemake]]
+
+# Adapter-trim and QC reads with fastp
+rule cfdna_wgs_fastp:
+    input:
+        read1 = f"{cfdna_wgs_fastq_dir}/{{library}}_raw_R1.fastq.gz",
+        read2 = f"{cfdna_wgs_fastq_dir}/{{library}}_raw_R2.fastq.gz",
+    log:
+        html = f"{log_dir}/{{library}}_cfdna_wgs_fastp.html",
+    output:
+        read1 = f"{cfdna_wgs_fastq_dir}/{{library}}_processed_R1.fastq.gz",
+        read2 = f"{cfdna_wgs_fastq_dir}/{{library}}_processed_R2.fastq.gz",
+        failed = f"{cfdna_wgs_fastq_dir}/{{library}}_failed_fastp.fastq.gz",
+        unpaired1 = f"{cfdna_wgs_fastq_dir}/{{library}}_unpaired_R1.fastq.gz",
+        unpaired2 = f"{cfdna_wgs_fastq_dir}/{{library}}_unpaired_R2.fastq.gz",
+        json = f"{qc_dir}/{{library}}_cfdna_wgs_fastp.json",
+        cmd = f"{qc_dir}/{{library}}_cfdna_wgs_fastp.log",
+    params:
+        script = f"{cfdna_wgs_script_dir}/fastp.sh",
+        threads = threads,
+    resources:
+        mem_mb = 500,
+    shell:
+        """
+        {params.script} \
+        {input.read1} \
+        {input.read2} \
+        {log.html} \
+        {output.json} \
+        {output.read1} \
+        {output.read2} \
+        {output.failed} \
+        {output.unpaired1} \
+        {output.unpaired2} \
+        {params.threads} &> {output.cmd}
+        """
+# Make alignment index
+# - [[./workflow/reads.smk::rule cfdna_wgs_index][Snakemake]]
+
+rule cfdna_wgs_index:
+    output: "f{data_dir}/ref/{fasta_base}.sa",
+    params:
+        out_prefix = "f{bwa_dir}/{{fasta_base}}",
+        script = "f{frag_script_dir}/frag_index.sh",
+    shell:
+        """
+        {params.script} {input} {params.out_prefix} &> {log}
+        """
+# Align reads with BWA
+# - [[./workflow/reads.smk::rule cfdna_wgs_align][Snakemake]]
+
+# Align reads with BWA
+rule frag_align:
+    input:
+        ref = f"{ref_dir}/{fasta_base}",
+        read1 = f"{cfdna_wgs_fastq_dir}/{{library}}_processed_R1.fastq.gz",
+        read2 = f"{cfdna_wgs_fastq_dir}/{{library}}_processed_R2.fastq.gz",
+    log: f"{log_dir}/{{library}}_frag_align.log",
+    output:
+        sort = f"{cfdna_wgs_bam_dir}/{{library}}_raw.bam",
+        index = f"{cfdna_wgs_bam_dir}/{{library}}_raw.bam.bai",
+    params:
+        script = f"{cfdna_wgs_script_dir}/align.sh",
+        threads = 4,
+    resources:
+        mem_mb = 500,
+    shell:
+        """
+        {params.script} \
+        {input.ref} \
+        {input.read1} \
+        {input.read2} \
+        {params.threads} \
+        {output.sort} &> {log}
+        """
+# Remove PCR duplicates
+# - [[./workflow/reads.smk::rule cfdna_wgs_dedup][Snakemake]]
+
+# Remove PCR duplicates from aligned reads
+rule frag_dedup:
+    input: f"{cfdna_wgs_bam_dir}/{{library}}_raw.bam",
+    log: f"{log_dir}/{{library}}_frag_dedup.log",
+    output: f"{cfdna_wgs_bam_dir}/{{library}}_dedup.bam",
+    params:
+        script = f"{cfdna_wgs_script_dir}/dedup.sh",
+        threads = threads,
+    shell:
+        """
+        {params.script} \
+        {input} \
+        {output} \
+        {params.threads} &> {log}
+        """
+# Filter alignments
+# - [[./workflow/reads.smk::rule cfdna_wgs_filter_alignment][Snakemake]]
+
+# Filter de-duplicated alignments.
+# Remove unmapped, not primary, and duplicate reads. Additional location filter by config bedfile variable.
+
+checkpoint frag_filter_alignment:
+    input: f"{cfdna_wgs_bam_dir}/{{library}}_dedup.bam",
+    log: f"{log_dir}/{{library}}_frag_filter_alignment.log",
+    output: f"{cfdna_wgs_bam_dir}/{{library}}_filt.bam",
+    params:
+        script = f"{cfdna_wgs_script_dir}/filter_alignment.sh",
+        threads = threads,
+    shell:
+        """
+        {params.script} \
+        {input} \
+        {params.threads} \
+        {output} &> {log}
+        """
+# Samtools alignment QC
+# - [[./workflow/reads.smk::rule cfdna_wgs_alignment_qc][Snakemake]]
+
+# Get alignment QC using samtools
+rule cfdna_wgs_alignment_qc:
+    input: f"{cfdna_wgs_bam_dir}/{{library}}_{{processing}}.bam",
+    log:
+        flagstat = f"{log_dir}/{{library}}_{{processing}}_flagstat_frag_alignment_qc.log",
+        samstat = f"{log_dir}/{{library}}_{{processing}}_samstats_frag_alignment_qc.log",
+    output:
+        flagstat = f"{qc_dir}/{{library}}_{{processing}}_flagstat.txt",
+        samstat = f"{qc_dir}/{{library}}_{{processing}}_samstats.txt",
+    params:
+        script = f"{frag_script_dir}/alignment_qc.sh",
+        threads = threads,
+    shell:
+        """
+        {params.script} \
+        {input} \
+        {log.flagstat} \
+        {log.samstat} \
+        {output.flagstat} \
+        {output.samstat} \
+        {params.threads}
+        """
+# FastQC
+# - [[./workflow/reads.smk::rule cfdna_wgs_fastqc][Snakemake]]
+
+# Get read quality by FASTQC
+rule cfdna_wgs_fastqc:
+    input: f"{cfdna_wgs_fastq_dir}/{{library}}_{{processing}}_{{read}}.fastq.gz",
+    log: f"{log_dir}/{{library}}_{{processing}}_{{read}}_frag_fastqc.log",
+    output:
+        f"{qc_dir}/{{library}}_{{processing}}_{{read}}_fastqc.html",
+        f"{qc_dir}/{{library}}_{{processing}}_{{read}}_fastqc.zip",
+    params:
+        outdir = f"{qc_dir}",
+        script = f"{cfdna_wgs_script_dir}/fastqc.sh",
+        threads = threads,
+    shell:
+        """
+        {params.script} \
+        {input} \
+        {params.outdir} \
+        {params.threads} &> {log}
+        """
+# Picard depth
+# - [[./workflow/reads.smk::rule cfdna_wgs_picard_depth][Snakemake]]
+
+# Sequencing depth metrics via Picard
+rule cfdna_wgs_picard_depth:
+    benchmark: f"{bench_dir}/{{library}}_picard_depth.benchmark.txt",
+    input: f"{cfdna_wgs_bam_dir}/{{library}}_filt.bam",
+    log: f"{log_dir}/{{library}}_picard_depth.log",
+    output: f"{qc_dir}/{{library}}_picard_depth.txt",
+    params:
+        script = f"{cfdna_wgs_script_dir}/picard_depth.sh",
+        threads = threads,
+    shell:
+        """
+        {params.script} \
+        {input} \
+        {config[genome_fasta]} \
+        {output}
+        """
+# Multiqc
+# - Snakemake
+
+rule cfdna_wgs_multiqc:
+    input:
+        expand(f"{qc_dir}/{{library}}_{{processing}}_{{read}}_fastqc.zip",
+               library = CFDNA_WGS_LIBS,
+               processing = ['raw', 'processed', 'unpaired'],
+               read = ['R1','R2']),
+        expand(f"{qc_dir}/{{library}}_{{processing}}_{{bamstat}}.txt",
+               library = CFDNA_WGS_LIBS,
+               processing = ['raw', 'dedup', 'filt'],
+               bamstat = ['samstats','flagstat']),
+        expand(f"{qc_dir}/{{library}}_picard_depth.txt",
+               library = CFDNA_WGS_LIBS),
+    log: f"{log_dir}/cfdna_wgs_multiqc.log",
+    output: f"{qc_dir}/cfdna_wgs_multiqc.html",
+    shell: "multiqc {input} --force --filename {output}"
+# Picard depth
+# - snakemake
+
+rule agg_picard_depth:
+    input:
+        expand(f"{qc_dir}/{{library}}_picard_depth.txt",
+               library = CFDNA_WGS_LIBS)
+    output: f"{qc_dir}/cfdna_wgs_picard_depth.tsv"
+    run:
+        import os
+
+        # Define the directory to search in
+        directory = "/mnt/ris/aadel/Active/mpnst/analysis/qc"
+
+        # Create the header line
+        header = "mean_coverage\tsd_coverage\tmedian_coverage\tlibrary\n"
+
+        # Write the output file, overwriting it if it already exists
+        with open(output[0], "w") as f:
+            # Write the header line
+            f.write(header)
+
+            # Loop over the libraries
+            for library in CFDNA_WGS_LIBS:
+                # Define the input file path
+                input_file = f"{qc_dir}/{library}_picard_depth.txt"
+
+                # Read the lines from the file and select the relevant ones
+                with open(input_file, "r") as f_in:
+                    lines = f_in.readlines()[7:8]
+
+                    # Split the lines into columns and select columns 2, 3, and 4
+                    columns = [line.strip().split("\t")[1:4] for line in lines]
+
+                    # Add the library identifier as a new column
+                    columns[0].append(library)
+
+                    # Write the data for this library to the output file
+                    f.write("\t".join(columns[0]) + "\n")
+# Aggregate fastp
+
+rule agg_fastp:
+    input:
+        expand(f"{qc_dir}/{{library}}_cfdna_wgs_fastp.json", library=CFDNA_WGS_LIBS),
+    output:
+        f"{qc_dir}/cfdna_wgs_fastp.tsv",
+    run:
+        import json
+        import csv
+
+        # Define the output TSV file
+        tsv_file = output[0]
+
+        # Initialize a list to store the q30_rates and libraries
+        q30_rates = []
+        libraries = []
+
+        # Loop over each input file
+        for input_file in input:
+            # Load the JSON file
+            with open(input_file) as f:
+                data = json.load(f)
+
+                # Extract the q30_rate from the after_filtering section of the summary
+                q30_rate = data["summary"]["after_filtering"]["q30_rate"]
+
+                # Extract the library name from the input file name
+                library = input_file.split("/")[-1].split("_")[0]
+
+                # Append the q30_rate and library to the lists
+                q30_rates.append(q30_rate)
+                libraries.append(library)
+
+        # Write the q30_rates and libraries lists to the output TSV file
+        with open(tsv_file, "w", newline="") as f:
+            writer = csv.writer(f, delimiter="\t")
+            writer.writerow(["library", "q30_rate"])
+            for library, q30_rate in zip(libraries, q30_rates):
+                writer.writerow([library, q30_rate])
+# Aggregate samstats
+
+rule agg_samstat:
+    input:
+        expand(f"{qc_dir}/{{library}}_raw_samstats.txt",
+               library = CFDNA_WGS_LIBS),
+    output:
+        f"{qc_dir}/cfdna_wgs_samstats.tsv",
+    run:
+        import os
+        import re
+
+        data = []
+
+        # Loop over the input files
+        for filename in input:
+            # Extract the library ID from the filename
+            library_id = os.path.basename(filename).split("_")[0]
+
+            # Open the log file
+            with open(filename, "r") as f:
+                lines = f.readlines()
+
+                # Find the required lines using regular expressions
+                reads = duplicated = total = mapped = error = None
+                for line in lines:
+                    if re.match(r"SN\traw total sequences:", line):
+                        reads = int(re.search(r"\d+", line).group())
+                    elif re.match(r"SN\treads duplicated:", line):
+                        duplicated = int(re.search(r"\d+", line).group())
+                    elif re.match(r"SN\ttotal length:", line):
+                        total = int(re.search(r"\d+", line).group())
+                    elif re.match(r"SN\tbases mapped \(cigar\):", line):
+                        mapped = int(re.search(r"\d+", line).group())
+                    elif re.match(r"SN\terror rate:", line):
+                        error = float(re.search(r"\d+\.\d+[eE][+-]\d+", line).group())
+
+                # Append the data to the list
+                data.append({
+                    "reads": reads,
+                    "duplicated": duplicated,
+                    "total": total,
+                    "mapped": mapped,
+                    "error": error,
+                    "library": library_id
+                })
+
+        # Write the data to a file
+        header = "total_reads\tduplicated_reads\ttotal_bases\tmapped_bases\terror_rate\tlibrary\n"
+        with open(output[0], "w") as f:
+            f.write(header)
+            for d in data:
+                f.write("{}\t{}\t{}\t{}\t{}\t{}\n".format(d["reads"], d["duplicated"], d["total"], d["mapped"], d["error"], d["library"]))
+# Make a tab-separated aggregate QC table
+rule cfdna_wgs_qc_tsv:
+    input:
+        fq = f"{qc_dir}/cfdna_wgs_multiqc_data/multiqc_fastqc.txt",
+        mqsam = f"{qc_dir}/cfdna_wgs_multiqc_data/multiqc_samtools_stats.txt",
+        mqflag = f"{qc_dir}/cfdna_wgs_multiqc_data/multiqc_samtools_flagstat.txt",
+        picard = f"{qc_dir}/cfdna_wgs_multiqc_data/multiqc_picard_wgsmetrics.txt",
+    log: f"{log_dir}/cfdna_wgs_make_qc_tsv.log",
+    output:
+        readqc = f"{qc_dir}/cfdna_wgs_read_qc.tsv",
+    params:
+        script = "{frag_script_dir}/make_qc_tsv.R",
+    shell:
+        """
+        Rscript {params.script} \
+        {input.fq} \
+        {input.mqsam} \
+        {input.mqflag} \
+        {input.picard} \
+        {output.readqc} >& {log}
+        """
+# Per-library cfDNA WGS QC results
+
+# Makes a per-library summary file of cfDNA-relevant quality control.
+
+
+rule lib_result:
+    input:
+        fastp = f"{qc_dir}/cfdna_wgs_fastp.tsv",
+        lib = f"{datamodel_dir}/libraries_full.rds",
+        picard = f"{qc_dir}/cfdna_wgs_picard_depth.tsv",
+        samstat = f"{qc_dir}/cfdna_wgs_samstats.tsv",
+    log: f"{log_dir}/lib_result.log",
+    output:
+        rds = f"{cfdna_wgs_dir}/cfdna_qc_summary.rds",
+        tsv = f"{cfdna_wgs_dir}/cfdna_qc_summary.tsv",
+    params:
+        script = mpnst_script_dir + "/lib_result.R",
+    shell:
+        """
+        Rscript {params.script} {input} {output} > {log} 2>&1
+        """
+
 *** Testing inputs update
 :PROPERTIES:
 :ID:       60c34d59-8eab-4d7b-82ee-7f15bf79e729

@@ -20,7 +20,7 @@
 # data-temp-dir:
 # mosdepth-quant-levels:
 #
-# cfdna_wgs_ref_assemblies:
+# ref_assemblies:
 #   <ASSEMBLY ID>:
 #     url:
 #     name:
@@ -28,7 +28,7 @@
 
 # Example minimal configuration yaml:
 # This is a nested map, e.g.:
-# cfdna_wgs_ref_assemblies:
+# ref_assemblies:
 #   ncbi_decoy_hg38:
 #     url: https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/001/405/GCA_000001405.15_GRCh38/seqs_for_alignment_pipelines.ucsc_ids/GCA_000001405.15_GRCh38_no_alt_plus_hs38d1_analysis_set.fna.gz
 #     name: ncbi_decoy_hg38
@@ -132,20 +132,22 @@ rule cfdna_wgs_fastp:
     conda:
         "../config/cfdna-wgs-conda-env.yaml"
     input:
-        r1 = f"{data_dir}/cfdna-wgs/fastqs/{{library_id}}.raw_R1.fastq.gz",
-        r2 = f"{data_dir}/cfdna-wgs/fastqs/{{library_id}}.raw_R2.fastq.gz",
+        r1 = f"{config['cfdna-wgs-dir']}/fastqs/{{library_id}}.raw_R1.fastq.gz",
+        r2 = f"{config['cfdna-wgs-dir']}/fastqs/{{library_id}}.raw_R2.fastq.gz",
     log:
-        html = f"{data_dir}/logs/{{library_id}}_cfdna_wgs_fastp.html",
-        json = f"{data_dir}/logs/{{library_id}}_cfdna_wgs_fastp.json",
-        run = f"{data_dir}/logs/{{library_id}}_cfdna_wgs_fastp.log",
+        html = f"{config['log-dir']}/{{library_id}}_cfdna_wgs_fastp.html",
+        json = f"{config['log-dir']}/{{library_id}}_cfdna_wgs_fastp.json",
+        run = f"{config['log-dir']}/{{library_id}}_cfdna_wgs_fastp.log",
     output:
-        failed = f"{data_dir}/cfdna-wgs/fastqs/{{library_id}}.failed.fastq.gz",
-        r1 = f"{data_dir}/cfdna-wgs/fastqs/{{library_id}}.processed_R1.fastq.gz",
-        r2 = f"{data_dir}/cfdna-wgs/fastqs/{{library_id}}.processed_R2.fastq.gz",
-        up1 = f"{data_dir}/cfdna-wgs/fastqs/{{library_id}}.unpaired_R1.fastq.gz",
-        up2 = f"{data_dir}/cfdna-wgs/fastqs/{{library_id}}.unpaired_R2.fastq.gz",
+        failed = f"{config['cfdna-wgs-dir']}/fastqs/{{library_id}}.failed.fastq.gz",
+        r1 = f"{config['cfdna-wgs-dir']}/fastqs/{{library_id}}.processed_R1.fastq.gz",
+        r2 = f"{config['cfdna-wgs-dir']}/fastqs/{{library_id}}.processed_R2.fastq.gz",
+        up1 = f"{config['cfdna-wgs-dir']}/fastqs/{{library_id}}.unpaired_R1.fastq.gz",
+        up2 = f"{config['cfdna-wgs-dir']}/fastqs/{{library_id}}.unpaired_R2.fastq.gz",
     resources:
         concurrency=12,
+    threads:
+        10
     shell:
         """
         fastp --detect_adapter_for_pe \
@@ -154,30 +156,31 @@ rule cfdna_wgs_fastp:
         --html {log.html} --json {log.json} \
         --out1 {output.r1} --out2 {output.r2} \
         --unpaired1 {output.up1} --unpaired2 {output.up2} \
-        --thread 8 &> {log.run}
+        --thread {threads} &> {log.run}
         """
 rule cfdna_wgs_fastqc:
     conda:
         "../config/cfdna-wgs-conda-env.yaml"
     input:
-        f"{data_dir}/cfdna-wgs/fastqs/{{library_id}}.{{processing}}_{{read}}.fastq.gz",
+        f"{config['cfdna-wgs-dir']}/fastqs/{{library_id}}.{{processing}}_{{read}}.fastq.gz",
     log:
-        f"{data_dir}/logs/{{library_id}}.{{processing}}_{{read}}_cfdna_wgs_fastqc.log",
+        f"{config['log-dir']}/{{library_id}}.{{processing}}_{{read}}_cfdna_wgs_fastqc.log",
     output:
-        f"{data_dir}/cfdna-wgs/qc/{{library_id}}.{{processing}}_{{read}}_fastqc.html",
-        f"{data_dir}/cfdna-wgs/qc/{{library_id}}.{{processing}}_{{read}}_fastqc.zip",
+        f"{config['cfdna-wgs-dir']}/qc/{{library_id}}.{{processing}}_{{read}}_fastqc.html",
+        f"{config['cfdna-wgs-dir']}/qc/{{library_id}}.{{processing}}_{{read}}_fastqc.zip",
     params:
-        outdir = f"{data_dir}/cfdna-wgs/qc",
-        threads = 2,
+        outdir = f"{config['cfdna-wgs-dir']}/qc",
     resources:
         concurrency = 25,
+    threads:
+        2
     shell:
         """
         fastqc \
         --outdir {params.outdir} \
         --quiet \
         --svg \
-        --threads {params.threads} \
+        --threads {threads} \
         {input} &> {log}
         """
 #########1#########2#########3#########4#########5#########6#########7#########8
@@ -191,21 +194,21 @@ rule cfdna_wgs_bwa_index:
     conda:
         "../config/cfdna-wgs-conda-env.yaml"
     input:
-        lambda wildcards: f"{data_dir}/inputs/{config['cfdna_wgs_ref_assemblies'][wildcards.name]['input']}",
+        lambda wildcards: f"{config['data-dir']}/inputs/{config['ref_assemblies'][wildcards.name]['input']}",
     output:
-        fa = f"{data_dir}/ref/bwa/{{name}}/{{name}}.fa",
-        fai = f"{data_dir}/ref/bwa/{{name}}/{{name}}.fa.fai",
-        bed = f"{data_dir}/ref/bwa/{{name}}/{{name}}.primary.bed",
-        amb = f"{data_dir}/ref/bwa/{{name}}/{{name}}.amb",
-        ann = f"{data_dir}/ref/bwa/{{name}}/{{name}}.ann",
-        bwt = f"{data_dir}/ref/bwa/{{name}}/{{name}}.bwt",
-        pac = f"{data_dir}/ref/bwa/{{name}}/{{name}}.pac",
-        sa  = f"{data_dir}/ref/bwa/{{name}}/{{name}}.sa",
+        fa = f"{config['data-dir']}/ref/bwa/{{name}}/{{name}}.fa",
+        fai = f"{config['data-dir']}/ref/bwa/{{name}}/{{name}}.fa.fai",
+        bed = f"{config['data-dir']}/ref/bwa/{{name}}/{{name}}.primary.bed",
+        amb = f"{config['data-dir']}/ref/bwa/{{name}}/{{name}}.amb",
+        ann = f"{config['data-dir']}/ref/bwa/{{name}}/{{name}}.ann",
+        bwt = f"{config['data-dir']}/ref/bwa/{{name}}/{{name}}.bwt",
+        pac = f"{config['data-dir']}/ref/bwa/{{name}}/{{name}}.pac",
+        sa  = f"{config['data-dir']}/ref/bwa/{{name}}/{{name}}.sa",
     params:
-        bwa_prefix = lambda wildcards: f"{data_dir}/ref/bwa/{wildcards.name}/{wildcards.name}",
+        bwa_prefix = lambda wildcards: f"{config['data-dir']}/ref/bwa/{wildcards.name}/{wildcards.name}",
         script = f"{config['cfdna-scripts-dir']}/cfdna_wgs_bwa_index.sh",
     log:
-        f"{data_dir}/logs/{{name}}_bwa_index.log"
+        f"{config['log-dir']}/{{name}}_bwa_index.log"
     shell:
         """
         {params.script} \
@@ -220,19 +223,20 @@ rule cfdna_wgs_bwa_mem:
     conda:
         "../config/cfdna-wgs-conda-env.yaml"
     input:
-        r1 = f"{data_dir}/cfdna-wgs/fastqs/{{library_id}}.processed_R1.fastq.gz",
-        r2 = f"{data_dir}/cfdna-wgs/fastqs/{{library_id}}.processed_R2.fastq.gz",
-        sa_check = f"{data_dir}/ref/bwa/{{ref_name}}/{{ref_name}}.sa",
+        r1 = f"{config['cfdna-wgs-dir']}/fastqs/{{library_id}}.processed_R1.fastq.gz",
+        r2 = f"{config['cfdna-wgs-dir']}/fastqs/{{library_id}}.processed_R2.fastq.gz",
+        sa_check = f"{config['data-dir']}/ref/bwa/{{ref_name}}/{{ref_name}}.sa",
     output:
-        bam = f"{data_dir}/cfdna-wgs/bams/{{library_id}}.{{ref_name}}.bwa.coorsort.bam",
+        bam = f"{config['cfdna-wgs-dir']}/bams/{{library_id}}.{{ref_name}}.bwa.coorsort.bam",
     params:
-        ref = f"{data_dir}/ref/bwa/{{ref_name}}/{{ref_name}}",
-        threads = 80,
+        ref = f"{config['data-dir']}/ref/bwa/{{ref_name}}/{{ref_name}}",
     resources:
         concurrency = 100,
+    threads:
+        50
     shell:
         """
-        bwa mem -M -t {params.threads} \
+        bwa mem -M -t {threads} \
         {params.ref} {input.r1} {input.r2} \
         | samtools view -@ 4 -Sb - -o - \
         | samtools sort -@ 4 - -o {output.bam}
@@ -248,14 +252,14 @@ rule cfdna_wgs_bam_dedup:
     conda:
         "../config/cfdna-wgs-conda-env.yaml",
     input:
-        f"{data_dir}/cfdna-wgs/bams/{{library_id}}.{{ref_name}}.{{align_method}}.coorsort.bam",
+        f"{config['cfdna-wgs-dir']}/bams/{{library_id}}.{{ref_name}}.{{align_method}}.coorsort.bam",
     log:
-        f"{data_dir}/logs/{{library_id}}.{{ref_name}}.{{align_method}}_cfdna_wgs_bam_dedup.log",
+        f"{config['log-dir']}/{{library_id}}.{{ref_name}}.{{align_method}}_cfdna_wgs_bam_dedup.log",
     output:
-        bam = f"{data_dir}/cfdna-wgs/bams/{{library_id}}.{{ref_name}}.{{align_method}}.dedup.coorsort.bam",
-        bai = f"{data_dir}/cfdna-wgs/bams/{{library_id}}.{{ref_name}}.{{align_method}}.dedup.coorsort.bam.bai",
+        bam = f"{config['cfdna-wgs-dir']}/bams/{{library_id}}.{{ref_name}}.{{align_method}}.dedup.coorsort.bam",
+        bai = f"{config['cfdna-wgs-dir']}/bams/{{library_id}}.{{ref_name}}.{{align_method}}.dedup.coorsort.bam.bai",
     params:
-        tmp_dir = config["data-tmp-dir"]
+        tmp_dir = config["local-tmp-dir"]
     shell:
         """
         rm -rf  {params.tmp_dir}/{wildcards.library_id}.namesort
@@ -281,13 +285,13 @@ rule cfdna_wgs_bam_filt:
     conda:
         "../config/cfdna-wgs-conda-env.yaml",
     input:
-        bam = f"{data_dir}/cfdna-wgs/bams/{{library_id}}.{{ref_name}}.{{align_method}}.dedup.coorsort.bam",
-        bed = f"{data_dir}/ref/bwa/{{ref_name}}/{{ref_name}}.primary.bed",
+        bam = f"{config['cfdna-wgs-dir']}/bams/{{library_id}}.{{ref_name}}.{{align_method}}.dedup.coorsort.bam",
+        bed = f"{config['data-dir']}/ref/bwa/{{ref_name}}/{{ref_name}}.primary.bed",
     log:
-        f"{data_dir}/logs/{{library_id}}.{{ref_name}}.{{align_method}}_cfdna_wgs_bam_filt.log",
+        f"{config['log-dir']}/{{library_id}}.{{ref_name}}.{{align_method}}_cfdna_wgs_bam_filt.log",
     output:
-        bam = f"{data_dir}/cfdna-wgs/bams/{{library_id}}.{{ref_name}}.{{align_method}}.dedup.coorsort.filt.bam",
-        bai = f"{data_dir}/cfdna-wgs/bams/{{library_id}}.{{ref_name}}.{{align_method}}.dedup.coorsort.filt.bam.bai",
+        bam = f"{config['cfdna-wgs-dir']}/bams/{{library_id}}.{{ref_name}}.{{align_method}}.dedup.coorsort.filt.bam",
+        bai = f"{config['cfdna-wgs-dir']}/bams/{{library_id}}.{{ref_name}}.{{align_method}}.dedup.coorsort.filt.bam.bai",
     shell:
         """
         samtools view -@ 8 -b -F 1284 -h -q 20 -L {input.bed} -o {output.bam} {input.bam}
@@ -297,13 +301,13 @@ rule cfdna_wgs_samtools_alignment_qc:
     conda:
         "../config/cfdna-wgs-conda-env.yaml",
     input:
-        f"{data_dir}/cfdna-wgs/bams/{{library_id}}.{{ref_name}}.{{align_method}}.{{processing}}.bam",
+        f"{config['cfdna-wgs-dir']}/bams/{{library_id}}.{{ref_name}}.{{align_method}}.{{processing}}.bam",
     log:
-        flagstat = f"{data_dir}/logs/{{library_id}}.{{ref_name}}.{{align_method}}.{{processing}}_cfdna_wgs_flagstat.log",
-        samstat = f"{data_dir}/logs/{{library_id}}.{{ref_name}}.{{align_method}}.{{processing}}_cfdna_wgs_samstat.log",
+        flagstat = f"{config['log-dir']}/{{library_id}}.{{ref_name}}.{{align_method}}.{{processing}}_cfdna_wgs_flagstat.log",
+        samstat = f"{config['log-dir']}/{{library_id}}.{{ref_name}}.{{align_method}}.{{processing}}_cfdna_wgs_samstat.log",
     output:
-        flagstat = f"{data_dir}/cfdna-wgs/qc/{{library_id}}.{{ref_name}}.{{align_method}}.{{processing}}_flagstat.txt",
-        samstat = f"{data_dir}/cfdna-wgs/qc/{{library_id}}.{{ref_name}}.{{align_method}}.{{processing}}_samstat.txt",
+        flagstat = f"{config['cfdna-wgs-dir']}/qc/{{library_id}}.{{ref_name}}.{{align_method}}.{{processing}}_flagstat.txt",
+        samstat = f"{config['cfdna-wgs-dir']}/qc/{{library_id}}.{{ref_name}}.{{align_method}}.{{processing}}_samstat.txt",
     params:
         script = f"{cfdna_script_dir}/samtools_alignment_qc.sh",
         threads = 8,
@@ -321,22 +325,22 @@ rule cfdna_wgs_mosdepth:
     conda:
         "../config/cfdna-wgs/conda-env.yaml",
     input:
-        bam = f"{data_dir}/cfdna-wgs/bams/{{library_id}}.{{ref_name}}.{{align_method}}.dedup.coorsort.filt.bam",
-        index = f"{data_dir}/cfdna-wgs/bams/{{library_id}}.{{ref_name}}.{{align_method}}.dedup.coorsort.filt.bam",
+        bam = f"{config['cfdna-wgs-dir']}/bams/{{library_id}}.{{ref_name}}.{{align_method}}.dedup.coorsort.filt.bam",
+        index = f"{config['cfdna-wgs-dir']}/bams/{{library_id}}.{{ref_name}}.{{align_method}}.dedup.coorsort.filt.bam",
     output:
-        summary = f"{data_dir}/cfdna-wgs/qc/mosdepth_{{library_id}}.{{ref_name}}.{{align_method}}.mosdepth.summary.txt",
-        global_dist = f"{data_dir}/cfdna-wgs/qc/mosdepth_{{library_id}}.{{ref_name}}.{{align_method}}.mosdepth.global.dist.txt",
-        region_dist = f"{data_dir}/cfdna-wgs/qc/mosdepth_{{library_id}}.{{ref_name}}.{{align_method}}.mosdepth.region.dist.txt",
-        regions = f"{data_dir}/cfdna-wgs/qc/mosdepth_{{library_id}}.{{ref_name}}.{{align_method}}.regions.bed.gz",
-        regions_idx = f"{data_dir}/cfdna-wgs/qc/mosdepth_{{library_id}}.{{ref_name}}.{{align_method}}.regions.bed.gz.csi",
-        quantized = f"{data_dir}/cfdna-wgs/qc/mosdepth_{{library_id}}.{{ref_name}}.{{align_method}}.quantized.bed.gz",
-        quantized_idx = f"{data_dir}/cfdna-wgs/qc/mosdepth_{{library_id}}.{{ref_name}}.{{align_method}}.quantized.bed.gz.csi",
-        thresholds = f"{data_dir}/cfdna-wgs/qc/mosdepth_{{library_id}}.{{ref_name}}.{{align_method}}.thresholds.bed.gz",
-        thresholds_idx = f"{data_dir}/cfdna-wgs/qc/mosdepth_{{library_id}}.{{ref_name}}.{{align_method}}.thresholds.bed.gz.csi",
+        summary = f"{config['cfdna-wgs-dir']}/qc/mosdepth_{{library_id}}.{{ref_name}}.{{align_method}}.mosdepth.summary.txt",
+        global_dist = f"{config['cfdna-wgs-dir']}/qc/mosdepth_{{library_id}}.{{ref_name}}.{{align_method}}.mosdepth.global.dist.txt",
+        region_dist = f"{config['cfdna-wgs-dir']}/qc/mosdepth_{{library_id}}.{{ref_name}}.{{align_method}}.mosdepth.region.dist.txt",
+        regions = f"{config['cfdna-wgs-dir']}/qc/mosdepth_{{library_id}}.{{ref_name}}.{{align_method}}.regions.bed.gz",
+        regions_idx = f"{config['cfdna-wgs-dir']}/qc/mosdepth_{{library_id}}.{{ref_name}}.{{align_method}}.regions.bed.gz.csi",
+        quantized = f"{config['cfdna-wgs-dir']}/qc/mosdepth_{{library_id}}.{{ref_name}}.{{align_method}}.quantized.bed.gz",
+        quantized_idx = f"{config['cfdna-wgs-dir']}/qc/mosdepth_{{library_id}}.{{ref_name}}.{{align_method}}.quantized.bed.gz.csi",
+        thresholds = f"{config['cfdna-wgs-dir']}/qc/mosdepth_{{library_id}}.{{ref_name}}.{{align_method}}.thresholds.bed.gz",
+        thresholds_idx = f"{config['cfdna-wgs-dir']}/qc/mosdepth_{{library_id}}.{{ref_name}}.{{align_method}}.thresholds.bed.gz.csi",
     params:
         script = f"{cfdna_script_dir}/cdfna_wgs_mosdepth.sh",
         quant_levels = config["mosdepth-quant-levels"],
-        out_dir = f"{data_dir}/cfdna-wgs/qc",
+        out_dir = f"{config['cfdna-wgs-dir']}/qc",
     threads: 8,
     resources:
         concurrency = 20,
@@ -354,13 +358,13 @@ rule cfdna_wgs_frag_bampefragsize:
     conda:
         "../config/cfdna-wgs-conda-env.yaml",
     input:
-        lambda wildcards: expand(f"{data_dir}/cfdna_wgs/bams/{{library}}.{{ref_name}}.{{align_method}}.dedup.coorsort.filt.bam",
+        lambda wildcards: expand(f"{config['data-dir']}/cfdna_wgs/bams/{{library}}.{{ref_name}}.{{align_method}}.dedup.coorsort.filt.bam",
                                  library = cdfna_wgs_map[wildcards.lib_set]['libs'],
                                  build = lib_map[wildcards.lib_set]['build']),
-    log: f"{data_dir}/logs/{{lib_set}}_cfdna_wgs_bampefragsize.log",
+    log: f"{config['log-dir']}/{{lib_set}}_cfdna_wgs_bampefragsize.log",
     output:
-        raw = f"{data_dir}/cfdna_wgs/qc/{{lib_set}}_bampefragsize.txt",
-        hist = f"{data_dir}/cfdna_wgs/qc/{{lib_set}}_bampefragsize.png",
+        raw = f"{config['data-dir']}/cfdna_wgs/qc/{{lib_set}}_bampefragsize.txt",
+        hist = f"{config['data-dir']}/cfdna_wgs/qc/{{lib_set}}_bampefragsize.png",
     params:
         blacklist = lambda wildcards: lib_map[wildcards.lib_set]['blacklist'],
         script = f"{cfdna_script_dir}/bampefragsize.sh",

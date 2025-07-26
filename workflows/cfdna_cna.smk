@@ -12,7 +12,7 @@ rule cfdna_frag_filt:
         index = f"{config['cfdna-cna-dir']}/bams/{{wkflow_id}}.frag{{frag_distro}}.bam.bai",
     params:
         script = f"{config['cfdna-script-dir']}/cfdna_frag_filt.sh",
-        tmp_dir = config["data-tmp-dir"],
+        tmp_dir = config["local-tmp-dir"],
     threads:
         12
     shell:

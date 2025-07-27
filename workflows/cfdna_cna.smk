@@ -11,7 +11,7 @@ rule cfdna_frag_filt:
         final = f"{config['cfdna-cna-dir']}/bams/{{wkflow_id}}.frag{{frag_distro}}.bam",
         index = f"{config['cfdna-cna-dir']}/bams/{{wkflow_id}}.frag{{frag_distro}}.bam.bai",
     params:
-        script = f"{config['cfdna-script-dir']}/cfdna_frag_filt.sh",
+        script = f"{config['cfdna-scripts-dir']}/cfdna_frag_filt.sh",
         tmp_dir = config["local-tmp-dir"],
     threads:
         12
@@ -42,7 +42,7 @@ rule cfdna_cna_downsample_bam:
         bai = f"{config['cfdna-cna-dir']}/ds-bams/{{wkflow_id}}.frag{{frag_distro}}.ds{{mil_reads}}.bam.bai",
     params:
         milreads = lambda wildcards: wildcards.mil_reads,
-        script = f"{config['cfdna-script-dir']}/downsample_bam.sh",
+        script = f"{config['cfdna-scripts-dir']}/downsample_bam.sh",
     shell:
         """
         {params.script} \

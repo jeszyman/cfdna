@@ -1513,6 +1513,8 @@ rule cfdna_frag_filt:
     params:
         script = f"{config['cfdna-scripts-dir']}/cfdna_frag_filt.sh",
         tmp_dir = config["local-tmp-dir"],
+    resources:
+        concurrency = 25,
     threads:
         12
     shell:

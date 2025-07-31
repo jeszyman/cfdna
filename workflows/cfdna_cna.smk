@@ -17,13 +17,11 @@ rule cfdna_frag_filt:
         12
     shell:
         """
-        frag_min=$(echo {wildcards.frag_distro} | sed -e "s/_.*$//g")
-        frag_max=$(echo {wildcards.frag_distro} | sed -e "s/^.*_//g")
-        {params.script} \
+        /home/ext_szymanski_jeffrey_mayo_edu/repos/cfdna/scripts/cfdna_frag_filt.sh \
         {input} \
         {output.nohead} \
-        $frag_min \
-        $frag_max \
+        $(echo {wildcards.frag_distro} | cut -d_ -f1) \
+        $(echo {wildcards.frag_distro} | cut -d_ -f2) \
         {threads} \
         {output.onlyhead} \
         {output.final} \

@@ -43,6 +43,11 @@ parse_args() {
 }
 
 main() {
+    # Strip trailing slash if present
+    tmpdir="${tmpdir%/}"
+
+    mkdir -p "$tmpdir"  # <- Add this line
+
     # Ensure output directories exist
     mkdir -p "$(dirname "$nohead")" "$(dirname "$header_out")" "$(dirname "$final_bam")"
 

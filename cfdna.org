@@ -268,7 +268,7 @@ Directory ~workflow~ contains two types of workflows- process-focused snakefiles
 # {Parameters} to be defined at the level of the snakefile include
 #
 # data_dir
-# cfdna_script_dir
+# config['cfdna-scripts-dir']
 
 # {{Wildcards}} to be defined in the wrapper snakefile rule all include:
 #
@@ -278,15 +278,15 @@ Directory ~workflow~ contains two types of workflows- process-focused snakefiles
 # ref_name
 # align_method
 
-<#~/repos/basecamp/basecamp.org:smk_comment_modular()#>
+#<#~/repos/basecamp/basecamp.org:smk_comment_modular()#>
 
-<#~/repos/basecamp/basecamp.org:smk_comment_datadir()#>
+#<#~/repos/basecamp/basecamp.org:smk_comment_datadir()#>
 
 # Specifically here, most ouputs will return to {data_dir}/cfdna-wgs
 
-<#~/repos/basecamp/basecamp.org:smk_comment_conda()#>
+#<#~/repos/basecamp/basecamp.org:smk_comment_conda()#>
 
-<#~/repos/basecamp/basecamp.org:smk_comment_concurrency()#>
+#<#~/repos/basecamp/basecamp.org:smk_comment_concurrency()#>
 
 #+end_src
 
@@ -597,7 +597,7 @@ rule cfdna_wgs_samtools_alignment_qc:
         flagstat = f"{config['cfdna-wgs-dir']}/qc/{{library_id}}.{{ref_name}}.{{align_method}}.{{processing}}_flagstat.txt",
         samstat = f"{config['cfdna-wgs-dir']}/qc/{{library_id}}.{{ref_name}}.{{align_method}}.{{processing}}_samstat.txt",
     params:
-        script = f"{cfdna_script_dir}/samtools_alignment_qc.sh",
+        script = f"{config['cfdna-scripts-dir']}/samtools_alignment_qc.sh",
         threads = 8,
     shell:
         """
@@ -673,7 +673,7 @@ rule cfdna_wgs_mosdepth:
         thresholds = f"{config['cfdna-wgs-dir']}/qc/mosdepth_{{library_id}}.{{ref_name}}.{{align_method}}.thresholds.bed.gz",
         thresholds_idx = f"{config['cfdna-wgs-dir']}/qc/mosdepth_{{library_id}}.{{ref_name}}.{{align_method}}.thresholds.bed.gz.csi",
     params:
-        script = f"{cfdna_script_dir}/cdfna_wgs_mosdepth.sh",
+        script = f"{config['cfdna-scripts-dir']}/cdfna_wgs_mosdepth.sh",
         quant_levels = config["mosdepth-quant-levels"],
         out_dir = f"{config['cfdna-wgs-dir']}/qc",
     threads: 8,
@@ -795,7 +795,7 @@ rule cfdna_wgs_frag_bampefragsize:
         hist = f"{config['data-dir']}/cfdna_wgs/qc/{{lib_set}}_bampefragsize.png",
     params:
         blacklist = lambda wildcards: lib_map[wildcards.lib_set]['blacklist'],
-        script = f"{cfdna_script_dir}/bampefragsize.sh",
+        script = f"{config['cfdna-scripts-dir']}/bampefragsize.sh",
     shell:
         """
         {params.script} \

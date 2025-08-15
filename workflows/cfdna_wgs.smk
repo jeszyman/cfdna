@@ -38,7 +38,7 @@
 # {Parameters} to be defined at the level of the snakefile include
 #
 # data_dir
-# cfdna_script_dir
+# config['cfdna-scripts-dir']
 
 # {{Wildcards}} to be defined in the wrapper snakefile rule all include:
 #
@@ -48,82 +48,15 @@
 # ref_name
 # align_method
 
-#########1#########2#########3#########4#########5#########6#########7#########8
-# This is a modular snakefile, intended to be incorporated into a larger
-# workflow using the "include:" directive. (See
-# https://snakemake.readthedocs.io/en/stable/snakefiles/modularization.html)
+#nil
 
-
-
-#########1#########2#########3#########4#########5#########6#########7#########8 
-# This snakefile uses a common data directory structure:
-#
-# |-- <MAIN PROJECT DATA DIRECTORY>, e.g. lung_cancer, variable {data_dir}>
-#     |-- inputs
-#     |-- ref
-#     |-- logs
-#     |-- <ANALYSIS LABEL>, e.g. emseq, example subdirectories: 
-#         |-- qc
-#         |-- fastqs
-#         |-- bams
+#nil
 
 # Specifically here, most ouputs will return to {data_dir}/cfdna-wgs
 
+#nil
 
-#########1#########2#########3#########4#########5#########6#########7#########8 
-# This snakefile uses conda to manage software install and versions. To work as
-# intended, a --use-conda flag must used at run time. The conda environment
-# file is referenced relative to its specific snakefile and not any wrapper
-# using "include:". i.e. for a directory structure below where subworkflow.smk
-# rules call a conda environment yaml:
-#
-# --main
-#   |-- config
-#       |-- main.yaml
-#   |-- workflows
-#       |-- workflow.smk
-#   |-- submodule
-#       |-- config
-#           |-- sub.yaml
-#       |-- workflows
-#           |-- subworkflow.smk
-#
-# the rule in subworkflow.smk would begin:
-#
-# rule example:
-#     conda:
-#         "../config/sub.yaml"
-#     input:...    
-#
-
-#########1#########2#########3#########4#########5#########6#########7#########8
-# This workflow use Snakemake's resources feature to control how many jobs of a
-# given rule can run simultaneously. Each rule may specify a concurrency value,
-# and a global limit is set at run time. For example:
-
-# resources:
-#     concurrency=100
-
-# Run the workflow with a system-wide concurrency cap, e.g.:
-
-# snakemake --resources concurrency=100
-
-# This setup allows Snakemake to schedule only one job requiring
-# concurrency=100 in parallel (100 / 100 = 1). (Jobs from other rules would
-# still run based on available overall cores). This mechanism helps manage
-# disk I/O, memory pressure, and other shared system resources.
-
-# The system is calibrated around a ~96-core machine such that rules requiring
-# concurrency=100 are designed to run one at a time. On larger systems
-# (e.g., 300 cores), multiple such jobs can run concurrently
-# (3 if concurrency=300). Lighter-weight rules (e.g., fastp) may specify lower
-# concurrency values allowing many to run in parallel on large or small
-# machines (e.g. at concurrency=10, 100/10 = 10 separate jobs could run when
-# overall run concurrency is set at 100. 
-
-# Other jobs are better managed by a set CPU number, e.g. samtools sorting is
-# I/O constrained so each job is limited to a set 8 cores. Threads are
-# rule-specific and declared at the rule for such instances.
+#nil
 rule cfdna_wgs_fastp:
     #
     # fastp for cfDNA WGS. Uses a set thread count of 8. Adapters are
@@ -309,7 +242,7 @@ rule cfdna_wgs_samtools_alignment_qc:
         flagstat = f"{config['cfdna-wgs-dir']}/qc/{{library_id}}.{{ref_name}}.{{align_method}}.{{processing}}_flagstat.txt",
         samstat = f"{config['cfdna-wgs-dir']}/qc/{{library_id}}.{{ref_name}}.{{align_method}}.{{processing}}_samstat.txt",
     params:
-        script = f"{cfdna_script_dir}/samtools_alignment_qc.sh",
+        script = f"{config['cfdna-scripts-dir']}/samtools_alignment_qc.sh",
         threads = 8,
     shell:
         """
@@ -338,7 +271,7 @@ rule cfdna_wgs_mosdepth:
         thresholds = f"{config['cfdna-wgs-dir']}/qc/mosdepth_{{library_id}}.{{ref_name}}.{{align_method}}.thresholds.bed.gz",
         thresholds_idx = f"{config['cfdna-wgs-dir']}/qc/mosdepth_{{library_id}}.{{ref_name}}.{{align_method}}.thresholds.bed.gz.csi",
     params:
-        script = f"{cfdna_script_dir}/cdfna_wgs_mosdepth.sh",
+        script = f"{config['cfdna-scripts-dir']}/cdfna_wgs_mosdepth.sh",
         quant_levels = config["mosdepth-quant-levels"],
         out_dir = f"{config['cfdna-wgs-dir']}/qc",
     threads: 8,
@@ -367,7 +300,7 @@ rule cfdna_wgs_frag_bampefragsize:
         hist = f"{config['data-dir']}/cfdna_wgs/qc/{{lib_set}}_bampefragsize.png",
     params:
         blacklist = lambda wildcards: lib_map[wildcards.lib_set]['blacklist'],
-        script = f"{cfdna_script_dir}/bampefragsize.sh",
+        script = f"{config['cfdna-scripts-dir']}/bampefragsize.sh",
     shell:
         """
         {params.script} \

@@ -1,4 +1,4 @@
-name: cfdna_wgs
+name: cfdna_cna
 channels:
   - conda-forge
   - bioconda

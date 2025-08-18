@@ -36,7 +36,7 @@ To github.com:jeszyman/emseq.git
 *** Conda environmental YAMLs
 **** cfDNA CNA
 #+begin_src yaml :tangle ./config/cfdna-cna-conda-env.yaml
-name: cfdna_wgs
+name: cfdna_cna
 channels:
   - conda-forge
   - bioconda

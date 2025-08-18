@@ -19,7 +19,7 @@ rule cfdna_frag_filt:
         12
     shell:
         """
-        /home/ext_szymanski_jeffrey_mayo_edu/repos/cfdna/scripts/cfdna_frag_filt.sh \
+        {params.script} \
         {input} \
         {output.nohead} \
         $(echo {wildcards.frag_distro} | cut -d_ -f1) \

@@ -1,0 +1,22 @@
+cfdna-cna-conda-env: "~/repos/cfdna/config/cfdna-cna-conda-env.yaml"
+cfdna-cna-dir: "/mnt/data/projects/cfdna/cfdna-cna"
+cfdna-scripts-dir: "~/repos/cfdna/scripts"
+cfdna-repo-dir: "~/repos/cfdna"
+ichor_repo: "~/repos/ichorCNA-patched"
+local-tmp-dir: "/mnt/data/projects/cfdna/tmp"
+log-dir: "/mnt/data/projects/cfdna/logs"
+
+input-tsv: "~/repos/cfdna/data/TEST_cfdna_cna.tsv"
+input-samples:
+  - kh_01
+
+samples-tsv: "~/repos/cfdna/data/TEST_cfdna_cna.tsv"
+
+input-bams-dir: "/mnt/data/projects/cfdna/cfdna-cna/input_bams"
+
+envs:
+  cfdna-cna: "~/repos/cfdna/config/cfdna-cna-conda-env.yaml"
+
+project-data-dir: "/mnt/data/projects/cfdna"
+
+cfdna-repo: "~/repos/cfdna"

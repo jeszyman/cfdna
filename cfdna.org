@@ -50,6 +50,7 @@ dependencies:
   - r-optparse
   - samtools
   - snakemake
+  - r-plyr
 #+end_src
 
 **** cfDNA WGS
@@ -1441,39 +1442,1158 @@ bamPEFragmentSize --bamfiles $input \
                   --maxFragmentLength 1000 \
                   --outRawFragmentLengths $output_raw
 #+end_src
+** Example configurations and wrappers
+*** cfDNA copy number
+#+begin_src yaml :tangle ./config/TEST_cfdna_cna.yaml
+
+cfdna-cna-conda-env: "~/repos/cfdna/config/cfdna-cna-conda-env.yaml"
+cfdna-cna-dir: "/mnt/data/projects/cfdna/cfdna-cna"
+cfdna-scripts-dir: "~/repos/cfdna/scripts"
+cfdna-repo-dir: "~/repos/cfdna"
+ichor_repo: "~/repos/ichorCNA-patched"
+local-tmp-dir: "/mnt/data/projects/cfdna/tmp"
+log-dir: "/mnt/data/projects/cfdna/logs"
+
+input-tsv: "~/repos/cfdna/data/TEST_cfdna_cna.tsv"
+input-samples:
+  - kh_01
+
+samples-tsv: "~/repos/cfdna/data/TEST_cfdna_cna.tsv"
+
+input-bams-dir: "/mnt/data/projects/cfdna/cfdna-cna/input_bams"
+
+envs:
+  cfdna-cna: "~/repos/cfdna/config/cfdna-cna-conda-env.yaml"
+
+project-data-dir: "/mnt/data/projects/cfdna"
+
+cfdna-repo: "~/repos/cfdna"
+
+#+end_src
+[[file:workflows/TEST_cfdna_cna.smk]]
+
+| library_id |
+|------------|
+| kh_01      |
+
+#+begin_src snakemake :tangle ./workflows/TEST3_cfdna_cna.smk
+import pandas as pd
+import os
+
+configfile: "./config/TEST_cfdna_cna.yaml"
+
+shell.executable("/bin/bash")
+
+def resolve_config_paths(config_dict):
+    for k, v in config_dict.items():
+        if isinstance(v, str):
+            config_dict[k] = os.path.expandvars(os.path.expanduser(v))
+        elif isinstance(v, dict):
+            resolve_config_paths(v)
+        elif isinstance(v, list):
+            config_dict[k] = [os.path.expandvars(os.path.expanduser(i)) if isinstance(i, str) else i for i in v]
+
+resolve_config_paths(config)
+
+# Directories
+D_PROJECT = config['project-data-dir']
+D_CFDNA_CNA = f"{D_PROJECT}/cfdna-cna"
+D_LOGS = f"{D_PROJECT}/logs"
+D_LOCAL_TMP = f"{D_PROJECT}/tmp"
+R_CFDNA = config['cfdna-repo']
+
+# Sample info
+SAMPLES = config["samples-tsv"]
+LIBS = sorted(pd.read_csv(SAMPLES, sep="\t")["library_id"].unique())
+
+# Parameters
+FRAGS = config.get("frag_distros", ["90_150", "_all"])
+MILS = config.get("ds_mil_reads", ["2", "_none"])
+
+# ichor_map presets consumed by the Snakemake rule via {wildcards.ichor_set}
+# Values are strings when interpolated directly into the CLI.
+ichor_map = {
+    'base': {
+        # Genome / scope
+        'genome': "hg38",                       # genomeBuild passed to ichorCNA
+
+        # Copy-state space
+        'includeHOMD': "FALSE",                 # omit CN=0 state (reduces spurious deep losses at low TF)
+        'maxCN': 4,                             # cfDNA-friendly cap; limits overfitting / WGD “explanations”
+
+        # Priors (fit TF around high-normal; keep baseline near diploid)
+        'normal_prior': "c(0.60,0.70,0.80,0.90,0.95,0.97,0.99)",  # cheap to try wide; pick best by likelihood
+        'ploidy_prior': "c(2)",                 # search around 2N; prevents drift toward ~3N
+
+        # Chromosome sets
+        'chrs': "c(paste0('chr',1:22),'chrX')", # segment/report X, but…
+        'chrTrain': "paste0('chr',1:22)",       # …train HMM on autosomes only (stable baseline)
+        'chrNormalize': "paste0('chr',1:22)",   # …normalize on autosomes only (avoid sex-chrom bias)
+
+        # Panel of Normals
+        'normalPanel': None,                    # None → omit --normalPanel (PoN OFF)
+
+        # HMM smoothing
+        'txnE': "0.995",                        # transition prob (higher = smoother, fewer breakpoints)
+        'txnStrength': "250",                   # segmentation penalty (higher = smoother)
+
+        # Estimation flags
+        'estimateNormal': "TRUE",               # fit normal fraction (i.e., TF)
+        'estimatePloidy': "TRUE",               # allow small drift around 2 (e.g., 2.02)
+        'estimateScPrevalence': "FALSE",        # keep subclones off until clonal fit is clean
+    },
+
+    'cfDNA_PoN_guard': {
+        # Same as base but with a *guarded* PoN + tighter normal grid
+        'genome': "hg38",
+
+        'includeHOMD': "FALSE",
+        'maxCN': 4,
+
+        'normal_prior': "c(0.90,0.95,0.97,0.99)",  # high-normal grid stabilizes TF at low fractions
+        'ploidy_prior': "c(2)",
+
+        'chrs': "c(paste0('chr',1:22),'chrX')",
+        'chrTrain': "paste0('chr',1:22)",
+        'chrNormalize': "paste0('chr',1:22)",
+
+        'normalPanel': 'inst/extdata/HD_ULP_PoN_1Mb_median_normAutosome_mapScoreFiltered_median.rds',
+        # NOTE: Use this only if PoN is processed identically to samples (same bins, fragment window, chr style).
+
+        'txnE': "0.995",
+        'txnStrength': "250",
+
+        'estimateNormal': "TRUE",
+        'estimatePloidy': "TRUE",
+        'estimateScPrevalence': "FALSE",
+    },
+
+    'ha_low_tumor': {
+
+        # Genome / naming (stock ichor defaults)
+        'genome': "hg38",
+
+        # Copy-state space
+        'includeHOMD': "FALSE",           # default
+        'maxCN': 3,
+
+        # Priors
+        'normal_prior': "c(0.5)",         # default (single start at 50% normal)
+        'ploidy_prior': "c(0.95, 0.99, 0.995, 0.999)",
+
+        # Chromosome sets (stock uses non-‘chr’ names)
+        'chrs': "c(paste0('chr',1:22),'chrX')",
+        'chrTrain': "paste0('chr',1:22)",
+        'chrNormalize': "paste0('chr',1:22)",
+
+        # Panel of Normals
+        'normalPanel': "DEFAULT",
+
+        # HMM smoothing (very aggressive by default)
+        'txnE': "0.9999999",              # default
+        'txnStrength': "10000000",        # default (1e7)
+
+        # Estimation flags
+        'estimateNormal': "TRUE",         # default
+        'estimatePloidy': "TRUE",         # default
+        'estimateScPrevalence': "FALSE",
+    },
+        'TEST': {
+
+        # Genome / naming (stock ichor defaults)
+        'genome': "hg38",
+
+        # Copy-state space
+        'includeHOMD': "FALSE",           # default
+        'maxCN': 3,
+
+        # Priors
+        'normal_prior': "c(0.5)",         # default (single start at 50% normal)
+        'ploidy_prior': "c(0.95, 0.99, 0.995, 0.999)",
+
+        # Chromosome sets (stock uses non-‘chr’ names)
+        'chrs': "c(paste0('chr',1:22),'chrX')",
+        'chrTrain': "paste0('chr',1:22)",
+        'chrNormalize': "paste0('chr',1:22)",
+
+        # Panel of Normals
+        'normalPanel': f"{D_CFDNA_CNA}/pon/test_median.rds",
+
+        # HMM smoothing (very aggressive by default)
+        'txnE': "0.9999999",              # default
+        'txnStrength': "10000000",        # default (1e7)
+
+        # Estimation flags
+        'estimateNormal': "TRUE",         # default
+        'estimatePloidy': "TRUE",         # default
+        'estimateScPrevalence': "FALSE",
+    },
+
+}
+
+
+
+# --- Preamble: define PoN sets here (no config) ------------------------------
+# Each key is a pon_id that will produce D_CFDNA_CNA/pon/{pon_id}_median.txt
+PON_SETS = {
+    "test": {
+        "libs": ["kh_01", "kh_02"],  # library_id values
+        "frag": "90_150",
+        "ds": "_none",
+    },
+    # add more sets if needed
+    # "pon2": {"libs": [...], "frag": "90_150", "ds": "_none"},
+}
+
+
+
+wildcard_constraints:
+    frag=r"(?:_all|\d+_\d+)",
+    mil_reads=r"(?:_none|\d+)"
+
+# All final outputs
+rule all:
+    input:
+        # Fragment filter
+        expand(f"{D_CFDNA_CNA}/bams/filt/{{lib}}.frag{{frag}}.bam",
+               lib=LIBS, frag=FRAGS),
+        #
+        # Downsample
+        expand(f"{D_CFDNA_CNA}/bams/ds/{{lib}}.frag{{frag}}.ds{{mil_reads}}.bam",
+               lib=LIBS, frag=FRAGS, mil_reads=MILS),
+        #
+        #Bam -> Wiggle
+        expand(f"{D_CFDNA_CNA}/wigs/{{lib}}.frag{{frag}}.ds{{mil_reads}}.wig",
+               lib=LIBS, frag=FRAGS, mil_reads=MILS),
+        #
+        # Make PoNs
+        expand(f"{D_CFDNA_CNA}/pon/{{pon_id}}_normals_list.txt",
+               pon_id=["test"]),
+        expand(f"{D_CFDNA_CNA}/pon/{{pon_id}}_median.rds",
+               pon_id=["test"]),
+
+        expand(f"{D_CFDNA_CNA}/pon/{{pon_id}}_median.txt",
+               pon_id=["test"]),
+
+        #
+        # NEW ichor
+        expand(f"{D_CFDNA_CNA}/ichor/{{ichor_set}}/{{lib}}.frag{{frag}}.ds{{mil_reads}}.ichor_{{ichor_set}}.cna.seg",
+               lib=LIBS, frag=FRAGS, mil_reads=MILS, ichor_set=['base','cfDNA_PoN_guard','ha_low_tumor', 'TEST']),
+
+
+include: f"{config['cfdna-repo']}/workflows/cfdna_cna.current.smk"
+
+#+end_src
+
+
+**** Wrapper
+[[id:3d555402-d898-437f-bdd8-c6a5bae55f17][Normalize configuration yaml paths]]
+
+#+begin_example
+|-- main data directory
+    |-- cfdna-cna
+        |-- bams
+	    |-- input
+	        |-- lib001.input.bam
+	    |-- frag
+	        |-- lib001.frag90_150.bam
+		|-- lib001.frag_all.bam
+	    |-- ds
+	        |-- lib001.frag90_150.ds2.bam
+	        |-- lib001.frag90_150.ds_none.bam
+	        |-- lib001.frag_all.ds2.bam
+	        |-- lib001.frag_all.ds_none.bam
+	|-- wigs
+	    |-- lib001.frag90_150.ds2.wig
+	    |-- lib001.frag90_150.ds_none.wig
+	    |-- lib001.frag_all.ds2.wig
+	    |-- lib001.frag_all.ds_none.wig
+	|-- ichor
+	    |-- base
+	        |-- lib001.frag90_150.ds2.ichor_base.cna.seg
+                |-- lib001.frag90_150.ds_none.ichor_base.cna.seg
+                |-- lib001.frag_all.ds2.ichor_base.cna.seg
+                |-- lib001.frag_all.ds_none.ichor_base.cna.seg
+	    |-- pon
+	        |-- lib001.frag90_150.ds2.ichor_pon.cna.seg
+                |-- lib001.frag90_150.ds_none.ichor_pon.cna.seg
+                |-- lib001.frag_all.ds2.ichor_pon.cna.seg
+                |-- lib001.frag_all.ds_none.ichor_pon.cna.seg
+
+#+end_example
+
+
+#+begin_src snakemake :tangle ./workflows/TEST2_cfdna_cna.smk
+import pandas as pd
+import os
+
+configfile: "./config/TEST_cfdna_cna.yaml"
+
+shell.executable("/bin/bash")
+
+def resolve_config_paths(config_dict):
+    for k, v in config_dict.items():
+        if isinstance(v, str):
+            config_dict[k] = os.path.expandvars(os.path.expanduser(v))
+        elif isinstance(v, dict):
+            resolve_config_paths(v)
+        elif isinstance(v, list):
+            config_dict[k] = [os.path.expandvars(os.path.expanduser(i)) if isinstance(i, str) else i for i in v]
+
+resolve_config_paths(config)
+
+# Directories
+D_PROJECT = config['project-data-dir']
+D_CFDNA_CNA = f"{D_PROJECT}/cfdna-cna"
+D_LOGS = f"{D_PROJECT}/logs"
+D_LOCAL_TMP = f"{D_PROJECT}/tmp"
+R_CFDNA = config['cfdna-repo']
+
+# Sample info
+SAMPLES = config["samples-tsv"]
+LIBS = sorted(pd.read_csv(SAMPLES, sep="\t")["library_id"].unique())
+
+# Parameters
+FRAGS = config.get("frag_distros", ["90_150", "_all"])
+MILS = config.get("ds_mil_reads", ["2", "_none"])
+
+# ichor_map presets consumed by the Snakemake rule via {wildcards.ichor_set}
+# Values are strings when interpolated directly into the CLI.
+ichor_map = {
+    'base': {
+        # Genome / scope
+        'genome': "hg38",                       # genomeBuild passed to ichorCNA
+
+        # Copy-state space
+        'includeHOMD': "FALSE",                 # omit CN=0 state (reduces spurious deep losses at low TF)
+        'maxCN': 4,                             # cfDNA-friendly cap; limits overfitting / WGD “explanations”
+
+        # Priors (fit TF around high-normal; keep baseline near diploid)
+        'normal_prior': "c(0.60,0.70,0.80,0.90,0.95,0.97,0.99)",  # cheap to try wide; pick best by likelihood
+        'ploidy_prior': "c(2)",                 # search around 2N; prevents drift toward ~3N
+
+        # Chromosome sets
+        'chrs': "c(paste0('chr',1:22),'chrX')", # segment/report X, but…
+        'chrTrain': "paste0('chr',1:22)",       # …train HMM on autosomes only (stable baseline)
+        'chrNormalize': "paste0('chr',1:22)",   # …normalize on autosomes only (avoid sex-chrom bias)
+
+        # Panel of Normals
+        'normalPanel': None,                    # None → omit --normalPanel (PoN OFF)
+
+        # HMM smoothing
+        'txnE': "0.995",                        # transition prob (higher = smoother, fewer breakpoints)
+        'txnStrength': "250",                   # segmentation penalty (higher = smoother)
+
+        # Estimation flags
+        'estimateNormal': "TRUE",               # fit normal fraction (i.e., TF)
+        'estimatePloidy': "TRUE",               # allow small drift around 2 (e.g., 2.02)
+        'estimateScPrevalence': "FALSE",        # keep subclones off until clonal fit is clean
+    },
+
+    'cfDNA_PoN_guard': {
+        # Same as base but with a *guarded* PoN + tighter normal grid
+        'genome': "hg38",
+
+        'includeHOMD': "FALSE",
+        'maxCN': 4,
+
+        'normal_prior': "c(0.90,0.95,0.97,0.99)",  # high-normal grid stabilizes TF at low fractions
+        'ploidy_prior': "c(2)",
+
+        'chrs': "c(paste0('chr',1:22),'chrX')",
+        'chrTrain': "paste0('chr',1:22)",
+        'chrNormalize': "paste0('chr',1:22)",
+
+        'normalPanel': 'inst/extdata/HD_ULP_PoN_1Mb_median_normAutosome_mapScoreFiltered_median.rds',
+        # NOTE: Use this only if PoN is processed identically to samples (same bins, fragment window, chr style).
+
+        'txnE': "0.995",
+        'txnStrength': "250",
+
+        'estimateNormal': "TRUE",
+        'estimatePloidy': "TRUE",
+        'estimateScPrevalence': "FALSE",
+    },
+
+    'ha_low_tumor': {
+
+        # Genome / naming (stock ichor defaults)
+        'genome': "hg38",
+
+        # Copy-state space
+        'includeHOMD': "FALSE",           # default
+        'maxCN': 3,
+
+        # Priors
+        'normal_prior': "c(0.5)",         # default (single start at 50% normal)
+        'ploidy_prior': "c(0.95, 0.99, 0.995, 0.999)",
+
+        # Chromosome sets (stock uses non-‘chr’ names)
+        'chrs': "c(paste0('chr',1:22),'chrX')",
+        'chrTrain': "paste0('chr',1:22)",
+        'chrNormalize': "paste0('chr',1:22)",
+
+        # Panel of Normals
+        'normalPanel': "DEFAULT",
+
+        # HMM smoothing (very aggressive by default)
+        'txnE': "0.9999999",              # default
+        'txnStrength': "10000000",        # default (1e7)
+
+        # Estimation flags
+        'estimateNormal': "TRUE",         # default
+        'estimatePloidy': "TRUE",         # default
+        'estimateScPrevalence': "FALSE",
+    },
+        'TEST': {
+
+        # Genome / naming (stock ichor defaults)
+        'genome': "hg38",
+
+        # Copy-state space
+        'includeHOMD': "FALSE",           # default
+        'maxCN': 3,
+
+        # Priors
+        'normal_prior': "c(0.5)",         # default (single start at 50% normal)
+        'ploidy_prior': "c(0.95, 0.99, 0.995, 0.999)",
+
+        # Chromosome sets (stock uses non-‘chr’ names)
+        'chrs': "c(paste0('chr',1:22),'chrX')",
+        'chrTrain': "paste0('chr',1:22)",
+        'chrNormalize': "paste0('chr',1:22)",
+
+        # Panel of Normals
+        'normalPanel': f"{D_CFDNA_CNA}/pon/test_median.rds",
+
+        # HMM smoothing (very aggressive by default)
+        'txnE': "0.9999999",              # default
+        'txnStrength': "10000000",        # default (1e7)
+
+        # Estimation flags
+        'estimateNormal': "TRUE",         # default
+        'estimatePloidy': "TRUE",         # default
+        'estimateScPrevalence': "FALSE",
+    },
+
+}
+
+
+
+# --- Preamble: define PoN sets here (no config) ------------------------------
+# Each key is a pon_id that will produce D_CFDNA_CNA/pon/{pon_id}_median.txt
+PON_SETS = {
+    "test": {
+        "libs": ["kh_01", "kh_02"],  # library_id values
+        "frag": "90_150",
+        "ds": "_none",
+    },
+    # add more sets if needed
+    # "pon2": {"libs": [...], "frag": "90_150", "ds": "_none"},
+}
+
+
+
+wildcard_constraints:
+    frag=r"(?:_all|\d+_\d+)",
+    mil_reads=r"(?:_none|\d+)"
+
+# All final outputs
+rule all:
+    input:
+        # # Fragment filter
+        # expand(f"{D_CFDNA_CNA}/bams/filt/{{lib}}.frag{{frag}}.bam",
+        #        lib=LIBS, frag=FRAGS),
+        # #
+        # # Downsample
+        # expand(f"{D_CFDNA_CNA}/bams/ds/{{lib}}.frag{{frag}}.ds{{mil_reads}}.bam",
+        #        lib=LIBS, frag=FRAGS, mil_reads=MILS),
+        #
+        # Bam -> Wiggle
+        # expand(f"{D_CFDNA_CNA}/wigs/{{lib}}.frag{{frag}}.ds{{mil_reads}}.wig",
+        #        lib=LIBS, frag=FRAGS, mil_reads=MILS),
+        #
+        # Make PoNs
+        expand(f"{D_CFDNA_CNA}/pon/{{pon_id}}_normals_list.txt",
+               pon_id=["test"]),
+        expand(f"{D_CFDNA_CNA}/pon/{{pon_id}}_median.rds",
+               pon_id=["test"]),
+
+        expand(f"{D_CFDNA_CNA}/pon/{{pon_id}}_median.txt",
+               pon_id=["test"]),
+
+        #
+        # NEW ichor
+        expand(f"{D_CFDNA_CNA}/ichor/{{ichor_set}}/{{lib}}.frag{{frag}}.ds{{mil_reads}}.ichor_{{ichor_set}}.cna.seg",
+               lib=LIBS, frag=FRAGS, mil_reads=MILS, ichor_set=['base','cfDNA_PoN_guard','default','ha_low_tumor', 'TEST']),
+
+rule fragment_filter:
+    conda: f"{config['envs']['cfdna-cna']}"
+    input:
+        bam = f"{D_CFDNA_CNA}/bams/input/{{lib}}.input.bam"
+    output:
+        bam = f"{D_CFDNA_CNA}/bams/filt/{{lib}}.frag{{frag}}.bam",
+        bai = f"{D_CFDNA_CNA}/bams/filt/{{lib}}.frag{{frag}}.bam.bai"
+    log:
+        f"{D_LOGS}/{{lib}}.frag{{frag}}_filter.log"
+    params:
+        script = f"{R_CFDNA}/scripts/cfdna_frag_filt.sh",
+        tmp = f"{D_LOCAL_TMP}/frag"
+    threads: 12
+    resources:
+        concurrency = 25
+    shell:
+        r"""
+        set -euo pipefail
+        mkdir -p "$(dirname {output.bam})" "{params.tmp}/{wildcards.lib}"
+        if [ "{wildcards.frag}" = "_all" ]; then
+            cp {input.bam} {output.bam}
+            samtools index -@ {threads} {output.bam}
+        else
+            {params.script} \
+              {input.bam} \
+              {params.tmp}/{wildcards.lib}.frag{wildcards.frag}.nohead \
+              $(echo {wildcards.frag} | cut -d_ -f1) \
+              $(echo {wildcards.frag} | cut -d_ -f2) \
+              {threads} \
+              {params.tmp}/{wildcards.lib}/frag{wildcards.frag}.onlyhead \
+              {output.bam} \
+              {params.tmp} &> {log}
+            samtools index -@ {threads} {output.bam}
+        fi
+        """
+
+rule cfdna_cna_downsample_bam:
+    conda: f"{config['envs']['cfdna-cna']}"
+    input:
+        bam = f"{D_CFDNA_CNA}/bams/filt/{{lib}}.frag{{frag}}.bam",
+        bai = f"{D_CFDNA_CNA}/bams/filt/{{lib}}.frag{{frag}}.bam.bai",
+    log:
+        f"{D_LOGS}/{{lib}}.frag{{frag}}.ds{{mil_reads}}_cfdna_cna_downsample_bam.log",
+    output:
+        bam = f"{D_CFDNA_CNA}/bams/ds/{{lib}}.frag{{frag}}.ds{{mil_reads}}.bam",
+        bai = f"{D_CFDNA_CNA}/bams/ds/{{lib}}.frag{{frag}}.ds{{mil_reads}}.bam.bai",
+    params:
+        milreads = lambda wildcards: wildcards.mil_reads,
+        script = f"{config['cfdna-scripts-dir']}/downsample_bam.sh",
+    shell:
+        r"""
+        if [ "{wildcards.mil_reads}" = "_none" ]; then
+            cp {input.bam} {output.bam}
+            samtools index {output.bam}
+        else
+            {params.script} \
+              {input.bam} \
+              {params.milreads} \
+              {output.bam} &> {log}
+            samtools index {output.bam}
+        fi
+        """
+
+# WIG generation - handles all BAM types
+rule make_wig:
+    conda: f"{config['envs']['cfdna-cna']}"
+    input:
+        f"{D_CFDNA_CNA}/bams/ds/{{lib}}.frag{{frag}}.ds{{mil_reads}}.bam",
+    output:
+        f"{D_CFDNA_CNA}/wigs/{{lib}}.frag{{frag}}.ds{{mil_reads}}.wig",
+    log:
+        f"{D_LOGS}/{{lib}}.frag{{frag}}.ds{{mil_reads}}_make_wig.log",
+    params:
+        window = "1000000",
+        quality = 20,
+        ichor_wig_dir = f"{D_CFDNA_CNA}/wigs",
+    shell:
+        """
+        mkdir -p "{params.ichor_wig_dir}"
+        readCounter \
+        --window {params.window} \
+        --quality {params.quality} \
+	--chromosome "chr1,chr2,chr3,chr4,chr5,chr6,chr7,chr8,chr9,chr10,chr11,chr12,chr13,chr14,chr15,chr16,chr17,chr18,chr19,chr20,chr21,chr22,chrX,chrY" \
+        {input} > {output}
+        """
+
+rule cfdna_ichor_pon_list:
+    conda: f"{config['envs']['cfdna-cna']}"
+    input:
+        wigs=lambda wc: [
+            f"{D_CFDNA_CNA}/wigs/{lib}.frag{PON_SETS[wc.pon_id]['frag']}.ds{PON_SETS[wc.pon_id]['ds']}.wig"
+            for lib in PON_SETS[wc.pon_id]["libs"]
+        ]
+    output:
+        f"{D_CFDNA_CNA}/pon/{{pon_id}}_normals_list.txt"
+    log:
+        f"{D_LOGS}/pon_{{pon_id}}_wiglist.log"
+    shell:
+        r"""
+        rm -f {output}
+        for f in {input}; do
+          [ -s "$f" ] && readlink -f "$f"
+        done | sort -u > {output}
+        if [ ! -s {output} ]; then
+          echo "No WIGs found for pon_id={wildcards.pon_id}" >&2
+          exit 2
+        fi
+        """
+
+rule cfdna_ichor_pon:
+    conda: f"{config['envs']['cfdna-cna']}"
+    input:
+        f"{D_CFDNA_CNA}/pon/{{pon_id}}_normals_list.txt",
+    output:
+        txt = f"{D_CFDNA_CNA}/pon/{{pon_id}}_median.txt",
+        rds = f"{D_CFDNA_CNA}/pon/{{pon_id}}_median.rds",
+    log:
+        f"{D_LOGS}/pon_{{pon_id}}_build.log",
+    params:
+        out_prefix = lambda wc: f"{D_CFDNA_CNA}/pon/{wc.pon_id}",
+        ichor_repo = config["ichor_repo"],
+    shell:
+        r"""
+        set -euo pipefail
+        Rscript {params.ichor_repo}/scripts/createPanelOfNormals.R \
+          --filelist {input} \
+          --chrNormalize "paste0('chr',1:22)" \
+          --chrs "c(paste0('chr',1:22),'chrX')" \
+          --gcWig {params.ichor_repo}/inst/extdata/gc_hg38_1000kb.wig \
+          --mapWig {params.ichor_repo}/inst/extdata/map_hg38_1000kb.wig \
+          --centromere {params.ichor_repo}/inst/extdata/GRCh38.GCA_000001405.2_centromere_acen.txt \
+          --libdir {params.ichor_repo} \
+          --outfile {params.out_prefix} &> {log}
+        # Ensure both artifacts exist (script should produce both)
+        test -s {output.txt} && test -s {output.rds}
+        """
+
+
+rule cfdna_ichor:
+    conda: f"{config['envs']['cfdna-cna']}"
+    input:
+        wig = f"{D_CFDNA_CNA}/wigs/{{lib}}.frag{{frag}}.ds{{mil_reads}}.wig",
+    output:
+        seg = f"{D_CFDNA_CNA}/ichor/{{ichor_set}}/{{lib}}.frag{{frag}}.ds{{mil_reads}}.ichor_{{ichor_set}}.cna.seg",
+    params:
+        ichor_out_main_dir = lambda wc: f"{D_CFDNA_CNA}/ichor/{wc.ichor_set}",
+        ichor_repo   = config["ichor_repo"],
+        genome       = lambda wc: ichor_map[wc.ichor_set]['genome'],
+        includeHOMD  = lambda wc: ichor_map[wc.ichor_set]['includeHOMD'],
+        maxCN        = lambda wc: ichor_map[wc.ichor_set]['maxCN'],
+        normal_prior = lambda wc: ichor_map[wc.ichor_set]['normal_prior'],
+        ploidy_prior = lambda wc: ichor_map[wc.ichor_set]['ploidy_prior'],
+        chrs         = lambda wc: ichor_map[wc.ichor_set]['chrs'],
+        chrTrain     = lambda wc: ichor_map[wc.ichor_set]['chrTrain'],
+        chrNormalize = lambda wc: ichor_map[wc.ichor_set]['chrNormalize'],
+        txnE         = lambda wc: ichor_map[wc.ichor_set]['txnE'],
+        txnStrength  = lambda wc: ichor_map[wc.ichor_set]['txnStrength'],
+        estimateNormal        = lambda wc: ichor_map[wc.ichor_set]['estimateNormal'],
+        estimatePloidy        = lambda wc: ichor_map[wc.ichor_set]['estimatePloidy'],
+        estimateScPrevalence  = lambda wc: ichor_map[wc.ichor_set]['estimateScPrevalence'],
+        normal_panel_opt = lambda wc: (
+            (lambda repo, val: (
+                "" if (val is None or val == "" or val == "OFF") else
+                f'--normalPanel "{repo}/inst/extdata/HD_ULP_PoN_1Mb_median_normAutosome_mapScoreFiltered_median.rds"' if val == "DEFAULT" else
+                (f'--normalPanel "{val}"' if val.startswith(("/", "~")) else
+                 f'--normalPanel "{repo}/{val}"')
+            ))(config.get("ichor_repo", config.get("ichor-repo")), ichor_map[wc.ichor_set].get("normalPanel"))
+        ),
+    log:
+        f"{D_LOGS}/{{lib}}.frag{{frag}}.ds{{mil_reads}}.{{ichor_set}}_ichor.log",
+    shell:
+        r"""
+        mkdir -p {params.ichor_out_main_dir}
+        Rscript {params.ichor_repo}/scripts/runIchorCNA.R \
+          --id {wildcards.lib}.frag{wildcards.frag}.ds{wildcards.mil_reads}.ichor_{wildcards.ichor_set} \
+          --WIG {input.wig} \
+          --genomeBuild "{params.genome}" \
+          --gcWig {params.ichor_repo}/inst/extdata/gc_hg38_1000kb.wig \
+          --mapWig {params.ichor_repo}/inst/extdata/map_hg38_1000kb.wig \
+          --centromere {params.ichor_repo}/inst/extdata/GRCh38.GCA_000001405.2_centromere_acen.txt \
+          {params.normal_panel_opt} \
+          --includeHOMD {params.includeHOMD} \
+          --ploidy "{params.ploidy_prior}" \
+          --normal "{params.normal_prior}" \
+          --maxCN {params.maxCN} \
+          --chrs "{params.chrs}" \
+          --chrTrain "{params.chrTrain}" \
+          --chrNormalize "{params.chrNormalize}" \
+          --estimateNormal {params.estimateNormal} \
+          --estimatePloidy {params.estimatePloidy} \
+          --estimateScPrevalence {params.estimateScPrevalence} \
+          --txnE {params.txnE} \
+          --txnStrength {params.txnStrength} \
+          --outDir {params.ichor_out_main_dir} \
+          --libdir {params.ichor_repo}
+        """
+
+
+
+
+#+end_src
+
+#+begin_src R
+# Robust parse of ichorCNA *.params.txt into a summary table
+# Fixes GC-MAP MAD extraction.
+
+suppressPackageStartupMessages({
+  library(tidyverse)
+  library(fs)
+})
+
+ichor_root <- "/mnt/data/projects/cfdna/cfdna-cna/ichor"  # adjust as needed
+out_csv    <- file.path(ichor_root, "ichor_summary.csv")
+
+param_files <- dir_ls(ichor_root, recurse = TRUE, type = "file",
+                      regexp = "\\.params\\.txt$")
+
+parse_params <- function(f) {
+  lines <- readr::read_lines(f)
+
+  # Top 2-line TSV block
+  hdr_i <- which(stringr::str_detect(lines, "^Sample\\tTumor Fraction\\tPloidy"))[1]
+  stopifnot(!is.na(hdr_i), length(lines) >= hdr_i + 1)
+  tsv <- readr::read_tsv(paste(lines[hdr_i:(hdr_i + 1)], collapse = "\n"),
+                         show_col_types = FALSE)
+
+  # GC-Map correction MAD (tolerate different hyphen chars)
+  # Match: GC-Map|GC-Map|GC–Map etc., then number
+  m <- stringr::str_match(lines, "GC[\\--–—]Map correction MAD:\\s*([0-9\\.eE\\+\\-]+)")
+  gc_mad <- suppressWarnings(as.numeric(stats::na.omit(m[, 2])[1]))
+  if (is.na(gc_mad)) gc_mad <- NA_real_
+
+  sample <- tsv$Sample[1]
+  parts  <- strsplit(sample, "\\.")[[1]]
+  # Expect: {lib}.frag{frag_range}.ds{downsample}.ichor_{ichor_set}
+  stopifnot(length(parts) >= 4)
+  lib        <- parts[1]
+  frag_range <- sub("^frag_", "", parts[2])
+  downsample <- sub("^ds", "", parts[3])
+  downsample <- ifelse(downsample %in% c("none","_none","NONE","_NONE","None"), "none", downsample)
+  ichor_set  <- sub("^ichor_", "", parts[4])
+
+  tibble(
+    library        = lib,
+    frag_range     = frag_range,
+    downsample     = downsample,
+    ichor_set      = ichor_set,
+    tumor_fraction = tsv$`Tumor Fraction`[1],
+    ploidy         = tsv$Ploidy[1],
+    gc_mad         = gc_mad,
+    params_file    = f
+  )
+}
+
+summary_tbl <- purrr::map_dfr(param_files, parse_params) |>
+  arrange(library, frag_range, downsample, ichor_set)
+
+readr::write_csv(summary_tbl, out_csv)
+print(summary_tbl, n = 50)
+
+# Visualizing how tumor fraction groups by settings and what associates with it
+library(tidyverse)
+library(ggrepel)
+library(broom)
+
+df <- summary_tbl %>%
+  mutate(
+    downsample = factor(downsample, levels = c("none","1","2","3","4","5"), ordered = TRUE),
+    frag_range = factor(frag_range),
+    ichor_set  = factor(ichor_set),
+    library    = factor(library)
+  )
+
+# 1) Overall distribution (log scale helps)
+p_hist <- ggplot(df, aes(tumor_fraction)) +
+  geom_histogram(bins = 30) +
+  scale_x_log10() +
+  labs(x = "Tumor fraction (log10)", y = "Count") +
+  theme_bw()
+
+# 2) By categorical settings (beeswarm-style jitter)
+p_by_frag <- ggplot(df, aes(frag_range, tumor_fraction, color = ichor_set, shape = downsample)) +
+  geom_jitter(width = 0.15, height = 0, size = 2, alpha = 0.85) +
+  scale_y_log10() +
+  labs(y = "Tumor fraction (log10)") +
+  theme_bw()
+
+p_by_ds <- ggplot(df, aes(downsample, tumor_fraction, color = frag_range)) +
+  geom_jitter(width = 0.1, height = 0, size = 2, alpha = 0.85) +
+  facet_wrap(~ ichor_set) +
+  scale_y_log10() +
+  labs(y = "Tumor fraction (log10)") +
+  theme_bw()
+
+# 3) Associations with continuous params
+p_tf_gc <- ggplot(df, aes(gc_mad, tumor_fraction, color = ichor_set, shape = frag_range)) +
+  geom_point(size = 2) +
+  geom_smooth(method = "lm", se = FALSE) +
+  scale_y_log10() +
+  labs(x = "GC-Map correction MAD", y = "Tumor fraction (log10)") +
+  theme_bw()
+
+p_tf_ploidy <- ggplot(df, aes(ploidy, tumor_fraction, color = ichor_set, shape = frag_range)) +
+  geom_point(size = 2) +
+  geom_smooth(method = "lm", se = FALSE) +
+  scale_y_log10() +
+  labs(x = "Ploidy", y = "Tumor fraction (log10)") +
+  theme_bw()
+
+# 4) Within-library contrasts: connect conditions to see shifts
+#   a) Effect of ichor_set (lines within lib×frag×downsample)
+p_lines_ichor <- ggplot(df, aes(ichor_set, tumor_fraction,
+                                group = interaction(library, frag_range, downsample),
+                                color = frag_range)) +
+  geom_line(alpha = 0.4) +
+  geom_point(size = 2) +
+  facet_wrap(~ downsample) +
+  scale_y_log10() +
+  labs(y = "Tumor fraction (log10)") +
+  theme_bw()
+
+#   b) Effect of downsample (lines within lib×frag×ichor_set)
+p_lines_ds <- ggplot(df, aes(downsample, tumor_fraction,
+                             group = interaction(library, frag_range, ichor_set),
+                             color = ichor_set)) +
+  geom_line(alpha = 0.4) +
+  geom_point(size = 2) +
+  facet_wrap(~ frag_range) +
+  scale_y_log10() +
+  labs(y = "Tumor fraction (log10)") +
+  theme_bw()
+
+# 5) Quick model to screen associations (optional but useful)
+#m <- lm(log10(tumor_fraction) ~ ploidy + gc_mad + frag_range + downsample + ichor_set, data = df)
+#assoc_table <- tidy(m) %>% arrange(p.value)
+
+# 6) Correlations by group (helps interpret the scatter plots)
+cors <- df %>%
+  group_by(ichor_set) %>%
+  summarize(
+    cor_gc     = cor(gc_mad, log10(tumor_fraction), use = "pairwise.complete.obs"),
+    cor_ploidy = cor(ploidy, log10(tumor_fraction), use = "pairwise.complete.obs"),
+    .groups = "drop"
+  )
+
+# Print or ggsave(p_hist), etc., as needed. Use p_lines_* to see grouping shifts clearly.
+p_hist
+p_by_frag
+p_by_ds
+p_tf_gc
+p_tf_ploidy
+p_lines_ichor
+#m
+cors
+#+end_src
+
+
+#+begin_src snakemake :tangle no
+import pandas as pd
+import os
+from tabulate import tabulate
+
+configfile: "./config/TEST_cfdna_cna.yaml"
+
+
+from pathlib import Path
+
+def resolve_config_paths(config_dict):
+    for k, v in config_dict.items():
+        if isinstance(v, str):
+            # Expand ~ and env vars
+            config_dict[k] = os.path.expandvars(os.path.expanduser(v))
+        elif isinstance(v, dict):
+            resolve_config_paths(v)  # Recurse into nested dicts
+        elif isinstance(v, list):
+            config_dict[k] = [os.path.expandvars(os.path.expanduser(i)) if isinstance(i, str) else i for i in v]
+
+resolve_config_paths(config)
+
+
+# Directories
+D_PROJECT       = config['project-data-dir']
+D_CFDNA_CNA     = f"{D_PROJECT}/cfdna-cna"
+D_LOGS          = f"{D_PROJECT}/logs"
+D_LOCAL_TMP     = f"{D_PROJECT}/tmp"
+R_CFDNA         = config['cfdna-repo']
+
+SAMPLES  = config["samples-tsv"]
+LIBS     = sorted(pd.read_csv(SAMPLES, sep="\t")["library_id"].unique())
+
+FRAGS = config.get("frag_distros", ["90_150"])
+MILS  = config.get("ds_mil_reads", ["1"])
+
+ENABLE_RAW  = config.get("enable_raw", True)
+ENABLE_FRAG = config.get("enable_frag", True)
+ENABLE_DS   = config.get("enable_frag_ds", True)
+
+# # choose finals: wigs or segs
+# TARGETS = []
+# if ENABLE_RAW:
+#     TARGETS += [f"{DATA}/wigs/raw/{lib}.wig" for lib in LIBS]
+# if ENABLE_FRAG:
+#     TARGETS += [f"{DATA}/wigs/frag/{frag}/{lib}.wig" for lib in LIBS for frag in FRAGS]
+# if ENABLE_DS:
+#     TARGETS += [f"{DATA}/wigs/ds/{frag}/ds{mil}/{lib}.wig"
+#                 for lib in LIBS for frag in FRAGS for mil in MILS]
+
+
+
+# Concrete targets (no unresolved wildcards)
+TESTS = []
+TESTS += expand(f"{D_CFDNA_CNA}/bams/frag/{{lib}}.frag{{frag}}.bam", lib=LIBS, frag=FRAGS)
+
+TESTS += expand(f"{D_CFDNA_CNA}/bams/ds/{{lib}}.ds{{m}}.bam", lib=LIBS, m=MILS)
+
+#TESTS += expand(f"{D_CFDNA_CNA}/bams/ds/frag/{{frag}}/ds{{m}}/{{lib}}.bam", lib=LIBS, frag=FRAGS, m=MILS)
+
+
+#TESTS += expand(f"{D_CFDNA_CNA}/bams/{{source}}/{{lib}}.ds{{mils}}.bam", lib=LIBS, frag=FRAGS, mils=MILS)
+
+rule all:
+    input:
+        sorted(set(TESTS))
+        #sorted(set(TARGETS))
+
+rule cfdna_frag_filt:
+    conda: f"{config['envs']['cfdna-cna']}"
+    wildcard_constraints:
+        frag_distro = r"\d+_\d+",
+    input:
+        bam = f"{D_CFDNA_CNA}/bams/input/{{rule_id}}.bam",
+    output:
+        bam = f"{D_CFDNA_CNA}/bams/frag/{{rule_id}}.frag{{frag_distro}}.bam",
+        bai = f"{D_CFDNA_CNA}/bams/frag/{{rule_id}}.frag{{frag_distro}}.bam.bai",
+    log:
+        f"{D_LOGS}/{{rule_id}}_{{frag_distro}}_frag_filt.log"
+    params:
+        script = f"{R_CFDNA}/scripts/cfdna_frag_filt.sh",
+        tmp    = f"{D_LOCAL_TMP}/frag",
+        bam    = f"{D_CFDNA_CNA}/bams/frag",
+    threads: 12
+    resources:
+        concurrency = 25
+    shell:
+        """
+        {params.script} \
+        {input} \
+        {params.tmp}/{wildcards.rule_id}.frag{wildcards.frag_distro}.nohead \
+        $(echo {wildcards.frag_distro} | cut -d_ -f1) \
+        $(echo {wildcards.frag_distro} | cut -d_ -f2) \
+        {threads} \
+        {params.tmp}/{wildcards.rule_id}/frag{wildcards.frag_distro}.onlyhead \
+        {output.bam} \
+        {params.tmp} &> {log}
+        samtools index {output.bam}
+        """
+
+rule cfdna_cna_downsample_bam:
+    conda: f"{config['envs']['cfdna-cna']}"
+    input:  f"{D_CFDNA_CNA}/bams/{{source}}/{{lib}}.bam"
+    log:
+        f"{D_LOGS}/{{rule_id}}.{{mil_reads}}_cfdna_cna_downsample.log",
+    output:
+        bam = f"{D_CFDNA_CNA}/bams/ds/{{rule_id}}.ds{{mil_reads}}.bam",
+        bai = f"{D_CFDNA_CNA}/bams/ds/{{rule_id}}.ds{{mil_reads}}.bam.bai",
+    params:
+        milreads = lambda wildcards: wildcards.mil_reads,
+        script = f"{R_CFDNA}/scripts/downsample_bam.sh",
+    shell:
+        """
+        {params.script} \
+        {input} \
+        {params.milreads} \
+        {output.bam} &> {log}
+        """
+
+# # 3) Downsample (from frag)
+# rule downsample:
+#     input:
+#         src = f"{DATA}/bams/frag/{{frag}}/{{lib}}.bam"
+#     output:
+#         bam = f"{DATA}/bams/ds/{{frag}}/ds{{mil}}/{{lib}}.bam",
+#         bai = f"{DATA}/bams/ds/{{frag}}/ds{{mil}}/{{lib}}.bam.bai"
+#     params:
+#         script = f"{config['cfdna-scripts-dir']}/downsample_bam.sh"
+#     shell:
+#         r"""
+#         mkdir -p {DATA}/bams/ds/{wildcards.frag}/ds{wildcards.mil}
+#         {params.script} {input.src} {wildcards.mil} {output.bam}
+#         samtools index {output.bam} {output.bai}
+#         """
+
+# # 4) Make WIGs (three variants mirror the dirs)
+# rule wig_raw:
+#     input:
+#         bam = f"{DATA}/bams/raw/{{lib}}.bam"
+#     output:
+#         wig = f"{DATA}/wigs/raw/{{lib}}.wig"
+#     shell:
+#         "make_wig_from_bam {input.bam} > {output.wig}"
+
+# rule wig_frag:
+#     input:
+#         bam = f"{DATA}/bams/frag/{{frag}}/{{lib}}.bam"
+#     output:
+#         wig = f"{DATA}/wigs/frag/{{frag}}/{{lib}}.wig"
+#     shell:
+#         "make_wig_from_bam {input.bam} > {output.wig}"
+
+# rule wig_ds:
+#     input:
+#         bam = f"{DATA}/bams/ds/{{frag}}/ds{{mil}}/{{lib}}.bam"
+#     output:
+#         wig = f"{DATA}/wigs/ds/{{frag}}/ds{{mil}}/{{lib}}.wig"
+#     shell:
+#         "make_wig_from_bam {input.bam} > {output.wig}"
+
+# # 5) Optional ichor (same mirroring)
+# rule ichor_raw:
+#     input:
+#         wig = f"{DATA}/wigs/raw/{{lib}}.wig"
+#     output:
+#         seg = f"{DATA}/ichor/raw/{{lib}}/{{lib}}.cna.seg"
+#     shell:
+#         r"""
+#         run_ichorCNA --WIG {input.wig} \
+#                      --outDir $(dirname {output.seg}) \
+#                      --outFile {wildcards.lib}.cna
+#         """
+
+# rule ichor_frag:
+#     input:
+#         wig = f"{DATA}/wigs/frag/{{frag}}/{{lib}}.wig"
+#     output:
+#         seg = f"{DATA}/ichor/frag/{{frag}}/{{lib}}/{{lib}}.cna.seg"
+#     shell:
+#         r"""
+#         run_ichorCNA --WIG {input.wig} \
+#                      --outDir $(dirname {output.seg}) \
+#                      --outFile {wildcards.lib}.cna
+#         """
+
+# rule ichor_ds:
+#     input:
+#         wig = f"{DATA}/wigs/ds/{{frag}}/ds{{mil}}/{{lib}}.wig"
+#     output:
+#         seg = f"{DATA}/ichor/ds/{{frag}}/ds{{mil}}/{{lib}}/{{lib}}.cna.seg"
+#     shell:
+#         r"""
+#         run_ichorCNA --WIG {input.wig} \
+#                      --outDir $(dirname {output.seg}) \
+#                      --outFile {wildcards.lib}.cna
+#         """
+
+#+end_src
+
+#+begin_src snakemake :tangle ./workflows/TEST_cfdna_cna.smk
+import pandas as pd
+import os
+from tabulate import tabulate
+
+configfile: "./config/TEST_cfdna_cna.yaml"
+
+
+from pathlib import Path
+
+def resolve_config_paths(config_dict):
+    for k, v in config_dict.items():
+        if isinstance(v, str):
+            # Expand ~ and env vars
+            config_dict[k] = os.path.expandvars(os.path.expanduser(v))
+        elif isinstance(v, dict):
+            resolve_config_paths(v)  # Recurse into nested dicts
+        elif isinstance(v, list):
+            config_dict[k] = [os.path.expandvars(os.path.expanduser(i)) if isinstance(i, str) else i for i in v]
+
+resolve_config_paths(config)
+
+class SampleTable:
+
+    def __init__(self, tsv_path, selected_ids):
+        # Load and filter the table to only include selected merged library IDs
+        df = pd.read_csv(tsv_path, sep="\t")
+        df = df[df["library_id"].isin(selected_ids)].copy()
+        self.df = df
+
+    @property
+    def library_ids(self):
+        return sorted(self.df["library_id"].unique())
+
+    @property
+    def frag_filt_ids(self):
+        return sorted(f"{lib}.frag90_150" for lib in self.df["library_id"].unique())
+
+#library_ids = ["kh_01"]
+
+samples = SampleTable(config['input-tsv'], config['input-samples'])
+print("Samples loaded:", samples.df["library_id"].unique().tolist())
+
+rule all:
+    input:
+        # Filter cfDNA fragments to a length range (Rule cfdna_frag_filt)
+        expand(f"{config['cfdna-cna-dir']}/bams/{{wkflow_id}}.frag{{frag_distro}}.bam",
+               wkflow_id = samples.library_ids,
+               frag_distro = ["90_150"]),
+        #
+        # Downsample length-filtered fragments (Rule cfdna_cna_downsample_bam)
+        expand(f"{config['cfdna-cna-dir']}/ds-bams/{{wkflow_id}}.ds{{mil_reads}}.{{ext}}",
+               wkflow_id = samples.library_ids,
+               mil_reads = ["1"],
+               ext = ["bam","bam.bai"]),
+
+        expand(f"{config['cfdna-cna-dir']}/ds-bams/{{wkflow_id}}.ds{{mil_reads}}.{{ext}}",
+               wkflow_id = samples.frag_filt_ids,
+               mil_reads = ["1"],
+               ext = [".bam",".bam.bai"]),
+
+        #
+        # Make wiggle file of coverage (Rule make_wig)
+        expand(f"{config['cfdna-cna-dir']}/wigs/{{wkflow_id}}.frag{{frag_distro}}.ds{{mil_reads}}.wig",
+               wkflow_id = samples.library_ids,
+               frag_distro = ["90_150"],
+               mil_reads = ["1"]),
+
+        expand(f"{config['cfdna-cna-dir']}/wigs/{{wkflow_id}}.ds{{mil_reads}}.wig",
+               wkflow_id = samples.library_ids,
+               mil_reads = ["1"]),
+
+        #
+        # Run ichorCNA (Rule cfdna_ichor)
+        expand(f"{config['cfdna-cna-dir']}/ichor/{{wkflow_id}}.frag{{frag_distro}}.ds{{mil_reads}}/{{wkflow_id}}.frag{{frag_distro}}.ds{{mil_reads}}.cna.seg",
+               wkflow_id = samples.library_ids,
+               frag_distro = ["90_150"],
+               mil_reads = ["1"]),
+
+
+include: f"{config['cfdna-repo-dir']}/workflows/cfdna_cna.smk"
+
+#+end_src
+***** Ideas
+- DRY the ichor map https://gemini.google.com/app/fb7a7bd7aa4dcabe
+*** Ideas
+- build in bin size
 ** cfDNA copy number
 :PROPERTIES:
 :ID:       ebc6e8c7-cb23-4f88-a66f-c412401eec8b
-:header-args:snakemake: :tangle ./workflows/cfdna_cna.smk
+:header-args:snakemake: :tangle ./workflows/cfdna_cna.current.smk
 :END:
-[[file:workflows/cfdna_cna.smk]]
+
+[[file:workflows/cfdna_cna.current.smk]]
+
 
 This workflow uses a modified version of the ichorCNA R package to avoid UCSC internet fallback and ensure consistent genome metadata.
+
+- The script scripts/runIchorCNA.R has been modified to skip UCSC fallback and instead load a pre-saved Seqinfo object from inst/extdata/seqinfo_hg38_ucsc.rds
 
 Repository:
 The modified version is available at:
 
 https://github.com/jeszyman/ichorCNA-patched
 
-Clone this repository to:
-
-repos/ichorCNA-patched/
-
-Then set the following in your Snakemake config.yaml:
-
-ichor_repo: repos/ichorCNA-patched
-
-Patch summary:
-The script scripts/runIchorCNA.R has been modified to skip UCSC fallback
-and instead load a pre-saved Seqinfo object from:
-
-inst/extdata/seqinfo_hg38_ucsc.rds
-
+#+NAME: cfdna_cna_config_keys
 #+begin_src python :results output replace
 import re
 from pathlib import Path
 
-snakefile = Path("./workflows/cfdna_cna.smk").read_text()
+snakefile = Path("./workflows/cfdna_cna.current.smk").read_text()
 
 # Matches: config["..."] or config['...']
 matches = re.findall(r"config\[['\"]([^'\"]+)['\"]\]", snakefile)
@@ -1487,49 +2607,54 @@ for key in unique_keys:
 
 #+end_src
 
-#+RESULTS[d4e466324f6e5001e7262eb9bcf78df5bbd75062]:
+#+RESULTS: cfdna_cna_config_keys
 : Config keys required:
-: - cfdna-cna-conda-env
-: - cfdna-cna-dir
+: - cfdna-repo
 : - cfdna-scripts-dir
-: - local-tmp-dir
+: - envs
 : - ichor_repo
-: - log-dir
+: - project-data-dir
+: - samples-tsv
 
 *** Filter cfDNA fragments by length range
+
 #+begin_src snakemake
-rule cfdna_frag_filt:
-    conda:
-        f"{config['cfdna-cna-conda-env']}",
+rule fragment_filter:
+    conda: f"{config['envs']['cfdna-cna']}"
     input:
-        f"{config['cfdna-cna-dir']}/input_bams/{{wkflow_id}}.bam",
-    log:
-        f"{config['log-dir']}/{{wkflow_id}}_{{frag_distro}}_cfdna_frag_filt.log",
+        bam = f"{D_CFDNA_CNA}/bams/input/{{lib}}.input.bam"
     output:
-        nohead = temp(f"{config['cfdna-cna-dir']}/bams/{{wkflow_id}}.frag{{frag_distro}}.nohead"),
-        onlyhead = temp(f"{config['cfdna-cna-dir']}/bams/{{wkflow_id}}.frag{{frag_distro}}.onlyhead"),
-        final = f"{config['cfdna-cna-dir']}/bams/{{wkflow_id}}.frag{{frag_distro}}.bam",
-        index = f"{config['cfdna-cna-dir']}/bams/{{wkflow_id}}.frag{{frag_distro}}.bam.bai",
+        bam = f"{D_CFDNA_CNA}/bams/filt/{{lib}}.frag{{frag}}.bam",
+        bai = f"{D_CFDNA_CNA}/bams/filt/{{lib}}.frag{{frag}}.bam.bai"
+    log:
+        f"{D_LOGS}/{{lib}}.frag{{frag}}_filter.log"
     params:
-        script = f"{config['cfdna-scripts-dir']}/cfdna_frag_filt.sh",
-        tmp_dir = config["local-tmp-dir"],
+        script = f"{R_CFDNA}/scripts/cfdna_frag_filt.sh",
+        tmp = f"{D_LOCAL_TMP}/frag"
+    threads: 12
     resources:
-        concurrency = 25,
-    threads:
-        12
+        concurrency = 25
     shell:
+        r"""
+        set -euo pipefail
+        mkdir -p "$(dirname {output.bam})" "{params.tmp}/{wildcards.lib}"
+        if [ "{wildcards.frag}" = "_all" ]; then
+            cp {input.bam} {output.bam}
+            samtools index -@ {threads} {output.bam}
+        else
+            {params.script} \
+              {input.bam} \
+              {params.tmp}/{wildcards.lib}.frag{wildcards.frag}.nohead \
+              $(echo {wildcards.frag} | cut -d_ -f1) \
+              $(echo {wildcards.frag} | cut -d_ -f2) \
+              {threads} \
+              {params.tmp}/{wildcards.lib}/frag{wildcards.frag}.onlyhead \
+              {output.bam} \
+              {params.tmp} &> {log}
+            samtools index -@ {threads} {output.bam}
+        fi
         """
-        {params.script} \
-        {input} \
-        {output.nohead} \
-        $(echo {wildcards.frag_distro} | cut -d_ -f1) \
-        $(echo {wildcards.frag_distro} | cut -d_ -f2) \
-        {threads} \
-        {output.onlyhead} \
-        {output.final} \
-        {params.tmp_dir} &> {log}
-        samtools index {output.final}
-        """
+
 #+end_src
 
 #+begin_src bash :tangle ./scripts/cfdna_frag_filt.sh
@@ -1606,41 +2731,7 @@ parse_args "$@"
 main
 
 #+end_src
-
-#+begin_src bash
-#!/usr/bin/env bash
-
-#########################################
-###   Filter Bam By Fragment Length   ###
-#########################################
-
-inbam="${1}"
-nohead="${2}"
-min="${3}"
-max="${4}"
-threads="${5}"
-onlyhead="${6}"
-outbam="${7}"
-
-# Filter by absolute value of TLEN for each read
-samtools view -@ $threads $inbam |
-    awk -F'\t' -v upper="$max" 'sqrt($9*$9) < upper {print $0}' |
-    awk -F'\t' -v lower="$min" 'sqrt($9*$9) > lower {print $0}'> $nohead
-
-# Restore header
-samtools view -@ $threads --header-only $inbam > $onlyhead
-
-
-cat $onlyhead $nohead |
-    samtools view -@ $threads --bam /dev/stdin |
-    samtools sort -@ $threads -o $outbam /dev/stdin
-
-
-#+end_src
-*** Downsample all bam files to a consistent read pair count       :smk_rule:
-:PROPERTIES:
-:ID:       bc8e3589-2293-4029-b46c-0cbc025fef58
-:END:
+*** Downsample all bam files to a consistent read pair count
 
 Downsample bam files on a per-directory basis
 
@@ -1648,25 +2739,32 @@ Note: The associated shell script will not result downsampled bams if sufficent 
 
 #+begin_src snakemake
 rule cfdna_cna_downsample_bam:
-    conda:
-        f"{config['cfdna-cna-conda-env']}",
+    conda: f"{config['envs']['cfdna-cna']}"
     input:
-        f"{config['cfdna-cna-dir']}/bams/{{wkflow_id}}.frag{{frag_distro}}.bam",
+        bam = f"{D_CFDNA_CNA}/bams/filt/{{lib}}.frag{{frag}}.bam",
+        bai = f"{D_CFDNA_CNA}/bams/filt/{{lib}}.frag{{frag}}.bam.bai",
     log:
-        f"{config['log-dir']}/{{wkflow_id}}.frag{{frag_distro}}_{{mil_reads}}_cfdna_cna_downsample.log",
+        f"{D_LOGS}/{{lib}}.frag{{frag}}.ds{{mil_reads}}_cfdna_cna_downsample_bam.log",
     output:
-        bam = f"{config['cfdna-cna-dir']}/ds-bams/{{wkflow_id}}.frag{{frag_distro}}.ds{{mil_reads}}.bam",
-        bai = f"{config['cfdna-cna-dir']}/ds-bams/{{wkflow_id}}.frag{{frag_distro}}.ds{{mil_reads}}.bam.bai",
+        bam = f"{D_CFDNA_CNA}/bams/ds/{{lib}}.frag{{frag}}.ds{{mil_reads}}.bam",
+        bai = f"{D_CFDNA_CNA}/bams/ds/{{lib}}.frag{{frag}}.ds{{mil_reads}}.bam.bai",
     params:
         milreads = lambda wildcards: wildcards.mil_reads,
         script = f"{config['cfdna-scripts-dir']}/downsample_bam.sh",
     shell:
+        r"""
+        if [ "{wildcards.mil_reads}" = "_none" ]; then
+            cp {input.bam} {output.bam}
+            samtools index {output.bam}
+        else
+            {params.script} \
+              {input.bam} \
+              {params.milreads} \
+              {output.bam} &> {log}
+            samtools index {output.bam}
+        fi
         """
-        {params.script} \
-        {input} \
-        {params.milreads} \
-        {output.bam} &> {log}
-        """
+
 #+end_src
 
 #+begin_src bash :tangle ./scripts/downsample_bam.sh
@@ -1717,41 +2815,21 @@ parse_args "$@"
 main
 
 #+end_src
-
-#+begin_src bash
-#!/usr/bin/env bash
-
-in_bam=$1
-milreads="$2"
-
-reads=$(echo |awk -v var1=$milreads '{ print 1000000*var1 }')
-
-out_bam=$(echo $in_bam | sed 's/_filt.bam/_ds10.bam/g')
-
-## Calculate the sampling factor based on the intended number of reads:
-
-FACTOR=$(samtools idxstats $in_bam | cut -f3 | awk -v COUNT=$reads 'BEGIN {total=0} {total += $1} END {print COUNT/total}')
-
-samtools view -@ 4 -s $FACTOR -b $in_bam > $out_bam
-
-samtools index $out_bam
-#+end_src
 *** Make wig
 #+begin_src snakemake
+# WIG generation - handles all BAM types
 rule make_wig:
-    conda:
-        f"{config['cfdna-cna-conda-env']}",
+    conda: f"{config['envs']['cfdna-cna']}"
     input:
-        bam = f"{config['cfdna-cna-dir']}/ds-bams/{{wkflow_id}}.frag{{frag_distro}}.ds{{mil_reads}}.bam",
-        bai = f"{config['cfdna-cna-dir']}/ds-bams/{{wkflow_id}}.frag{{frag_distro}}.ds{{mil_reads}}.bam.bai",
-    log:
-        f"{config['log-dir']}/{{wkflow_id}}.frag{{frag_distro}}.ds{{mil_reads}}_cfdna_cna_make_wig.log",
+        f"{D_CFDNA_CNA}/bams/ds/{{lib}}.frag{{frag}}.ds{{mil_reads}}.bam",
     output:
-        wig = f"{config['cfdna-cna-dir']}/wigs/{{wkflow_id}}.frag{{frag_distro}}.ds{{mil_reads}}.wig",
+        f"{D_CFDNA_CNA}/wigs/{{lib}}.frag{{frag}}.ds{{mil_reads}}.wig",
+    log:
+        f"{D_LOGS}/{{lib}}.frag{{frag}}.ds{{mil_reads}}_make_wig.log",
     params:
         window = "1000000",
         quality = 20,
-        ichor_wig_dir = f"{config['cfdna-cna-dir']}/wigs",
+        ichor_wig_dir = f"{D_CFDNA_CNA}/wigs",
     shell:
         """
         mkdir -p "{params.ichor_wig_dir}"
@@ -1763,433 +2841,126 @@ rule make_wig:
         """
 
 #+end_src
-#+begin_src bash
-#ssh jeff-nf1
-#conda activate base
-#mamba env create --file ~/repos/cfdna/config/cfdna-cna-conda-env.yaml
-#conda activate cfdna_wgs
+*** Make panel of normals
+#+begin_src snakemake
 
-#!/usr/bin/env bash
-set -o errexit
-set -o nounset
-set -o pipefail
+rule cfdna_ichor_pon_list:
+    conda: f"{config['envs']['cfdna-cna']}"
+    input:
+        wigs=lambda wc: [
+            f"{D_CFDNA_CNA}/wigs/{lib}.frag{PON_SETS[wc.pon_id]['frag']}.ds{PON_SETS[wc.pon_id]['ds']}.wig"
+            for lib in PON_SETS[wc.pon_id]["libs"]
+        ]
+    output:
+        f"{D_CFDNA_CNA}/pon/{{pon_id}}_normals_list.txt"
+    log:
+        f"{D_LOGS}/pon_{{pon_id}}_wiglist.log"
+    shell:
+        r"""
+        rm -f {output}
+        for f in {input}; do
+          [ -s "$f" ] && readlink -f "$f"
+        done | sort -u > {output}
+        if [ ! -s {output} ]; then
+          echo "No WIGs found for pon_id={wildcards.pon_id}" >&2
+          exit 2
+        fi
+        """
 
-usage() {
-    cat <<EOF
-Usage: $(basename "$0") <in_bam> <out_wig>
+rule cfdna_ichor_pon:
+    conda: f"{config['envs']['cfdna-cna']}"
+    input:
+        f"{D_CFDNA_CNA}/pon/{{pon_id}}_normals_list.txt",
+    output:
+        txt = f"{D_CFDNA_CNA}/pon/{{pon_id}}_median.txt",
+        rds = f"{D_CFDNA_CNA}/pon/{{pon_id}}_median.rds",
+    log:
+        f"{D_LOGS}/pon_{{pon_id}}_build.log",
+    params:
+        out_prefix = lambda wc: f"{D_CFDNA_CNA}/pon/{wc.pon_id}",
+        ichor_repo = config["ichor_repo"],
+    shell:
+        r"""
+        set -euo pipefail
+        Rscript {params.ichor_repo}/scripts/createPanelOfNormals.R \
+          --filelist {input} \
+          --chrNormalize "paste0('chr',1:22)" \
+          --chrs "c(paste0('chr',1:22),'chrX')" \
+          --gcWig {params.ichor_repo}/inst/extdata/gc_hg38_1000kb.wig \
+          --mapWig {params.ichor_repo}/inst/extdata/map_hg38_1000kb.wig \
+          --centromere {params.ichor_repo}/inst/extdata/GRCh38.GCA_000001405.2_centromere_acen.txt \
+          --libdir {params.ichor_repo} \
+          --outfile {params.out_prefix} &> {log}
+        # Ensure both artifacts exist (script should produce both)
+        test -s {output.txt} && test -s {output.rds}
+        """
 
-Generate a WIG from a BAM using readCounter.
-
-Positional arguments:
-  in_bam   Path to input BAM file
-  out_wig  Path to output WIG file
-EOF
-    exit 1
-}
-
-if [[ $# -ne 2 ]]; then
-    usage
-fi
-
-IN_BAM=$1
-OUT_WIG=$2
-
-#IN_BAM=/mnt/gcs/jeszyman/projects/nf1/cfdna-wgs/bams/kh_02.ncbi_decoy_hg38.bwa.dedup.coorsort.filt.bam
-
-IN_BAM=/mnt/gcs/jeszyman/projects/nf1/cfdna-wgs/bams/kh_02.ncbi_decoy_hg38.bwa.coorsort.bam
-
-IN_BAM=/mnt/gcs/ris/mpnst/analysis/cfdna-wgs/bams/lib424_filt.bam
-
-IN_BAM=/mnt/gcs/ris/mpnst/analysis/cfdna-wgs/cna/frag_bams/lib424_frag90_150.bam
-
-IN_BAM=/mnt/gcs/jeszyman/projects/nf1/emseq/bams/emseq_06.ncbi_decoy_hg38.bwa_meth.coorsort.deduped.bam
-OUT_WIG=/mnt/gcs/jeszyman/projects/nf1/tmp/TEST3.wig
-
-# parameters (override via env if desired)
-WINDOW=${WINDOW:-1000000}
-QUALITY=${QUALITY:-20}
-CHROMS=${CHROMS:-chr1,chr2,chr3,chr4,chr5,chr6,chr7,chr8,chr9,chr10,chr11,chr12,chr13,chr14,chr15,chr16,chr17,chr18,chr19,chr20,chr21,chr22,chrX,chrY}
-
-mkdir -p "$(dirname "$OUT_WIG")"
-
-readCounter \
-    --window "$WINDOW" \
-    --quality "$QUALITY" \
-    --chromosome "$CHROMS" \
-    "$IN_BAM" > "$OUT_WIG"
-
-
-
-#mkdir -p /tmp/ichor
-mkdir -p /mnt/gcs/jeszyman/projects/nf1/tmp/ichor
-
-Rscript ~/repos/ichorCNA-patched/scripts/runIchorCNA.R \
-        --id TEST3 \
-        --WIG $OUT_WIG \
-        --normal "c(0.95, 0.99, 0.995, 0.999)" \
-        --genomeBuild hg38 \
-        --ploidy "c(2)" \
-        --gcWig ~/repos/ichorCNA-patched/inst/extdata/gc_hg38_1000kb.wig \
-        --mapWig ~/repos/ichorCNA-patched/inst/extdata/map_hg38_1000kb.wig \
-        --centromere ~/repos/ichorCNA-patched/inst/extdata/GRCh38.GCA_000001405.2_centromere_acen.txt \
-        --normalPanel ~/repos/ichorCNA-patched/inst/extdata/HD_ULP_PoN_1Mb_median_normAutosome_mapScoreFiltered_median.rds \
-        --includeHOMD FALSE \
-        --chrs "c(1:22)" \
-        --chrTrain "c(1:22)" \
-        --estimateNormal TRUE \
-        --estimatePloidy TRUE \
-        --estimateScPrevalence FALSE \
-        --scStates "c()" \
-        --txnE 0.9999 \
-        --txnStrength 10000 \
-        --outDir /mnt/gcs/jeszyman/projects/nf1/tmp/ichor \
-        --libdir ~/repos/ichorCNA-patched
-
-cat /mnt/gcs/jeszyman/projects/nf1/tmp/ichor/TEST.params.txt
-cat /mnt/gcs/jeszyman/projects/nf1/tmp/ichor/TEST2.params.txt
-cat /mnt/gcs/jeszyman/projects/nf1/tmp/ichor/TEST3.params.txt
-
-##########1##########2##########3##########4##########5##########6##########7##########8
-
-Rscript ~/repos/ichorCNA-patched/scripts/runIchorCNA.R \
-        --id TEST \
-        --WIG $OUT_WIG \
-        --normal "c(0.95, 0.99, 0.995, 0.999)" \
-        --genomeBuild hg38 \
-        --ploidy "c(2)" \
-        --gcWig ~/repos/ichorCNA-patched/inst/extdata/gc_hg38_1000kb.wig \
-        --mapWig ~/repos/ichorCNA-patched/inst/extdata/map_hg38_1000kb.wig \
-        --centromere ~/repos/ichorCNA-patched/inst/extdata/GRCh38.GCA_000001405.2_centromere_acen.txt \
-        --normalPanel ~/repos/ichorCNA-patched/inst/extdata/HD_ULP_PoN_1Mb_median_normAutosome_mapScoreFiltered_median.rds \
-        --includeHOMD FALSE \
-        --chrs "c(1:22)" \
-        --chrTrain "c(1:22)" \
-        --estimateNormal TRUE \
-        --estimatePloidy FALSE \
-	--estimateScPrevalence FALSE --scStates "c()" \
-        --txnE 0.9999 \
-        --txnStrength 10000 \
-        --outDir /mnt/gcs/jeszyman/projects/nf1/tmp/ichor \
-        --libdir ~/repos/ichorCNA-patched
-
-
-Rscript ~/repos/ichorCNA-patched/scripts/runIchorCNA.R \
-        --id TEST \
-        --WIG $OUT_WIG \
-        --normal "c(0.5,0.6,0.7,0.8,0.9)" --maxCN 5 \
-        --gcWig ~/repos/ichorCNA-patched/inst/extdata/gc_hg38_1000kb.wig \
-        --mapWig ~/repos/ichorCNA-patched/inst/extdata/map_hg38_1000kb.wig \
-        --centromere ~/repos/ichorCNA-patched/inst/extdata/GRCh38.GCA_000001405.2_centromere_acen.txt \
-        --normalPanel ~/repos/ichorCNA-patched/inst/extdata/HD_ULP_PoN_1Mb_median_normAutosome_mapScoreFiltered_median.rds \
-	--includeHOMD False --chrs "c(1:22)" --chrTrain "c(1:22)" \
-	--estimateNormal True --estimatePloidy True --estimateScPrevalence True \
-	--txnE 0.9999 --txnStrength 10000 \
-	--scStates "c()" \
-	--outDir /mnt/gcs/jeszyman/projects/nf1/tmp/ichor \
-        --libdir ~/repos/ichorCNA-patched
 #+end_src
 
 *** ichor
 #+begin_src snakemake
+
 rule cfdna_ichor:
-    conda:
-        f"{config['cfdna-cna-conda-env']}",
+    conda: f"{config['envs']['cfdna-cna']}"
     input:
-        f"{config['cfdna-cna-dir']}/wigs/{{wkflow_id}}.frag{{frag_distro}}.ds{{mil_reads}}.wig",
+        wig = f"{D_CFDNA_CNA}/wigs/{{lib}}.frag{{frag}}.ds{{mil_reads}}.wig",
     output:
-        f"{config['cfdna-cna-dir']}/ichor/{{wkflow_id}}.frag{{frag_distro}}.ds{{mil_reads}}/{{wkflow_id}}.frag{{frag_distro}}.ds{{mil_reads}}.cna.seg",
+        seg = f"{D_CFDNA_CNA}/ichor/{{ichor_set}}/{{lib}}.frag{{frag}}.ds{{mil_reads}}.ichor_{{ichor_set}}.cna.seg",
     params:
-        ichor_out_main_dir = f"{config['cfdna-cna-dir']}/ichor",
-        ichor_repo = config["ichor_repo"],
-    shell:
-        """
-        mkdir -p $(dirname {params.ichor_out_main_dir}/{wildcards.wkflow_id}.frag{wildcards.frag_distro}.ds{wildcards.mil_reads})
-        Rscript {params.ichor_repo}/scripts/runIchorCNA.R \
-            --id {wildcards.wkflow_id}.frag{wildcards.frag_distro}.ds{wildcards.mil_reads} \
-            --WIG {input} \
-            --normal "c(0.95, 0.99, 0.995, 0.999)" \
-            --genomeBuild hg38 \
-            --ploidy "c(2)" \
-            --gcWig {params.ichor_repo}/inst/extdata/gc_hg38_1000kb.wig \
-            --mapWig {params.ichor_repo}/inst/extdata/map_hg38_1000kb.wig \
-            --centromere {params.ichor_repo}/inst/extdata/GRCh38.GCA_000001405.2_centromere_acen.txt \
-            --normalPanel {params.ichor_repo}/inst/extdata/HD_ULP_PoN_1Mb_median_normAutosome_mapScoreFiltered_median.rds \
-            --includeHOMD FALSE \
-            --chrs "c(1:22)" \
-            --chrTrain "c(1:22)" \
-            --estimateNormal TRUE \
-            --estimatePloidy TRUE \
-            --estimateScPrevalence TRUE \
-            --scStates "c()" \
-            --txnE 0.9999 \
-            --txnStrength 10000 \
-            --outDir {params.ichor_out_main_dir}/{wildcards.wkflow_id}.frag{wildcards.frag_distro}.ds{wildcards.mil_reads} \
-            --libdir {params.ichor_repo}
-        """
-
-#+end_src
-#+begin_src bash
-# conda activate base
-# mamba env create -f ~/repos/cfdna/config/cfdna-cna-conda-env.yaml
-
-# conda activate cfdna_wgs
-
-#mkdir -p /tmp/ichor
-
-Rscript ~/repos/ichorCNA-patched/scripts/runIchorCNA.R \
-        --id TEST \
-        --WIG ~/kh_02.wig \
-        --normal "c(0.95, 0.99, 0.995, 0.999)" \
-        --genomeBuild hg38 \
-        --ploidy "c(2)" \
-        --gcWig ~/repos/ichorCNA-patched/inst/extdata/gc_hg38_1000kb.wig \
-        --mapWig ~/repos/ichorCNA-patched/inst/extdata/map_hg38_1000kb.wig \
-        --centromere ~/repos/ichorCNA-patched/inst/extdata/GRCh38.GCA_000001405.2_centromere_acen.txt \
-        --normalPanel ~/repos/ichorCNA-patched/inst/extdata/HD_ULP_PoN_1Mb_median_normAutosome_mapScoreFiltered_median.rds \
-        --includeHOMD FALSE \
-        --chrs "c(1:22)" \
-        --chrTrain "c(1:22)" \
-        --estimateNormal TRUE \
-        --estimatePloidy TRUE \
-        --estimateScPrevalence TRUE \
-        --scStates "c()" \
-        --txnE 0.9999 \
-        --txnStrength 10000 \
-        --outDir /tmp/ichor \
-        --libdir ~/repos/ichorCNA-patched
-
-#+end_src
-
-*** Extract and aggregate tumor fractions
-#+begin_src snakemake
-# Snakefile
-# at the top of your Snakefile (if not already):
-from pathlib import Path
-import os
-
-# … your other rules …
-
-rule cfdna_cna_extract_tumor_fractions:
-    conda:
-        f"{config['cfdna-cna-conda-env']}"
-    input:
-        # dynamically find every .params.txt under ichor/
-        params=lambda wc: sorted(
-            str(p) for p in Path(config['cfdna-cna-dir'], "ichor")
-                       .rglob("*.params.txt")
-        )
-    output:
-        tf_summary=os.path.join(
-            config['cfdna-cna-dir'], "ichor", "ichor_tumor_fractions.tsv"
-        )
+        ichor_out_main_dir = lambda wc: f"{D_CFDNA_CNA}/ichor/{wc.ichor_set}",
+        ichor_repo   = config["ichor_repo"],
+        genome       = lambda wc: ichor_map[wc.ichor_set]['genome'],
+        includeHOMD  = lambda wc: ichor_map[wc.ichor_set]['includeHOMD'],
+        maxCN        = lambda wc: ichor_map[wc.ichor_set]['maxCN'],
+        normal_prior = lambda wc: ichor_map[wc.ichor_set]['normal_prior'],
+        ploidy_prior = lambda wc: ichor_map[wc.ichor_set]['ploidy_prior'],
+        chrs         = lambda wc: ichor_map[wc.ichor_set]['chrs'],
+        chrTrain     = lambda wc: ichor_map[wc.ichor_set]['chrTrain'],
+        chrNormalize = lambda wc: ichor_map[wc.ichor_set]['chrNormalize'],
+        txnE         = lambda wc: ichor_map[wc.ichor_set]['txnE'],
+        txnStrength  = lambda wc: ichor_map[wc.ichor_set]['txnStrength'],
+        estimateNormal        = lambda wc: ichor_map[wc.ichor_set]['estimateNormal'],
+        estimatePloidy        = lambda wc: ichor_map[wc.ichor_set]['estimatePloidy'],
+        estimateScPrevalence  = lambda wc: ichor_map[wc.ichor_set]['estimateScPrevalence'],
+        normal_panel_opt = lambda wc: (
+            (lambda repo, val: (
+                "" if (val is None or val == "" or val == "OFF") else
+                f'--normalPanel "{repo}/inst/extdata/HD_ULP_PoN_1Mb_median_normAutosome_mapScoreFiltered_median.rds"' if val == "DEFAULT" else
+                (f'--normalPanel "{val}"' if val.startswith(("/", "~")) else
+                 f'--normalPanel "{repo}/{val}"')
+            ))(config.get("ichor_repo", config.get("ichor-repo")), ichor_map[wc.ichor_set].get("normalPanel"))
+        ),
+    log:
+        f"{D_LOGS}/{{lib}}.frag{{frag}}.ds{{mil_reads}}.{{ichor_set}}_ichor.log",
     shell:
         r"""
-        # write header
-        echo -e "library\ttf" > {output.tf_summary}
-
-        # for each params.txt, pull the second field on line 2
-        for f in {input.params}; do
-            sample=$(basename "$f" .params.txt)
-            tf=$(awk 'NR==2 {{print $2}}' "$f")
-            echo -e "$sample\t$tf"
-        done >> {output.tf_summary}
+        mkdir -p {params.ichor_out_main_dir}
+        Rscript {params.ichor_repo}/scripts/runIchorCNA.R \
+          --id {wildcards.lib}.frag{wildcards.frag}.ds{wildcards.mil_reads}.ichor_{wildcards.ichor_set} \
+          --WIG {input.wig} \
+          --genomeBuild "{params.genome}" \
+          --gcWig {params.ichor_repo}/inst/extdata/gc_hg38_1000kb.wig \
+          --mapWig {params.ichor_repo}/inst/extdata/map_hg38_1000kb.wig \
+          --centromere {params.ichor_repo}/inst/extdata/GRCh38.GCA_000001405.2_centromere_acen.txt \
+          {params.normal_panel_opt} \
+          --includeHOMD {params.includeHOMD} \
+          --ploidy "{params.ploidy_prior}" \
+          --normal "{params.normal_prior}" \
+          --maxCN {params.maxCN} \
+          --chrs "{params.chrs}" \
+          --chrTrain "{params.chrTrain}" \
+          --chrNormalize "{params.chrNormalize}" \
+          --estimateNormal {params.estimateNormal} \
+          --estimatePloidy {params.estimatePloidy} \
+          --estimateScPrevalence {params.estimateScPrevalence} \
+          --txnE {params.txnE} \
+          --txnStrength {params.txnStrength} \
+          --outDir {params.ichor_out_main_dir} \
+          --libdir {params.ichor_repo}
         """
 
 #+end_src
 
-#+begin_src snakemake :tangle no
-rule cfdna_cna_extract_tumor_fractions:
-    conda:
-        f"{config['cfdna-cna-conda-env']}",
-    input:
-        expand(f"{config['cfdna-cna-dir']}/ichor/{{wkflow_id}}.frag{{frag_distro}}.ds{{mil_reads}}/{{wkflow_id}}.frag{{frag_distro}}.ds{{mil_reads}}.params.txt", wkflow_id = cfdna_cna_wkflow_ids),
-    output:
-        f"{config['cfdna-cna-dir']}/ichor/ichor_tumor_fractions.tsv"
-    run:
-        with open(output[0], "w") as out:
-            out.write("library\ttf\n")
-            for f in input:
-                sample = f.split("/")[-1].replace(".params.txt", "")
-                with open(f) as fh:
-                    lines = fh.readlines()
-                    if len(lines) >= 2:
-                        tf = lines[1].split()[1]
-                        out.write(f"{sample}\t{tf}\n")
-
-#+end_src
-*** Development
-:PROPERTIES:
-:ID:       d7114139-00ab-4a79-8324-8876095b436e
-:header-args:snakemake: :tangle no
-:END:
-**** PON
-***** DONE Make list of wigs from normals                          :smk_rule:
-- Snakemake
-  #+begin_src snakemake
-# Make ichorCNA panel of normals from healthy samples
-rule pon_list:
-    input:
-        expand(wig + "/{library}_frag{frag_distro}.wig", library = NORMAL_LIBRARIES, frag_distro = ["90_150"]),
-    output:
-        wig + "/normal.txt",
-    log:
-        cfdna_wgs_logs + "/pon.log",
-    container:
-        cfdna_wgs_container,
-    shell:
-        """
-        input_string=$(echo "{input}" | tr " " "\n")
-        if [ -f {output} ]; then rm {output}; fi
-        echo -e "${{input_string}}" >> {output}
-        """
-#+end_src
-***** DONE Make panel of normals                                   :smk_rule:
-- Snakemake
-  #+begin_src snakemake
-# Make ichorCNA panel of normals from healthy samples
-rule pon:
-    input:
-        wig + "/normal.txt",
-    params:
-        script = cfdna_wgs_scripts + "/pon.sh",
-	outdir = wig
-    output:
-        wig + "/pon_median.rds"
-    log:
-        cfdna_wgs_logs + "/pon.log",
-    container:
-        cfdna_wgs_container,
-    shell:
-        """
-        {params.script} \
-        {input} \
-        {params.outdir} &> {log}
-        """
-#+end_src
-- [[file:./workflow/scripts/pon.sh][Shell script]]
-  #+begin_src bash :tangle ./workflow/scripts/pon.sh
-#!/usr/bin/env bash
-filelist=$1
-out_dir=$2
-
-Rscript /opt/ichorCNA/scripts/createPanelOfNormals.R --filelist $filelist \
-        --chrs "paste0('chr', c(1:22, \"X\"))" \
-        --chrNormalize "c(1:22, \"X\")" \
-        --gcWig /opt/ichorCNA/inst/extdata/gc_hg38_1000kb.wig \
-        --mapWig /opt/ichorCNA/inst/extdata/map_hg38_1000kb.wig \
-        --centromere /opt/ichorCNA/inst/extdata/GRCh38.GCA_000001405.2_centromere_acen.txt  \
-        --outfile "${out_dir}/pon"
-
-#+end_src
-***** DONE Run ichor
-#+begin_src snakemake
-rule ichor:
-    input:
-        wig = wig + "/{library}_frag{frag_distro}.wig",
-	pon = wig + "/pon_median.rds",
-    output:
-        ichor + "/{library}_frag{frag_distro}.cna.seg",
-    params:
-        script = cfdna_wgs_scripts + "/MOD_runIchorCNA.R",
-        out_dir = ichor,
-    container:
-        cfdna_wgs_container,
-    shell:
-        """
-        Rscript {params.script} \
-         --id {wildcards.library}_frag{wildcards.frag_distro} \
-         --WIG {input.wig} \
-         --gcWig /opt/ichorCNA/inst/extdata/gc_hg38_1000kb.wig \
-         --mapWig /opt/ichorCNA/inst/extdata/map_hg38_1000kb.wig \
-         --centromere /opt/ichorCNA/inst/extdata/GRCh38.GCA_000001405.2_centromere_acen.txt \
-         --normal "c(0.95, 0.99, 0.995, 0.999)" \
-         --normalPanel {input.pon} \
-         --ploidy "c(2)" \
-         --maxCN 3 \
-         --estimateScPrevalence FALSE \
-         --scStates "c()" \
-         --outDir {params.out_dir}
-        """
-#+end_src
-- Testing
-  - hg38 test
-    #+begin_src bash
-  # mkdir /tmp/ichor_out
-  # singularity shell ~/sing_containers/mpnst.sif
-
-  Rscript /opt/ichorCNA/scripts/runIchorCNA.R --id tumor_sample \
-  --WIG /tmp/test.wig --ploidy "c(2,3)" --normal "c(0.5,0.6,0.7,0.8,0.9)" --maxCN 5 \
-  --gcWig /opt/ichorCNA/inst/extdata/gc_hg38_1000kb.wig \
-
-
-
-  --includeHOMD False --chrs "c(1:22, \"X\")" --chrTrain "c(1:22)" \
-  --estimateNormal True --estimatePloidy True --estimateScPrevalence True \
-  --scStates "c(1,3)" --txnE 0.9999 --txnStrength 10000 --outDir /tmp/ichor_out
-  #+end_src
-  - works
-    - hg19
-      #+begin_src bash
-  #mkdir -p /tmp/ichor_out
-  #singularity shell ~/sing_containers/mpnst.sif
-
-  # Notes
-  ##
-  ## Will overwrite target files with a warning
-  ##
-  ##
-
-
-  Rscript /opt/ichorCNA/scripts/runIchorCNA.R --id tumor_sample \
-    --WIG ~/repos/cfdna-cna/test/wig/lib002_hg19_frag90_150.wig --ploidy "c(2,3)" --normal "c(0.5,0.6,0.7,0.8,0.9)" --maxCN 5 \
-    --gcWig /opt/ichorCNA/inst/extdata/gc_hg19_1000kb.wig \
-    --mapWig /opt/ichorCNA/inst/extdata/map_hg19_1000kb.wig \
-    --centromere /opt/ichorCNA/inst/extdata/GRCh37.p13_centromere_UCSC-gapTable.txt \
-    --normalPanel /opt/ichorCNA/inst/extdata/HD_ULP_PoN_1Mb_median_normAutosome_mapScoreFiltered_median.rds \
-    --includeHOMD False --chrs "c(1:22, \"X\")" --chrTrain "c(1:22)" \
-    --estimateNormal True --estimatePloidy True --estimateScPrevalence True \
-    --scStates "c(1,3)" --txnE 0.9999 --txnStrength 10000 --outDir /tmp/ichor_out
-  #+end_src
-      #+begin_src bash
-  # mkdir /tmp/ichor_out
-  # singularity shell ~/sing_containers/mpnst.sif
-
-  Rscript ./workflow/scripts/MOD_runIchorCNA.R --id tumor_sample \
-    --WIG ~/repos/cfdna-cna/test/wig/lib002_frag90_150.wig --ploidy "c(2,3)" --normal "c(0.5,0.6,0.7,0.8,0.9)" --maxCN 5 \
-    --gcWig /opt/ichorCNA/inst/extdata/gc_hg19_1000kb.wig \
-    --mapWig /opt/ichorCNA/inst/extdata/map_hg19_1000kb.wig \
-    --centromere /opt/ichorCNA/inst/extdata/GRCh37.p13_centromere_UCSC-gapTable.txt \
-    --normalPanel /opt/ichorCNA/inst/extdata/HD_ULP_PoN_1Mb_median_normAutosome_mapScoreFiltered_median.rds \
-    --includeHOMD False --chrs "c(1:22, \"X\")" --chrTrain "c(1:22)" \
-    --estimateNormal True --estimatePloidy True --estimateScPrevalence True \
-    --scStates "c(1,3)" --txnE 0.9999 --txnStrength 10000 --outDir /tmp/ichor_out
-  #+end_src
-      - running an old hg19
-        #+begin_src bash
-      Rscript /opt/ichorCNA/scripts/runIchorCNA.R --id tumor_sample \
-        --WIG /tmp/test_hg19.wig --ploidy "c(2,3)" --normal "c(0.5,0.6,0.7,0.8,0.9)" --maxCN 5 \
-        --gcWig /opt/ichorCNA/inst/extdata/gc_hg19_1000kb.wig \
-        --mapWig /opt/ichorCNA/inst/extdata/map_hg19_1000kb.wig \
-        --centromere /opt/ichorCNA/inst/extdata/GRCh37.p13_centromere_UCSC-gapTable.txt \
-        --normalPanel /opt/ichorCNA/inst/extdata/HD_ULP_PoN_1Mb_median_normAutosome_mapScoreFiltered_median.rds \
-        --includeHOMD False --chrs "c(1:22, \"X\")" --chrTrain "c(1:22)" \
-        --estimateNormal True --estimatePloidy True --estimateScPrevalence True \
-        --scStates "c(1,3)" --txnE 0.9999 --txnStrength 10000 --outDir /tmp/ichor_out_test
-      #+end_src
-  - d
-- Notes: Fails when extdata PoN specified
-#+begin_src R
-
-#+end_src
-*** Reference
-- Coverage-based CNA from scratch [cite:@vavoulis2025]
-*** Ideas
-- https://www.medrxiv.org/content/10.1101/19002550v3.full.pdf+html
-  - In order to maximize sensitivity of CNAs while preventing false positive detections, Spearman’s rank correlation between local mean fragment length and copy number was used as a disqualifier of CNA call sets (Hellwig et al. 2018; Mouliere et al. 2018
-- Build out Landau MRD-EDGECNV (CN denoising, BAF, and fragment-length entropy)
-  - https://www.annalsofoncology.org/article/S0923-7534(19)31323-7/fulltext
-  - https://github.com/mskilab-org/dryclean https://www.biorxiv.org/content/10.1101/847681v2.full
-  - [cite:@widman2024]
 ** End motifs
 *** Sample 5' motifs per filtered bam file
 #+begin_src snakemake

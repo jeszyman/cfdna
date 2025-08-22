@@ -12,3 +12,4 @@ dependencies:
   - r-optparse
   - samtools
   - snakemake
+  - r-plyr

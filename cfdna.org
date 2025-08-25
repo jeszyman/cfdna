@@ -2138,8 +2138,8 @@ suppressPackageStartupMessages({
   library(fs)
 })
 
-ichor_root <- "/mnt/data/projects/cfdna/cfdna-cna/ichor"  # adjust as needed
-out_csv    <- file.path(ichor_root, "ichor_summary.csv")
+ichor_root <- "/mnt/gcs/jeszyman/projects/nf1/cfdna-cna/ichor"  # adjust as needed
+out_csv    <- "/tmp/test.csv"
 
 param_files <- dir_ls(ichor_root, recurse = TRUE, type = "file",
                       regexp = "\\.params\\.txt$")
@@ -2184,7 +2184,7 @@ parse_params <- function(f) {
 summary_tbl <- purrr::map_dfr(param_files, parse_params) |>
   arrange(library, frag_range, downsample, ichor_set)
 
-readr::write_csv(summary_tbl, out_csv)
+#readr::write_csv(summary_tbl, out_csv)
 print(summary_tbl, n = 50)
 
 # Visualizing how tumor fraction groups by settings and what associates with it

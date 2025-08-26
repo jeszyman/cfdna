@@ -1560,6 +1560,7 @@ include: f"{config['cfdna-repo']}/workflows/cfdna_wgs.smk"
 #+end_src
 
 *** cfDNA copy number
+- [ ] make pon a dependency for the ichor step
 #+begin_src yaml :tangle ./config/TEST_cfdna_cna.yaml
 
 cfdna-cna-conda-env: "~/repos/cfdna/config/cfdna-cna-conda-env.yaml"

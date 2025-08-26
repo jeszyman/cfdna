@@ -139,7 +139,6 @@ rule cfdna_ichor:
     conda: f"{config['envs']['cfdna-cna']}"
     input:
         wig = f"{D_CFDNA_CNA}/wigs/{{lib}}.frag{{frag}}.ds{{mil_reads}}.wig",
-        pon =
     output:
         seg = f"{D_CFDNA_CNA}/ichor/{{ichor_set}}/{{lib}}.frag{{frag}}.ds{{mil_reads}}.ichor_{{ichor_set}}.cna.seg",
     params:

@@ -4626,6 +4626,7 @@ include: cfdna_repo + "workflows/read_processing.smk"
 :PROPERTIES:
 :ID:       8052e364-df54-4c6f-a34f-fe2df8bf07b4
 :END:
+- consider blacklist filtering
 - Tangle org file
   #+begin_src bash :tangle ./tools/org_tangle.sh :tangle-mode (identity #o555)
 #!/usr/bin/env bash

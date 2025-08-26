@@ -279,9 +279,9 @@ Directory ~workflow~ contains two types of workflows- process-focused snakefiles
 # ref_name
 # align_method
 
-#<#~/repos/basecamp/basecamp.org:smk_comment_modular()#>
+<#~/repos/basecamp/basecamp.org:smk_comment_modular_wrapper()#>
 
-#<#~/repos/basecamp/basecamp.org:smk_comment_datadir()#>
+<#~/repos/basecamp/basecamp.org:smk_comment_datadir_wrapper()#>
 
 # Specifically here, most ouputs will return to {data_dir}/cfdna-wgs
 
@@ -1443,6 +1443,122 @@ bamPEFragmentSize --bamfiles $input \
                   --outRawFragmentLengths $output_raw
 #+end_src
 ** Example configurations and wrappers
+*** cfDNA WGS
+#+begin_src bash
+wget -O /mnt/data/projects/cfdna/inputs/GCA_000001405.15_GRCh38_no_alt_analysis_set.fa.gz \
+  https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/001/405/GCA_000001405.15_GRCh38/seqs_for_alignment_pipelines.ucsc_ids/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna.gz
+
+#+end_src
+
+#+begin_src yaml :tangle ./config/TEST_cfdna_wgs.smk
+ref_assemblies:
+  ncbi_hg38:
+    url:
+      "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/001/405/GCA_000001405.15_GRCh38/seqs_for_alignment_pipelines.ucsc_ids/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna.gz"
+    name: ncbi_hg38
+    input: GCA_000001405.15_GRCh38_no_alt_analysis_set.fa.gz
+
+cfdna-cna-conda-env: "~/repos/cfdna/config/cfdna-cna-conda-env.yaml"
+cfdna-cna-dir: "/mnt/data/projects/cfdna/cfdna-cna"
+cfdna-scripts-dir: "~/repos/cfdna/scripts"
+cfdna-repo-dir: "~/repos/cfdna"
+ichor_repo: "~/repos/ichorCNA-patched"
+local-tmp-dir: "/mnt/data/projects/cfdna/tmp"
+log-dir: "/mnt/data/projects/cfdna/logs"
+
+input-tsv: "~/repos/cfdna/data/TEST_cfdna_cna.tsv"
+input-samples:
+  - kh_01
+
+samples-tsv: "~/repos/cfdna/data/TEST_cfdna_cna.tsv"
+
+input-bams-dir: "/mnt/data/projects/cfdna/cfdna-cna/input_bams"
+
+envs:
+  cfdna-cna: "~/repos/cfdna/config/cfdna-cna-conda-env.yaml"
+
+project-data-dir: "/mnt/data/projects/cfdna"
+
+cfdna-repo: "~/repos/cfdna"
+data-dir: "/mnt/data/projects/cfdna"
+cfdna-wgs-dir: "/mnt/data/projects/cfdna/cfdna-wgs"
+mosdepth-quant-levels: "1,5,10,20,30"
+
+#+end_src
+
+#+begin_src snakemake :tangle ./workflows/TEST_cfdna_wgs.smk
+import pandas as pd
+import os
+from tabulate import tabulate
+
+configfile: "./config/TEST_cfdna_wgs.yaml"
+
+from pathlib import Path
+
+def resolve_config_paths(config_dict):
+    for k, v in config_dict.items():
+        if isinstance(v, str):
+            # Expand ~ and env vars
+            config_dict[k] = os.path.expandvars(os.path.expanduser(v))
+        elif isinstance(v, dict):
+            resolve_config_paths(v)  # Recurse into nested dicts
+        elif isinstance(v, list):
+            config_dict[k] = [os.path.expandvars(os.path.expanduser(i)) if isinstance(i, str) else i for i in v]
+
+resolve_config_paths(config)
+
+LIBS = ["kh_01"]
+
+cfdna_wgs_ref_names = ['ncbi_hg38']
+
+rule all:
+    input:
+        # Process FASTQs
+        expand(f"{config['data-dir']}/cfdna-wgs/fastqs/{{library_id}}.processed_{{read}}.fastq.gz",
+               library_id = LIBS,
+               read = ["R1","R2"]),
+
+        # FastQC
+        expand(f"{config['data-dir']}/cfdna-wgs/qc/{{library_id}}.{{processing}}_{{read}}_fastqc.{{sfx}}",
+               library_id = LIBS,
+               processing = ["raw", "processed"],
+               read = ["R1", "R2"],
+               sfx = ["html","zip"]),
+
+        # BWA index
+        expand(f"{config['data-dir']}/ref/bwa/{{name}}/{{name}}.amb",
+               name = cfdna_wgs_ref_names),
+
+        # Align
+        expand(f"{config['cfdna-wgs-dir']}/bams/{{library_id}}.{{ref_name}}.bwa.coorsort.bam",
+               library_id = LIBS,
+               ref_name = cfdna_wgs_ref_names),
+
+        # Post-process BAMs
+        expand(f"{config['data-dir']}/cfdna-wgs/bams/{{library_id}}.{{ref_name}}.bwa.dedup.coorsort.{{suffix}}",
+               library_id = LIBS,
+               ref_name = cfdna_wgs_ref_names,
+               suffix = ["bam", "bam.bai"]),
+
+        expand(f"{config['data-dir']}/cfdna-wgs/bams/{{library_id}}.{{ref_name}}.bwa.dedup.coorsort.filt.{{suffix}}",
+               library_id = LIBS,
+               ref_name = cfdna_wgs_ref_names,
+               suffix = ["bam", "bam.bai"]),
+
+        # Alignment QC
+        expand(f"{config['data-dir']}/cfdna-wgs/qc/{{library_id}}.{{ref_name}}.{{align_method}}.{{processing}}_{{stat}}.txt",
+               library_id = LIBS,
+               ref_name = cfdna_wgs_ref_names,
+               align_method = ["bwa"],
+               processing = ["coorsort","dedup.coorsort.filt"],
+               stat = ["flagstat","samstat"])
+
+
+
+include: f"{config['cfdna-repo']}/workflows/cfdna_wgs.smk"
+
+#+end_src
+
 *** cfDNA copy number
 #+begin_src yaml :tangle ./config/TEST_cfdna_cna.yaml
 
@@ -1468,6 +1584,7 @@ envs:
 project-data-dir: "/mnt/data/projects/cfdna"
 
 cfdna-repo: "~/repos/cfdna"
+
 
 #+end_src
 [[file:workflows/TEST_cfdna_cna.smk]]

@@ -5,7 +5,6 @@
 #                                                                              #
 #                                                                              #
 #########1#########2#########3#########4#########5#########6#########7#########8
-
 # Use readCounter to create windowed wig from bam file
 rule bam_to_wig:
     benchmark: benchdir + "/{library}_ds{downsample}_{frag_distro}_frag_bam_to_wig.benchmark.txt",
@@ -27,7 +26,6 @@ rule bam_to_wig:
         --window 1000000 \
         {input} > {output}
         """
-
 # Run ichorCNA without a panel of normals
 rule ichor_nopon:
     input: frag_wigs + "/{library}_ds{downsample}_frag{frag_distro}.wig",

@@ -20,7 +20,6 @@ bamPEFragmentSize --bamfiles $input \
                   --histogram $output_hist \
                   --maxFragmentLength 1000 \
                   --outRawFragmentLengths $output_raw
-
 #!/usr/bin/env bash
 #!/usr/bin/env bash
 set -o errexit   # abort on nonzero exitstatus

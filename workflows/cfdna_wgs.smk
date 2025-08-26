@@ -78,6 +78,7 @@
 #nil
 
 #nil
+
 rule cfdna_wgs_fastp:
     #
     # fastp for cfDNA WGS. Uses a set thread count of 8. Adapters are
@@ -112,6 +113,7 @@ rule cfdna_wgs_fastp:
         --unpaired1 {output.up1} --unpaired2 {output.up2} \
         --thread {threads} &> {log.run}
         """
+
 rule cfdna_wgs_fastqc:
     conda:
         "../config/cfdna-wgs-conda-env.yaml"
@@ -137,6 +139,7 @@ rule cfdna_wgs_fastqc:
         --threads {threads} \
         {input} &> {log}
         """
+
 #########1#########2#########3#########4#########5#########6#########7#########8
 rule cfdna_wgs_bwa_index:
     #
@@ -173,6 +176,7 @@ rule cfdna_wgs_bwa_index:
         {params.bwa_prefix} \
         {log}
         """
+
 rule cfdna_wgs_bwa_mem:
     conda:
         "../config/cfdna-wgs-conda-env.yaml"
@@ -196,6 +200,7 @@ rule cfdna_wgs_bwa_mem:
         | samtools sort -@ 4 - -o {output.bam}
         samtools index -@ 4 {output.bam}
         """
+
 rule cfdna_wgs_bam_dedup:
     #
     # 1) Name sort, required by fixmate
@@ -224,6 +229,7 @@ rule cfdna_wgs_bam_dedup:
         | samtools markdup -@ 8 -r -T {params.tmp_dir}/{wildcards.library_id}.namesort - {output.bam}
         samtools index -@ 4 {output.bam}
         """
+
 rule cfdna_wgs_bam_filt:
     #
     # Excludes any unmapped (0x4),
@@ -251,6 +257,7 @@ rule cfdna_wgs_bam_filt:
         samtools view -@ 8 -b -F 1284 -h -q 20 -L {input.bed} -o {output.bam} {input.bam}
         samtools index {output.bam}
         """
+
 rule cfdna_wgs_samtools_alignment_qc:
     conda:
         "../config/cfdna-wgs-conda-env.yaml",
@@ -275,6 +282,7 @@ rule cfdna_wgs_samtools_alignment_qc:
         {output.samstat} \
         {params.threads}
         """
+
 rule cfdna_wgs_mosdepth:
     conda:
         "../config/cfdna-wgs/conda-env.yaml",
@@ -307,6 +315,7 @@ rule cfdna_wgs_mosdepth:
         '{params.quant_levels}' \
         {threads}
         """
+
 # Get fragment sizes using deepTools
 rule cfdna_wgs_frag_bampefragsize:
     conda:

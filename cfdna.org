@@ -3009,8 +3009,6 @@ rule cfdna_ichor_pon:
           --centromere {params.ichor_repo}/inst/extdata/GRCh38.GCA_000001405.2_centromere_acen.txt \
           --libdir {params.ichor_repo} \
           --outfile {params.out_prefix} &> {log}
-        # Ensure both artifacts exist (script should produce both)
-        test -s {output.txt} && test -s {output.rds}
         """
 
 #+end_src

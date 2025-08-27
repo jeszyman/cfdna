@@ -125,7 +125,7 @@ rule cfdna_ichor_pon:
         Rscript {params.ichor_repo}/scripts/createPanelOfNormals.R \
           --filelist {input} \
           --chrNormalize "paste0('chr',1:22)" \
-          --chrs "c(paste0('chr',1:22),'chrX')" \
+          --chrs "paste0('chr',1:22)" \
           --gcWig {params.ichor_repo}/inst/extdata/gc_hg38_1000kb.wig \
           --mapWig {params.ichor_repo}/inst/extdata/map_hg38_1000kb.wig \
           --centromere {params.ichor_repo}/inst/extdata/GRCh38.GCA_000001405.2_centromere_acen.txt \

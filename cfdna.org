@@ -207,6 +207,7 @@ Directory ~workflow~ contains two types of workflows- process-focused snakefiles
 :PROPERTIES:
 :ID:       dbe230c9-b8a6-44f3-b9a1-67fd70f47895
 :END:
+- [2025-09-03 Wed] - Begin version tracking at workflow level. cfdna-cna v1.0.0
 - [2023-01-26 Thu] - Version 9.1.0: Repo cleanup
 - [2023-01-26 Thu] - Version 9.0.0: Removed -f 3 flag for perfectly matched pairs in samtools filtering as the flag from BWA removes some fragments at a set max length. Added framework for benchmark analysis. Added conditional execution of downsampling. Removed (temporarily) final wig and ichor commands of CNA as these don't currently run correctly without full genome alignment, so can't be validated on test data. Added local documentation of cfdna-wgs dockerfile.
 - [2023-01-21 Sat] - Version 8.0.0: Corrected rule filt_bam_to_frag_bed to fix mates of inputs, which seems to prevent errors in the bamtobed call. Frag_window_count now uses windows of consistent 5 Mb size, which are generated from rule make_gc_map_bind. Added a merged fragment counts file and zero-centered unit SD counts.

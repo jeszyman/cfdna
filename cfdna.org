@@ -1486,7 +1486,7 @@ mosdepth-quant-levels: "1,5,10,20,30"
 
 #+end_src
 
-#+begin_src snakemake :tangle ./workflows/TEST_cfdna_wgs.smk
+#+begin_src snakemake
 import pandas as pd
 import os
 from tabulate import tabulate
@@ -1594,7 +1594,7 @@ cfdna-repo: "~/repos/cfdna"
 |------------|
 | kh_01      |
 
-#+begin_src snakemake :tangle ./workflows/TEST3_cfdna_cna.smk
+#+begin_src snakemake
 import pandas as pd
 import os
 
@@ -1841,7 +1841,7 @@ include: f"{config['cfdna-repo']}/workflows/cfdna_cna.current.smk"
 #+end_example
 
 
-#+begin_src snakemake :tangle ./workflows/TEST2_cfdna_cna.smk
+#+begin_src snakemake
 import pandas as pd
 import os
 
@@ -2601,7 +2601,7 @@ rule cfdna_cna_downsample_bam:
 
 #+end_src
 
-#+begin_src snakemake :tangle ./workflows/TEST_cfdna_cna.smk
+#+begin_src snakemake
 import pandas as pd
 import os
 from tabulate import tabulate
@@ -2691,11 +2691,8 @@ include: f"{config['cfdna-repo-dir']}/workflows/cfdna_cna.smk"
 ** cfDNA copy number
 :PROPERTIES:
 :ID:       ebc6e8c7-cb23-4f88-a66f-c412401eec8b
-:header-args:snakemake: :tangle ./workflows/cfdna_cna.current.smk
+:header-args:snakemake: :tangle ./workflows/cfdna_cna.smk
 :END:
-
-[[file:workflows/cfdna_cna.current.smk]]
-
 
 This workflow uses a modified version of the ichorCNA R package to avoid UCSC internet fallback and ensure consistent genome metadata.
 
@@ -3599,7 +3596,7 @@ mds
 - https://claude.ai/chat/3565c5c3-1204-497b-be1b-3abb0c207468
 
 
-#+begin_src python :tangle /tmp/test.py
+#+begin_src python
 import numpy as np
 from sklearn.decomposition import NMF
 from scipy.optimize import nnls
@@ -3666,7 +3663,7 @@ F_df_normalized = pd.DataFrame(F_normalized, columns=motif_names, index=[f'fprof
 F_df_normalized.to_csv('~/repos/cfdna/data/motifs/normalized_motif_in_fprof.tsv', sep='\t', index=True)
 #+end_src
 
-#+begin_src python :tangle /tmp/test.py
+#+begin_src python
 #!/usr/bin/env python3
 """
 Script to perform Non-negative Matrix Factorization (NMF) on motif frequency data from a TSV file,
@@ -3949,7 +3946,7 @@ scripts/fprofiles.py --data_file ./data/combined_motif_fractions_matrix.tsv --ou
 
 ** Fragment length fragmentomics                                        :smk:
 :PROPERTIES:
-:header-args:snakemake: :tangle ./workflow/frag.smk
+:header-args:snakemake: :tangle ./workflows/frag.smk
 :ID:       a72c2025-a18a-45a4-b4e7-efdafeaee80e
 :END:
 *** Preamble
@@ -6364,17 +6361,8 @@ rule cfdna_wgs_multiqc:
 :END:
 - https://github.com/jeszyman/cfdna-wgs
 *** [[id:271b4d5f-727e-496e-b835-8fe9f8655655][Bioinformatics project module]]
-:PROPERTIES:
-:ID:       66399318-4be5-4404-8f19-c872abb15255
-:END:
 *** [[https://github.com/jeszyman/cfdna-wgs][Github link]]
-:PROPERTIES:
-:ID:       801992bf-8dcd-4df6-a0c2-9778829e924d
-:END:
 *** [[id:13120759-71db-497c-8ed3-1c58e47a7840][Biotools headline]]
-:PROPERTIES:
-:ID:       43d7175a-a16e-4bde-8f5a-b59985de3b42
-:END:
 *** Old rules
 :PROPERTIES:
 :ID:       a6406c59-ea89-4d45-ac8e-6e787d145865

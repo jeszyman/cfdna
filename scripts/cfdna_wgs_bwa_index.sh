@@ -72,8 +72,8 @@ index_fasta() {
 generate_bed() {
     echo "Generating BED file: $output_bed"
     cut -f1,2 "$output_fai" \
-        | grep -E '^chr([1-9]|1[0-9]|2[0-2]|X|Y)\s' \
-        | awk '{print $1 "\t0\t" $2}' > "$output_bed"
+        | grep -E '^chr([1-9]                         | 1[0-9] | 2[0-2] | X | Y)\s' \ |
+        | awk '{print $1 "\t0\t" $2}' > "$output_bed" |        |        |   |         |
 }
 
 run_bwa_index() {
@@ -82,7 +82,6 @@ run_bwa_index() {
 }
 
 main "$@"
-
 #!/usr/bin/env bash
 set -o errexit
 set -o nounset
@@ -157,8 +156,8 @@ index_fasta() {
 generate_bed() {
     echo "Generating BED file: $output_bed"
     cut -f1,2 "$output_fai" \
-        | grep -E '^chr([1-9]|1[0-9]|2[0-2]|X|Y)\s' \
-        | awk '{print $1 "\t0\t" $2}' > "$output_bed"
+        | grep -E '^chr([1-9]                         | 1[0-9] | 2[0-2] | X | Y)\s' \ |
+        | awk '{print $1 "\t0\t" $2}' > "$output_bed" |        |        |   |         |
 }
 
 run_bwa_index() {

@@ -2694,7 +2694,7 @@ include: f"{config['cfdna-repo-dir']}/workflows/cfdna_cna.smk"
 :ID:       ebc6e8c7-cb23-4f88-a66f-c412401eec8b
 :header-args:snakemake: :tangle ./workflows/cfdna_cna.smk
 :END:
-
+- TODO MAKE PON and ichor dependnecy
 This workflow uses a modified version of the ichorCNA R package to avoid UCSC internet fallback and ensure consistent genome metadata.
 
 - The script scripts/runIchorCNA.R has been modified to skip UCSC fallback and instead load a pre-saved Seqinfo object from inst/extdata/seqinfo_hg38_ucsc.rds

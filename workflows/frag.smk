@@ -3,6 +3,7 @@
 #     Fragmentomic Analysis of Cell-free DNA Whole Genome Sequencing           #
 #                                                                              #
 #########1#########2#########3#########4#########5#########6#########7#########8
+
 rule make_gc_map_bind:
     container: frag_container,
     input:
@@ -19,6 +20,7 @@ rule make_gc_map_bind:
         {input.blklist} \
         {output} &> {log}
         """
+
 # Make a bed file from filtered bam
 rule filt_bam_to_frag_bed:
     benchmark: benchdir + "/{library}_filt_bam_to_frag_bed.benchmark.txt",
@@ -38,6 +40,7 @@ rule filt_bam_to_frag_bed:
         {params.threads} \
         {output}
         """
+
 # Make GC distributions
 rule gc_distro:
     benchmark: benchdir + "/{library}_frag_gc_distro.benchmark.txt",
@@ -54,6 +57,7 @@ rule gc_distro:
         {output} \
         > {log} 2>&1
         """
+
 # Make healthy GC distributions summary file
 rule healthy_gc:
     benchmark: benchdir + "/frag_healthy_gc.benchmark.txt",
@@ -71,6 +75,7 @@ rule healthy_gc:
         "{input}" \
         {output} > {log} 2>&1
         """
+
 # Sample fragments by healthy GC proportions
 rule frag_gc_sample:
     benchmark: benchdir + "/{library}_frag_gc_sample.benchmark.txt",
@@ -89,6 +94,7 @@ rule frag_gc_sample:
         {input.frag_bed} \
         {output} > {log} 2>&1
         """
+
 # Sum fragments in short and long length groups
 
 rule frag_sum:
@@ -108,6 +114,7 @@ rule frag_sum:
         {input} \
         {output.short} {output.long} &> {log}
         """
+
 # Count short and long fragments intersecting kept genomic windows
 
 rule frag_window_count:
@@ -135,6 +142,7 @@ rule frag_window_count:
         {input.matbed} \
         {output.long}
         """
+
 # Merge short and long fragment counts by genomic poistion for all libraries
 rule frag_count_merge:
     benchmark: benchdir + "/frag_count_merge.benchmark.txt",
@@ -152,6 +160,7 @@ rule frag_count_merge:
         {params.counts_dir} \
         {output} &> {log}
         """
+
 rule unit_cent_sd:
     benchmark: benchdir + "/unit_cent_sd.benchmark.txt",
     container: frag_container,

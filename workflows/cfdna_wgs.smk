@@ -59,7 +59,7 @@
 
 
 
-#########1#########2#########3#########4#########5#########6#########7#########8 
+#########1#########2#########3#########4#########5#########6#########7#########8
 #
 # This snakefile uses a common data directory structure:
 #
@@ -67,7 +67,7 @@
 #     |-- inputs
 #     |-- ref
 #     |-- logs
-#     |-- <ANALYSIS LABEL>, e.g. emseq, example subdirectories: 
+#     |-- <ANALYSIS LABEL>, e.g. emseq, example subdirectories:
 #         |-- qc
 #         |-- fastqs
 #         |-- bams

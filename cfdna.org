@@ -3,8 +3,16 @@
 :header-args: :tangle no :mkdirp yes :tangle-mode (identity #o555)
 :ID:       f0fbade8-2251-4aec-958f-ac1e1edd6c18
 :END:
+- Multi-omic integration
+  - Mouliere
+    - [cite:@tivey2024]
+    - [cite:@moldovan2021]
 ** [[elisp:(progn (org-babel-goto-named-src-block "git-workflow-up") (org-babel-execute-src-block))][Run git workflow up]]
 ** [[https://github.com/jeszyman/cfdna][GitHub url]]
+** cfDNA chromatin immunoprecipitation
+10.26508/lsa.202302003
+https://doi-org.mclibrary.idm.oclc.org/10.1158/0008-5472.CAN-24-2052
+[cite:@sadeh2021cfchipseq]
 ** Repository setup and administration
 :PROPERTIES:
 :ID:       2b64f328-8636-4068-8d09-9d698cc26822

@@ -1,4 +1,6 @@
 
+> **ARCHIVED** — This repository is no longer maintained. Fragment length and end motif pipelines have been migrated to [jeszyman/frag](https://github.com/jeszyman/frag).
+
 # Introduction
 
 This repository hosts a snakemake workflow for basic processing of whole-genome sequencing reads from cell-free DNA.
